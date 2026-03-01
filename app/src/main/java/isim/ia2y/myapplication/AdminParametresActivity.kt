@@ -31,6 +31,11 @@ class AdminParametresActivity : AppCompatActivity() {
         setupDeliveryEdits()
     }
 
+    override fun onResume() {
+        super.onResume()
+        refreshAdminBottomNav(AdminNavTab.SETTINGS)
+    }
+
     private fun setupDeliveryEdits() {
         val standardGroup = findViewById<View>(R.id.adminParamLivrStandardEditGroup)
         val expressGroup = findViewById<View>(R.id.adminParamLivrExpressEditGroup)

@@ -30,6 +30,11 @@ class AdminProduitsActivity : AppCompatActivity() {
         )
     }
 
+    override fun onResume() {
+        super.onResume()
+        refreshAdminBottomNav(AdminNavTab.PRODUITS)
+    }
+
     private fun setupTopBar() {
         findViewById<View?>(R.id.adminProduitsIvBack)?.setOnClickListener {
             navigateBackToMain()

@@ -33,6 +33,11 @@ class AdminCommandesActivity : AppCompatActivity() {
         )
     }
 
+    override fun onResume() {
+        super.onResume()
+        refreshAdminBottomNav(AdminNavTab.COMMANDES)
+    }
+
     private fun setupTopBar() {
         findViewById<View?>(R.id.adminCommandesIvBack)?.setOnClickListener {
             navigateBackToMain()

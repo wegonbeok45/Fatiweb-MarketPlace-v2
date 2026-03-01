@@ -31,6 +31,11 @@ class AdminClientsActivity : AppCompatActivity() {
         )
     }
 
+    override fun onResume() {
+        super.onResume()
+        refreshAdminBottomNav(AdminNavTab.CLIENTS)
+    }
+
     private fun setupTopBar() {
         findViewById<View?>(R.id.adminClientsIvBack)?.setOnClickListener {
             navigateBackToMain()

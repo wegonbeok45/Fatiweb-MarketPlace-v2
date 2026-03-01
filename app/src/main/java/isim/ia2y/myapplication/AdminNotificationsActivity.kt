@@ -24,6 +24,11 @@ class AdminNotificationsActivity : AppCompatActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        refreshAdminBottomNav(AdminNavTab.NOTIFICATIONS)
+    }
+
     private fun setupTopBar() {
         findViewById<View?>(R.id.adminNotifIvBack)?.setOnClickListener {
             navigateBackToMain()

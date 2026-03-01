@@ -53,6 +53,11 @@ class AdminDashboardActivity : AppCompatActivity() {
         setupAdminBottomNav(AdminNavTab.DASHBOARD)
     }
 
+    override fun onResume() {
+        super.onResume()
+        refreshAdminBottomNav(AdminNavTab.DASHBOARD)
+    }
+
     private fun restoreAvatar() {
         val savedPath = getSharedPreferences(avatarPrefsName, MODE_PRIVATE)
             .getString(avatarUriKey, null) ?: return
