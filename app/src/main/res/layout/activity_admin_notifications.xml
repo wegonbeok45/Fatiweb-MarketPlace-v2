@@ -1,0 +1,347 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/adminNotifRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/profile_body_bg"
+    tools:context=".AdminNotificationsActivity">
+
+    <!-- Top App Bar -->
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/adminNotifAppBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/profile_header_bg"
+        app:elevation="0dp"
+        app:liftOnScroll="false">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/adminNotifTopBar"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp">
+
+            <ImageView
+                android:id="@+id/adminNotifIvBack"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:contentDescription="@null"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?selectableItemBackgroundBorderless"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/back"
+                app:tint="@color/profile_text_primary" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="14dp"
+                android:fontFamily="@font/funnelsans_semibold"
+                android:text="Notifications Admin"
+                android:textColor="@color/profile_text_primary"
+                android:textSize="18sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/adminNotifIvBack"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/profile_divider" />
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <!-- Scrollable Content -->
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/adminNotifScroll"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:overScrollMode="never"
+        android:clipToPadding="false"
+        android:paddingBottom="88dp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="20dp">
+
+            <!-- Compose Notification Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/adminNotifComposeCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                app:cardBackgroundColor="@color/profile_card_bg"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/colorBorderLight"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/funnelsans_semibold"
+                        android:text="Envoyer une Notification"
+                        android:textColor="@color/profile_text_primary"
+                        android:textSize="15sp"
+                        android:layout_marginBottom="14dp" />
+
+                    <!-- Title field -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/adminNotifCardTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="52dp"
+                        android:layout_marginBottom="10dp"
+                        app:cardBackgroundColor="@color/profile_body_bg"
+                        app:cardCornerRadius="10dp"
+                        app:cardElevation="0dp"
+                        app:strokeColor="@color/colorBorderLight"
+                        app:strokeWidth="1dp">
+
+                        <EditText
+                            android:id="@+id/adminNotifEtTitle"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@android:color/transparent"
+                            android:fontFamily="@font/funnelsans_regular"
+                            android:hint="Titre de la notification"
+                            android:paddingStart="14dp"
+                            android:paddingEnd="14dp"
+                            android:textColor="@color/profile_text_primary"
+                            android:textColorHint="@color/profile_text_secondary"
+                            android:textSize="14sp"
+                            android:inputType="text"
+                            android:imeOptions="actionNext" />
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <!-- Message field -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/adminNotifCardMessage"
+                        android:layout_width="match_parent"
+                        android:layout_height="100dp"
+                        android:layout_marginBottom="14dp"
+                        app:cardBackgroundColor="@color/profile_body_bg"
+                        app:cardCornerRadius="10dp"
+                        app:cardElevation="0dp"
+                        app:strokeColor="@color/colorBorderLight"
+                        app:strokeWidth="1dp">
+
+                        <EditText
+                            android:id="@+id/adminNotifEtMessage"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@android:color/transparent"
+                            android:fontFamily="@font/funnelsans_regular"
+                            android:hint="Message de la notification..."
+                            android:paddingStart="14dp"
+                            android:paddingEnd="14dp"
+                            android:paddingTop="12dp"
+                            android:gravity="top"
+                            android:textColor="@color/profile_text_primary"
+                            android:textColorHint="@color/profile_text_secondary"
+                            android:textSize="14sp"
+                            android:inputType="textMultiLine"
+                            android:imeOptions="actionDone" />
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <!-- Send Button -->
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/adminNotifBtnSend"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:fontFamily="@font/funnelsans_semibold"
+                        android:text="Envoyer"
+                        android:textSize="15sp"
+                        app:backgroundTint="@color/colorPrimary"
+                        app:cornerRadius="12dp"
+                        app:strokeWidth="0dp" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- History -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/funnelsans_semibold"
+                android:text="Historique des envois"
+                android:textColor="@color/profile_text_primary"
+                android:textSize="15sp"
+                android:layout_marginBottom="12dp" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/adminNotifHistoryCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardBackgroundColor="@color/profile_card_bg"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/colorBorderLight"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <!-- History item 1 -->
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="16dp">
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/adminNotifIconH1"
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            app:cardBackgroundColor="@color/profile_card_icon_bg"
+                            app:cardCornerRadius="999dp"
+                            app:cardElevation="0dp"
+                            app:strokeWidth="0dp"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent">
+                            <ImageView
+                                android:layout_width="16dp"
+                                android:layout_height="16dp"
+                                android:layout_gravity="center"
+                                android:contentDescription="@null"
+                                app:srcCompat="@drawable/notification"
+                                app:tint="@color/colorPrimary" />
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <TextView
+                            android:id="@+id/adminNotifH1Sender"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:fontFamily="@font/funnelsans_semibold"
+                            android:text="Promotion Artisanat"
+                            android:textColor="@color/profile_text_primary"
+                            android:textSize="13sp"
+                            app:layout_constraintEnd_toStartOf="@id/adminNotifH1Date"
+                            app:layout_constraintStart_toEndOf="@id/adminNotifIconH1"
+                            app:layout_constraintTop_toTopOf="@id/adminNotifIconH1" />
+
+                        <TextView
+                            android:id="@+id/adminNotifH1Date"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/funnelsans_regular"
+                            android:text="Hier"
+                            android:textColor="@color/profile_text_secondary"
+                            android:textSize="11sp"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="@id/adminNotifIconH1" />
+
+                        <TextView
+                            android:id="@+id/adminNotifH1Msg"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:layout_marginTop="4dp"
+                            android:fontFamily="@font/funnelsans_regular"
+                            android:text="Profitez de -20% sur toute la catégorie artisanat cette semaine !"
+                            android:textColor="@color/profile_text_secondary"
+                            android:textSize="12sp"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toEndOf="@id/adminNotifIconH1"
+                            app:layout_constraintTop_toBottomOf="@id/adminNotifH1Sender" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <View android:layout_width="match_parent" android:layout_height="1dp"
+                        android:layout_marginStart="16dp" android:layout_marginEnd="16dp"
+                        android:background="@color/profile_divider" />
+
+                    <!-- History item 2 -->
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="16dp">
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/adminNotifIconH2"
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            app:cardBackgroundColor="#FFF3E0"
+                            app:cardCornerRadius="999dp"
+                            app:cardElevation="0dp"
+                            app:strokeWidth="0dp"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent">
+                            <ImageView
+                                android:layout_width="16dp"
+                                android:layout_height="16dp"
+                                android:layout_gravity="center"
+                                android:contentDescription="@null"
+                                app:srcCompat="@drawable/notification"
+                                app:tint="#E65100" />
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <TextView
+                            android:id="@+id/adminNotifH2Sender"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:fontFamily="@font/funnelsans_semibold"
+                            android:text="Maintenance Système"
+                            android:textColor="@color/profile_text_primary"
+                            android:textSize="13sp"
+                            app:layout_constraintEnd_toStartOf="@id/adminNotifH2Date"
+                            app:layout_constraintStart_toEndOf="@id/adminNotifIconH2"
+                            app:layout_constraintTop_toTopOf="@id/adminNotifIconH2" />
+
+                        <TextView
+                            android:id="@+id/adminNotifH2Date"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/funnelsans_regular"
+                            android:text="Il y a 2j"
+                            android:textColor="@color/profile_text_secondary"
+                            android:textSize="11sp"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="@id/adminNotifIconH2" />
+
+                        <TextView
+                            android:id="@+id/adminNotifH2Msg"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:layout_marginTop="4dp"
+                            android:fontFamily="@font/funnelsans_regular"
+                            android:text="L'application sera indisponible pour maintenance de 02h à 04h du matin."
+                            android:textColor="@color/profile_text_secondary"
+                            android:textSize="12sp"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toEndOf="@id/adminNotifIconH2"
+                            app:layout_constraintTop_toBottomOf="@id/adminNotifH2Sender" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- Bottom Nav -->
+    <include
+        layout="@layout/include_admin_bottom_nav"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
