@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Shared Admin Bottom Nav — include in every admin screen CoordinatorLayout -->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:layout_gravity="bottom">
+
+    <!-- Divider -->
+    <View
+        android:id="@+id/adminBottomNavDivider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/home_divider" />
+
+    <!-- Nav bar -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/adminBottomNav"
+        android:layout_width="match_parent"
+        android:layout_height="76dp"
+        android:background="@color/home_nav_bg"
+        android:elevation="0dp"
+        android:paddingTop="2dp">
+
+        <!-- Animated Pill Indicator -->
+        <View
+            android:id="@+id/admin_nav_indicator"
+            android:layout_width="@dimen/nav_pill_width"
+            android:layout_height="@dimen/nav_pill_height"
+            android:background="@drawable/bg_nav_pill"
+            android:layout_marginTop="6dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/admin_guide_pill_bottom"
+            app:layout_constraintStart_toStartOf="@id/adminNavDashboard"
+            app:layout_constraintEnd_toEndOf="@id/adminNavDashboard" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/admin_guide_pill_bottom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_begin="42dp" />
+
+        <!-- Dashboard -->
+        <LinearLayout
+            android:id="@+id/adminNavDashboard"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:gravity="center_horizontal"
+            android:paddingTop="10dp"
+            android:orientation="vertical"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?selectableItemBackgroundBorderless"
+            app:layout_constraintEnd_toStartOf="@id/adminNavCommandes"
+            app:layout_constraintHorizontal_chainStyle="spread"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/adminNavDashboardIcon"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:contentDescription="@null"
+                app:srcCompat="@drawable/ic_admin_shield"
+                app:tint="@color/home_nav_inactive" />
+
+            <TextView
+                android:id="@+id/adminNavDashboardLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Dashboard"
+                android:textSize="9.5sp"
+                android:textColor="@color/home_nav_inactive"
+                android:layout_marginTop="5dp"
+                android:fontFamily="@font/poppins_regular" />
+        </LinearLayout>
+
+        <!-- Commandes -->
+        <LinearLayout
+            android:id="@+id/adminNavCommandes"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:gravity="center_horizontal"
+            android:paddingTop="10dp"
+            android:orientation="vertical"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?selectableItemBackgroundBorderless"
+            app:layout_constraintEnd_toStartOf="@id/adminNavProduits"
+            app:layout_constraintStart_toEndOf="@id/adminNavDashboard"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/adminNavCommandesIcon"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:contentDescription="@null"
+                app:srcCompat="@drawable/ic_admin_nav_commandes"
+                app:tint="@color/home_nav_inactive" />
+
+            <TextView
+                android:id="@+id/adminNavCommandesLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Commandes"
+                android:textSize="9.5sp"
+                android:textColor="@color/home_nav_inactive"
+                android:layout_marginTop="5dp"
+                android:fontFamily="@font/poppins_regular" />
+        </LinearLayout>
+
+        <!-- Produits -->
+        <LinearLayout
+            android:id="@+id/adminNavProduits"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:gravity="center_horizontal"
+            android:paddingTop="10dp"
+            android:orientation="vertical"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?selectableItemBackgroundBorderless"
+            app:layout_constraintEnd_toStartOf="@id/adminNavClients"
+            app:layout_constraintStart_toEndOf="@id/adminNavCommandes"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/adminNavProduitsIcon"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:contentDescription="@null"
+                app:srcCompat="@drawable/ic_admin_nav_produits"
+                app:tint="@color/home_nav_inactive" />
+
+            <TextView
+                android:id="@+id/adminNavProduitsLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Produits"
+                android:textSize="9.5sp"
+                android:textColor="@color/home_nav_inactive"
+                android:layout_marginTop="5dp"
+                android:fontFamily="@font/poppins_regular" />
+        </LinearLayout>
+
+        <!-- Clients -->
+        <LinearLayout
+            android:id="@+id/adminNavClients"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:gravity="center_horizontal"
+            android:paddingTop="10dp"
+            android:orientation="vertical"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?selectableItemBackgroundBorderless"
+            app:layout_constraintEnd_toStartOf="@id/adminNavNotifications"
+            app:layout_constraintStart_toEndOf="@id/adminNavProduits"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/adminNavClientsIcon"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:contentDescription="@null"
+                app:srcCompat="@drawable/ic_admin_nav_clients"
+                app:tint="@color/home_nav_inactive" />
+
+            <TextView
+                android:id="@+id/adminNavClientsLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Clients"
+                android:textSize="9.5sp"
+                android:textColor="@color/home_nav_inactive"
+                android:layout_marginTop="5dp"
+                android:fontFamily="@font/poppins_regular" />
+        </LinearLayout>
+
+        <!-- Notifications -->
+        <LinearLayout
+            android:id="@+id/adminNavNotifications"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:gravity="center_horizontal"
+            android:paddingTop="10dp"
+            android:orientation="vertical"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?selectableItemBackgroundBorderless"
+            app:layout_constraintEnd_toStartOf="@id/adminNavSettings"
+            app:layout_constraintStart_toEndOf="@id/adminNavClients"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/adminNavNotificationsIcon"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:contentDescription="@null"
+                app:srcCompat="@drawable/ic_admin_nav_notifications"
+                app:tint="@color/home_nav_inactive" />
+
+            <TextView
+                android:id="@+id/adminNavNotificationsLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Notifs"
+                android:textSize="9.5sp"
+                android:textColor="@color/home_nav_inactive"
+                android:layout_marginTop="5dp"
+                android:fontFamily="@font/poppins_regular" />
+        </LinearLayout>
+
+        <!-- Paramètres -->
+        <LinearLayout
+            android:id="@+id/adminNavSettings"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:gravity="center_horizontal"
+            android:paddingTop="10dp"
+            android:orientation="vertical"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?selectableItemBackgroundBorderless"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/adminNavNotifications"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/adminNavSettingsIcon"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:contentDescription="@null"
+                app:srcCompat="@drawable/ic_admin_nav_settings"
+                app:tint="@color/home_nav_inactive" />
+
+            <TextView
+                android:id="@+id/adminNavSettingsLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Paramètres"
+                android:textSize="9.5sp"
+                android:textColor="@color/home_nav_inactive"
+                android:layout_marginTop="5dp"
+                android:fontFamily="@font/poppins_regular" />
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>
