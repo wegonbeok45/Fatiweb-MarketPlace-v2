@@ -18,6 +18,7 @@ class AdminDashboardActivity : AppCompatActivity() {
         runCatching {
             setContentView(R.layout.activity_admin_dashboard)
             setupTopBar()
+            setupBottomNav()
             restoreAvatar()
             setupQuickActions()
             revealViewsInOrder(
@@ -30,6 +31,7 @@ class AdminDashboardActivity : AppCompatActivity() {
                 R.id.adminActionsRow,
                 R.id.adminTvOrdersHeader,
                 R.id.adminCardOrders,
+                R.id.adminBottomNav,
                 startDelayMs = 60L,
                 staggerMs = 48L
             )
@@ -45,6 +47,10 @@ class AdminDashboardActivity : AppCompatActivity() {
             finishWithMotion(isForward = false)
         }
         applyPressFeedback(R.id.adminIvBack)
+    }
+
+    private fun setupBottomNav() {
+        setupAdminBottomNav(AdminNavTab.DASHBOARD)
     }
 
     private fun restoreAvatar() {
