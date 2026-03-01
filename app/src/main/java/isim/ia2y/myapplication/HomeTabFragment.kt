@@ -95,7 +95,7 @@ class HomeTabFragment : Fragment(R.layout.fragment_home_tab) {
             (activity as? MainActivity)?.selectTab(MainActivity.Tab.HOME)
         }
         root.findViewById<View>(R.id.ivTopCart)?.setOnClickListener {
-            (activity as? MainActivity)?.selectTab(MainActivity.Tab.CART)
+            (activity as? AppCompatActivity)?.navigateFromTop(favoris::class.java)
         }
         listOf(
             R.id.itemCategoryArtisanat,
