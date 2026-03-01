@@ -32,7 +32,7 @@ class AdminProduitsActivity : AppCompatActivity() {
 
     private fun setupTopBar() {
         findViewById<View?>(R.id.adminProduitsIvBack)?.setOnClickListener {
-            finishWithMotion(isForward = false)
+            navigateBackToMain()
         }
         applyPressFeedback(R.id.adminProduitsIvBack)
     }

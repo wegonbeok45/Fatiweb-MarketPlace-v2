@@ -44,7 +44,7 @@ class AdminDashboardActivity : AppCompatActivity() {
 
     private fun setupTopBar() {
         findViewById<View>(R.id.adminIvBack)?.setOnClickListener {
-            finishWithMotion(isForward = false)
+            navigateBackToMain()
         }
         applyPressFeedback(R.id.adminIvBack)
     }

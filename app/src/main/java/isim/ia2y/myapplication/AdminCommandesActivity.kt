@@ -35,7 +35,7 @@ class AdminCommandesActivity : AppCompatActivity() {
 
     private fun setupTopBar() {
         findViewById<View?>(R.id.adminCommandesIvBack)?.setOnClickListener {
-            finishWithMotion(isForward = false)
+            navigateBackToMain()
         }
         applyPressFeedback(R.id.adminCommandesIvBack)
     }

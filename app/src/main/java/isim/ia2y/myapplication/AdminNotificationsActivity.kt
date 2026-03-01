@@ -26,7 +26,7 @@ class AdminNotificationsActivity : AppCompatActivity() {
 
     private fun setupTopBar() {
         findViewById<View?>(R.id.adminNotifIvBack)?.setOnClickListener {
-            finishWithMotion(isForward = false)
+            navigateBackToMain()
         }
         applyPressFeedback(R.id.adminNotifIvBack)
     }
