@@ -38,7 +38,7 @@ fun AppCompatActivity.setupAdminBottomNav(activeTab: AdminNavTab) {
         AdminNavTab.SETTINGS       to R.id.adminNavSettings
     )
 
-    val activeColor   = ContextCompat.getColor(this, R.color.colorPrimary)
+    val activeColor   = ContextCompat.getColor(this, R.color.profile_text_primary)
     val inactiveColor = ContextCompat.getColor(this, R.color.home_nav_inactive)
 
     // Apply active/inactive tint immediately
@@ -63,14 +63,15 @@ fun AppCompatActivity.setupAdminBottomNav(activeTab: AdminNavTab) {
 }
 
 private fun AppCompatActivity.snapAdminPillTo(@IdRes targetNavId: Int) {
-    val indicator = findViewById<View?>(R.id.admin_nav_indicator) ?: return
-    val target = findViewById<View?>(targetNavId) ?: return
+    val navContainer = findViewById<androidx.constraintlayout.widget.ConstraintLayout>(R.id.adminBottomNav) ?: return
+    val indicator = navContainer.findViewById<View>(R.id.admin_nav_indicator) ?: return
 
-    target.post {
-        val targetCenterX = target.x + target.width / 2f
-        val indicatorBaseCenterX = indicator.left + indicator.width / 2f
-        indicator.translationX = targetCenterX - indicatorBaseCenterX
-    }
+    indicator.translationX = 0f
+    val constraintSet = androidx.constraintlayout.widget.ConstraintSet()
+    constraintSet.clone(navContainer)
+    constraintSet.connect(R.id.admin_nav_indicator, androidx.constraintlayout.widget.ConstraintSet.START, targetNavId, androidx.constraintlayout.widget.ConstraintSet.START)
+    constraintSet.connect(R.id.admin_nav_indicator, androidx.constraintlayout.widget.ConstraintSet.END, targetNavId, androidx.constraintlayout.widget.ConstraintSet.END)
+    constraintSet.applyTo(navContainer)
 }
 
 private fun AppCompatActivity.animateAdminNavAndNavigate(
@@ -78,7 +79,7 @@ private fun AppCompatActivity.animateAdminNavAndNavigate(
     currentTab: AdminNavTab,
     tabToNavId: Map<AdminNavTab, Int>
 ) {
-    val activeColor   = ContextCompat.getColor(this, R.color.colorPrimary)
+    val activeColor   = ContextCompat.getColor(this, R.color.profile_text_primary)
     val inactiveColor = ContextCompat.getColor(this, R.color.home_nav_inactive)
     val reducedMotion = isReducedMotionEnabled()
 
@@ -108,20 +109,22 @@ private fun AppCompatActivity.animateAdminPillTo(@IdRes targetNavId: Int) {
         snapAdminPillTo(targetNavId)
         return
     }
-    val indicator = findViewById<View?>(R.id.admin_nav_indicator) ?: return
-    val target = findViewById<View?>(targetNavId) ?: return
+    val navContainer = findViewById<androidx.constraintlayout.widget.ConstraintLayout>(R.id.adminBottomNav) ?: return
+    val indicator = navContainer.findViewById<View>(R.id.admin_nav_indicator) ?: return
+    
+    indicator.translationX = 0f
+    
+    val constraintSet = androidx.constraintlayout.widget.ConstraintSet()
+    constraintSet.clone(navContainer)
+    constraintSet.connect(R.id.admin_nav_indicator, androidx.constraintlayout.widget.ConstraintSet.START, targetNavId, androidx.constraintlayout.widget.ConstraintSet.START)
+    constraintSet.connect(R.id.admin_nav_indicator, androidx.constraintlayout.widget.ConstraintSet.END, targetNavId, androidx.constraintlayout.widget.ConstraintSet.END)
 
-    target.post {
-        val targetCenterX = target.x + target.width / 2f
-        val indicatorBaseCenterX = indicator.left + indicator.width / 2f
-        val toTranslation = targetCenterX - indicatorBaseCenterX
+    val transition = androidx.transition.ChangeBounds()
+    transition.duration = 250L
+    transition.interpolator = FastOutSlowInInterpolator()
+    androidx.transition.TransitionManager.beginDelayedTransition(navContainer, transition)
 
-        indicator.animate()
-            .translationX(toTranslation)
-            .setDuration(250L)
-            .setInterpolator(FastOutSlowInInterpolator())
-            .start()
-    }
+    constraintSet.applyTo(navContainer)
 }
 
 private fun AppCompatActivity.setAdminNavItemColor(@IdRes viewId: Int, color: Int) {
