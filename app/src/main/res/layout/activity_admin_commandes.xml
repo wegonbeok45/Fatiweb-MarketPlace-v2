@@ -1,0 +1,610 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/adminCommandesRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/profile_body_bg"
+    tools:context=".AdminCommandesActivity">
+
+    <!-- Top App Bar -->
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/adminCommandesAppBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/profile_header_bg"
+        app:elevation="0dp"
+        app:liftOnScroll="false">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/adminCommandesTopBar"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp">
+
+            <ImageView
+                android:id="@+id/adminCommandesIvBack"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:contentDescription="@null"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?selectableItemBackgroundBorderless"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/back"
+                app:tint="@color/profile_text_primary" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="14dp"
+                android:fontFamily="@font/funnelsans_semibold"
+                android:text="Gestion des Commandes"
+                android:textColor="@color/profile_text_primary"
+                android:textSize="18sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/adminCommandesIvBack"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/profile_divider" />
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <!-- Scrollable Content -->
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/adminCommandesScroll"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:overScrollMode="never"
+        android:clipToPadding="false"
+        android:paddingBottom="88dp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="20dp">
+
+            <!-- Stats Row -->
+            <LinearLayout
+                android:id="@+id/adminCommandesStatsRow"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="20dp">
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
+                    android:layout_height="72dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="8dp"
+                    app:cardBackgroundColor="@color/profile_card_bg"
+                    app:cardCornerRadius="14dp"
+                    app:cardElevation="0dp"
+                    app:strokeColor="@color/colorBorderLight"
+                    app:strokeWidth="1dp">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:paddingStart="12dp"
+                        android:paddingEnd="12dp">
+
+                        <TextView
+                            android:id="@+id/adminCommandesTvTotal"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/funnelsans_semibold"
+                            android:text="142"
+                            android:textColor="@color/colorPrimary"
+                            android:textSize="22sp"
+                            app:layout_constraintBottom_toTopOf="@id/adminCommandesTvTotalLabel"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintVertical_chainStyle="packed" />
+
+                        <TextView
+                            android:id="@+id/adminCommandesTvTotalLabel"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/funnelsans_regular"
+                            android:text="Total"
+                            android:textColor="@color/profile_text_secondary"
+                            android:textSize="12sp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@id/adminCommandesTvTotal" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
+                    android:layout_height="72dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginEnd="4dp"
+                    app:cardBackgroundColor="@color/profile_card_bg"
+                    app:cardCornerRadius="14dp"
+                    app:cardElevation="0dp"
+                    app:strokeColor="@color/colorBorderLight"
+                    app:strokeWidth="1dp">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:paddingStart="12dp"
+                        android:paddingEnd="12dp">
+
+                        <TextView
+                            android:id="@+id/adminCommandesTvPending"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/funnelsans_semibold"
+                            android:text="28"
+                            android:textColor="@color/colorError"
+                            android:textSize="22sp"
+                            app:layout_constraintBottom_toTopOf="@id/adminCommandesTvPendingLabel"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintVertical_chainStyle="packed" />
+
+                        <TextView
+                            android:id="@+id/adminCommandesTvPendingLabel"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/funnelsans_regular"
+                            android:text="En attente"
+                            android:textColor="@color/profile_text_secondary"
+                            android:textSize="12sp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@id/adminCommandesTvPending" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
+                    android:layout_height="72dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="8dp"
+                    app:cardBackgroundColor="@color/profile_card_bg"
+                    app:cardCornerRadius="14dp"
+                    app:cardElevation="0dp"
+                    app:strokeColor="@color/colorBorderLight"
+                    app:strokeWidth="1dp">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:paddingStart="12dp"
+                        android:paddingEnd="12dp">
+
+                        <TextView
+                            android:id="@+id/adminCommandesTvDelivered"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/funnelsans_semibold"
+                            android:text="114"
+                            android:textColor="#34A853"
+                            android:textSize="22sp"
+                            app:layout_constraintBottom_toTopOf="@id/adminCommandesTvDeliveredLabel"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintVertical_chainStyle="packed" />
+
+                        <TextView
+                            android:id="@+id/adminCommandesTvDeliveredLabel"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/funnelsans_regular"
+                            android:text="Livrées"
+                            android:textColor="@color/profile_text_secondary"
+                            android:textSize="12sp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@id/adminCommandesTvDelivered" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+                </com.google.android.material.card.MaterialCardView>
+            </LinearLayout>
+
+            <!-- Section Header -->
+            <TextView
+                android:id="@+id/adminCommandesTvHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/funnelsans_semibold"
+                android:text="Commandes Récentes"
+                android:textColor="@color/profile_text_primary"
+                android:textSize="16sp"
+                android:layout_marginBottom="12dp" />
+
+            <!-- Orders Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/adminCommandesCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardBackgroundColor="@color/profile_card_bg"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/colorBorderLight"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <!-- Order Row 1 -->
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/adminCommRow1"
+                        android:layout_width="match_parent"
+                        android:layout_height="70dp"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
+                        android:background="?selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true">
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/adminCommIcon1"
+                            android:layout_width="38dp"
+                            android:layout_height="38dp"
+                            app:cardBackgroundColor="@color/profile_card_icon_bg"
+                            app:cardCornerRadius="999dp"
+                            app:cardElevation="0dp"
+                            app:strokeWidth="0dp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent">
+                            <ImageView
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:layout_gravity="center"
+                                android:contentDescription="@null"
+                                app:srcCompat="@drawable/shoppingbag"
+                                app:tint="@color/colorPrimary" />
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <TextView
+                            android:id="@+id/adminCommId1"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:fontFamily="@font/funnelsans_semibold"
+                            android:text="#FW-8821"
+                            android:textColor="@color/profile_text_primary"
+                            android:textSize="14sp"
+                            app:layout_constraintBottom_toTopOf="@id/adminCommName1"
+                            app:layout_constraintEnd_toStartOf="@id/adminCommBadge1"
+                            app:layout_constraintStart_toEndOf="@id/adminCommIcon1"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintVertical_chainStyle="packed" />
+
+                        <TextView
+                            android:id="@+id/adminCommName1"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:fontFamily="@font/funnelsans_regular"
+                            android:text="Ahmed Ben Ali"
+                            android:textColor="@color/profile_text_secondary"
+                            android:textSize="12sp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toStartOf="@id/adminCommBadge1"
+                            app:layout_constraintStart_toEndOf="@id/adminCommIcon1"
+                            app:layout_constraintTop_toBottomOf="@id/adminCommId1" />
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/adminCommBadge1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="26dp"
+                            app:cardBackgroundColor="#FFF3E0"
+                            app:cardCornerRadius="999dp"
+                            app:cardElevation="0dp"
+                            app:strokeWidth="0dp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:gravity="center"
+                                android:paddingStart="10dp"
+                                android:paddingEnd="10dp"
+                                android:fontFamily="@font/funnelsans_semibold"
+                                android:text="En cours"
+                                android:textColor="#E65100"
+                                android:textSize="11sp" />
+                        </com.google.android.material.card.MaterialCardView>
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <View android:layout_width="match_parent" android:layout_height="1dp"
+                        android:layout_marginStart="16dp" android:layout_marginEnd="16dp"
+                        android:background="@color/profile_divider" />
+
+                    <!-- Order Row 2 -->
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/adminCommRow2"
+                        android:layout_width="match_parent"
+                        android:layout_height="70dp"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
+                        android:background="?selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true">
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/adminCommIcon2"
+                            android:layout_width="38dp"
+                            android:layout_height="38dp"
+                            app:cardBackgroundColor="@color/profile_card_icon_bg"
+                            app:cardCornerRadius="999dp"
+                            app:cardElevation="0dp"
+                            app:strokeWidth="0dp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent">
+                            <ImageView
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:layout_gravity="center"
+                                android:contentDescription="@null"
+                                app:srcCompat="@drawable/shoppingbag"
+                                app:tint="@color/colorPrimary" />
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <TextView
+                            android:id="@+id/adminCommId2"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:fontFamily="@font/funnelsans_semibold"
+                            android:text="#FW-8820"
+                            android:textColor="@color/profile_text_primary"
+                            android:textSize="14sp"
+                            app:layout_constraintBottom_toTopOf="@id/adminCommName2"
+                            app:layout_constraintEnd_toStartOf="@id/adminCommBadge2"
+                            app:layout_constraintStart_toEndOf="@id/adminCommIcon2"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintVertical_chainStyle="packed" />
+
+                        <TextView
+                            android:id="@+id/adminCommName2"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:fontFamily="@font/funnelsans_regular"
+                            android:text="Sara Mansour"
+                            android:textColor="@color/profile_text_secondary"
+                            android:textSize="12sp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toStartOf="@id/adminCommBadge2"
+                            app:layout_constraintStart_toEndOf="@id/adminCommIcon2"
+                            app:layout_constraintTop_toBottomOf="@id/adminCommId2" />
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/adminCommBadge2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="26dp"
+                            app:cardBackgroundColor="#E8F5E9"
+                            app:cardCornerRadius="999dp"
+                            app:cardElevation="0dp"
+                            app:strokeWidth="0dp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:gravity="center"
+                                android:paddingStart="10dp"
+                                android:paddingEnd="10dp"
+                                android:fontFamily="@font/funnelsans_semibold"
+                                android:text="Livrée"
+                                android:textColor="#1B5E20"
+                                android:textSize="11sp" />
+                        </com.google.android.material.card.MaterialCardView>
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <View android:layout_width="match_parent" android:layout_height="1dp"
+                        android:layout_marginStart="16dp" android:layout_marginEnd="16dp"
+                        android:background="@color/profile_divider" />
+
+                    <!-- Order Row 3 -->
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/adminCommRow3"
+                        android:layout_width="match_parent"
+                        android:layout_height="70dp"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
+                        android:background="?selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true">
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/adminCommIcon3"
+                            android:layout_width="38dp"
+                            android:layout_height="38dp"
+                            app:cardBackgroundColor="@color/profile_card_icon_bg"
+                            app:cardCornerRadius="999dp"
+                            app:cardElevation="0dp"
+                            app:strokeWidth="0dp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent">
+                            <ImageView
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:layout_gravity="center"
+                                android:contentDescription="@null"
+                                app:srcCompat="@drawable/shoppingbag"
+                                app:tint="@color/colorPrimary" />
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <TextView
+                            android:id="@+id/adminCommId3"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:fontFamily="@font/funnelsans_semibold"
+                            android:text="#FW-8819"
+                            android:textColor="@color/profile_text_primary"
+                            android:textSize="14sp"
+                            app:layout_constraintBottom_toTopOf="@id/adminCommName3"
+                            app:layout_constraintEnd_toStartOf="@id/adminCommBadge3"
+                            app:layout_constraintStart_toEndOf="@id/adminCommIcon3"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintVertical_chainStyle="packed" />
+
+                        <TextView
+                            android:id="@+id/adminCommName3"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:fontFamily="@font/funnelsans_regular"
+                            android:text="Mohamed Aziz"
+                            android:textColor="@color/profile_text_secondary"
+                            android:textSize="12sp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toStartOf="@id/adminCommBadge3"
+                            app:layout_constraintStart_toEndOf="@id/adminCommIcon3"
+                            app:layout_constraintTop_toBottomOf="@id/adminCommId3" />
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/adminCommBadge3"
+                            android:layout_width="wrap_content"
+                            android:layout_height="26dp"
+                            app:cardBackgroundColor="#FFF3E0"
+                            app:cardCornerRadius="999dp"
+                            app:cardElevation="0dp"
+                            app:strokeWidth="0dp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:gravity="center"
+                                android:paddingStart="10dp"
+                                android:paddingEnd="10dp"
+                                android:fontFamily="@font/funnelsans_semibold"
+                                android:text="En cours"
+                                android:textColor="#E65100"
+                                android:textSize="11sp" />
+                        </com.google.android.material.card.MaterialCardView>
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <View android:layout_width="match_parent" android:layout_height="1dp"
+                        android:layout_marginStart="16dp" android:layout_marginEnd="16dp"
+                        android:background="@color/profile_divider" />
+
+                    <!-- Order Row 4 -->
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/adminCommRow4"
+                        android:layout_width="match_parent"
+                        android:layout_height="70dp"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
+                        android:background="?selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true">
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/adminCommIcon4"
+                            android:layout_width="38dp"
+                            android:layout_height="38dp"
+                            app:cardBackgroundColor="@color/profile_card_icon_bg"
+                            app:cardCornerRadius="999dp"
+                            app:cardElevation="0dp"
+                            app:strokeWidth="0dp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent">
+                            <ImageView
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:layout_gravity="center"
+                                android:contentDescription="@null"
+                                app:srcCompat="@drawable/shoppingbag"
+                                app:tint="@color/colorPrimary" />
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <TextView
+                            android:id="@+id/adminCommId4"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:fontFamily="@font/funnelsans_semibold"
+                            android:text="#FW-8818"
+                            android:textColor="@color/profile_text_primary"
+                            android:textSize="14sp"
+                            app:layout_constraintBottom_toTopOf="@id/adminCommName4"
+                            app:layout_constraintEnd_toStartOf="@id/adminCommBadge4"
+                            app:layout_constraintStart_toEndOf="@id/adminCommIcon4"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintVertical_chainStyle="packed" />
+
+                        <TextView
+                            android:id="@+id/adminCommName4"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:fontFamily="@font/funnelsans_regular"
+                            android:text="Linda Gharbi"
+                            android:textColor="@color/profile_text_secondary"
+                            android:textSize="12sp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toStartOf="@id/adminCommBadge4"
+                            app:layout_constraintStart_toEndOf="@id/adminCommIcon4"
+                            app:layout_constraintTop_toBottomOf="@id/adminCommId4" />
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/adminCommBadge4"
+                            android:layout_width="wrap_content"
+                            android:layout_height="26dp"
+                            app:cardBackgroundColor="#FCE4EC"
+                            app:cardCornerRadius="999dp"
+                            app:cardElevation="0dp"
+                            app:strokeWidth="0dp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:gravity="center"
+                                android:paddingStart="10dp"
+                                android:paddingEnd="10dp"
+                                android:fontFamily="@font/funnelsans_semibold"
+                                android:text="Annulée"
+                                android:textColor="#880E4F"
+                                android:textSize="11sp" />
+                        </com.google.android.material.card.MaterialCardView>
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- Bottom Nav -->
+    <include
+        layout="@layout/include_admin_bottom_nav"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
