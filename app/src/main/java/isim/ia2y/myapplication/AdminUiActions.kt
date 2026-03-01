@@ -67,14 +67,9 @@ private fun AppCompatActivity.snapAdminPillTo(@IdRes targetNavId: Int) {
     val target = findViewById<View?>(targetNavId) ?: return
 
     target.post {
-        val navRoot = target.parent as? View ?: return@post
-        val targetRect = android.graphics.Rect()
-        target.getGlobalVisibleRect(targetRect)
-        val navRect = android.graphics.Rect()
-        navRoot.getGlobalVisibleRect(navRect)
-        val targetCenterX = targetRect.centerX() - navRect.left
-        val pillHalfWidth = indicator.width / 2
-        indicator.translationX = (targetCenterX - pillHalfWidth - indicator.left).toFloat()
+        val targetCenterX = target.x + target.width / 2f
+        val indicatorBaseCenterX = indicator.left + indicator.width / 2f
+        indicator.translationX = targetCenterX - indicatorBaseCenterX
     }
 }
 
@@ -117,14 +112,9 @@ private fun AppCompatActivity.animateAdminPillTo(@IdRes targetNavId: Int) {
     val target = findViewById<View?>(targetNavId) ?: return
 
     target.post {
-        val navRoot = target.parent as? View ?: return@post
-        val targetRect = android.graphics.Rect()
-        target.getGlobalVisibleRect(targetRect)
-        val navRect = android.graphics.Rect()
-        navRoot.getGlobalVisibleRect(navRect)
-        val targetCenterX = targetRect.centerX() - navRect.left
-        val pillHalfWidth = indicator.width / 2
-        val toTranslation = (targetCenterX - pillHalfWidth - indicator.left).toFloat()
+        val targetCenterX = target.x + target.width / 2f
+        val indicatorBaseCenterX = indicator.left + indicator.width / 2f
+        val toTranslation = targetCenterX - indicatorBaseCenterX
 
         indicator.animate()
             .translationX(toTranslation)
@@ -170,5 +160,10 @@ private fun AppCompatActivity.navigateToAdminTab(tab: AdminNavTab) {
         AdminNavTab.SETTINGS      -> AdminParametresActivity::class.java
     }
     if (this::class.java == target) return
-    navigateNoShift(target as Class<out android.app.Activity>)
+    
+    val intent = android.content.Intent(this, target).apply {
+        addFlags(android.content.Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+    }
+    startActivity(intent)
+    overridePendingTransition(0, 0) // No whole-window slide: simulates static bottom nav. The new activity's content will slide in via revealViewsInOrder.
 }
