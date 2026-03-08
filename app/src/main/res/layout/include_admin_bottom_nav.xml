@@ -75,7 +75,9 @@
                 android:textSize="9.5sp"
                 android:textColor="@color/home_nav_inactive"
                 android:layout_marginTop="5dp"
-                android:fontFamily="@font/poppins_regular" />
+                android:fontFamily="@font/poppins_regular"
+                android:maxLines="1"
+                android:ellipsize="end" />
         </LinearLayout>
 
         <!-- Commandes -->
@@ -109,7 +111,9 @@
                 android:textSize="9.5sp"
                 android:textColor="@color/home_nav_inactive"
                 android:layout_marginTop="5dp"
-                android:fontFamily="@font/poppins_regular" />
+                android:fontFamily="@font/poppins_regular"
+                android:maxLines="1"
+                android:ellipsize="end" />
         </LinearLayout>
 
         <!-- Produits -->
@@ -143,7 +147,9 @@
                 android:textSize="9.5sp"
                 android:textColor="@color/home_nav_inactive"
                 android:layout_marginTop="5dp"
-                android:fontFamily="@font/poppins_regular" />
+                android:fontFamily="@font/poppins_regular"
+                android:maxLines="1"
+                android:ellipsize="end" />
         </LinearLayout>
 
         <!-- Clients -->
@@ -177,7 +183,9 @@
                 android:textSize="9.5sp"
                 android:textColor="@color/home_nav_inactive"
                 android:layout_marginTop="5dp"
-                android:fontFamily="@font/poppins_regular" />
+                android:fontFamily="@font/poppins_regular"
+                android:maxLines="1"
+                android:ellipsize="end" />
         </LinearLayout>
 
         <!-- Notifications -->
@@ -211,7 +219,9 @@
                 android:textSize="9.5sp"
                 android:textColor="@color/home_nav_inactive"
                 android:layout_marginTop="5dp"
-                android:fontFamily="@font/poppins_regular" />
+                android:fontFamily="@font/poppins_regular"
+                android:maxLines="1"
+                android:ellipsize="end" />
         </LinearLayout>
 
         <!-- Paramètres -->
@@ -245,7 +255,9 @@
                 android:textSize="9.5sp"
                 android:textColor="@color/home_nav_inactive"
                 android:layout_marginTop="5dp"
-                android:fontFamily="@font/poppins_regular" />
+                android:fontFamily="@font/poppins_regular"
+                android:maxLines="1"
+                android:ellipsize="end" />
         </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
