@@ -5,7 +5,11 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.ImageView
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 
 class AdminDashboardActivity : AppCompatActivity() {
 
@@ -15,8 +19,10 @@ class AdminDashboardActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         runCatching {
             setContentView(R.layout.activity_admin_dashboard)
+            setupWindowInsets()
             setupTopBar()
             setupBottomNav()
             restoreAvatar()
@@ -39,6 +45,21 @@ class AdminDashboardActivity : AppCompatActivity() {
             Log.e(logTag, "Failed to init admin dashboard", e)
             showToast(getString(R.string.coming_soon))
             finish()
+        }
+    }
+
+    private fun setupWindowInsets() {
+        // Top: push the AppBar below the status bar
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.adminAppBar)) { view, insets ->
+            val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            view.updatePadding(top = bars.top)
+            insets
+        }
+        // Bottom: push the bottom nav above the system nav bar / gesture handle
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.adminBottomNav)) { view, insets ->
+            val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            view.updatePadding(bottom = bars.bottom)
+            insets
         }
     }
 
