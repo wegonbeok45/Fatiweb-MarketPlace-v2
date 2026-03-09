@@ -5,10 +5,13 @@ import android.text.method.PasswordTransformationMethod
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
+import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 
 class login : AppCompatActivity() {
     private var passwordVisible = false
@@ -54,6 +57,8 @@ class login : AppCompatActivity() {
 
         val etEmail = findViewById<EditText>(R.id.etEmail)
         val etPassword = findViewById<EditText>(R.id.etPassword)
+        val btnLogin = findViewById<TextView>(R.id.btnLogin)
+
         bindInputFieldMotion(R.id.cardEmailField, R.id.etEmail) { value ->
             value.contains("@") && value.contains(".")
         }
@@ -61,9 +66,13 @@ class login : AppCompatActivity() {
             value.length >= 6
         }
 
-        findViewById<View>(R.id.btnLogin)?.setOnClickListener {
-            val hasValidEmail = etEmail.text?.toString().orEmpty().contains("@")
-            val hasValidPassword = (etPassword.text?.length ?: 0) >= 6
+        btnLogin?.setOnClickListener {
+            val email = etEmail.text?.toString().orEmpty().trim()
+            val password = etPassword.text?.toString().orEmpty()
+
+            val hasValidEmail = email.contains("@") && email.contains(".")
+            val hasValidPassword = password.length >= 6
+
             if (!hasValidEmail || !hasValidPassword) {
                 if (!hasValidEmail) markInputState(R.id.cardEmailField, InputFieldState.ERROR)
                 if (!hasValidPassword) markInputState(R.id.cardPasswordField, InputFieldState.ERROR)
@@ -71,10 +80,27 @@ class login : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            markInputState(R.id.cardEmailField, InputFieldState.SUCCESS)
-            markInputState(R.id.cardPasswordField, InputFieldState.SUCCESS)
-            showMotionSnackbar(getString(R.string.login_placeholder_success))
-            navigateToMainTab(MainActivity.Tab.HOME)
+            // Disable button and show loading state
+            btnLogin.isEnabled = false
+            btnLogin.text = "Connexion…"
+
+            lifecycleScope.launch {
+                val result = FirebaseAuthManager.signIn(email, password)
+                result.fold(
+                    onSuccess = {
+                        markInputState(R.id.cardEmailField, InputFieldState.SUCCESS)
+                        markInputState(R.id.cardPasswordField, InputFieldState.SUCCESS)
+                        navigateToMainTab(MainActivity.Tab.HOME)
+                    },
+                    onFailure = { e ->
+                        btnLogin.isEnabled = true
+                        btnLogin.text = getString(R.string.login_btn_label)
+                        markInputState(R.id.cardEmailField, InputFieldState.ERROR)
+                        markInputState(R.id.cardPasswordField, InputFieldState.ERROR)
+                        showMotionSnackbar(FirebaseAuthManager.friendlyError(e))
+                    }
+                )
+            }
         }
 
         findViewById<View>(R.id.ivPasswordToggle)?.setOnClickListener {
@@ -85,7 +111,7 @@ class login : AppCompatActivity() {
         }
         etPassword.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_GO) {
-                findViewById<View>(R.id.btnLogin)?.performClick()
+                btnLogin?.performClick()
                 true
             } else {
                 false
