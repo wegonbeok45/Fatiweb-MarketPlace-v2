@@ -90,6 +90,61 @@ object FirestoreService {
     }
 
     /**
+     * Fetch ALL orders from ALL users — for the admin orders screen.
+     * Returns a flat list sorted newest-first, each paired with the user uid.
+     */
+    suspend fun fetchAllOrders(): List<Pair<String, AppOrder>> {
+        return try {
+            val usersSnapshot = db.collection("users").get().await()
+            val result = mutableListOf<Pair<String, AppOrder>>()
+            for (userDoc in usersSnapshot.documents) {
+                val ordersSnapshot = ordersRef(userDoc.id)
+                    .orderBy("createdAt", Query.Direction.DESCENDING)
+                    .get()
+                    .await()
+                ordersSnapshot.documents.forEach { orderDoc ->
+                    val data = orderDoc.data ?: return@forEach
+                    result.add(userDoc.id to AppOrder.fromMap(data))
+                }
+            }
+            result.sortedByDescending { it.second.createdAt }
+        } catch (e: Exception) {
+            emptyList()
+        }
+    }
+
+    data class ClientInfo(
+        val uid: String = "",
+        val name: String = "",
+        val email: String = "",
+        val orderCount: Int = 0,
+        val createdAt: Long = 0L
+    )
+
+    /**
+     * Fetch all registered clients from Firestore users collection.
+     */
+    suspend fun fetchAllClients(): List<ClientInfo> {
+        return try {
+            val usersSnapshot = db.collection("users").get().await()
+            usersSnapshot.documents.mapNotNull { doc ->
+                val data = doc.data ?: return@mapNotNull null
+                val uid = doc.id
+                val orderCount = ordersRef(uid).get().await().size()
+                ClientInfo(
+                    uid        = uid,
+                    name       = data["name"] as? String ?: "Inconnu",
+                    email      = data["email"] as? String ?: "",
+                    orderCount = orderCount,
+                    createdAt  = (data["createdAt"] as? Long) ?: 0L
+                )
+            }.sortedByDescending { it.createdAt }
+        } catch (e: Exception) {
+            emptyList()
+        }
+    }
+
+    /**
      * Update the status of an existing order (admin use).
      */
     suspend fun updateOrderStatus(uid: String, orderId: String, newStatus: String) {

@@ -107,24 +107,20 @@ class AdminDashboardActivity : AppCompatActivity() {
         applyPressFeedback(
             R.id.adminBtnAddProduct,
             R.id.adminBtnViewOrders,
-            R.id.adminBtnSettings,
-            R.id.adminOrderRow1,
-            R.id.adminOrderRow2,
-            R.id.adminOrderRow3
+            R.id.adminBtnSettings
         )
-        listOf(
-            R.id.adminBtnAddProduct,
-            R.id.adminBtnViewOrders,
-            R.id.adminBtnSettings,
-            R.id.adminOrderRow1,
-            R.id.adminOrderRow2,
-            R.id.adminOrderRow3,
-            R.id.adminCardCommandes,
-            R.id.adminCardRevenue,
-            R.id.adminCardClients,
-            R.id.adminCardStock
-        ).forEach { id ->
-            bindComingSoon(id)
+
+        // Wire "View Orders" button to AdminCommandesActivity
+        findViewById<View>(R.id.adminBtnViewOrders)?.setOnClickListener {
+            navigateNoShift(AdminCommandesActivity::class.java)
+        }
+
+        // Stat cards — still coming soon individually
+        bindComingSoon(R.id.adminBtnAddProduct, R.id.adminBtnSettings)
+
+        // Hide the 3 static placeholder order rows — real orders shown in AdminCommandesActivity
+        listOf(R.id.adminOrderRow1, R.id.adminOrderRow2, R.id.adminOrderRow3).forEach { id ->
+            findViewById<View>(id)?.visibility = View.GONE
         }
     }
 

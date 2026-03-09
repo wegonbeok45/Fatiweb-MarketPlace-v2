@@ -106,7 +106,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/funnelsans_semibold"
-                            android:text="1,284"
+                            android:text="..."
                             android:textColor="#FFFFFF"
                             android:textSize="24sp" />
 
@@ -142,7 +142,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/funnelsans_semibold"
-                            android:text="+24"
+                            android:text=""
+                            android:visibility="gone"
                             android:textColor="#34A853"
                             android:textSize="24sp" />
 
@@ -193,7 +194,8 @@
                         android:paddingEnd="16dp"
                         android:background="?selectableItemBackground"
                         android:clickable="true"
-                        android:focusable="true">
+                        android:focusable="true"
+                        android:visibility="gone">
 
                         <com.google.android.material.card.MaterialCardView
                             android:id="@+id/adminClientAvatar1"
@@ -272,7 +274,8 @@
                         android:paddingEnd="16dp"
                         android:background="?selectableItemBackground"
                         android:clickable="true"
-                        android:focusable="true">
+                        android:focusable="true"
+                        android:visibility="gone">
 
                         <com.google.android.material.card.MaterialCardView
                             android:id="@+id/adminClientAvatar2"
@@ -351,7 +354,8 @@
                         android:paddingEnd="16dp"
                         android:background="?selectableItemBackground"
                         android:clickable="true"
-                        android:focusable="true">
+                        android:focusable="true"
+                        android:visibility="gone">
 
                         <com.google.android.material.card.MaterialCardView
                             android:id="@+id/adminClientAvatar3"
