@@ -236,6 +236,14 @@
     <string name="address_add_validation">Please enter an address.</string>
     <string name="notification_welcome_title">Bienvenue sur FatiWeb !</string>
     <string name="notification_welcome_msg">Merci d\'avoir rejoint notre communaut&#233;. D&#233;couvrez le meilleur de l\'artisanat tunisien authentique.</string>
+
+    <!-- Facebook Login (Placeholders) -->
+    <string name="facebook_app_id">YOUR_FACEBOOK_APP_ID</string>
+    <string name="fb_login_protocol_scheme">fbYOUR_FACEBOOK_APP_ID</string>
+    <string name="facebook_client_token">YOUR_FACEBOOK_CLIENT_TOKEN</string>
+
+    <!-- Google Sign-In (Placeholder — replace with Web Client ID from Firebase) -->
+    <string name="google_web_client_id">1036840816071-nhcuumju7knmgufhnqu3fgv8lkqks96m.apps.googleusercontent.com</string>
 </resources>
 
 
