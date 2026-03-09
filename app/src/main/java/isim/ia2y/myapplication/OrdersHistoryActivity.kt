@@ -8,15 +8,10 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 
 class OrdersHistoryActivity : AppCompatActivity() {
-    data class OrderEntry(
-        val id: String,
-        val date: String,
-        val items: String,
-        val total: String,
-        val status: String
-    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,17 +25,31 @@ class OrdersHistoryActivity : AppCompatActivity() {
 
         findViewById<View>(R.id.ivBack)?.setOnClickListener { finishWithMotion(isForward = false) }
         applyPressFeedback(R.id.ivBack)
-        renderOrders()
+        loadOrders()
     }
 
-    private fun renderOrders() {
-        val orders = listOf(
-            OrderEntry("#FW-2026-018", "12 Feb 2026", "Chechia Traditionnelle x1", "45.500 DT", "Delivered"),
-            OrderEntry("#FW-2026-015", "03 Feb 2026", "Bijoux de l'Argent x1", "120.000 DT", "On the way"),
-            OrderEntry("#FW-2026-009", "25 Jan 2026", "Harissa Artisanale Bio x2", "25.800 DT", "Delivered"),
-            OrderEntry("#FW-2026-004", "11 Jan 2026", "Balgha Cuir x1", "65.000 DT", "Delivered")
-        )
+    private fun loadOrders() {
+        val uid = FirebaseAuthManager.currentUser?.uid
+        if (uid == null) {
+            // Not logged in — show empty state
+            showEmpty()
+            return
+        }
 
+        lifecycleScope.launch {
+            val orders = FirestoreService.fetchOrders(uid)
+            renderOrders(orders)
+        }
+    }
+
+    private fun showEmpty() {
+        val empty = findViewById<TextView>(R.id.tvEmptyOrders) ?: return
+        val container = findViewById<LinearLayout>(R.id.layoutOrdersContainer) ?: return
+        container.removeAllViews()
+        empty.visibility = View.VISIBLE
+    }
+
+    private fun renderOrders(orders: List<AppOrder>) {
         val container = findViewById<LinearLayout>(R.id.layoutOrdersContainer) ?: return
         val empty = findViewById<TextView>(R.id.tvEmptyOrders) ?: return
         container.removeAllViews()
@@ -53,13 +62,21 @@ class OrdersHistoryActivity : AppCompatActivity() {
 
         orders.forEachIndexed { index, order ->
             val row = layoutInflater.inflate(R.layout.item_order_history, container, false)
-            row.findViewById<TextView>(R.id.tvOrderId)?.text = order.id
-            row.findViewById<TextView>(R.id.tvOrderDate)?.text = order.date
-            row.findViewById<TextView>(R.id.tvOrderItems)?.text = order.items
-            row.findViewById<TextView>(R.id.tvOrderTotal)?.text = order.total
-            row.findViewById<TextView>(R.id.tvOrderStatus)?.text = order.status
+
+            // Summarise items: "Chechia x1, Bijoux x2, …"
+            val itemsSummary = order.items.entries.take(2).joinToString(", ") { (id, qty) ->
+                val name = ProductCatalog.byId(id)?.title?.split(" ")?.firstOrNull() ?: id
+                "$name x$qty"
+            }.let { if (order.items.size > 2) "$it…" else it }
+
+            row.findViewById<TextView>(R.id.tvOrderId)?.text = order.displayId
+            row.findViewById<TextView>(R.id.tvOrderDate)?.text = order.formattedDate
+            row.findViewById<TextView>(R.id.tvOrderItems)?.text = itemsSummary
+            row.findViewById<TextView>(R.id.tvOrderTotal)?.text = formatDt(order.total)
+            row.findViewById<TextView>(R.id.tvOrderStatus)?.text = order.statusLabel
             container.addView(row)
             animateListItemEntry(row, index, startDelayMs = 35L)
         }
     }
 }
+
