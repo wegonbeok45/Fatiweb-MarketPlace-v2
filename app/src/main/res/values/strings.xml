@@ -39,7 +39,9 @@
     <string name="product_removed_from_favorites">%1$s retire des favoris</string>
     <string name="product_added_to_cart">%1$s ajoute au panier</string>
     <string name="login_validation_error">Verifier votre email et mot de passe.</string>
+    <string name="login_btn_label">Se connecter</string>
     <string name="register_validation_error">Completer correctement tous les champs.</string>
+    <string name="register_btn_label">Créer mon compte</string>
     <string name="loading_progress_percent">%1$d%%</string>
     <string name="loading_progress_full">100%</string>
     <string name="user_guest_name">Utilisateur invit&#233;</string>
