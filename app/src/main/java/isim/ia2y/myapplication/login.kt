@@ -11,10 +11,22 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
+import com.facebook.CallbackManager
+import com.facebook.FacebookCallback
+import com.facebook.FacebookException
+import com.facebook.login.LoginManager
+import com.facebook.login.LoginResult
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
 import kotlinx.coroutines.launch
 
 class login : AppCompatActivity() {
     private var passwordVisible = false
+    private lateinit var callbackManager: CallbackManager
+    private lateinit var googleSignInClient: GoogleSignInClient
+    private val RC_GOOGLE_SIGN_IN = 1001
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,6 +39,12 @@ class login : AppCompatActivity() {
             v.setPadding(hPadding, systemBars.top + vPadding, hPadding, systemBars.bottom + vPadding)
             insets
         }
+        callbackManager = CallbackManager.Factory.create()
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken(getString(R.string.google_web_client_id))
+            .requestEmail()
+            .build()
+        googleSignInClient = GoogleSignIn.getClient(this, gso)
         setupLoginActions()
         revealViewsInOrder(
             R.id.ivBack,
@@ -52,8 +70,10 @@ class login : AppCompatActivity() {
         findViewById<View>(R.id.tvSignUp)?.setOnClickListener {
             navigateNoShift(register::class.java)
         }
+        setupFacebookLogin()
+        setupGoogleLogin()
 
-        bindComingSoon(R.id.tvForgotPassword, R.id.btnGoogle, R.id.btnFacebook)
+        bindComingSoon(R.id.tvForgotPassword)
 
         val etEmail = findViewById<EditText>(R.id.etEmail)
         val etPassword = findViewById<EditText>(R.id.etPassword)
@@ -127,5 +147,77 @@ class login : AppCompatActivity() {
             R.id.btnFacebook,
             R.id.ivPasswordToggle
         )
+    }
+
+    private fun setupFacebookLogin() {
+        val btnFacebook = findViewById<View>(R.id.btnFacebook) ?: return
+        
+        btnFacebook.setOnClickListener {
+            LoginManager.getInstance().logInWithReadPermissions(
+                this,
+                callbackManager,
+                listOf("email", "public_profile")
+            )
+        }
+
+        LoginManager.getInstance().registerCallback(callbackManager, object : FacebookCallback<LoginResult> {
+            override fun onSuccess(result: LoginResult) {
+                handleFacebookAccessToken(result.accessToken.token)
+            }
+
+            override fun onCancel() {
+                showMotionSnackbar("Connexion annulée")
+            }
+
+            override fun onError(error: FacebookException) {
+                showMotionSnackbar("Erreur Facebook: ${error.message}")
+            }
+        })
+    }
+
+    private fun handleFacebookAccessToken(token: String) {
+        lifecycleScope.launch {
+            val result = FirebaseAuthManager.signInWithFacebook(token)
+            result.fold(
+                onSuccess = {
+                    navigateToMainTab(MainActivity.Tab.HOME)
+                },
+                onFailure = { e ->
+                    showMotionSnackbar(FirebaseAuthManager.friendlyError(e))
+                }
+            )
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: android.content.Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        callbackManager.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == RC_GOOGLE_SIGN_IN) {
+            val task = GoogleSignIn.getSignedInAccountFromIntent(data)
+            try {
+                val account = task.getResult(ApiException::class.java)!!
+                handleGoogleIdToken(account.idToken!!)
+            } catch (e: ApiException) {
+                showMotionSnackbar("Google error ${e.statusCode}: ${e.message}")
+            }
+        }
+    }
+
+    private fun setupGoogleLogin() {
+        findViewById<View>(R.id.btnGoogle)?.setOnClickListener {
+            val signInIntent = googleSignInClient.signInIntent
+            @Suppress("DEPRECATION")
+            startActivityForResult(signInIntent, RC_GOOGLE_SIGN_IN)
+        }
+    }
+
+    private fun handleGoogleIdToken(idToken: String) {
+        lifecycleScope.launch {
+            val result = FirebaseAuthManager.signInWithGoogle(idToken)
+            result.fold(
+                onSuccess = { navigateToMainTab(MainActivity.Tab.HOME) },
+                onFailure = { e -> showMotionSnackbar(FirebaseAuthManager.friendlyError(e)) }
+            )
+        }
     }
 }
