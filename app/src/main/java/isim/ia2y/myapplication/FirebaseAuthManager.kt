@@ -1,7 +1,9 @@
 package isim.ia2y.myapplication
 
+import com.google.firebase.auth.FacebookAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.userProfileChangeRequest
 import kotlinx.coroutines.tasks.await
 
@@ -18,6 +20,53 @@ object FirebaseAuthManager {
 
     /** True if a real (non-guest) user is logged in. */
     val isLoggedIn: Boolean get() = auth.currentUser != null
+
+    /**
+     * Sign in with Facebook token.
+     * @return Result.success(user) on success, Result.failure(exception) on error.
+     */
+    suspend fun signInWithFacebook(token: String): Result<FirebaseUser> {
+        return try {
+            val credential = FacebookAuthProvider.getCredential(token)
+            val result = auth.signInWithCredential(credential).await()
+            val user = result.user!!
+
+            // Also check if we need to save to Firestore (if new user)
+            // For now, consistent with email register, we can save profile
+            FirestoreService.saveUserProfile(
+                uid = user.uid,
+                name = user.displayName ?: "User",
+                email = user.email ?: ""
+            )
+
+            Result.success(user)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * Sign in with Google ID token.
+     * @return Result.success(user) on success, Result.failure(exception) on error.
+     */
+    suspend fun signInWithGoogle(idToken: String): Result<FirebaseUser> {
+        return try {
+            val credential = GoogleAuthProvider.getCredential(idToken, null)
+            val result = auth.signInWithCredential(credential).await()
+            val user = result.user!!
+
+            // Save profile to Firestore (for new users)
+            FirestoreService.saveUserProfile(
+                uid = user.uid,
+                name = user.displayName ?: "User",
+                email = user.email ?: ""
+            )
+
+            Result.success(user)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 
     /**
      * Sign in with email and password.
