@@ -3,9 +3,6 @@ package isim.ia2y.myapplication
 import android.Manifest
 import android.content.Context
 import android.graphics.BitmapFactory
-import android.location.Address
-import android.location.Geocoder
-import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.net.Uri
@@ -21,6 +18,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isGone
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 import java.util.Locale
 
 class ProfileTabFragment : Fragment(R.layout.fragment_profile_tab) {
@@ -73,6 +72,7 @@ class ProfileTabFragment : Fragment(R.layout.fragment_profile_tab) {
         super.onResume()
         (activity as? MainActivity)?.updateHostCartBadge()
         refreshProfileLocation()
+        refreshUserInfo()
     }
 
     override fun onPause() {
@@ -116,6 +116,7 @@ class ProfileTabFragment : Fragment(R.layout.fragment_profile_tab) {
         }
         (activity as? AppCompatActivity)?.bindComingSoon(R.id.cardHelp)
         root.findViewById<View>(R.id.cardLogout)?.setOnClickListener {
+            FirebaseAuthManager.signOut()
             (activity as? AppCompatActivity)?.navigateNoShift(login::class.java)
         }
         (activity as? AppCompatActivity)?.applyPressFeedback(
@@ -195,6 +196,27 @@ class ProfileTabFragment : Fragment(R.layout.fragment_profile_tab) {
         }
 
         loadAvatarFromPath(filePath)
+    }
+
+    /** Refresh the displayed user name/email from Firebase Auth. */
+    private fun refreshUserInfo() {
+        val root = view ?: return
+        val firebaseUser = FirebaseAuthManager.currentUser
+        if (firebaseUser != null) {
+            root.findViewById<TextView>(R.id.tvUserName)?.text =
+                firebaseUser.displayName?.ifEmpty { null } ?: getString(R.string.user_guest_name)
+            // If Firestore has a better display name (e.g. set during register), prefer it
+            lifecycleScope.launch {
+                val fsName = FirestoreService.fetchUserName(firebaseUser.uid)
+                if (!fsName.isNullOrBlank()) {
+                    root.findViewById<TextView>(R.id.tvUserName)?.text = fsName
+                }
+            }
+            root.findViewById<TextView>(R.id.tvRole)?.text = firebaseUser.email ?: getString(R.string.profile_signup_chip)
+        } else {
+            root.findViewById<TextView>(R.id.tvUserName)?.text = getString(R.string.user_guest_name)
+            root.findViewById<TextView>(R.id.tvRole)?.text = getString(R.string.profile_signup_chip)
+        }
     }
 
     private val requestLocationLauncher = registerForActivityResult(
