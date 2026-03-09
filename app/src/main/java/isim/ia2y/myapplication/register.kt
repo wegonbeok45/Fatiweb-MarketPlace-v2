@@ -5,10 +5,13 @@ import android.text.method.PasswordTransformationMethod
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
+import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 
 class register : AppCompatActivity() {
     private var passwordVisible = false
@@ -56,6 +59,8 @@ class register : AppCompatActivity() {
         val etFullName = findViewById<EditText>(R.id.etFullName)
         val etEmail = findViewById<EditText>(R.id.etEmail)
         val etPassword = findViewById<EditText>(R.id.etPassword)
+        val btnRegister = findViewById<TextView>(R.id.btnRegister)
+
         bindInputFieldMotion(R.id.cardFullNameField, R.id.etFullName) { value -> value.length >= 3 }
         bindInputFieldMotion(R.id.cardEmailField, R.id.etEmail) { value ->
             value.contains("@") && value.contains(".")
@@ -64,10 +69,15 @@ class register : AppCompatActivity() {
             value.length >= 6
         }
 
-        findViewById<View>(R.id.btnRegister)?.setOnClickListener {
-            val hasName = etFullName.text?.toString().orEmpty().trim().length >= 3
-            val hasValidEmail = etEmail.text?.toString().orEmpty().contains("@")
-            val hasValidPassword = (etPassword.text?.length ?: 0) >= 6
+        btnRegister?.setOnClickListener {
+            val name = etFullName.text?.toString().orEmpty().trim()
+            val email = etEmail.text?.toString().orEmpty().trim()
+            val password = etPassword.text?.toString().orEmpty()
+
+            val hasName = name.length >= 3
+            val hasValidEmail = email.contains("@") && email.contains(".")
+            val hasValidPassword = password.length >= 6
+
             if (!hasName || !hasValidEmail || !hasValidPassword) {
                 if (!hasName) markInputState(R.id.cardFullNameField, InputFieldState.ERROR)
                 if (!hasValidEmail) markInputState(R.id.cardEmailField, InputFieldState.ERROR)
@@ -76,11 +86,26 @@ class register : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            markInputState(R.id.cardFullNameField, InputFieldState.SUCCESS)
-            markInputState(R.id.cardEmailField, InputFieldState.SUCCESS)
-            markInputState(R.id.cardPasswordField, InputFieldState.SUCCESS)
-            showMotionSnackbar(getString(R.string.register_placeholder_success))
-            navigateToMainTab(MainActivity.Tab.HOME)
+            // Disable button and show loading state
+            btnRegister.isEnabled = false
+            btnRegister.text = "Création du compte…"
+
+            lifecycleScope.launch {
+                val result = FirebaseAuthManager.register(email, password, name)
+                result.fold(
+                    onSuccess = {
+                        markInputState(R.id.cardFullNameField, InputFieldState.SUCCESS)
+                        markInputState(R.id.cardEmailField, InputFieldState.SUCCESS)
+                        markInputState(R.id.cardPasswordField, InputFieldState.SUCCESS)
+                        navigateToMainTab(MainActivity.Tab.HOME)
+                    },
+                    onFailure = { e ->
+                        btnRegister.isEnabled = true
+                        btnRegister.text = getString(R.string.register_btn_label)
+                        showMotionSnackbar(FirebaseAuthManager.friendlyError(e))
+                    }
+                )
+            }
         }
 
         findViewById<View>(R.id.ivPasswordToggle)?.setOnClickListener {
@@ -91,7 +116,7 @@ class register : AppCompatActivity() {
         }
         etPassword.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_GO) {
-                findViewById<View>(R.id.btnRegister)?.performClick()
+                btnRegister?.performClick()
                 true
             } else {
                 false
