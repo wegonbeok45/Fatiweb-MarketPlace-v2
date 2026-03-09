@@ -57,6 +57,8 @@ dependencies {
     // Coroutines for Firebase .await() support
     implementation(libs.kotlinx.coroutines.play.services)
     implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.facebook.login)
+    implementation(libs.play.services.auth)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
