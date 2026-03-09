@@ -5,11 +5,14 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 
 class AdminDashboardActivity : AppCompatActivity() {
 
@@ -46,6 +49,8 @@ class AdminDashboardActivity : AppCompatActivity() {
             showToast(getString(R.string.coming_soon))
             finish()
         }
+        seedProductsOnce()
+        loadAdminStats()
     }
 
     private fun setupWindowInsets() {
@@ -120,6 +125,42 @@ class AdminDashboardActivity : AppCompatActivity() {
             R.id.adminCardStock
         ).forEach { id ->
             bindComingSoon(id)
+        }
+    }
+
+    /** Fetch real stats from Firestore and populate the dashboard stat cards. */
+    private fun loadAdminStats() {
+        lifecycleScope.launch {
+            runCatching {
+                val stats = FirestoreService.fetchAdminStats()
+
+                findViewById<TextView>(R.id.adminTvCommandesVal)?.text = stats.totalOrders.toString()
+                findViewById<TextView>(R.id.adminTvRevenueVal)?.text = formatDt(stats.totalRevenue)
+                findViewById<TextView>(R.id.adminTvClientsVal)?.text = stats.totalClients.toString()
+                findViewById<TextView>(R.id.adminTvStockVal)?.text = stats.totalProducts.toString()
+            }.onFailure { e ->
+                Log.w(logTag, "Could not load admin stats", e)
+            }
+        }
+    }
+
+    /**
+     * Seeds the 10 local products to Firestore exactly once.
+     * After the first run, the flag "catalog_seeded" is set in SharedPreferences
+     * so this never runs again on subsequent openings.
+     */
+    private fun seedProductsOnce() {
+        val prefs = getSharedPreferences("AppPrefs", MODE_PRIVATE)
+        if (prefs.getBoolean("catalog_seeded", false)) return // Already done
+
+        lifecycleScope.launch {
+            runCatching {
+                FirestoreService.seedProducts()
+                prefs.edit().putBoolean("catalog_seeded", true).apply()
+                Log.i(logTag, "Product catalog seeded to Firestore successfully.")
+            }.onFailure { e ->
+                Log.w(logTag, "Could not seed catalog", e)
+            }
         }
     }
 }
