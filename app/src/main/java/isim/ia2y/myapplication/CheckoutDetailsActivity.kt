@@ -11,7 +11,10 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.card.MaterialCardView
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class CheckoutDetailsActivity : AppCompatActivity() {
 
@@ -123,18 +126,44 @@ class CheckoutDetailsActivity : AppCompatActivity() {
         if (selectedPaymentMethod == PaymentMethod.CARD) {
             val hasSavedCard = getSharedPreferences("AppPrefs", android.content.Context.MODE_PRIVATE).getBoolean("has_saved_card", false)
             if (isUsingSavedCard && hasSavedCard) {
-                transitionToStep3()
+                saveOrderAndProceed()
             } else {
                 val switchSave = findViewById<com.google.android.material.switchmaterial.SwitchMaterial>(R.id.switchSaveCard)
                 if (switchSave?.isChecked == true) {
                     getSharedPreferences("AppPrefs", android.content.Context.MODE_PRIVATE)
                         .edit().putBoolean("has_saved_card", true).apply()
                 }
-                transitionToStep3()
+                saveOrderAndProceed()
             }
         } else {
-            transitionToStep3()
+            saveOrderAndProceed()
         }
+    }
+
+    private fun saveOrderAndProceed() {
+        val uid = FirebaseAuthManager.currentUser?.uid
+        if (uid != null) {
+            val cart = CartStore.getCart(this)
+            val subtotal = CartStore.subtotal(this)
+            val shippingFee = if (isStandardSelected) 0.0 else EXPRESS_FEE
+            val order = AppOrder(
+                items         = cart,
+                subtotal      = subtotal,
+                shippingFee   = shippingFee,
+                total         = subtotal + shippingFee,
+                deliveryType  = if (isStandardSelected) "standard" else "express",
+                paymentMethod = when (selectedPaymentMethod) {
+                    PaymentMethod.CARD   -> "card"
+                    PaymentMethod.EDINAR -> "edinar"
+                    PaymentMethod.CASH   -> "cash"
+                }
+            )
+            // Fire-and-forget save — we don't block the UI on Firestore
+            lifecycleScope.launch(Dispatchers.IO) {
+                runCatching { FirestoreService.saveOrder(uid, order) }
+            }
+        }
+        transitionToStep3()
     }
 
     private fun transitionToStep2() {
