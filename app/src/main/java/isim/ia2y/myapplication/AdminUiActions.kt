@@ -105,6 +105,11 @@ fun AppCompatActivity.refreshAdminBottomNav(activeTab: AdminNavTab) {
 
 private fun AppCompatActivity.snapAdminPillTo(@IdRes targetNavId: Int) {
     val navContainer = findViewById<ConstraintLayout>(R.id.adminBottomNav) ?: return
+    val indicator = findViewById<View>(R.id.admin_nav_indicator) ?: return
+    
+    // Check if already snapped to correct target to avoid redundant layout passes
+    if (indicator.tag == targetNavId) return
+    indicator.tag = targetNavId
 
     val constraintSet = ConstraintSet()
     constraintSet.clone(navContainer)
@@ -143,6 +148,10 @@ private fun AppCompatActivity.animateAdminNavAndNavigate(
 }
 
 private fun AppCompatActivity.animateAdminPillTo(@IdRes targetNavId: Int) {
+    val indicator = findViewById<View>(R.id.admin_nav_indicator) ?: return
+    if (indicator.tag == targetNavId) return
+    indicator.tag = targetNavId
+
     if (isReducedMotionEnabled()) {
         snapAdminPillTo(targetNavId)
         return

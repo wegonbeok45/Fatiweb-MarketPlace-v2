@@ -30,20 +30,22 @@ class AdminDashboardActivity : AppCompatActivity() {
             setupBottomNav()
             restoreAvatar()
             setupQuickActions()
-            revealViewsInOrder(
-                R.id.adminTopBar,
-                R.id.adminCardWelcome,
-                R.id.adminTvStatsHeader,
-                R.id.adminStatsRow1,
-                R.id.adminStatsRow2,
-                R.id.adminTvActionsHeader,
-                R.id.adminActionsRow,
-                R.id.adminTvOrdersHeader,
-                R.id.adminCardOrders,
-                R.id.adminBottomNav,
-                startDelayMs = 60L,
-                staggerMs = 48L
-            )
+            if (savedInstanceState == null) {
+                revealViewsInOrder(
+                    R.id.adminTopBar,
+                    R.id.adminCardWelcome,
+                    R.id.adminTvStatsHeader,
+                    R.id.adminStatsRow1,
+                    R.id.adminStatsRow2,
+                    R.id.adminTvActionsHeader,
+                    R.id.adminActionsRow,
+                    R.id.adminTvOrdersHeader,
+                    R.id.adminCardOrders,
+                    R.id.adminBottomNav,
+                    startDelayMs = 60L,
+                    staggerMs = 48L
+                )
+            }
         }.onFailure { e ->
             Log.e(logTag, "Failed to init admin dashboard", e)
             showToast(getString(R.string.coming_soon))

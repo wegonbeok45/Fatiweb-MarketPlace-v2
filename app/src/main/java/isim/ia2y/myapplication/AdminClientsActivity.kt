@@ -3,7 +3,11 @@ package isim.ia2y.myapplication
 import android.os.Bundle
 import android.view.View
 import android.widget.TextView
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 
@@ -16,18 +20,36 @@ class AdminClientsActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         setContentView(R.layout.activity_admin_clients)
+        setupWindowInsets()
         setupTopBar()
         setupAdminBottomNav(AdminNavTab.CLIENTS)
-        revealViewsInOrder(
-            R.id.adminClientsTopBar,
-            R.id.adminClientsStatsRow,
-            R.id.adminClientsTvHeader,
-            R.id.adminClientsCard,
-            startDelayMs = 60L,
-            staggerMs = 48L
-        )
+
+        if (savedInstanceState == null) {
+            revealViewsInOrder(
+                R.id.adminClientsTopBar,
+                R.id.adminClientsStatsRow,
+                R.id.adminClientsTvHeader,
+                R.id.adminClientsCard,
+                startDelayMs = 60L,
+                staggerMs = 48L
+            )
+        }
         loadClients()
+    }
+
+    private fun setupWindowInsets() {
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.adminClientsAppBar)) { view, insets ->
+            val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            view.updatePadding(top = bars.top)
+            insets
+        }
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.adminBottomNav)) { view, insets ->
+            val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            view.updatePadding(bottom = bars.bottom)
+            insets
+        }
     }
 
     override fun onResume() {

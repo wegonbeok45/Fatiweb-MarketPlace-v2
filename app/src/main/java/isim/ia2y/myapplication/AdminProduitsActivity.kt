@@ -2,22 +2,31 @@ package isim.ia2y.myapplication
 
 import android.os.Bundle
 import android.view.View
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 
 class AdminProduitsActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         setContentView(R.layout.activity_admin_produits)
+        setupWindowInsets()
         setupTopBar()
         setupAdminBottomNav(AdminNavTab.PRODUITS)
-        revealViewsInOrder(
-            R.id.adminProduitsTopBar,
-            R.id.adminProduitsTvHeader,
-            R.id.adminProduitsCard,
-            startDelayMs = 60L,
-            staggerMs = 48L
-        )
+
+        if (savedInstanceState == null) {
+            revealViewsInOrder(
+                R.id.adminProduitsTopBar,
+                R.id.adminProduitsTvHeader,
+                R.id.adminProduitsCard,
+                startDelayMs = 60L,
+                staggerMs = 48L
+            )
+        }
         applyPressFeedback(
             R.id.adminProduitRow1,
             R.id.adminProduitRow2,
@@ -40,5 +49,18 @@ class AdminProduitsActivity : AppCompatActivity() {
             navigateBackToMain()
         }
         applyPressFeedback(R.id.adminProduitsIvBack)
+    }
+
+    private fun setupWindowInsets() {
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.adminProduitsAppBar)) { view, insets ->
+            val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            view.updatePadding(top = bars.top)
+            insets
+        }
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.adminBottomNav)) { view, insets ->
+            val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            view.updatePadding(bottom = bars.bottom)
+            insets
+        }
     }
 }

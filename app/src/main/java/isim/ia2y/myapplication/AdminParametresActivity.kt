@@ -2,7 +2,11 @@ package isim.ia2y.myapplication
 
 import android.os.Bundle
 import android.view.View
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 
 import android.app.Dialog
 import android.graphics.drawable.ColorDrawable
@@ -14,21 +18,39 @@ class AdminParametresActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         setContentView(R.layout.activity_admin_parametres)
+        setupWindowInsets()
         setupTopBar()
         setupAdminBottomNav(AdminNavTab.SETTINGS)
-        revealViewsInOrder(
-            R.id.adminParametresTopBar,
-            R.id.adminParamCardBoutique,
-            R.id.adminParamCardLivraison,
-            R.id.adminParamCardPaiement,
-            startDelayMs = 60L,
-            staggerMs = 48L
-        )
+
+        if (savedInstanceState == null) {
+            revealViewsInOrder(
+                R.id.adminParametresTopBar,
+                R.id.adminParamCardBoutique,
+                R.id.adminParamCardLivraison,
+                R.id.adminParamCardPaiement,
+                startDelayMs = 60L,
+                staggerMs = 48L
+            )
+        }
         applyPressFeedback(R.id.adminParamCardLivraison, R.id.adminParamCardPaiement)
         bindComingSoon(R.id.adminParamCardPaiement)
         
         setupDeliveryEdits()
+    }
+
+    private fun setupWindowInsets() {
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.adminParametresAppBar)) { view, insets ->
+            val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            view.updatePadding(top = bars.top)
+            insets
+        }
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.adminBottomNav)) { view, insets ->
+            val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            view.updatePadding(bottom = bars.bottom)
+            insets
+        }
     }
 
     override fun onResume() {
