@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1036840816071",
+    "project_id": "fatiweb-marketplace",
+    "storage_bucket": "fatiweb-marketplace.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1036840816071:android:db13bac45b5c0f12a95de2",
+        "android_client_info": {
+          "package_name": "isim.ia2y.myapplication"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCBmcuN_SGTVJ08K4f1y5Jix7WsXEbcnug"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
