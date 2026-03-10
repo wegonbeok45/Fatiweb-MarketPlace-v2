@@ -14,19 +14,31 @@ object AddressBookStore {
 
     fun getAddresses(context: Context): MutableList<String> {
         val raw = prefs(context).getString(KEY_ADDRESSES, "").orEmpty()
-        if (raw.isBlank()) {
-            return mutableListOf("Tunis, Tunisie")
+        val defaultList = mutableListOf("Tunis, Tunisie")
+        if (raw.isBlank()) return defaultList
+        
+        return try {
+            val array = org.json.JSONArray(raw)
+            val list = mutableListOf<String>()
+            for (i in 0 until array.length()) {
+                val item = array.getString(i).trim()
+                if (item.isNotBlank()) list.add(item)
+            }
+            if (list.isEmpty()) defaultList else list
+        } catch (e: Exception) {
+            raw.split(SEP)
+                .map { it.trim() }
+                .filter { it.isNotBlank() }
+                .toMutableList()
+                .ifEmpty { defaultList }
         }
-        return raw.split(SEP)
-            .map { it.trim() }
-            .filter { it.isNotBlank() }
-            .toMutableList()
-            .ifEmpty { mutableListOf("Tunis, Tunisie") }
     }
 
     fun saveAddresses(context: Context, addresses: List<String>) {
         val clean = addresses.map { it.trim() }.filter { it.isNotBlank() }
-        prefs(context).edit().putString(KEY_ADDRESSES, clean.joinToString(SEP)).apply()
+        val array = org.json.JSONArray()
+        clean.forEach { array.put(it) }
+        prefs(context).edit().putString(KEY_ADDRESSES, array.toString()).apply()
     }
 
     fun addAddress(context: Context, address: String) {

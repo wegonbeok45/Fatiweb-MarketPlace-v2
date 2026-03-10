@@ -704,9 +704,28 @@ class SearchActivity : AppCompatActivity() {
             .getString(KEY_RECENT_SEARCHES_CSV, "")
             .orEmpty()
         if (raw.isBlank()) return mutableListOf()
-        return raw.split(RECENT_SEPARATOR).map { it.trim() }
-            .filter { it.isNotBlank() }
-            .toMutableList()
+        
+        return try {
+            val array = org.json.JSONArray(raw)
+            val list = mutableListOf<String>()
+            for (i in 0 until array.length()) {
+                list.add(array.getString(i))
+            }
+            list
+        } catch (e: Exception) {
+            raw.split(RECENT_SEPARATOR).map { it.trim() }
+                .filter { it.isNotBlank() }
+                .toMutableList()
+        }
+    }
+
+    private fun saveRecentListToPrefs(list: List<String>) {
+        val array = org.json.JSONArray()
+        list.forEach { array.put(it) }
+        getSharedPreferences(PREFS_SEARCH, Context.MODE_PRIVATE)
+            .edit()
+            .putString(KEY_RECENT_SEARCHES_CSV, array.toString())
+            .apply()
     }
 
     private fun saveRecentSearch(query: String) {
@@ -715,18 +734,12 @@ class SearchActivity : AppCompatActivity() {
         val recent = getRecentSearches()
         recent.removeAll { it.equals(normalized, ignoreCase = true) }
         recent.add(0, normalized)
-        getSharedPreferences(PREFS_SEARCH, Context.MODE_PRIVATE)
-            .edit()
-            .putString(KEY_RECENT_SEARCHES_CSV, recent.take(5).joinToString(RECENT_SEPARATOR))
-            .apply()
+        saveRecentListToPrefs(recent.take(5))
     }
 
     private fun removeRecentSearch(query: String) {
         val filtered = getRecentSearches().filterNot { it.equals(query, ignoreCase = true) }
-        getSharedPreferences(PREFS_SEARCH, Context.MODE_PRIVATE)
-            .edit()
-            .putString(KEY_RECENT_SEARCHES_CSV, filtered.joinToString(RECENT_SEPARATOR))
-            .apply()
+        saveRecentListToPrefs(filtered)
     }
 
     private val Int.dp: Int
