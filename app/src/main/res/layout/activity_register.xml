@@ -9,7 +9,7 @@
     android:fillViewport="true"
     android:paddingStart="@dimen/auth_screen_padding"
     android:paddingEnd="@dimen/auth_screen_padding"
-    tools:context=".register">
+    tools:context=".RegisterActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"

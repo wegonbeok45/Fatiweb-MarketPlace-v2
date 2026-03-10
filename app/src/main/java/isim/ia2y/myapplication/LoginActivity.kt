@@ -23,7 +23,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import kotlinx.coroutines.launch
 
-class login : AppCompatActivity() {
+class LoginActivity : AppCompatActivity() {
     private var passwordVisible = false
     private lateinit var callbackManager: CallbackManager
     private lateinit var googleSignInClient: GoogleSignInClient
@@ -80,7 +80,7 @@ class login : AppCompatActivity() {
             navigateToMainTab(MainActivity.Tab.HOME)
         }
         findViewById<View>(R.id.tvSignUp)?.setOnClickListener {
-            navigateNoShift(register::class.java)
+            navigateNoShift(RegisterActivity::class.java)
         }
         setupFacebookLogin()
         setupGoogleLogin()

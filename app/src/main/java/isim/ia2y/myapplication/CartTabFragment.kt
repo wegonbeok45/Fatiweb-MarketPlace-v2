@@ -70,7 +70,7 @@ class CartTabFragment : Fragment(R.layout.fragment_cart_tab) {
             (activity as? MainActivity)?.selectTab(MainActivity.Tab.HOME, animate = false)
         }
         root.findViewById<View>(R.id.ivTopCart)?.setOnClickListener {
-            (activity as? AppCompatActivity)?.navigateFromTop(favoris::class.java)
+            (activity as? AppCompatActivity)?.navigateFromTop(FavoritesActivity::class.java)
         }
         (activity as? AppCompatActivity)?.bindNotificationEntry(R.id.ivTopNotifications)
 

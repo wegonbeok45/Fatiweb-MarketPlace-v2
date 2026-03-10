@@ -191,7 +191,7 @@ class MainActivity : AppCompatActivity() {
     private fun setupHostHeader() {
         findViewById<View>(R.id.hostIvHomeLogo).setOnClickListener { selectTab(Tab.HOME, animate = false) }
         findViewById<View>(R.id.hostTvBrand).setOnClickListener { selectTab(Tab.HOME, animate = false) }
-        findViewById<View>(R.id.hostIvTopCart).setOnClickListener { navigateFromTop(favoris::class.java) }
+        findViewById<View>(R.id.hostIvTopCart).setOnClickListener { navigateFromTop(FavoritesActivity::class.java) }
         bindNotificationEntry(R.id.hostIvTopNotifications)
         applyPressFeedback(
             R.id.hostIvHomeLogo,

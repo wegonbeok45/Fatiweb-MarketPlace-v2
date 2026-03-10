@@ -55,23 +55,16 @@
         <activity
             android:name=".OrdersHistoryActivity"
             android:exported="false" />
+
         <activity
-            android:name=".explore"
+            android:name=".FavoritesActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".RegisterActivity"
             android:exported="false" />
         <activity
-            android:name=".favoris"
-            android:exported="false" />
-        <activity
-            android:name=".panier"
-            android:exported="false" />
-        <activity
-            android:name=".user"
-            android:exported="false" />
-        <activity
-            android:name=".register"
-            android:exported="false" />
-        <activity
-            android:name=".login"
+            android:name=".LoginActivity"
             android:exported="false" />
         <activity
             android:name=".Onboard3"

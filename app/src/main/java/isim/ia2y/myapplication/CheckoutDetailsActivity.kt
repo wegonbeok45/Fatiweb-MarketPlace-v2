@@ -141,29 +141,45 @@ class CheckoutDetailsActivity : AppCompatActivity() {
     }
 
     private fun saveOrderAndProceed() {
-        val uid = FirebaseAuthManager.currentUser?.uid
-        if (uid != null) {
-            val cart = CartStore.getCart(this)
-            val subtotal = CartStore.subtotal(this)
-            val shippingFee = if (isStandardSelected) 0.0 else EXPRESS_FEE
-            val order = AppOrder(
-                items         = cart,
-                subtotal      = subtotal,
-                shippingFee   = shippingFee,
-                total         = subtotal + shippingFee,
-                deliveryType  = if (isStandardSelected) "standard" else "express",
-                paymentMethod = when (selectedPaymentMethod) {
-                    PaymentMethod.CARD   -> "card"
-                    PaymentMethod.EDINAR -> "edinar"
-                    PaymentMethod.CASH   -> "cash"
-                }
-            )
-            // Fire-and-forget save — we don't block the UI on Firestore
-            lifecycleScope.launch(Dispatchers.IO) {
-                runCatching { FirestoreService.saveOrder(uid, order) }
+        val uid = FirebaseAuthManager.currentUser?.uid ?: "anonymous_${java.util.UUID.randomUUID()}"
+        val cart = CartStore.getCart(this)
+        if (cart.isEmpty()) {
+            showMotionSnackbar("Votre panier est vide")
+            return
+        }
+        val subtotal = CartStore.subtotal(this)
+        val shippingFee = if (isStandardSelected) CartStore.LIVRAISON_FEE else EXPRESS_FEE
+        val order = AppOrder(
+            items         = cart,
+            subtotal      = subtotal,
+            shippingFee   = shippingFee,
+            total         = subtotal + shippingFee,
+            deliveryType  = if (isStandardSelected) "standard" else "express",
+            paymentMethod = when (selectedPaymentMethod) {
+                PaymentMethod.CARD   -> "card"
+                PaymentMethod.EDINAR -> "edinar"
+                PaymentMethod.CASH   -> "cash"
+            }
+        )
+
+        val btnContinue = findViewById<TextView>(R.id.btnCheckoutContinue)
+        val originalText = btnContinue?.text
+        btnContinue?.text = "Enregistrement..."
+        btnContinue?.isEnabled = false
+
+        lifecycleScope.launch(kotlinx.coroutines.Dispatchers.Main) {
+            val result = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+                kotlin.runCatching { FirestoreService.saveOrder(uid, order) }
+            }
+            btnContinue?.isEnabled = true
+            btnContinue?.text = originalText
+
+            result.onSuccess {
+                transitionToStep3()
+            }.onFailure { e ->
+                showMotionSnackbar("Erreur: ${e.localizedMessage}")
             }
         }
-        transitionToStep3()
     }
 
     private fun transitionToStep2() {
@@ -260,10 +276,12 @@ class CheckoutDetailsActivity : AppCompatActivity() {
             container?.addView(itemView)
         }
 
-        // Update Total Paid
-        findViewById<TextView>(R.id.tvConfirmationTotal)?.text = formatDt(CartStore.total(this))
+        // Update Total Paid to reflect exact shipping choice
+        val subtotal = CartStore.subtotal(this)
+        val finalTotal = subtotal + if (isStandardSelected) CartStore.LIVRAISON_FEE else EXPRESS_FEE
+        findViewById<TextView>(R.id.tvConfirmationTotal)?.text = formatDt(finalTotal)
 
-        // Clear Cart
+        // Clear Cart only after successful order submission
         CartStore.clear(this)
 
         // Buttons in Step 3
@@ -331,7 +349,7 @@ class CheckoutDetailsActivity : AppCompatActivity() {
 
     private fun updateSummary() {
         val subtotal = CartStore.subtotal(this)
-        val shipping = if (isStandardSelected) 0.0 else EXPRESS_FEE
+        val shipping = if (isStandardSelected) CartStore.LIVRAISON_FEE else EXPRESS_FEE
         val total = subtotal + shipping
 
         findViewById<TextView>(R.id.tvCheckoutSubtotal)?.text = formatDt(subtotal)
@@ -341,7 +359,7 @@ class CheckoutDetailsActivity : AppCompatActivity() {
         
         if (isStandardSelected) {
             tvShippingLabel?.text = "Frais de port (Standard)"
-            tvShippingValue?.text = "GRATUIT"
+            tvShippingValue?.text = formatDt(CartStore.LIVRAISON_FEE)
         } else {
             tvShippingLabel?.text = "Frais de port (Express)"
             tvShippingValue?.text = formatDt(EXPRESS_FEE)

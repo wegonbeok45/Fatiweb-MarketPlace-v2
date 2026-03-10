@@ -12,7 +12,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.button.MaterialButton
 
-class favoris : AppCompatActivity() {
+class FavoritesActivity : AppCompatActivity() {
     private var shouldAnimateListOnNextRender = true
 
     override fun onCreate(savedInstanceState: Bundle?) {

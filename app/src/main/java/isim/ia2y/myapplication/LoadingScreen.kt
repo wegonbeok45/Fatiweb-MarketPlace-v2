@@ -42,7 +42,7 @@ class LoadingScreen : AppCompatActivity() {
             Milestone(R.string.loading_step_preferences, 15) { ctx ->
                 // Read all shared-preference files so they're cached in memory
                 ctx.getSharedPreferences("profile_prefs", Context.MODE_PRIVATE).all
-                ctx.getSharedPreferences("app_prefs", Context.MODE_PRIVATE).all
+                ctx.getSharedPreferences("AppPrefs", Context.MODE_PRIVATE).all
                 ctx.getSharedPreferences("address_book", Context.MODE_PRIVATE).all
                 LanguageManager.ensureDefaultAndApply(ctx)
             },

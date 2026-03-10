@@ -95,17 +95,12 @@ object FirestoreService {
      */
     suspend fun fetchAllOrders(): List<Pair<String, AppOrder>> {
         return try {
-            val usersSnapshot = db.collection("users").get().await()
+            val ordersSnapshot = db.collectionGroup("orders").get().await()
             val result = mutableListOf<Pair<String, AppOrder>>()
-            for (userDoc in usersSnapshot.documents) {
-                val ordersSnapshot = ordersRef(userDoc.id)
-                    .orderBy("createdAt", Query.Direction.DESCENDING)
-                    .get()
-                    .await()
-                ordersSnapshot.documents.forEach { orderDoc ->
-                    val data = orderDoc.data ?: return@forEach
-                    result.add(userDoc.id to AppOrder.fromMap(data))
-                }
+            ordersSnapshot.documents.forEach { doc ->
+                val data = doc.data ?: return@forEach
+                val uid = doc.reference.parent.parent?.id ?: return@forEach
+                result.add(uid to AppOrder.fromMap(data))
             }
             result.sortedByDescending { it.second.createdAt }
         } catch (e: Exception) {
@@ -127,10 +122,20 @@ object FirestoreService {
     suspend fun fetchAllClients(): List<ClientInfo> {
         return try {
             val usersSnapshot = db.collection("users").get().await()
+            val ordersSnapshot = db.collectionGroup("orders").get().await()
+            
+            val orderCounts = mutableMapOf<String, Int>()
+            ordersSnapshot.documents.forEach { doc ->
+                val uid = doc.reference.parent.parent?.id
+                if (uid != null) {
+                    orderCounts[uid] = (orderCounts[uid] ?: 0) + 1
+                }
+            }
+
             usersSnapshot.documents.mapNotNull { doc ->
                 val data = doc.data ?: return@mapNotNull null
                 val uid = doc.id
-                val orderCount = ordersRef(uid).get().await().size()
+                val orderCount = orderCounts[uid] ?: 0
                 ClientInfo(
                     uid        = uid,
                     name       = data["name"] as? String ?: "Inconnu",
@@ -199,17 +204,15 @@ object FirestoreService {
         return try {
             val usersSnapshot = db.collection("users").get().await()
             val productsSnapshot = productsRef.get().await()
-            var totalOrders = 0
+            val ordersSnapshot = db.collectionGroup("orders").get().await()
+            
             var totalRevenue = 0.0
-            for (userDoc in usersSnapshot.documents) {
-                val ordersSnapshot = ordersRef(userDoc.id).get().await()
-                totalOrders += ordersSnapshot.size()
-                ordersSnapshot.documents.forEach { orderDoc ->
-                    totalRevenue += (orderDoc.getDouble("total") ?: 0.0)
-                }
+            ordersSnapshot.documents.forEach { orderDoc ->
+                totalRevenue += (orderDoc.getDouble("total") ?: 0.0)
             }
+            
             AdminStats(
-                totalOrders   = totalOrders,
+                totalOrders   = ordersSnapshot.size(),
                 totalRevenue  = totalRevenue,
                 totalClients  = usersSnapshot.size(),
                 totalProducts = productsSnapshot.size()

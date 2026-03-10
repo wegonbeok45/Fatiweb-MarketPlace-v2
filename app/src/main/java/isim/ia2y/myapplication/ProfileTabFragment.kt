@@ -98,8 +98,8 @@ class ProfileTabFragment : Fragment(R.layout.fragment_profile_tab) {
         root.findViewById<View>(R.id.cardEdit)?.setOnClickListener { openAvatarPicker() }
         root.findViewById<View>(R.id.cardRole)?.setOnClickListener {
             (activity as? AppCompatActivity)?.showAuthChoiceDialog(
-                onCreateAccount = { (activity as? AppCompatActivity)?.navigateNoShift(register::class.java) },
-                onExistingClient = { (activity as? AppCompatActivity)?.navigateNoShift(login::class.java) }
+                onCreateAccount = { (activity as? AppCompatActivity)?.navigateNoShift(RegisterActivity::class.java) },
+                onExistingClient = { (activity as? AppCompatActivity)?.navigateNoShift(LoginActivity::class.java) }
             )
         }
         root.findViewById<View>(R.id.tvRole)?.setOnClickListener {
@@ -117,7 +117,7 @@ class ProfileTabFragment : Fragment(R.layout.fragment_profile_tab) {
         (activity as? AppCompatActivity)?.bindComingSoon(R.id.cardHelp)
         root.findViewById<View>(R.id.cardLogout)?.setOnClickListener {
             FirebaseAuthManager.signOut()
-            (activity as? AppCompatActivity)?.navigateNoShift(login::class.java)
+            (activity as? AppCompatActivity)?.navigateNoShift(LoginActivity::class.java)
         }
         (activity as? AppCompatActivity)?.applyPressFeedback(
             R.id.ivBack,
@@ -163,7 +163,24 @@ class ProfileTabFragment : Fragment(R.layout.fragment_profile_tab) {
     private fun loadAvatarFromPath(path: String) {
         val imageView = view?.findViewById<ImageView>(R.id.ivAvatar) ?: return
         runCatching {
-            val bitmap = BitmapFactory.decodeFile(path)
+            val options = android.graphics.BitmapFactory.Options()
+            options.inJustDecodeBounds = true
+            android.graphics.BitmapFactory.decodeFile(path, options)
+
+            val reqSize = 256
+            var inSampleSize = 1
+            if (options.outHeight > reqSize || options.outWidth > reqSize) {
+                val halfHeight = options.outHeight / 2
+                val halfWidth = options.outWidth / 2
+                while (halfHeight / inSampleSize >= reqSize && halfWidth / inSampleSize >= reqSize) {
+                    inSampleSize *= 2
+                }
+            }
+
+            options.inJustDecodeBounds = false
+            options.inSampleSize = inSampleSize
+            
+            val bitmap = android.graphics.BitmapFactory.decodeFile(path, options)
             if (bitmap != null) {
                 imageView.setImageBitmap(bitmap)
             } else {

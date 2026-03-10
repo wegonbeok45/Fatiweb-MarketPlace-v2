@@ -436,21 +436,29 @@ fun AppCompatActivity.bindBottomNav(
     val navIds = listOfNotNull(homeId, exploreId, favoritesId, cartId, profileId)
 
     findViewById<View?>(homeId)?.setOnClickListener {
-        animateBottomNavAndNavigate(navIds, homeId, MainActivity::class.java)
+        animateBottomNavAndNavigate(navIds, homeId, MainActivity::class.java) {
+            navigateToMainTab(MainActivity.Tab.HOME)
+        }
     }
     findViewById<View?>(exploreId)?.setOnClickListener {
-        animateBottomNavAndNavigate(navIds, exploreId, explore::class.java)
+        animateBottomNavAndNavigate(navIds, exploreId, MainActivity::class.java) {
+            navigateToMainTab(MainActivity.Tab.EXPLORE)
+        }
     }
     favoritesId?.let { id ->
         findViewById<View?>(id)?.setOnClickListener {
-            animateBottomNavAndNavigate(navIds, id, favoris::class.java)
+            animateBottomNavAndNavigate(navIds, id, FavoritesActivity::class.java)
         }
     }
     findViewById<View?>(cartId)?.setOnClickListener {
-        animateBottomNavAndNavigate(navIds, cartId, panier::class.java)
+        animateBottomNavAndNavigate(navIds, cartId, MainActivity::class.java) {
+            navigateToMainTab(MainActivity.Tab.CART)
+        }
     }
     findViewById<View?>(profileId)?.setOnClickListener {
-        animateBottomNavAndNavigate(navIds, profileId, user::class.java)
+        animateBottomNavAndNavigate(navIds, profileId, MainActivity::class.java) {
+            navigateToMainTab(MainActivity.Tab.PROFILE)
+        }
     }
 }
 

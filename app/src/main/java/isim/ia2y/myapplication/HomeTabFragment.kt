@@ -19,6 +19,10 @@ class HomeTabFragment : Fragment(R.layout.fragment_home_tab) {
     private val sliderHandler = Handler(Looper.getMainLooper())
     private var categorySliderRunnable: Runnable? = null
     private var announcementSliderRunnable: Runnable? = null
+    private var isCategoryAutoSliding = false
+    private var isAnnouncementAutoSliding = false
+    private var categoryScrollListener: android.view.ViewTreeObserver.OnScrollChangedListener? = null
+    private var announcementScrollListener: android.view.ViewTreeObserver.OnScrollChangedListener? = null
     private var categoryCycleWidthPx: Int = 0
     private var categoryScrollOffsetPx: Float = 0f
     private var announcementScrollOffsetPx: Float = 0f
@@ -87,6 +91,22 @@ class HomeTabFragment : Fragment(R.layout.fragment_home_tab) {
         super.onPause()
     }
 
+    override fun onDestroyView() {
+        stopCategoryAutoSlide()
+        stopAnnouncementAutoSlide()
+        sliderHandler.removeCallbacksAndMessages(null)
+        
+        view?.findViewById<HorizontalScrollView>(R.id.hsvCategories)?.viewTreeObserver?.let { obs ->
+            categoryScrollListener?.let { if (obs.isAlive) obs.removeOnScrollChangedListener(it) }
+        }
+        view?.findViewById<HorizontalScrollView>(R.id.hsvAnnouncements)?.viewTreeObserver?.let { obs ->
+            announcementScrollListener?.let { if (obs.isAlive) obs.removeOnScrollChangedListener(it) }
+        }
+        categoryScrollListener = null
+        announcementScrollListener = null
+        super.onDestroyView()
+    }
+
     private fun setupHeaderAndContentActions(root: View) {
         root.findViewById<View>(R.id.ivHomeLogo)?.setOnClickListener {
             (activity as? MainActivity)?.selectTab(MainActivity.Tab.HOME)
@@ -95,7 +115,7 @@ class HomeTabFragment : Fragment(R.layout.fragment_home_tab) {
             (activity as? MainActivity)?.selectTab(MainActivity.Tab.HOME)
         }
         root.findViewById<View>(R.id.ivTopCart)?.setOnClickListener {
-            (activity as? AppCompatActivity)?.navigateFromTop(favoris::class.java)
+            (activity as? AppCompatActivity)?.navigateFromTop(FavoritesActivity::class.java)
         }
         listOf(
             R.id.itemCategoryArtisanat,
@@ -269,7 +289,7 @@ class HomeTabFragment : Fragment(R.layout.fragment_home_tab) {
                 }
             }
             categoriesScroll.overScrollMode = View.OVER_SCROLL_NEVER
-            categoriesScroll.viewTreeObserver.addOnScrollChangedListener {
+            categoryScrollListener = android.view.ViewTreeObserver.OnScrollChangedListener {
                 val cycleWidth = if (categoryCycleWidthPx > 0) categoryCycleWidthPx else 1
                 val currentX = categoriesScroll.scrollX
                 
@@ -282,11 +302,12 @@ class HomeTabFragment : Fragment(R.layout.fragment_home_tab) {
                     categoriesScroll.scrollX = (currentX + cycleWidth)
                 }
 
-                if (categorySliderRunnable == null || !sliderHandler.hasCallbacks(categorySliderRunnable!!)) {
+                if (!isCategoryAutoSliding) {
                      // Sync offset while user is dragging or flinging so resumption is smooth
                      categoryScrollOffsetPx = categoriesScroll.scrollX.toFloat()
                 }
             }
+            categoriesScroll.viewTreeObserver.addOnScrollChangedListener(categoryScrollListener)
             categoriesScroll.setOnTouchListener { _, event ->
                 when (event.action) {
                     android.view.MotionEvent.ACTION_DOWN, android.view.MotionEvent.ACTION_MOVE -> {
@@ -337,11 +358,12 @@ class HomeTabFragment : Fragment(R.layout.fragment_home_tab) {
                     sliderHandler.postDelayed(this, sliderFrameDelayMs)
                 }
             }
-            announcementsScroll.viewTreeObserver.addOnScrollChangedListener {
-                if (announcementSliderRunnable == null || !sliderHandler.hasCallbacks(announcementSliderRunnable!!)) {
+            announcementScrollListener = android.view.ViewTreeObserver.OnScrollChangedListener {
+                if (!isAnnouncementAutoSliding) {
                     announcementScrollOffsetPx = announcementsScroll.scrollX.toFloat()
                 }
             }
+            announcementsScroll.viewTreeObserver.addOnScrollChangedListener(announcementScrollListener)
             announcementsScroll.setOnTouchListener { _, event ->
                 when (event.action) {
                     android.view.MotionEvent.ACTION_DOWN, android.view.MotionEvent.ACTION_MOVE -> {
@@ -360,6 +382,7 @@ class HomeTabFragment : Fragment(R.layout.fragment_home_tab) {
     private fun startCategoryAutoSlide() {
         val runnable = categorySliderRunnable ?: return
         sliderHandler.removeCallbacks(runnable)
+        isCategoryAutoSliding = true
         
         // Sync offset with current scroll position to prevent "jumping"
         val hsv = view?.findViewById<HorizontalScrollView>(R.id.hsvCategories)
@@ -373,11 +396,13 @@ class HomeTabFragment : Fragment(R.layout.fragment_home_tab) {
 
     private fun stopCategoryAutoSlide() {
         categorySliderRunnable?.let { sliderHandler.removeCallbacks(it) }
+        isCategoryAutoSliding = false
     }
 
     private fun startAnnouncementAutoSlide() {
         val runnable = announcementSliderRunnable ?: return
         sliderHandler.removeCallbacks(runnable)
+        isAnnouncementAutoSliding = true
 
         // Sync offset with current scroll position to prevent "jumping"
         val hsv = view?.findViewById<HorizontalScrollView>(R.id.hsvAnnouncements)
@@ -391,6 +416,7 @@ class HomeTabFragment : Fragment(R.layout.fragment_home_tab) {
 
     private fun stopAnnouncementAutoSlide() {
         announcementSliderRunnable?.let { sliderHandler.removeCallbacks(it) }
+        isAnnouncementAutoSliding = false
     }
 
     private var categoryIdleRunnable: Runnable? = null

@@ -18,12 +18,16 @@ object NotificationStore {
     private const val KEY_NOTIFICATIONS = "notifications_json"
     private const val KEY_FIRST_LAUNCH = "notification_first_launch"
 
+    private var cachedList: List<AppNotification>? = null
+
     private fun getPrefs(context: Context): SharedPreferences {
         return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
     }
 
     fun getAll(context: Context): List<AppNotification> {
         checkFirstLaunch(context)
+        cachedList?.let { return it }
+
         val json = getPrefs(context).getString(KEY_NOTIFICATIONS, "[]") ?: "[]"
         val array = JSONArray(json)
         val list = mutableListOf<AppNotification>()
@@ -39,7 +43,9 @@ object NotificationStore {
                 )
             )
         }
-        return list.sortedByDescending { it.timestamp }
+        val sortedList = list.sortedByDescending { it.timestamp }
+        cachedList = sortedList
+        return sortedList
     }
 
     fun hasUnread(context: Context): Boolean {
@@ -53,6 +59,7 @@ object NotificationStore {
     }
 
     private fun saveAll(context: Context, notifications: List<AppNotification>) {
+        cachedList = notifications.sortedByDescending { it.timestamp }
         val array = JSONArray()
         notifications.forEach {
             val obj = JSONObject().apply {

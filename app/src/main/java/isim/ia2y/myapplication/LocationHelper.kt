@@ -72,7 +72,7 @@ object LocationHelper {
             override fun onProviderDisabled(p: String) {}
         }
         pendingListener = listener
-        runCatching { locationManager.requestLocationUpdates(provider, 0L, 0f, listener) }
+        runCatching { locationManager.requestLocationUpdates(provider, 10000L, 50f, listener) }
     }
 
     private fun getBestLastKnownLocation(locationManager: LocationManager): Location? {
