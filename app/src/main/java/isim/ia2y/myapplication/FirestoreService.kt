@@ -25,23 +25,7 @@ object FirestoreService {
 
     // ─── Products ─────────────────────────────────────────────────────────────
 
-    /**
-     * Fetch all products from Firestore.
-     * Falls back to the local [ProductCatalog] if Firestore fails or returns no results.
-     */
-    suspend fun fetchProducts(): List<Product> {
-        return try {
-            val snapshot = productsRef.get().await()
-            val firestoreProducts = snapshot.documents.mapNotNull { doc ->
-                val data = doc.data ?: return@mapNotNull null
-                productFromMap(doc.id, data)
-            }
-            firestoreProducts.ifEmpty { ProductCatalog.all() }
-        } catch (e: Exception) {
-            // Graceful fallback to local data
-            ProductCatalog.all()
-        }
-    }
+
 
     /**
      * Seed the local product catalog to Firestore (one-time migration).
@@ -49,6 +33,9 @@ object FirestoreService {
      */
     suspend fun seedProducts() {
         try {
+            val snapshot = productsRef.limit(1).get().await()
+            if (!snapshot.isEmpty) return
+
             val batch = db.batch()
             ProductCatalog.all().forEach { product ->
                 val ref = productsRef.document(product.id)
@@ -175,13 +162,22 @@ object FirestoreService {
         } catch (_: Exception) {}
     }
 
-    /**
-     * Fetch a user's display name from Firestore.
-     */
     suspend fun fetchUserName(uid: String): String? {
         return try {
             val doc = userRef(uid).get().await()
             doc.getString("name")
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    /**
+     * Fetch a user's role from Firestore.
+     */
+    suspend fun fetchUserRole(uid: String): String? {
+        return try {
+            val doc = userRef(uid).get().await()
+            doc.getString("role")
         } catch (e: Exception) {
             null
         }

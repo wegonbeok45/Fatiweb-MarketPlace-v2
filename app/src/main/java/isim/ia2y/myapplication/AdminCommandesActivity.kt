@@ -30,17 +30,25 @@ class AdminCommandesActivity : AppCompatActivity() {
         setupTopBar()
         setupAdminBottomNav(AdminNavTab.COMMANDES)
 
-        if (savedInstanceState == null) {
-            revealViewsInOrder(
-                R.id.adminCommandesTopBar,
-                R.id.adminCommandesStatsRow,
-                R.id.adminCommandesTvHeader,
-                R.id.adminCommandesCard,
-                startDelayMs = 60L,
-                staggerMs = 48L
-            )
+        lifecycleScope.launch {
+            val uid = FirebaseAuthManager.currentUser?.uid
+            if (uid == null || FirestoreService.fetchUserRole(uid) != "admin") {
+                finish()
+                return@launch
+            }
+
+            if (savedInstanceState == null) {
+                revealViewsInOrder(
+                    R.id.adminCommandesTopBar,
+                    R.id.adminCommandesStatsRow,
+                    R.id.adminCommandesTvHeader,
+                    R.id.adminCommandesCard,
+                    startDelayMs = 60L,
+                    staggerMs = 48L
+                )
+            }
+            loadOrders()
         }
-        loadOrders()
     }
 
     private fun setupWindowInsets() {

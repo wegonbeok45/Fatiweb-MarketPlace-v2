@@ -89,7 +89,9 @@ class ProfileTabFragment : Fragment(R.layout.fragment_profile_tab) {
         root.findViewById<View>(R.id.ivBack)?.setOnClickListener {
             (activity as? MainActivity)?.selectTab(MainActivity.Tab.HOME, animate = false)
         }
-        root.findViewById<View>(R.id.cardAdmin)?.setOnClickListener {
+        val cardAdmin = root.findViewById<View>(R.id.cardAdmin)
+        cardAdmin?.visibility = View.GONE
+        cardAdmin?.setOnClickListener {
             (activity as? AppCompatActivity)?.navigateNoShift(AdminDashboardActivity::class.java)
         }
         (activity as? AppCompatActivity)?.bindNotificationEntry(R.id.ivNotifications)
@@ -222,11 +224,14 @@ class ProfileTabFragment : Fragment(R.layout.fragment_profile_tab) {
         if (firebaseUser != null) {
             root.findViewById<TextView>(R.id.tvUserName)?.text =
                 firebaseUser.displayName?.ifEmpty { null } ?: getString(R.string.user_guest_name)
-            // If Firestore has a better display name (e.g. set during register), prefer it
             lifecycleScope.launch {
                 val fsName = FirestoreService.fetchUserName(firebaseUser.uid)
+                val role = FirestoreService.fetchUserRole(firebaseUser.uid)
                 if (!fsName.isNullOrBlank()) {
                     root.findViewById<TextView>(R.id.tvUserName)?.text = fsName
+                }
+                if (role == "admin") {
+                    root.findViewById<View>(R.id.cardAdmin)?.visibility = View.VISIBLE
                 }
             }
             root.findViewById<TextView>(R.id.tvRole)?.text = firebaseUser.email ?: getString(R.string.profile_signup_chip)

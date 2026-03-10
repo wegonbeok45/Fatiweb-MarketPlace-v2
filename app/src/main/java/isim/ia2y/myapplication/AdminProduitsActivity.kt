@@ -7,6 +7,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 
 class AdminProduitsActivity : AppCompatActivity() {
 
@@ -18,25 +20,33 @@ class AdminProduitsActivity : AppCompatActivity() {
         setupTopBar()
         setupAdminBottomNav(AdminNavTab.PRODUITS)
 
-        if (savedInstanceState == null) {
-            revealViewsInOrder(
-                R.id.adminProduitsTopBar,
-                R.id.adminProduitsTvHeader,
-                R.id.adminProduitsCard,
-                startDelayMs = 60L,
-                staggerMs = 48L
+        lifecycleScope.launch {
+            val uid = FirebaseAuthManager.currentUser?.uid
+            if (uid == null || FirestoreService.fetchUserRole(uid) != "admin") {
+                finish()
+                return@launch
+            }
+
+            if (savedInstanceState == null) {
+                revealViewsInOrder(
+                    R.id.adminProduitsTopBar,
+                    R.id.adminProduitsTvHeader,
+                    R.id.adminProduitsCard,
+                    startDelayMs = 60L,
+                    staggerMs = 48L
+                )
+            }
+            applyPressFeedback(
+                R.id.adminProduitRow1,
+                R.id.adminProduitRow2,
+                R.id.adminProduitRow3
+            )
+            bindComingSoon(
+                R.id.adminProduitRow1,
+                R.id.adminProduitRow2,
+                R.id.adminProduitRow3
             )
         }
-        applyPressFeedback(
-            R.id.adminProduitRow1,
-            R.id.adminProduitRow2,
-            R.id.adminProduitRow3
-        )
-        bindComingSoon(
-            R.id.adminProduitRow1,
-            R.id.adminProduitRow2,
-            R.id.adminProduitRow3
-        )
     }
 
     override fun onResume() {

@@ -23,6 +23,13 @@ class AdminDashboardActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        
+        val uid = FirebaseAuthManager.currentUser?.uid
+        if (uid == null) {
+            finish()
+            return
+        }
+
         runCatching {
             setContentView(R.layout.activity_admin_dashboard)
             setupWindowInsets()
@@ -30,29 +37,38 @@ class AdminDashboardActivity : AppCompatActivity() {
             setupBottomNav()
             restoreAvatar()
             setupQuickActions()
-            if (savedInstanceState == null) {
-                revealViewsInOrder(
-                    R.id.adminTopBar,
-                    R.id.adminCardWelcome,
-                    R.id.adminTvStatsHeader,
-                    R.id.adminStatsRow1,
-                    R.id.adminStatsRow2,
-                    R.id.adminTvActionsHeader,
-                    R.id.adminActionsRow,
-                    R.id.adminTvOrdersHeader,
-                    R.id.adminCardOrders,
-                    R.id.adminBottomNav,
-                    startDelayMs = 60L,
-                    staggerMs = 48L
-                )
+            
+            lifecycleScope.launch {
+                val role = FirestoreService.fetchUserRole(uid)
+                if (role != "admin") {
+                    finish()
+                    return@launch
+                }
+                
+                if (savedInstanceState == null) {
+                    revealViewsInOrder(
+                        R.id.adminTopBar,
+                        R.id.adminCardWelcome,
+                        R.id.adminTvStatsHeader,
+                        R.id.adminStatsRow1,
+                        R.id.adminStatsRow2,
+                        R.id.adminTvActionsHeader,
+                        R.id.adminActionsRow,
+                        R.id.adminTvOrdersHeader,
+                        R.id.adminCardOrders,
+                        R.id.adminBottomNav,
+                        startDelayMs = 60L,
+                        staggerMs = 48L
+                    )
+                }
+                seedProductsOnce()
+                loadAdminStats()
             }
         }.onFailure { e ->
             Log.e(logTag, "Failed to init admin dashboard", e)
             showToast(getString(R.string.coming_soon))
             finish()
         }
-        seedProductsOnce()
-        loadAdminStats()
     }
 
     private fun setupWindowInsets() {
@@ -144,20 +160,16 @@ class AdminDashboardActivity : AppCompatActivity() {
 
     /**
      * Seeds the 10 local products to Firestore exactly once.
-     * After the first run, the flag "catalog_seeded" is set in SharedPreferences
-     * so this never runs again on subsequent openings.
+     * Delegates to FirestoreService which checks if products already exist
+     * to prevent destructive overwrites of live data.
      */
     private fun seedProductsOnce() {
-        val prefs = getSharedPreferences("AppPrefs", MODE_PRIVATE)
-        if (prefs.getBoolean("catalog_seeded", false)) return // Already done
-
         lifecycleScope.launch {
             runCatching {
                 FirestoreService.seedProducts()
-                prefs.edit().putBoolean("catalog_seeded", true).apply()
-                Log.i(logTag, "Product catalog seeded to Firestore successfully.")
+                Log.i(logTag, "Product catalog seed check finished.")
             }.onFailure { e ->
-                Log.w(logTag, "Could not seed catalog", e)
+                Log.w(logTag, "Could not check/seed catalog", e)
             }
         }
     }

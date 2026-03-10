@@ -26,17 +26,25 @@ class AdminClientsActivity : AppCompatActivity() {
         setupTopBar()
         setupAdminBottomNav(AdminNavTab.CLIENTS)
 
-        if (savedInstanceState == null) {
-            revealViewsInOrder(
-                R.id.adminClientsTopBar,
-                R.id.adminClientsStatsRow,
-                R.id.adminClientsTvHeader,
-                R.id.adminClientsCard,
-                startDelayMs = 60L,
-                staggerMs = 48L
-            )
+        lifecycleScope.launch {
+            val uid = FirebaseAuthManager.currentUser?.uid
+            if (uid == null || FirestoreService.fetchUserRole(uid) != "admin") {
+                finish()
+                return@launch
+            }
+
+            if (savedInstanceState == null) {
+                revealViewsInOrder(
+                    R.id.adminClientsTopBar,
+                    R.id.adminClientsStatsRow,
+                    R.id.adminClientsTvHeader,
+                    R.id.adminClientsCard,
+                    startDelayMs = 60L,
+                    staggerMs = 48L
+                )
+            }
+            loadClients()
         }
-        loadClients()
     }
 
     private fun setupWindowInsets() {

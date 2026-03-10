@@ -7,6 +7,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 
 import android.app.Dialog
 import android.graphics.drawable.ColorDrawable
@@ -24,20 +26,27 @@ class AdminParametresActivity : AppCompatActivity() {
         setupTopBar()
         setupAdminBottomNav(AdminNavTab.SETTINGS)
 
-        if (savedInstanceState == null) {
-            revealViewsInOrder(
-                R.id.adminParametresTopBar,
-                R.id.adminParamCardBoutique,
-                R.id.adminParamCardLivraison,
-                R.id.adminParamCardPaiement,
-                startDelayMs = 60L,
-                staggerMs = 48L
-            )
+        lifecycleScope.launch {
+            val uid = FirebaseAuthManager.currentUser?.uid
+            if (uid == null || FirestoreService.fetchUserRole(uid) != "admin") {
+                finish()
+                return@launch
+            }
+
+            if (savedInstanceState == null) {
+                revealViewsInOrder(
+                    R.id.adminParametresTopBar,
+                    R.id.adminParamCardBoutique,
+                    R.id.adminParamCardLivraison,
+                    R.id.adminParamCardPaiement,
+                    startDelayMs = 60L,
+                    staggerMs = 48L
+                )
+            }
+            applyPressFeedback(R.id.adminParamCardLivraison, R.id.adminParamCardPaiement)
+            bindComingSoon(R.id.adminParamCardPaiement)
+            setupDeliveryEdits()
         }
-        applyPressFeedback(R.id.adminParamCardLivraison, R.id.adminParamCardPaiement)
-        bindComingSoon(R.id.adminParamCardPaiement)
-        
-        setupDeliveryEdits()
     }
 
     private fun setupWindowInsets() {
