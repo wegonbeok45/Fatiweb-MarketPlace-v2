@@ -8,8 +8,10 @@ object CartStore {
     private const val KEY_QTY = "cart_qty"
     const val LIVRAISON_FEE = 7.000
 
-    private fun prefs(context: Context) =
-        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+    private fun prefs(context: Context): android.content.SharedPreferences {
+        val uid = FirebaseAuthManager.currentUser?.uid ?: "guest"
+        return context.getSharedPreferences("${uid}_$PREFS_NAME", Context.MODE_PRIVATE)
+    }
 
     private fun decode(entries: Set<String>?): MutableMap<String, Int> {
         val result = mutableMapOf<String, Int>()

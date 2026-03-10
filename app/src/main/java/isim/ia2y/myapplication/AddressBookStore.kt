@@ -7,8 +7,10 @@ object AddressBookStore {
     private const val KEY_ADDRESSES = "addresses_csv"
     private const val SEP = "|||"
 
-    private fun prefs(context: Context) =
-        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+    private fun prefs(context: Context): android.content.SharedPreferences {
+        val uid = FirebaseAuthManager.currentUser?.uid ?: "guest"
+        return context.getSharedPreferences("${uid}_$PREFS_NAME", Context.MODE_PRIVATE)
+    }
 
     fun getAddresses(context: Context): MutableList<String> {
         val raw = prefs(context).getString(KEY_ADDRESSES, "").orEmpty()

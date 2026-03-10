@@ -43,13 +43,14 @@ class LoadingScreen : AppCompatActivity() {
                 // Read all shared-preference files so they're cached in memory
                 ctx.getSharedPreferences("profile_prefs", Context.MODE_PRIVATE).all
                 ctx.getSharedPreferences("AppPrefs", Context.MODE_PRIVATE).all
-                ctx.getSharedPreferences("address_book", Context.MODE_PRIVATE).all
+                AddressBookStore.getAddresses(ctx)
+                CartStore.getCart(ctx)
                 LanguageManager.ensureDefaultAndApply(ctx)
             },
             Milestone(R.string.loading_step_language, 30) { ctx ->
                 // Apply locale and read notification state
                 NotificationStore.hasUnread(ctx)
-                ctx.getSharedPreferences("favorites_prefs", Context.MODE_PRIVATE).all
+                FavoritesStore.getFavorites(ctx)
             },
             Milestone(R.string.loading_step_catalog, 50) { _ ->
                 // Force the entire product catalog into memory

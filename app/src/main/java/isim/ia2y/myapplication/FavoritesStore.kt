@@ -6,8 +6,10 @@ object FavoritesStore {
     private const val PREFS_NAME = "favoris_store"
     private const val KEY_IDS = "liked_ids"
 
-    private fun prefs(context: Context) =
-        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+    private fun prefs(context: Context): android.content.SharedPreferences {
+        val uid = FirebaseAuthManager.currentUser?.uid ?: "guest"
+        return context.getSharedPreferences("${uid}_$PREFS_NAME", Context.MODE_PRIVATE)
+    }
 
     fun getFavorites(context: Context): Set<String> {
         return prefs(context).getStringSet(KEY_IDS, emptySet()) ?: emptySet()
