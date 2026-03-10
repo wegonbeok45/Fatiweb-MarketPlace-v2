@@ -65,6 +65,15 @@ class ProductDetailsScreen : AppCompatActivity() {
         findViewById<TextView>(R.id.tvBullet3)?.text = bullets.getOrNull(2).orEmpty()
 
         updateQuantityUi()
+        
+        // Favorite state setup (Lottie Heart)
+        val lottieHeart = findViewById<com.airbnb.lottie.LottieAnimationView>(R.id.ivFavoriteLottie)
+        val isFav = FavoritesStore.isFavorite(this, product.id)
+        if (isFav) {
+            lottieHeart?.progress = 1f // Full heart
+        } else {
+            lottieHeart?.progress = 0f // Empty heart
+        }
     }
 
     private fun bindActions() {
@@ -87,6 +96,22 @@ class ProductDetailsScreen : AppCompatActivity() {
         findViewById<View>(R.id.btnAddToCart)?.setOnClickListener {
             repeat(quantity) { CartStore.addOne(this, product.id) }
             showMotionSnackbar(getString(R.string.details_added_to_cart, quantity), R.id.layoutBottomBar)
+        }
+
+        val lottieHeart = findViewById<com.airbnb.lottie.LottieAnimationView>(R.id.ivFavoriteLottie)
+        lottieHeart?.setOnClickListener {
+            val isNowFav = FavoritesStore.toggleFavorite(this, product.id)
+            if (isNowFav) {
+                lottieHeart.apply {
+                    speed = 1f // Play forward
+                    playAnimation()
+                }
+            } else {
+                lottieHeart.apply {
+                    speed = -2f // Play backward quickly
+                    playAnimation()
+                }
+            }
         }
 
         applyPressFeedback(R.id.ivBack, R.id.ivShare, R.id.btnMinus, R.id.btnPlus, R.id.btnAddToCart)

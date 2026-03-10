@@ -44,6 +44,18 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/ivFavoriteLottie"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginEnd="16dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/ivShare"
+            app:layout_constraintTop_toTopOf="parent"
+            app:lottie_rawRes="@raw/anim_heart"
+            app:lottie_autoPlay="false"
+            app:lottie_loop="false" />
+
         <ImageView
             android:id="@+id/ivShare"
             android:layout_width="@dimen/details_top_icon"

@@ -385,10 +385,31 @@ class MainActivity : AppCompatActivity() {
         )
         val icon = findViewById<ImageView>(iconId)
         
-        // Reset scale as we use pill indicator now
         icon.animate().cancel()
-        icon.scaleX = 1f
-        icon.scaleY = 1f
+        if (active) {
+            icon.scaleX = 0.8f
+            icon.scaleY = 0.8f
+            icon.animate()
+                .scaleX(1.15f)
+                .scaleY(1.15f)
+                .setDuration(150L)
+                .setInterpolator(androidx.interpolator.view.animation.FastOutSlowInInterpolator())
+                .withEndAction {
+                    icon.animate()
+                        .scaleX(1f)
+                        .scaleY(1f)
+                        .setDuration(100L)
+                        .setInterpolator(android.view.animation.OvershootInterpolator())
+                        .start()
+                }
+                .start()
+        } else {
+            icon.animate()
+                .scaleX(1f)
+                .scaleY(1f)
+                .setDuration(150L)
+                .start()
+        }
 
         icon.setColorFilter(color)
 
