@@ -215,8 +215,8 @@ object FirestoreService {
             
             // Use Aggregate query to sum total revenue without pulling documents
             val sumQuery = db.collectionGroup("orders").aggregate(AggregateField.sum("total"))
-            val revenueSum = sumQuery.get(AggregateSource.SERVER).await()
-                .get(AggregateField.sum("total")) ?: 0.0
+            val revenueSum = (sumQuery.get(AggregateSource.SERVER).await()
+                .get(AggregateField.sum("total")) as? Number)?.toDouble() ?: 0.0
 
             AdminStats(
                 totalOrders   = ordersCount.toInt(),
