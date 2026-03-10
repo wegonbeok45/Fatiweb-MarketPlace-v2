@@ -13,6 +13,7 @@ data class Product(
     val description: String,
     val bullets: List<String>,
     @DrawableRes val imageRes: Int
+) {
     val unitPrice: Double get() = price
     val tag: String get() = tags.firstOrNull().orEmpty()
 
