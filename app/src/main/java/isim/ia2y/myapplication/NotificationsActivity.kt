@@ -6,6 +6,9 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class NotificationsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,9 +44,10 @@ class NotificationsActivity : AppCompatActivity() {
             rv.adapter = NotificationsAdapter(notifications)
             
             // Mark as read after viewing
-            window.decorView.postDelayed({
-                NotificationStore.markAllAsRead(this)
-            }, 1200)
+            lifecycleScope.launch {
+                delay(1200)
+                NotificationStore.markAllAsRead(this@NotificationsActivity)
+            }
         }
     }
 }

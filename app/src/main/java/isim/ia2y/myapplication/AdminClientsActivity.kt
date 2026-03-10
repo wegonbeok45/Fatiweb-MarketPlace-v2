@@ -13,10 +13,6 @@ import kotlinx.coroutines.launch
 
 class AdminClientsActivity : AppCompatActivity() {
 
-    private val rowIds    = listOf(R.id.adminClientRow1,   R.id.adminClientRow2,   R.id.adminClientRow3)
-    private val nameTvIds = listOf(R.id.adminClientName1,  R.id.adminClientName2,  R.id.adminClientName3)
-    private val emailIds  = listOf(R.id.adminClientEmail1, R.id.adminClientEmail2, R.id.adminClientEmail3)
-    private val idTvIds   = listOf(R.id.adminClientId1,    R.id.adminClientId2,    R.id.adminClientId3)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -78,31 +74,54 @@ class AdminClientsActivity : AppCompatActivity() {
     }
 
     private fun renderClients(clients: List<FirestoreService.ClientInfo>) {
-        rowIds.forEach { id -> findViewById<View>(id)?.visibility = View.GONE }
+        val container = findViewById<android.widget.LinearLayout>(R.id.adminClientsListContainer) ?: return
+        container.removeAllViews()
 
         if (clients.isEmpty()) {
-            findViewById<View>(rowIds[0])?.visibility = View.VISIBLE
-            findViewById<TextView>(nameTvIds[0])?.text = "Aucun client inscrit"
+            val emptyTv = TextView(this).apply {
+                text = "Aucun client inscrit"
+                setPadding(48, 48, 48, 48)
+                textSize = 14f
+                gravity = android.view.Gravity.CENTER
+                setTextColor(androidx.core.content.ContextCompat.getColor(context, R.color.profile_text_secondary))
+            }
+            container.addView(emptyTv)
             return
         }
 
-        clients.take(rowIds.size).forEachIndexed { i, client ->
-            val row = findViewById<View>(rowIds[i]) ?: return@forEachIndexed
-            row.visibility = View.VISIBLE
+        val inflater = android.view.LayoutInflater.from(this)
+        val density = resources.displayMetrics.density
 
-            findViewById<TextView>(nameTvIds[i])?.text = client.name
-            findViewById<TextView>(emailIds[i])?.text  = client.email
+        clients.forEachIndexed { i, client ->
+            val row = inflater.inflate(R.layout.item_admin_client_row, container, false)
+
+            row.findViewById<TextView>(R.id.adminClientName)?.text = client.name
+            row.findViewById<TextView>(R.id.adminClientEmail)?.text = client.email
             val orderLabel = if (client.orderCount == 1) "1 commande" else "${client.orderCount} commandes"
-            findViewById<TextView>(idTvIds[i])?.text   = orderLabel
+            row.findViewById<TextView>(R.id.adminClientId)?.text = orderLabel
+            
+            val initial = if (client.name.isNotBlank()) client.name.take(1).uppercase() else "?"
+            row.findViewById<TextView>(R.id.adminClientAvatarInitial)?.text = initial
 
-            applyPressFeedback(rowIds[i])
             row.setOnClickListener {
                 showToast("${client.name} — ${client.email}")
             }
-        }
 
-        // Update total clients count if view exists
-        // NOTE: adminClientsTvCount not in layout, using adminClientsTvHeader or others if needed
-        // findViewById<TextView>(R.id.adminClientsTvCount)?.text = clients.size.toString()
+            container.addView(row)
+
+            if (i < clients.lastIndex) {
+                val divider = View(this).apply {
+                    layoutParams = android.widget.LinearLayout.LayoutParams(
+                        android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+                        (1 * density).toInt()
+                    ).apply {
+                        marginStart = (16 * density).toInt()
+                        marginEnd = (16 * density).toInt()
+                    }
+                    setBackgroundColor(androidx.core.content.ContextCompat.getColor(context, R.color.profile_divider))
+                }
+                container.addView(divider)
+            }
+        }
     }
 }

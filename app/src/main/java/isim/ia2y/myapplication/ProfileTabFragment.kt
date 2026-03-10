@@ -23,7 +23,7 @@ import kotlinx.coroutines.launch
 import java.util.Locale
 
 class ProfileTabFragment : Fragment(R.layout.fragment_profile_tab) {
-    private var pendingLocationListener: LocationListener? = null
+
     private val avatarPrefsName = "profile_prefs"
     private val avatarUriKey = "avatar_uri"
     private val logTag = "ProfileTabFragment"
@@ -75,15 +75,7 @@ class ProfileTabFragment : Fragment(R.layout.fragment_profile_tab) {
         refreshUserInfo()
     }
 
-    override fun onPause() {
-        val context = context
-        pendingLocationListener?.let { listener ->
-            val manager = context?.getSystemService(LocationManager::class.java)
-            runCatching { manager?.removeUpdates(listener) }
-        }
-        pendingLocationListener = null
-        super.onPause()
-    }
+
 
     private fun setupProfileActions(root: View) {
         root.findViewById<View>(R.id.ivBack)?.setOnClickListener {

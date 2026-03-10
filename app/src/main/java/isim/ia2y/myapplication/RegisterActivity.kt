@@ -86,7 +86,7 @@ class RegisterActivity : AppCompatActivity() {
         setupFacebookLogin()
         setupGoogleLogin()
 
-        bindComingSoon()
+
 
         val etFullName = findViewById<EditText>(R.id.etFullName)
         val etEmail = findViewById<EditText>(R.id.etEmail)

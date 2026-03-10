@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="76dp"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp"
+    android:background="?selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true">
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/adminClientAvatar"
+        android:layout_width="42dp"
+        android:layout_height="42dp"
+        app:cardBackgroundColor="@color/profile_card_icon_bg"
+        app:cardCornerRadius="999dp"
+        app:cardElevation="0dp"
+        app:strokeWidth="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+        <TextView
+            android:id="@+id/adminClientAvatarInitial"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:fontFamily="@font/funnelsans_semibold"
+            android:text="A"
+            android:textColor="@color/colorPrimary"
+            android:textSize="18sp" />
+    </com.google.android.material.card.MaterialCardView>
+
+    <TextView
+        android:id="@+id/adminClientId"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:fontFamily="@font/funnelsans_regular"
+        android:text="#001"
+        android:textColor="@color/profile_text_secondary"
+        android:textSize="10sp"
+        app:layout_constraintBottom_toTopOf="@id/adminClientName"
+        app:layout_constraintStart_toEndOf="@id/adminClientAvatar"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed" />
+
+    <TextView
+        android:id="@+id/adminClientName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:fontFamily="@font/funnelsans_semibold"
+        android:text="Ahmed Ben Ali"
+        android:textColor="@color/profile_text_primary"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toTopOf="@id/adminClientEmail"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/adminClientAvatar"
+        app:layout_constraintTop_toBottomOf="@id/adminClientId" />
+
+    <TextView
+        android:id="@+id/adminClientEmail"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:fontFamily="@font/funnelsans_regular"
+        android:text="ahmed.benali@email.com"
+        android:textColor="@color/profile_text_secondary"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/adminClientAvatar"
+        app:layout_constraintTop_toBottomOf="@id/adminClientName" />
+</androidx.constraintlayout.widget.ConstraintLayout>
