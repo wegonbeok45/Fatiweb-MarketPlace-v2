@@ -182,13 +182,22 @@ object FirestoreService {
         }
     }
 
+    private var cachedUserRole: Pair<String, String>? = null
+
     /**
      * Fetch a user's role from Firestore.
      */
     suspend fun fetchUserRole(uid: String): String? {
+        cachedUserRole?.let {
+            if (it.first == uid) return it.second
+        }
         return try {
             val doc = userRef(uid).get().await()
-            doc.getString("role")
+            val role = doc.getString("role")
+            if (role != null) {
+                cachedUserRole = Pair(uid, role)
+            }
+            role
         } catch (e: Exception) {
             null
         }
