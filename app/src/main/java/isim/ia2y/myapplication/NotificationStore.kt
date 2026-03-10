@@ -18,15 +18,13 @@ object NotificationStore {
     private const val KEY_NOTIFICATIONS = "notifications_json"
     private const val KEY_FIRST_LAUNCH = "notification_first_launch"
 
-    private var cachedList: List<AppNotification>? = null
-
     private fun getPrefs(context: Context): SharedPreferences {
-        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val uid = FirebaseAuthManager.currentUser?.uid ?: "guest"
+        return context.getSharedPreferences("${uid}_$PREFS_NAME", Context.MODE_PRIVATE)
     }
 
     fun getAll(context: Context): List<AppNotification> {
         checkFirstLaunch(context)
-        cachedList?.let { return it }
 
         val json = getPrefs(context).getString(KEY_NOTIFICATIONS, "[]") ?: "[]"
         val array = JSONArray(json)
@@ -43,9 +41,7 @@ object NotificationStore {
                 )
             )
         }
-        val sortedList = list.sortedByDescending { it.timestamp }
-        cachedList = sortedList
-        return sortedList
+        return list.sortedByDescending { it.timestamp }
     }
 
     fun hasUnread(context: Context): Boolean {
@@ -59,9 +55,9 @@ object NotificationStore {
     }
 
     private fun saveAll(context: Context, notifications: List<AppNotification>) {
-        cachedList = notifications.sortedByDescending { it.timestamp }
+        val cappedList = notifications.sortedByDescending { it.timestamp }.take(50)
         val array = JSONArray()
-        notifications.forEach {
+        cappedList.forEach {
             val obj = JSONObject().apply {
                 put("id", it.id)
                 put("title", it.title)
