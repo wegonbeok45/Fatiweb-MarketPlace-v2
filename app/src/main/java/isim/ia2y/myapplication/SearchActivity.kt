@@ -511,12 +511,7 @@ class SearchActivity : AppCompatActivity() {
         val locationKeyword = mapLocationToKeyword(location)
         val normalizedQuery = query.lowercase(Locale.getDefault())
         return source.filter { product ->
-            val searchable = buildString {
-                append(product.title).append(' ')
-                append(product.subtitle).append(' ')
-                append(product.description).append(' ')
-                append(product.tags.joinToString(" "))
-            }.lowercase(Locale.getDefault())
+            val searchable = product.searchableText
 
             val queryMatch = searchable.contains(normalizedQuery)
             val categoryMatch = when (category) {

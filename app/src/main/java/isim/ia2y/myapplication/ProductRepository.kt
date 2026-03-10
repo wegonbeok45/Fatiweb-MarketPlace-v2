@@ -13,9 +13,17 @@ data class Product(
     val description: String,
     val bullets: List<String>,
     @DrawableRes val imageRes: Int
-) {
     val unitPrice: Double get() = price
     val tag: String get() = tags.firstOrNull().orEmpty()
+
+    val searchableText: String by lazy {
+        buildString {
+            append(title).append(' ')
+            append(subtitle).append(' ')
+            append(description).append(' ')
+            append(tags.joinToString(" "))
+        }.lowercase(java.util.Locale.getDefault())
+    }
 }
 
 object ProductCatalog {
