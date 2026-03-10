@@ -7,6 +7,7 @@ import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -26,7 +27,18 @@ class register : AppCompatActivity() {
     private var passwordVisible = false
     private lateinit var callbackManager: CallbackManager
     private lateinit var googleSignInClient: GoogleSignInClient
-    private val RC_GOOGLE_SIGN_IN = 1001
+
+    private val googleSignInLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+        try {
+            val account = task.getResult(ApiException::class.java)!!
+            handleGoogleIdToken(account.idToken!!)
+        } catch (e: ApiException) {
+            showMotionSnackbar("Google error ${e.statusCode}: ${e.message}")
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -194,25 +206,16 @@ class register : AppCompatActivity() {
     }
 
 
+    // Forward Facebook activity results to its callback manager
+    @Suppress("DEPRECATION")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: android.content.Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         callbackManager.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == RC_GOOGLE_SIGN_IN) {
-            val task = GoogleSignIn.getSignedInAccountFromIntent(data)
-            try {
-                val account = task.getResult(ApiException::class.java)!!
-                handleGoogleIdToken(account.idToken!!)
-            } catch (e: ApiException) {
-                showMotionSnackbar("Google error ${e.statusCode}: ${e.message}")
-            }
-        }
     }
 
     private fun setupGoogleLogin() {
         findViewById<View>(R.id.btnGoogle)?.setOnClickListener {
-            val signInIntent = googleSignInClient.signInIntent
-            @Suppress("DEPRECATION")
-            startActivityForResult(signInIntent, RC_GOOGLE_SIGN_IN)
+            googleSignInLauncher.launch(googleSignInClient.signInIntent)
         }
     }
 
