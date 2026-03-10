@@ -91,7 +91,10 @@ class AdminCommandesActivity : AppCompatActivity() {
             findViewById<View>(rowIds[0])?.visibility = View.VISIBLE
             findViewById<TextView>(nameTvIds[0])?.text = "Aucune commande"
             findViewById<TextView>(idTvIds[0])?.text   = ""
-            findViewById<TextView>(badgeIds[0])?.text  = ""
+            
+            val badgeCard = findViewById<com.google.android.material.card.MaterialCardView>(badgeIds[0])
+            val badgeTv = badgeCard?.getChildAt(0) as? TextView
+            badgeTv?.text = ""
             return
         }
 
@@ -108,7 +111,10 @@ class AdminCommandesActivity : AppCompatActivity() {
 
             findViewById<TextView>(idTvIds[i])?.text   = order.displayId
             findViewById<TextView>(nameTvIds[i])?.text = firstProduct
-            findViewById<TextView>(badgeIds[i])?.text  = order.statusLabel
+            
+            val badgeCard = findViewById<com.google.android.material.card.MaterialCardView>(badgeIds[i])
+            val badgeTv = badgeCard?.getChildAt(0) as? TextView
+            badgeTv?.text = order.statusLabel
 
             applyPressFeedback(rowIds[i])
             row.setOnClickListener { showStatusDialog(uid, order, i) }
@@ -137,7 +143,9 @@ class AdminCommandesActivity : AppCompatActivity() {
                     loadedOrders = loadedOrders.toMutableList().also {
                         it[rowIndex] = uid to updatedOrder
                     }
-                    findViewById<TextView>(badgeIds[rowIndex])?.text = updatedOrder.statusLabel
+                    val badgeCard = findViewById<com.google.android.material.card.MaterialCardView>(badgeIds[rowIndex])
+                    val badgeTv = badgeCard?.getChildAt(0) as? TextView
+                    badgeTv?.text = updatedOrder.statusLabel
                     showToast("Statut mis à jour")
                 }
             }
