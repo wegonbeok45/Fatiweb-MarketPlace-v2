@@ -2,6 +2,8 @@ package isim.ia2y.myapplication
 
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.AggregateField
+import com.google.firebase.firestore.AggregateSource
 import kotlinx.coroutines.tasks.await
 
 /**
@@ -82,7 +84,10 @@ object FirestoreService {
      */
     suspend fun fetchAllOrders(): List<Pair<String, AppOrder>> {
         return try {
-            val ordersSnapshot = db.collectionGroup("orders").get().await()
+            val ordersSnapshot = db.collectionGroup("orders")
+                .limit(200)
+                .get()
+                .await()
             val result = mutableListOf<Pair<String, AppOrder>>()
             ordersSnapshot.documents.forEach { doc ->
                 val data = doc.data ?: return@forEach
@@ -108,8 +113,14 @@ object FirestoreService {
      */
     suspend fun fetchAllClients(): List<ClientInfo> {
         return try {
-            val usersSnapshot = db.collection("users").get().await()
-            val ordersSnapshot = db.collectionGroup("orders").get().await()
+            val usersSnapshot = db.collection("users")
+                .limit(100)
+                .get()
+                .await()
+            val ordersSnapshot = db.collectionGroup("orders")
+                .limit(500)
+                .get()
+                .await()
             
             val orderCounts = mutableMapOf<String, Int>()
             ordersSnapshot.documents.forEach { doc ->
@@ -198,20 +209,20 @@ object FirestoreService {
      */
     suspend fun fetchAdminStats(): AdminStats {
         return try {
-            val usersSnapshot = db.collection("users").get().await()
-            val productsSnapshot = productsRef.get().await()
-            val ordersSnapshot = db.collectionGroup("orders").get().await()
+            val usersCount = db.collection("users").count().get(AggregateSource.SERVER).await().count
+            val productsCount = productsRef.count().get(AggregateSource.SERVER).await().count
+            val ordersCount = db.collectionGroup("orders").count().get(AggregateSource.SERVER).await().count
             
-            var totalRevenue = 0.0
-            ordersSnapshot.documents.forEach { orderDoc ->
-                totalRevenue += (orderDoc.getDouble("total") ?: 0.0)
-            }
-            
+            // Use Aggregate query to sum total revenue without pulling documents
+            val sumQuery = db.collectionGroup("orders").aggregate(AggregateField.sum("total"))
+            val revenueSum = sumQuery.get(AggregateSource.SERVER).await()
+                .get(AggregateField.sum("total")) ?: 0.0
+
             AdminStats(
-                totalOrders   = ordersSnapshot.size(),
-                totalRevenue  = totalRevenue,
-                totalClients  = usersSnapshot.size(),
-                totalProducts = productsSnapshot.size()
+                totalOrders   = ordersCount.toInt(),
+                totalRevenue  = revenueSum,
+                totalClients  = usersCount.toInt(),
+                totalProducts = productsCount.toInt()
             )
         } catch (e: Exception) {
             AdminStats()
