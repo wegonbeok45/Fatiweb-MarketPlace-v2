@@ -24,14 +24,14 @@
     <dimen name="screen_padding_vertical">16dp</dimen>
     <dimen name="auth_screen_padding">24dp</dimen>
 
-    <dimen name="corner_radius_small">4dp</dimen>
-    <dimen name="corner_radius_medium">8dp</dimen>
-    <dimen name="corner_radius_large">12dp</dimen>
+    <dimen name="corner_radius_small">6dp</dimen>
+    <dimen name="corner_radius_medium">12dp</dimen>
+    <dimen name="corner_radius_large">16dp</dimen>
     <dimen name="corner_radius_round">999dp</dimen>
 
-    <dimen name="button_height">44dp</dimen>
-    <dimen name="input_height">44dp</dimen>
-    <dimen name="toolbar_height">48dp</dimen>
+    <dimen name="button_height">56dp</dimen>
+    <dimen name="input_height">56dp</dimen>
+    <dimen name="toolbar_height">56dp</dimen>
     <dimen name="list_item_height">72dp</dimen>
     <dimen name="bottom_nav_height">72dp</dimen>
     <dimen name="chip_height">36dp</dimen>
@@ -70,11 +70,11 @@
     <dimen name="text_size_title">24sp</dimen>
     <dimen name="text_size_title_large">28sp</dimen>
     <dimen name="text_size_subtitle">18sp</dimen>
-    <dimen name="text_size_body">14sp</dimen>
-    <dimen name="text_size_caption">12sp</dimen>
-    <dimen name="text_size_overline">11sp</dimen>
-    <dimen name="text_size_input">14sp</dimen>
-    <dimen name="text_size_button">14sp</dimen>
+    <dimen name="text_size_body">16sp</dimen>
+    <dimen name="text_size_caption">14sp</dimen>
+    <dimen name="text_size_overline">12sp</dimen>
+    <dimen name="text_size_input">16sp</dimen>
+    <dimen name="text_size_button">16sp</dimen>
 
     <!-- Home screen -->
     <dimen name="home_horizontal_padding">16dp</dimen>
@@ -121,10 +121,10 @@
     <dimen name="home_product_name_margin_top">12dp</dimen>
     <dimen name="home_product_subtitle_margin_top">4dp</dimen>
     <dimen name="home_product_price_row_margin_top">12dp</dimen>
-    <dimen name="home_product_price_row_height">34dp</dimen>
-    <dimen name="home_add_cart_button_size">34dp</dimen>
-    <dimen name="home_add_cart_button_radius">8dp</dimen>
-    <dimen name="home_add_cart_icon_size">19dp</dimen>
+    <dimen name="home_product_price_row_height">40dp</dimen>
+    <dimen name="home_add_cart_button_size">40dp</dimen>
+    <dimen name="home_add_cart_button_radius">12dp</dimen>
+    <dimen name="home_add_cart_icon_size">20dp</dimen>
     <dimen name="home_bottom_divider_margin_top">18dp</dimen>
     <dimen name="home_nav_padding_vertical">14dp</dimen>
     <dimen name="home_nav_horizontal_margin">20dp</dimen>
@@ -149,7 +149,7 @@
     <dimen name="home_text_product_price">18sp</dimen>
     <dimen name="home_text_product_price_unit">12sp</dimen>
     <dimen name="home_product_price_unit_margin_start">4dp</dimen>
-    <dimen name="home_product_card_elevation">0dp</dimen>
+    <dimen name="home_product_card_elevation">1dp</dimen>
     <dimen name="home_header_elevation">0dp</dimen>
     <dimen name="home_text_nav_label">12sp</dimen>
 
@@ -237,24 +237,24 @@
     <dimen name="profile_location_horizontal_padding">12dp</dimen>
     <dimen name="profile_location_icon_size">16dp</dimen>
     <dimen name="profile_location_text_gap">6dp</dimen>
-    <dimen name="profile_menu_top_padding">12dp</dimen>
-    <dimen name="profile_menu_bottom_padding">12dp</dimen>
-    <dimen name="profile_menu_item_height_exact">56dp</dimen>
-    <dimen name="profile_menu_card_spacing">10dp</dimen>
-    <dimen name="profile_menu_card_radius">12dp</dimen>
-    <dimen name="profile_menu_card_elevation">0dp</dimen>
-    <dimen name="profile_menu_content_horizontal_padding">14dp</dimen>
+    <dimen name="profile_menu_top_padding">24dp</dimen>
+    <dimen name="profile_menu_bottom_padding">24dp</dimen>
+    <dimen name="profile_menu_item_height_exact">64dp</dimen>
+    <dimen name="profile_menu_card_spacing">12dp</dimen>
+    <dimen name="profile_menu_card_radius">16dp</dimen>
+    <dimen name="profile_menu_card_elevation">2dp</dimen>
+    <dimen name="profile_menu_content_horizontal_padding">16dp</dimen>
     <dimen name="profile_menu_icon_container_size_exact">48dp</dimen>
-    <dimen name="profile_menu_icon_size">22dp</dimen>
+    <dimen name="profile_menu_icon_size">24dp</dimen>
     <dimen name="profile_menu_text_start_margin">12dp</dimen>
     <dimen name="profile_menu_subtitle_margin_top">0dp</dimen>
     <dimen name="profile_chevron_size">16dp</dimen>
-    <dimen name="profile_logout_height_exact">52dp</dimen>
-    <dimen name="profile_logout_top_margin">16dp</dimen>
-    <dimen name="profile_logout_corner_radius">12dp</dimen>
-    <dimen name="profile_logout_stroke_width">0dp</dimen>
-    <dimen name="profile_logout_icon_size">20dp</dimen>
-    <dimen name="profile_logout_text_start_margin">10dp</dimen>
+    <dimen name="profile_logout_height_exact">64dp</dimen>
+    <dimen name="profile_logout_top_margin">24dp</dimen>
+    <dimen name="profile_logout_corner_radius">16dp</dimen>
+    <dimen name="profile_logout_stroke_width">1dp</dimen>
+    <dimen name="profile_logout_icon_size">24dp</dimen>
+    <dimen name="profile_logout_text_start_margin">12dp</dimen>
     <dimen name="profile_bottom_nav_height_exact">72dp</dimen>
     <dimen name="profile_bottom_nav_icon_size">20dp</dimen>
     <dimen name="profile_nav_item_padding_top">8dp</dimen>
@@ -302,7 +302,7 @@
     <dimen name="details_top_icon">24dp</dimen>
     <dimen name="details_top_title_size">18sp</dimen>
     <dimen name="details_divider_height">1dp</dimen>
-    <dimen name="details_image_height">360dp</dimen>
+    <dimen name="details_image_height">420dp</dimen>
     <dimen name="details_image_width">250dp</dimen>
     <dimen name="details_section_top">18dp</dimen>
     <dimen name="details_section_bottom">24dp</dimen>

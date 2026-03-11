@@ -42,8 +42,8 @@
     <string name="loading_progress_percent">%1$d%%</string>
     <string name="loading_progress_full">100%</string>
     <string name="user_guest_name">Guest user</string>
-    <string name="details_star_symbol">?</string>
-    <string name="details_check_symbol">?</string>
+    <string name="details_star_symbol">&#9733;</string>
+    <string name="details_check_symbol">&#10003;</string>
     <string name="settings_title">Settings</string>
     <string name="settings_back">Back</string>
     <string name="settings_language_title">Language</string>

@@ -1,20 +1,20 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <resources>
 
     <style name="AppText.Base">
-        <item name="android:fontFamily">@font/funnelsans_regular</item>
+        <item name="android:fontFamily">@font/poppins_regular</item>
         <item name="android:textColor">@color/colorOnSurface</item>
     </style>
 
     <style name="AppText.Title" parent="AppText.Base">
-        <item name="android:fontFamily">@font/funnelsans_extrabold</item>
+        <item name="android:fontFamily">@font/poppins_bold</item>
         <item name="android:textSize">@dimen/text_size_title</item>
         <item name="android:textStyle">bold</item>
         <item name="android:lineSpacingExtra">@dimen/space_4</item>
     </style>
 
     <style name="AppText.Subtitle" parent="AppText.Base">
-        <item name="android:fontFamily">@font/funnelsans_semibold</item>
+        <item name="android:fontFamily">@font/poppins_semibold</item>
         <item name="android:textSize">@dimen/text_size_subtitle</item>
         <item name="android:textStyle">bold</item>
     </style>
@@ -26,19 +26,19 @@
     </style>
 
     <style name="AppText.Caption" parent="AppText.Base">
-        <item name="android:fontFamily">@font/funnelsans_medium</item>
+        <item name="android:fontFamily">@font/poppins_medium</item>
         <item name="android:textSize">@dimen/text_size_caption</item>
         <item name="android:textColor">@color/colorOnSurfaceVariant</item>
     </style>
 
     <style name="AppText.FieldLabel" parent="AppText.Body">
-        <item name="android:fontFamily">@font/funnelsans_semibold</item>
+        <item name="android:fontFamily">@font/poppins_semibold</item>
         <item name="android:textColor">@color/colorOnSurface</item>
         <item name="android:textStyle">bold</item>
     </style>
 
     <style name="AppText.Overline" parent="AppText.Caption">
-        <item name="android:fontFamily">@font/funnelsans_semibold</item>
+        <item name="android:fontFamily">@font/poppins_semibold</item>
         <item name="android:textSize">@dimen/text_size_overline</item>
         <item name="android:textStyle">bold</item>
         <item name="android:letterSpacing">0.2</item>
@@ -53,7 +53,7 @@
         <item name="android:textAlignment">center</item>
         <item name="android:includeFontPadding">true</item>
         <item name="android:textStyle">bold</item>
-        <item name="android:fontFamily">@font/funnelsans_semibold</item>
+        <item name="android:fontFamily">@font/poppins_semibold</item>
         <item name="cornerRadius">@dimen/corner_radius_medium</item>
         <item name="android:insetLeft">@dimen/space_0</item>
         <item name="android:insetRight">@dimen/space_0</item>
@@ -67,6 +67,7 @@
         <item name="backgroundTint">@color/colorPrimary</item>
         <item name="android:textColor">@color/colorOnPrimary</item>
         <item name="strokeWidth">@dimen/space_0</item>
+        <item name="elevation">4dp</item>
     </style>
 
     <style name="AppButton.Secondary" parent="AppButton.Base">
@@ -88,7 +89,7 @@
     <style name="AppInput.Layout" parent="Widget.MaterialComponents.CardView">
         <item name="android:layout_height">@dimen/input_height</item>
         <item name="cardBackgroundColor">@color/colorSurface</item>
-        <item name="cardCornerRadius">@dimen/corner_radius_medium</item>
+        <item name="cardCornerRadius">@dimen/corner_radius_large</item>
         <item name="cardElevation">@dimen/space_0</item>
         <item name="strokeColor">@color/colorOutline</item>
         <item name="strokeWidth">@dimen/stroke_width_default</item>
@@ -172,7 +173,7 @@
     </style>
 
     <style name="HomeText.BannerTitle" parent="HomeText.Base">
-        <item name="android:fontFamily">@font/funnelsans_extrabold</item>
+        <item name="android:fontFamily">@font/poppins_bold</item>
         <item name="android:textSize">@dimen/home_text_banner_title</item>
         <item name="android:textColor">@color/home_banner_text</item>
         <item name="android:textStyle">bold</item>
@@ -228,17 +229,17 @@
 
     <!-- Panier screen styles -->
     <style name="PanierText.Base" parent="AppText.Base">
-        <item name="android:fontFamily">@font/funnelsans_regular</item>
+        <item name="android:fontFamily">@font/poppins_regular</item>
         <item name="android:textColor">@color/panier_text_primary</item>
     </style>
 
     <style name="PanierText.ToolbarTitle" parent="PanierText.Base">
-        <item name="android:fontFamily">@font/funnelsans_extrabold</item>
+        <item name="android:fontFamily">@font/poppins_bold</item>
         <item name="android:textSize">@dimen/panier_text_size_toolbar_title</item>
     </style>
 
     <style name="PanierText.ProductTitle" parent="PanierText.Base">
-        <item name="android:fontFamily">@font/funnelsans_semibold</item>
+        <item name="android:fontFamily">@font/poppins_semibold</item>
         <item name="android:textSize">@dimen/panier_text_size_product_title</item>
     </style>
 
@@ -248,18 +249,18 @@
     </style>
 
     <style name="PanierText.Price" parent="PanierText.Base">
-        <item name="android:fontFamily">@font/funnelsans_semibold</item>
+        <item name="android:fontFamily">@font/poppins_semibold</item>
         <item name="android:textSize">@dimen/panier_text_size_price</item>
     </style>
 
     <style name="PanierText.QtySymbol" parent="PanierText.Base">
-        <item name="android:fontFamily">@font/funnelsans_extrabold</item>
+        <item name="android:fontFamily">@font/poppins_bold</item>
         <item name="android:textSize">@dimen/panier_text_size_qty</item>
         <item name="android:textColor">@color/panier_qty_symbol</item>
     </style>
 
     <style name="PanierText.QtyValue" parent="PanierText.Base">
-        <item name="android:fontFamily">@font/funnelsans_medium</item>
+        <item name="android:fontFamily">@font/poppins_medium</item>
         <item name="android:textSize">@dimen/panier_text_size_qty</item>
         <item name="android:textColor">@color/panier_text_primary</item>
     </style>
@@ -270,13 +271,13 @@
     </style>
 
     <style name="PanierText.SummaryValue" parent="PanierText.Base">
-        <item name="android:fontFamily">@font/funnelsans_semibold</item>
+        <item name="android:fontFamily">@font/poppins_semibold</item>
         <item name="android:textSize">@dimen/panier_text_size_summary</item>
         <item name="android:textColor">@color/panier_text_primary</item>
     </style>
 
     <style name="PanierText.TotalLabel" parent="PanierText.Base">
-        <item name="android:fontFamily">@font/funnelsans_semibold</item>
+        <item name="android:fontFamily">@font/poppins_semibold</item>
         <item name="android:textSize">@dimen/panier_text_size_total</item>
     </style>
 
@@ -305,20 +306,20 @@
     </style>
 
     <style name="Widget.App.TextView" parent="@android:style/Widget.TextView">
-        <item name="android:fontFamily">@font/funnelsans_regular</item>
+        <item name="android:fontFamily">@font/poppins_regular</item>
         <item name="android:textSize">@dimen/text_size_body</item>
         <item name="android:textColor">@color/colorOnSurface</item>
     </style>
 
     <style name="Widget.App.EditText" parent="@android:style/Widget.EditText">
-        <item name="android:fontFamily">@font/funnelsans_regular</item>
+        <item name="android:fontFamily">@font/poppins_regular</item>
         <item name="android:textSize">@dimen/text_size_input</item>
         <item name="android:textColor">@color/colorOnSurface</item>
         <item name="android:textColorHint">@color/colorOnSurfaceVariant</item>
     </style>
 
     <style name="Widget.App.Button" parent="Widget.MaterialComponents.Button">
-        <item name="android:fontFamily">@font/funnelsans_semibold</item>
+        <item name="android:fontFamily">@font/poppins_semibold</item>
         <item name="android:textSize">@dimen/text_size_button</item>
         <item name="cornerRadius">@dimen/corner_radius_medium</item>
         <item name="android:minHeight">@dimen/button_height</item>
@@ -337,7 +338,7 @@
         <item name="android:textColor">@color/colorOnPrimary</item>
         <item name="android:textAllCaps">false</item>
         <item name="android:textSize">@dimen/panier_text_size_checkout</item>
-        <item name="android:fontFamily">@font/funnelsans_semibold</item>
+        <item name="android:fontFamily">@font/poppins_semibold</item>
         <item name="android:insetLeft">@dimen/space_0</item>
         <item name="android:insetRight">@dimen/space_0</item>
     </style>
@@ -358,7 +359,7 @@
     </style>
 
     <style name="ProfileText.Role" parent="AppText.Base">
-        <item name="android:fontFamily">@font/funnelsans_semibold</item>
+        <item name="android:fontFamily">@font/poppins_semibold</item>
         <item name="android:textSize">@dimen/profile_text_size_role</item>
         <item name="android:textColor">@color/profile_accent_text</item>
         <item name="android:letterSpacing">0.12</item>
@@ -366,31 +367,31 @@
     </style>
 
     <style name="ProfileText.Location" parent="AppText.Base">
-        <item name="android:fontFamily">@font/funnelsans_regular</item>
+        <item name="android:fontFamily">@font/poppins_regular</item>
         <item name="android:textSize">@dimen/profile_text_size_location</item>
         <item name="android:textColor">@color/profile_location_icon</item>
     </style>
 
     <style name="ProfileText.MenuTitle" parent="AppText.Base">
-        <item name="android:fontFamily">@font/funnelsans_semibold</item>
+        <item name="android:fontFamily">@font/poppins_semibold</item>
         <item name="android:textSize">@dimen/profile_text_size_menu_title</item>
         <item name="android:textColor">@color/profile_text_primary</item>
     </style>
 
     <style name="ProfileText.MenuSubtitle" parent="AppText.Base">
-        <item name="android:fontFamily">@font/funnelsans_regular</item>
+        <item name="android:fontFamily">@font/poppins_regular</item>
         <item name="android:textSize">@dimen/profile_text_size_menu_subtitle</item>
         <item name="android:textColor">@color/profile_text_secondary</item>
     </style>
 
     <style name="ProfileText.Logout" parent="AppText.Base">
-        <item name="android:fontFamily">@font/funnelsans_semibold</item>
+        <item name="android:fontFamily">@font/poppins_semibold</item>
         <item name="android:textSize">@dimen/profile_text_size_logout</item>
         <item name="android:textColor">@color/profile_logout_text</item>
     </style>
 
     <style name="ProfileText.NavInactive" parent="AppText.Base">
-        <item name="android:fontFamily">@font/funnelsans_regular</item>
+        <item name="android:fontFamily">@font/poppins_regular</item>
         <item name="android:textSize">@dimen/profile_text_size_nav</item>
         <item name="android:textColor">@color/profile_nav_inactive</item>
     </style>
@@ -400,7 +401,7 @@
     </style>
 
     <style name="LanguageButton.Base" parent="Widget.MaterialComponents.Button">
-        <item name="android:fontFamily">@font/funnelsans_semibold</item>
+        <item name="android:fontFamily">@font/poppins_semibold</item>
         <item name="android:textAllCaps">false</item>
         <item name="android:textSize">@dimen/text_size_body</item>
         <item name="android:insetLeft">@dimen/space_0</item>
@@ -457,3 +458,4 @@
     </style>
 
 </resources>
+

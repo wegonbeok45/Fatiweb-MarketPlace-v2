@@ -75,7 +75,7 @@
     <color name="panier_cta_bg">#B68A5E</color>
     <color name="panier_nav_bg">#FFFFFF</color>
     <color name="panier_nav_inactive">#94A3B8</color>
-    <color name="panier_nav_active">#1A1C24</color>
+    <color name="panier_nav_active">#B68A5E</color>
     <color name="panier_notification_dot">#EF4444</color>
 
     <!-- Home screen -->
@@ -96,7 +96,7 @@
     <color name="home_nav_bg">#F7F5F1</color>
     <color name="home_nav_pill_bg">#F4F0EC</color>
     <color name="home_nav_selected_bg">#D9B787</color>
-    <color name="home_nav_active">#111111</color>
+    <color name="home_nav_active">#B68A5E</color>
     <color name="home_nav_inactive">#6B7280</color>
     <color name="home_divider">#E6E1DA</color>
 
