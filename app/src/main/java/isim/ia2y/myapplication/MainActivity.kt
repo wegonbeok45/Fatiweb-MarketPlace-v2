@@ -49,7 +49,18 @@ class MainActivity : AppCompatActivity() {
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            v.setPadding(systemBars.left, 0, systemBars.right, 0)
+            
+            // Push header down to clear status bar
+            findViewById<View>(R.id.hostLayoutTopSection)?.apply {
+                setPadding(paddingLeft, systemBars.top, paddingRight, paddingBottom)
+            }
+            
+            // Push bottom nav up but draw its colored background behind the home indicator
+            findViewById<View>(R.id.hostLayoutBottomNav)?.apply {
+                setPadding(paddingLeft, paddingTop, paddingRight, systemBars.bottom + 2) // +2 for slight extra padding 
+            }
+            
             insets
         }
 
@@ -157,8 +168,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun updateHostCartBadge() {
-        val badgeContainer = findViewById<View>(R.id.hostCardBottomCartBadge)
-        val badgeText = findViewById<TextView>(R.id.hostTvBottomCartBadge)
+        val badgeContainer = findViewById<View>(R.id.cardBottomCartBadge)
+        val badgeText = findViewById<TextView>(R.id.tvBottomCartBadge)
         val count = CartStore.itemCount(this)
         if (count <= 0) {
             badgeContainer.visibility = View.GONE

@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -190,7 +190,8 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/hostLayoutBottomNav"
         android:layout_width="match_parent"
-        android:layout_height="76dp"
+        android:layout_height="wrap_content"
+        android:minHeight="76dp"
         android:background="@color/home_nav_bg"
         android:elevation="0dp"
         android:paddingTop="2dp"
@@ -316,25 +317,23 @@
                     app:tint="@color/home_nav_inactive" />
 
                 <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/hostCardBottomCartBadge"
-                    android:layout_width="12dp"
-                    android:layout_height="12dp"
+                    android:id="@+id/cardBottomCartBadge"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
                     android:layout_gravity="end|top"
-                    android:layout_marginTop="-2dp"
-                    android:layout_marginEnd="-2dp"
                     android:visibility="gone"
                     app:cardBackgroundColor="@color/home_chip_bg"
                     app:cardCornerRadius="@dimen/corner_radius_round"
-                    app:cardElevation="0dp"
-                    app:strokeWidth="0dp">
+                    app:cardElevation="@dimen/space_0"
+                    app:strokeWidth="@dimen/space_0">
 
                     <TextView
-                        android:id="@+id/hostTvBottomCartBadge"
+                        android:id="@+id/tvBottomCartBadge"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:gravity="center"
                         android:textColor="@color/home_text_primary"
-                        android:textSize="7sp"
+                        android:textSize="8sp"
                         android:textStyle="bold"
                         tools:text="2" />
                 </com.google.android.material.card.MaterialCardView>
