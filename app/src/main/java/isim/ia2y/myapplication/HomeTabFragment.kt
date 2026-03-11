@@ -177,29 +177,33 @@ class HomeTabFragment : Fragment(R.layout.fragment_home_tab) {
             val product = ProductCatalog.byId(productId) ?: return@forEach
             val initial = FavoritesStore.isFavorite(requireContext(), productId)
             favoriteState[buttonId] = initial
-            setFavoriteTint(root, iconId, isFavorite = initial)
-            root.findViewById<View>(buttonId)?.setOnClickListener {
+            
+            val lottieIcon = root.findViewById<com.airbnb.lottie.LottieAnimationView>(iconId)
+            lottieIcon?.progress = if (initial) 1f else 0f
+            
+            root.findViewById<View>(buttonId)?.setOnClickListener { view ->
+                view.performLightHapticFeedback()
                 val nextState = FavoritesStore.toggleFavorite(requireContext(), productId)
                 favoriteState[buttonId] = nextState
-                setFavoriteTint(root, iconId, isFavorite = nextState)
-                root.findViewById<View>(iconId)?.animate()?.scaleX(1.14f)?.scaleY(1.14f)
-                    ?.setDuration(130L)
-                    ?.withEndAction {
-                        root.findViewById<View>(iconId)?.animate()?.scaleX(1f)?.scaleY(1f)
-                            ?.setDuration(150L)?.start()
-                    }?.start()
+                
+                if (nextState) {
+                    lottieIcon?.apply {
+                        speed = 1f
+                        playAnimation()
+                    }
+                } else {
+                    lottieIcon?.apply {
+                        speed = -2f
+                        playAnimation()
+                    }
+                }
+                
                 host.showToast(
                     if (nextState) getString(R.string.product_added_to_favorites, product.title)
                     else getString(R.string.product_removed_from_favorites, product.title)
                 )
             }
         }
-    }
-
-    private fun setFavoriteTint(root: View, iconId: Int, isFavorite: Boolean) {
-        val icon = root.findViewById<ImageView>(iconId) ?: return
-        val colorRes = if (isFavorite) R.color.home_heart_active else R.color.home_text_primary
-        icon.setColorFilter(ContextCompat.getColor(requireContext(), colorRes))
     }
 
     private data class FavoriteBinding(
