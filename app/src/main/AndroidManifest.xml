@@ -18,22 +18,28 @@
         android:theme="@style/Theme.MyApplication">
         <activity
             android:name=".AdminDashboardActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:theme="@style/Theme.MyApplication.Admin" />
         <activity
             android:name=".AdminCommandesActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:theme="@style/Theme.MyApplication.Admin" />
         <activity
             android:name=".AdminClientsActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:theme="@style/Theme.MyApplication.Admin" />
         <activity
             android:name=".AdminProduitsActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:theme="@style/Theme.MyApplication.Admin" />
         <activity
             android:name=".AdminParametresActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:theme="@style/Theme.MyApplication.Admin" />
         <activity
             android:name=".AdminNotificationsActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:theme="@style/Theme.MyApplication.Admin" />
         <activity
             android:name=".LanguageSettingsActivity"
             android:exported="false" />
