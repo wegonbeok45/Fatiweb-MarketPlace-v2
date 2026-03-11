@@ -46,7 +46,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="14dp"
-                android:fontFamily="@font/funnelsans_semibold"
+
                 android:text="Tableau de Bord"
                 android:textColor="@color/profile_text_primary"
                 android:textSize="18sp"
@@ -146,7 +146,7 @@
                         android:id="@+id/adminTvWelcomeLabel"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:fontFamily="@font/funnelsans_regular"
+
                         android:text="Bienvenue,"
                         android:textColor="#FFFFFF"
                         android:textSize="13sp"
@@ -160,7 +160,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
-                        android:fontFamily="@font/funnelsans_extrabold"
+
                         android:text="Administrateur"
                         android:textColor="#FFFFFF"
                         android:textSize="20sp"
@@ -173,7 +173,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
-                        android:fontFamily="@font/funnelsans_regular"
+
                         android:text="FatiWeb Market · Panneau Admin"
                         android:textColor="#FFFFFF"
                         android:textSize="12sp"
@@ -203,7 +203,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="22dp"
-                android:fontFamily="@font/funnelsans_semibold"
+
                 android:text="Vue d'ensemble"
                 android:textColor="@color/profile_text_primary"
                 android:textSize="16sp" />
@@ -257,7 +257,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="10dp"
-                            android:fontFamily="@font/funnelsans_extrabold"
+
                             android:text="..."
                             android:textColor="@color/profile_text_primary"
                             android:textSize="26sp" />
@@ -265,7 +265,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/funnelsans_regular"
+
                             android:text="Commandes"
                             android:textColor="@color/profile_text_secondary"
                             android:textSize="12sp" />
@@ -276,7 +276,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="6dp"
                             android:background="@drawable/bg_admin_stat_positive"
-                            android:fontFamily="@font/funnelsans_semibold"
+
                             android:paddingStart="7dp"
                             android:paddingEnd="7dp"
                             android:paddingTop="2dp"
@@ -328,7 +328,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="10dp"
-                            android:fontFamily="@font/funnelsans_extrabold"
+
                             android:text="..."
                             android:textColor="@color/profile_text_primary"
                             android:textSize="26sp" />
@@ -336,7 +336,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/funnelsans_regular"
+
                             android:text="CA (DT)"
                             android:textColor="@color/profile_text_secondary"
                             android:textSize="12sp" />
@@ -347,7 +347,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="6dp"
                             android:background="@drawable/bg_admin_stat_positive"
-                            android:fontFamily="@font/funnelsans_semibold"
+
                             android:paddingStart="7dp"
                             android:paddingEnd="7dp"
                             android:paddingTop="2dp"
@@ -409,7 +409,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="10dp"
-                            android:fontFamily="@font/funnelsans_extrabold"
+
                             android:text="..."
                             android:textColor="@color/profile_text_primary"
                             android:textSize="26sp" />
@@ -417,7 +417,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/funnelsans_regular"
+
                             android:text="Nv. clients"
                             android:textColor="@color/profile_text_secondary"
                             android:textSize="12sp" />
@@ -428,7 +428,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="6dp"
                             android:background="@drawable/bg_admin_stat_neutral"
-                            android:fontFamily="@font/funnelsans_semibold"
+
                             android:paddingStart="7dp"
                             android:paddingEnd="7dp"
                             android:paddingTop="2dp"
@@ -480,7 +480,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="10dp"
-                            android:fontFamily="@font/funnelsans_extrabold"
+
                             android:text="..."
                             android:textColor="@color/profile_text_primary"
                             android:textSize="26sp" />
@@ -488,7 +488,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/funnelsans_regular"
+
                             android:text="Stock faible"
                             android:textColor="@color/profile_text_secondary"
                             android:textSize="12sp" />
@@ -499,7 +499,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="6dp"
                             android:background="@drawable/bg_admin_stat_alert"
-                            android:fontFamily="@font/funnelsans_semibold"
+
                             android:paddingStart="7dp"
                             android:paddingEnd="7dp"
                             android:paddingTop="2dp"
@@ -518,7 +518,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                android:fontFamily="@font/funnelsans_semibold"
+
                 android:text="Actions Rapides"
                 android:textColor="@color/profile_text_primary"
                 android:textSize="16sp" />
@@ -574,7 +574,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
-                            android:fontFamily="@font/funnelsans_semibold"
+
                             android:gravity="center"
                             android:text="Ajouter\nProduit"
                             android:textColor="@color/profile_text_primary"
@@ -625,7 +625,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
-                            android:fontFamily="@font/funnelsans_semibold"
+
                             android:gravity="center"
                             android:text="Voir\nCommandes"
                             android:textColor="@color/profile_text_primary"
@@ -675,7 +675,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
-                            android:fontFamily="@font/funnelsans_semibold"
+
                             android:gravity="center"
                             android:text="Paramètres"
                             android:textColor="@color/profile_text_primary"
@@ -690,7 +690,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                android:fontFamily="@font/funnelsans_semibold"
+
                 android:text="Dernières Commandes"
                 android:textColor="@color/profile_text_primary"
                 android:textSize="16sp" />
@@ -749,7 +749,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="12dp"
-                            android:fontFamily="@font/funnelsans_semibold"
+
                             android:text="#FW-1234"
                             android:textColor="@color/profile_text_primary"
                             android:textSize="14sp"
@@ -764,7 +764,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="12dp"
-                            android:fontFamily="@font/funnelsans_regular"
+
                             android:text="Ahmed Ben Salem"
                             android:textColor="@color/profile_text_secondary"
                             android:textSize="12sp"
@@ -777,7 +777,7 @@
                             android:id="@+id/adminOrderPrice1"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/funnelsans_semibold"
+
                             android:text="85,500 DT"
                             android:textColor="@color/colorPrimary"
                             android:textSize="14sp"
@@ -830,7 +830,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="12dp"
-                            android:fontFamily="@font/funnelsans_semibold"
+
                             android:text="#FW-1235"
                             android:textColor="@color/profile_text_primary"
                             android:textSize="14sp"
@@ -845,7 +845,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="12dp"
-                            android:fontFamily="@font/funnelsans_regular"
+
                             android:text="Meryem Mansour"
                             android:textColor="@color/profile_text_secondary"
                             android:textSize="12sp"
@@ -858,7 +858,7 @@
                             android:id="@+id/adminOrderPrice2"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/funnelsans_semibold"
+
                             android:text="120,000 DT"
                             android:textColor="@color/colorPrimary"
                             android:textSize="14sp"
@@ -911,7 +911,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="12dp"
-                            android:fontFamily="@font/funnelsans_semibold"
+
                             android:text="#FW-1236"
                             android:textColor="@color/profile_text_primary"
                             android:textSize="14sp"
@@ -926,7 +926,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="12dp"
-                            android:fontFamily="@font/funnelsans_regular"
+
                             android:text="Sami Gharbi"
                             android:textColor="@color/profile_text_secondary"
                             android:textSize="12sp"
@@ -939,7 +939,7 @@
                             android:id="@+id/adminOrderPrice3"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/funnelsans_semibold"
+
                             android:text="42,000 DT"
                             android:textColor="@color/colorPrimary"
                             android:textSize="14sp"

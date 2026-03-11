@@ -1045,11 +1045,15 @@
                 android:gravity="center_horizontal">
 
                 <!-- Success Illustration -->
-                <ImageView
-                    android:layout_width="140dp"
-                    android:layout_height="140dp"
-                    android:src="@drawable/ic_checkout_confirmed_check"
-                    android:layout_marginBottom="32dp" />
+                <!-- Success Illustration (Lottie) -->
+                <com.airbnb.lottie.LottieAnimationView
+                    android:layout_width="160dp"
+                    android:layout_height="160dp"
+                    android:layout_gravity="center"
+                    app:lottie_rawRes="@raw/anim_success"
+                    app:lottie_autoPlay="true"
+                    app:lottie_loop="false"
+                    android:layout_marginBottom="24dp" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -1350,5 +1354,26 @@
         </LinearLayout>
 
     </LinearLayout>
+
+    <!-- LOADING OVERLAY (Lottie) -->
+    <FrameLayout
+        android:id="@+id/layoutLottieLoading"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#80FFFFFF"
+        android:visibility="gone"
+        android:elevation="10dp"
+        android:clickable="true"
+        android:focusable="true">
+        
+        <com.airbnb.lottie.LottieAnimationView
+            android:layout_width="160dp"
+            android:layout_height="160dp"
+            android:layout_gravity="center"
+            app:lottie_rawRes="@raw/anim_loading"
+            app:lottie_autoPlay="true"
+            app:lottie_loop="true" />
+            
+    </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

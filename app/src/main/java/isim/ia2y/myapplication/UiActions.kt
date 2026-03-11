@@ -16,6 +16,7 @@ import android.provider.Settings
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
+import android.view.HapticFeedbackConstants
 import android.view.MotionEvent
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
@@ -136,11 +137,22 @@ fun Context.isOnboardingCompleted(): Boolean {
         .getBoolean(KEY_ONBOARDING_COMPLETED, false)
 }
 
+fun View.performLightHapticFeedback() {
+    performHapticFeedback(
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) 
+            HapticFeedbackConstants.KEYBOARD_TAP 
+        else 
+            HapticFeedbackConstants.KEYBOARD_TAP,
+        HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING
+    )
+}
+
 fun View.applyPressFeedback() {
     stateListAnimator = null
     setOnTouchListener { v, event ->
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
+                v.performLightHapticFeedback()
                 v.animate().scaleX(0.96f).scaleY(0.96f).setDuration(MotionTokens.QUICK)
                     .setInterpolator(FastOutSlowInInterpolator()).start()
             }
@@ -560,6 +572,7 @@ fun AppCompatActivity.applyPressFeedback(
         view.setOnTouchListener { _, event ->
             when (event.actionMasked) {
                 MotionEvent.ACTION_DOWN -> {
+                    view.performLightHapticFeedback()
                     if (reducedMotion) {
                         view.alpha = 0.92f
                     } else {

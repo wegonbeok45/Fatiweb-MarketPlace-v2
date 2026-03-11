@@ -166,6 +166,9 @@ class CheckoutDetailsActivity : AppCompatActivity() {
         val originalText = btnContinue?.text
         btnContinue?.text = "Enregistrement..."
         btnContinue?.isEnabled = false
+        
+        val loadingOverlay = findViewById<View>(R.id.layoutLottieLoading)
+        loadingOverlay?.visibility = View.VISIBLE
 
         lifecycleScope.launch(kotlinx.coroutines.Dispatchers.Main) {
             val result = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
@@ -173,6 +176,7 @@ class CheckoutDetailsActivity : AppCompatActivity() {
             }
             btnContinue?.isEnabled = true
             btnContinue?.text = originalText
+            loadingOverlay?.visibility = View.GONE
 
             result.onSuccess {
                 transitionToStep3()

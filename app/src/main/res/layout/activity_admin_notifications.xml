@@ -43,7 +43,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="14dp"
-                android:fontFamily="@font/funnelsans_semibold"
+
                 android:text="Notifications Admin"
                 android:textColor="@color/profile_text_primary"
                 android:textSize="18sp"
@@ -98,7 +98,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:fontFamily="@font/funnelsans_semibold"
+
                         android:text="Envoyer une Notification"
                         android:textColor="@color/profile_text_primary"
                         android:textSize="15sp"
@@ -121,7 +121,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:background="@android:color/transparent"
-                            android:fontFamily="@font/funnelsans_regular"
+
                             android:hint="Titre de la notification"
                             android:paddingStart="14dp"
                             android:paddingEnd="14dp"
@@ -149,7 +149,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:background="@android:color/transparent"
-                            android:fontFamily="@font/funnelsans_regular"
+
                             android:hint="Message de la notification..."
                             android:paddingStart="14dp"
                             android:paddingEnd="14dp"
@@ -167,7 +167,7 @@
                         android:id="@+id/adminNotifBtnSend"
                         android:layout_width="match_parent"
                         android:layout_height="50dp"
-                        android:fontFamily="@font/funnelsans_semibold"
+
                         android:text="Envoyer"
                         android:textSize="15sp"
                         app:backgroundTint="@color/colorPrimary"
@@ -180,7 +180,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/funnelsans_semibold"
+
                 android:text="Historique des envois"
                 android:textColor="@color/profile_text_primary"
                 android:textSize="15sp"
@@ -231,7 +231,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="12dp"
-                            android:fontFamily="@font/funnelsans_semibold"
+
                             android:text="Promotion Artisanat"
                             android:textColor="@color/profile_text_primary"
                             android:textSize="13sp"
@@ -243,7 +243,7 @@
                             android:id="@+id/adminNotifH1Date"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/funnelsans_regular"
+
                             android:text="Hier"
                             android:textColor="@color/profile_text_secondary"
                             android:textSize="11sp"
@@ -256,7 +256,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginStart="12dp"
                             android:layout_marginTop="4dp"
-                            android:fontFamily="@font/funnelsans_regular"
+
                             android:text="Profitez de -20% sur toute la catégorie artisanat cette semaine !"
                             android:textColor="@color/profile_text_secondary"
                             android:textSize="12sp"
@@ -299,7 +299,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="12dp"
-                            android:fontFamily="@font/funnelsans_semibold"
+
                             android:text="Maintenance Système"
                             android:textColor="@color/profile_text_primary"
                             android:textSize="13sp"
@@ -311,7 +311,7 @@
                             android:id="@+id/adminNotifH2Date"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/funnelsans_regular"
+
                             android:text="Il y a 2j"
                             android:textColor="@color/profile_text_secondary"
                             android:textSize="11sp"
@@ -324,7 +324,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginStart="12dp"
                             android:layout_marginTop="4dp"
-                            android:fontFamily="@font/funnelsans_regular"
+
                             android:text="L'application sera indisponible pour maintenance de 02h à 04h du matin."
                             android:textColor="@color/profile_text_secondary"
                             android:textSize="12sp"

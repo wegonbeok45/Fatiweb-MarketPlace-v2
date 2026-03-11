@@ -22,7 +22,16 @@ class ProductDetailsScreen : AppCompatActivity() {
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            v.setPadding(systemBars.left, 0, systemBars.right, 0)
+            
+            findViewById<View>(R.id.layoutTopBar)?.apply {
+                setPadding(paddingLeft, systemBars.top, paddingRight, paddingBottom)
+            }
+            
+            findViewById<View>(R.id.layoutBottomBar)?.apply {
+                setPadding(paddingLeft, paddingTop, paddingRight, systemBars.bottom + 12)
+            }
+            
             insets
         }
 
@@ -100,6 +109,7 @@ class ProductDetailsScreen : AppCompatActivity() {
 
         val lottieHeart = findViewById<com.airbnb.lottie.LottieAnimationView>(R.id.ivFavoriteLottie)
         lottieHeart?.setOnClickListener {
+            it.performLightHapticFeedback()
             val isNowFav = FavoritesStore.toggleFavorite(this, product.id)
             if (isNowFav) {
                 lottieHeart.apply {

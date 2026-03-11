@@ -9,7 +9,7 @@
         android:id="@+id/tvEditPriceTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:fontFamily="@font/funnelsans_bold"
+
         android:text="Modifier le prix"
         android:textColor="@color/profile_text_primary"
         android:textSize="18sp"
@@ -32,7 +32,7 @@
             android:id="@+id/etEditPrice"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:fontFamily="@font/funnelsans_regular"
+
             android:hint="Nouveau prix (DT)"
             android:inputType="numberDecimal" />
     </com.google.android.material.textfield.TextInputLayout>
@@ -44,7 +44,7 @@
         android:layout_height="52dp"
         android:layout_marginTop="24dp"
         android:layout_marginEnd="8dp"
-        android:fontFamily="@font/funnelsans_semibold"
+
         android:text="Annuler"
         android:textColor="@color/profile_text_secondary"
         app:cornerRadius="12dp"
@@ -58,7 +58,7 @@
         android:layout_height="52dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="24dp"
-        android:fontFamily="@font/funnelsans_semibold"
+
         android:text="Enregistrer"
         app:backgroundTint="@color/colorPrimary"
         app:cornerRadius="12dp"

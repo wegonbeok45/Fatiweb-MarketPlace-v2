@@ -43,7 +43,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="14dp"
-                android:fontFamily="@font/funnelsans_semibold"
+
                 android:text="Clients"
                 android:textColor="@color/profile_text_primary"
                 android:textSize="18sp"
@@ -105,7 +105,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/funnelsans_semibold"
+
                             android:text="..."
                             android:textColor="#FFFFFF"
                             android:textSize="24sp" />
@@ -113,7 +113,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/funnelsans_regular"
+
                             android:text="Total Clients"
                             android:textColor="#CCFFFFFF"
                             android:textSize="12sp" />
@@ -141,7 +141,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/funnelsans_semibold"
+
                             android:text=""
                             android:visibility="gone"
                             android:textColor="#34A853"
@@ -150,7 +150,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/funnelsans_regular"
+
                             android:text="Nouveaux"
                             android:textColor="@color/profile_text_secondary"
                             android:textSize="12sp" />
@@ -163,7 +163,7 @@
                 android:id="@+id/adminClientsTvHeader"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/funnelsans_semibold"
+
                 android:text="Liste des Clients"
                 android:textColor="@color/profile_text_primary"
                 android:textSize="16sp"

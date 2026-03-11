@@ -43,7 +43,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="14dp"
-                android:fontFamily="@font/funnelsans_semibold"
+
                 android:text="Gestion des Commandes"
                 android:textColor="@color/profile_text_primary"
                 android:textSize="18sp"
@@ -107,7 +107,7 @@
                             android:id="@+id/adminCommandesTvTotal"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/funnelsans_semibold"
+
                             android:text="..."
                             android:textColor="@color/colorPrimary"
                             android:textSize="22sp"
@@ -120,7 +120,7 @@
                             android:id="@+id/adminCommandesTvTotalLabel"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/funnelsans_regular"
+
                             android:text="Total"
                             android:textColor="@color/profile_text_secondary"
                             android:textSize="12sp"
@@ -152,7 +152,7 @@
                             android:id="@+id/adminCommandesTvPending"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/funnelsans_semibold"
+
                             android:text="..."
                             android:textColor="@color/colorError"
                             android:textSize="22sp"
@@ -165,7 +165,7 @@
                             android:id="@+id/adminCommandesTvPendingLabel"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/funnelsans_regular"
+
                             android:text="En attente"
                             android:textColor="@color/profile_text_secondary"
                             android:textSize="12sp"
@@ -196,7 +196,7 @@
                             android:id="@+id/adminCommandesTvDelivered"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/funnelsans_semibold"
+
                             android:text="..."
                             android:textColor="#34A853"
                             android:textSize="22sp"
@@ -209,7 +209,7 @@
                             android:id="@+id/adminCommandesTvDeliveredLabel"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/funnelsans_regular"
+
                             android:text="Livrées"
                             android:textColor="@color/profile_text_secondary"
                             android:textSize="12sp"
@@ -225,7 +225,7 @@
                 android:id="@+id/adminCommandesTvHeader"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/funnelsans_semibold"
+
                 android:text="Commandes Récentes"
                 android:textColor="@color/profile_text_primary"
                 android:textSize="16sp"
@@ -284,7 +284,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="12dp"
-                            android:fontFamily="@font/funnelsans_semibold"
+
                             android:text="#FW-8821"
                             android:textColor="@color/profile_text_primary"
                             android:textSize="14sp"
@@ -299,7 +299,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="12dp"
-                            android:fontFamily="@font/funnelsans_regular"
+
                             android:text="Ahmed Ben Ali"
                             android:textColor="@color/profile_text_secondary"
                             android:textSize="12sp"
@@ -325,7 +325,7 @@
                                 android:gravity="center"
                                 android:paddingStart="10dp"
                                 android:paddingEnd="10dp"
-                                android:fontFamily="@font/funnelsans_semibold"
+
                                 android:text="En cours"
                                 android:textColor="#E65100"
                                 android:textSize="11sp" />
@@ -373,7 +373,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="12dp"
-                            android:fontFamily="@font/funnelsans_semibold"
+
                             android:text="#FW-8820"
                             android:textColor="@color/profile_text_primary"
                             android:textSize="14sp"
@@ -388,7 +388,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="12dp"
-                            android:fontFamily="@font/funnelsans_regular"
+
                             android:text="Sara Mansour"
                             android:textColor="@color/profile_text_secondary"
                             android:textSize="12sp"
@@ -414,7 +414,7 @@
                                 android:gravity="center"
                                 android:paddingStart="10dp"
                                 android:paddingEnd="10dp"
-                                android:fontFamily="@font/funnelsans_semibold"
+
                                 android:text="Livrée"
                                 android:textColor="#1B5E20"
                                 android:textSize="11sp" />
@@ -462,7 +462,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="12dp"
-                            android:fontFamily="@font/funnelsans_semibold"
+
                             android:text="#FW-8819"
                             android:textColor="@color/profile_text_primary"
                             android:textSize="14sp"
@@ -477,7 +477,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="12dp"
-                            android:fontFamily="@font/funnelsans_regular"
+
                             android:text="Mohamed Aziz"
                             android:textColor="@color/profile_text_secondary"
                             android:textSize="12sp"
@@ -503,7 +503,7 @@
                                 android:gravity="center"
                                 android:paddingStart="10dp"
                                 android:paddingEnd="10dp"
-                                android:fontFamily="@font/funnelsans_semibold"
+
                                 android:text="En cours"
                                 android:textColor="#E65100"
                                 android:textSize="11sp" />
@@ -551,7 +551,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="12dp"
-                            android:fontFamily="@font/funnelsans_semibold"
+
                             android:text="#FW-8818"
                             android:textColor="@color/profile_text_primary"
                             android:textSize="14sp"
@@ -566,7 +566,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="12dp"
-                            android:fontFamily="@font/funnelsans_regular"
+
                             android:text="Linda Gharbi"
                             android:textColor="@color/profile_text_secondary"
                             android:textSize="12sp"
@@ -592,7 +592,7 @@
                                 android:gravity="center"
                                 android:paddingStart="10dp"
                                 android:paddingEnd="10dp"
-                                android:fontFamily="@font/funnelsans_semibold"
+
                                 android:text="Annulée"
                                 android:textColor="#880E4F"
                                 android:textSize="11sp" />

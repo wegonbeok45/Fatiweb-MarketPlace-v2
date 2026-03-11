@@ -27,26 +27,22 @@
                 app:srcCompat="@drawable/product3example" />
         </com.google.android.material.card.MaterialCardView>
 
-        <com.google.android.material.card.MaterialCardView
+        <FrameLayout
             android:id="@+id/btnFavoriteMarqoum"
-            android:layout_width="@dimen/home_product_heart_size"
-            android:layout_height="@dimen/home_product_heart_size"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:layout_gravity="end|top"
-            android:layout_margin="@dimen/home_product_heart_margin"
-            app:cardBackgroundColor="@color/home_heart_bg"
-            app:cardCornerRadius="@dimen/corner_radius_round"
-            app:cardElevation="@dimen/space_0"
-            app:strokeColor="@color/colorBorderLight"
-            app:strokeWidth="@dimen/stroke_width_default">
+            android:layout_margin="4dp">
 
-            <ImageView
+            <com.airbnb.lottie.LottieAnimationView
                 android:id="@+id/ivFavoriteMarqoum"
-                android:layout_width="@dimen/home_product_heart_icon_size"
-                android:layout_height="@dimen/home_product_heart_icon_size"
-                android:layout_gravity="center"
-                android:contentDescription="@string/auto_text_070"
-                app:srcCompat="@drawable/ic_home_heart" />
-        </com.google.android.material.card.MaterialCardView>
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="fitCenter"
+                app:lottie_rawRes="@raw/anim_heart"
+                app:lottie_autoPlay="false"
+                app:lottie_loop="false" />
+        </FrameLayout>
     </FrameLayout>
 
     <TextView

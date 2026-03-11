@@ -90,9 +90,9 @@ fun AppCompatActivity.refreshAdminBottomNav(activeTab: AdminNavTab) {
     val activeColor   = ContextCompat.getColor(this, R.color.profile_text_primary)
     val inactiveColor = ContextCompat.getColor(this, R.color.home_nav_inactive)
 
-    // Apply active/inactive tint immediately (no animation – this is a snap refresh)
+    // Apply active/inactive tint immediately
     TAB_TO_NAV_ID.forEach { (tab, viewId) ->
-        setAdminNavItemColor(viewId, if (tab == activeTab) activeColor else inactiveColor)
+        setAdminNavItemColor(viewId, if (tab == activeTab) activeColor else inactiveColor, isActive = tab == activeTab)
     }
 
     // Snap pill to the correct position (no animation)
@@ -130,9 +130,9 @@ private fun AppCompatActivity.animateAdminNavAndNavigate(
     TAB_TO_NAV_ID.forEach { (t, viewId) ->
         val isActive = t == tab
         if (reducedMotion) {
-            setAdminNavItemColor(viewId, if (isActive) activeColor else inactiveColor)
+            setAdminNavItemColor(viewId, if (isActive) activeColor else inactiveColor, isActive)
         } else {
-            animateAdminNavItemColor(viewId, if (isActive) activeColor else inactiveColor)
+            animateAdminNavItemColor(viewId, if (isActive) activeColor else inactiveColor, isActive)
         }
     }
 
@@ -171,18 +171,72 @@ private fun AppCompatActivity.animateAdminPillTo(@IdRes targetNavId: Int) {
     constraintSet.applyTo(navContainer)
 }
 
-private fun AppCompatActivity.setAdminNavItemColor(@IdRes viewId: Int, color: Int) {
-    val item = findViewById<LinearLayout?>(viewId) ?: return
-    val icon = item.getChildAt(0) as? ImageView
-    val label = item.getChildAt(1) as? TextView
-    icon?.setColorFilter(color)
-    label?.setTextColor(color)
-}
-
-private fun AppCompatActivity.animateAdminNavItemColor(@IdRes viewId: Int, toColor: Int) {
+private fun AppCompatActivity.setAdminNavItemColor(@IdRes viewId: Int, color: Int, isActive: Boolean = false) {
     val item = findViewById<LinearLayout?>(viewId) ?: return
     val icon = item.getChildAt(0) as? ImageView ?: return
     val label = item.getChildAt(1) as? TextView
+
+    icon.animate().cancel()
+    if (isActive) {
+        icon.scaleX = 0.8f
+        icon.scaleY = 0.8f
+        icon.animate()
+            .scaleX(1.15f)
+            .scaleY(1.15f)
+            .setDuration(150L)
+            .setInterpolator(FastOutSlowInInterpolator())
+            .withEndAction {
+                icon.animate()
+                    .scaleX(1f)
+                    .scaleY(1f)
+                    .setDuration(100L)
+                    .setInterpolator(android.view.animation.OvershootInterpolator())
+                    .start()
+            }
+            .start()
+    } else {
+        icon.animate()
+            .scaleX(1f)
+            .scaleY(1f)
+            .setDuration(150L)
+            .start()
+    }
+
+    icon.setColorFilter(color)
+    label?.setTextColor(color)
+}
+
+private fun AppCompatActivity.animateAdminNavItemColor(@IdRes viewId: Int, toColor: Int, isActive: Boolean) {
+    val item = findViewById<LinearLayout?>(viewId) ?: return
+    val icon = item.getChildAt(0) as? ImageView ?: return
+    val label = item.getChildAt(1) as? TextView
+    
+    icon.animate().cancel()
+    if (isActive) {
+        icon.scaleX = 0.8f
+        icon.scaleY = 0.8f
+        icon.animate()
+            .scaleX(1.15f)
+            .scaleY(1.15f)
+            .setDuration(150L)
+            .setInterpolator(FastOutSlowInInterpolator())
+            .withEndAction {
+                icon.animate()
+                    .scaleX(1f)
+                    .scaleY(1f)
+                    .setDuration(100L)
+                    .setInterpolator(android.view.animation.OvershootInterpolator())
+                    .start()
+            }
+            .start()
+    } else {
+        icon.animate()
+            .scaleX(1f)
+            .scaleY(1f)
+            .setDuration(150L)
+            .start()
+    }
+
     val fromColor = label?.currentTextColor ?: toColor
     if (fromColor == toColor) return
 
@@ -203,7 +257,12 @@ private fun AppCompatActivity.navigateToAdminTab(tab: AdminNavTab) {
 
     val intent = Intent(this, target).apply {
         addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+        addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
     }
+    
+    // We launch the activity intent without any window animations
     startActivity(intent)
+    
+    // We suppress the default Android shared element fade that creates a dual bottom nav 'ghosting' effect
     overridePendingTransition(0, 0)
 }

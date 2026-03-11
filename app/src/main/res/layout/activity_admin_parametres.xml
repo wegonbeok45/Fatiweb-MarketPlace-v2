@@ -43,7 +43,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="14dp"
-                android:fontFamily="@font/funnelsans_semibold"
+
                 android:text="Paramètres"
                 android:textColor="@color/profile_text_primary"
                 android:textSize="18sp"
@@ -97,7 +97,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:fontFamily="@font/funnelsans_semibold"
+
                         android:text="FatiWeb Market"
                         android:textColor="#FFFFFF"
                         android:textSize="18sp" />
@@ -106,7 +106,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
-                        android:fontFamily="@font/funnelsans_regular"
+
                         android:text="Gestion de la boutique"
                         android:textColor="#CCFFFFFF"
                         android:textSize="13sp" />
@@ -117,7 +117,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/funnelsans_semibold"
+
                 android:text="Méthodes de livraison"
                 android:textColor="@color/profile_text_primary"
                 android:textSize="15sp"
@@ -149,7 +149,7 @@
                             android:id="@+id/adminParamLivrStandard"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/funnelsans_semibold"
+
                             android:text="Standard"
                             android:textColor="@color/profile_text_primary"
                             android:textSize="14sp"
@@ -175,7 +175,7 @@
                                 android:id="@+id/adminParamLivrStandardPrice"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:fontFamily="@font/funnelsans_semibold"
+
                                 android:text="7 DT"
                                 android:textColor="@color/colorPrimary"
                                 android:textSize="14sp" />
@@ -204,7 +204,7 @@
                             android:id="@+id/adminParamLivrExpress"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/funnelsans_semibold"
+
                             android:text="Express"
                             android:textColor="@color/profile_text_primary"
                             android:textSize="14sp"
@@ -230,7 +230,7 @@
                                 android:id="@+id/adminParamLivrExpressPrice"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:fontFamily="@font/funnelsans_semibold"
+
                                 android:text="15 DT"
                                 android:textColor="@color/colorPrimary"
                                 android:textSize="14sp" />
@@ -251,7 +251,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/funnelsans_semibold"
+
                 android:text="Modes de paiement"
                 android:textColor="@color/profile_text_primary"
                 android:textSize="15sp"
@@ -281,7 +281,7 @@
                         <TextView
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/funnelsans_regular"
+
                             android:text="Carte Bancaire"
                             android:textColor="@color/profile_text_primary"
                             android:textSize="14sp"
@@ -311,7 +311,7 @@
                         <TextView
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/funnelsans_regular"
+
                             android:text="E-Dinar"
                             android:textColor="@color/profile_text_primary"
                             android:textSize="14sp"
@@ -341,7 +341,7 @@
                         <TextView
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/funnelsans_regular"
+
                             android:text="Cash à la livraison"
                             android:textColor="@color/profile_text_primary"
                             android:textSize="14sp"

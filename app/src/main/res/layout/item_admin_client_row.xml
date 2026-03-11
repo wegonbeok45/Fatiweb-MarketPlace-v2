@@ -25,7 +25,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center"
-            android:fontFamily="@font/funnelsans_semibold"
+
             android:text="A"
             android:textColor="@color/colorPrimary"
             android:textSize="18sp" />
@@ -36,7 +36,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
-        android:fontFamily="@font/funnelsans_regular"
+
         android:text="#001"
         android:textColor="@color/profile_text_secondary"
         android:textSize="10sp"
@@ -50,7 +50,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
-        android:fontFamily="@font/funnelsans_semibold"
+
         android:text="Ahmed Ben Ali"
         android:textColor="@color/profile_text_primary"
         android:textSize="14sp"
@@ -64,7 +64,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
-        android:fontFamily="@font/funnelsans_regular"
+
         android:text="ahmed.benali@email.com"
         android:textColor="@color/profile_text_secondary"
         android:textSize="12sp"
