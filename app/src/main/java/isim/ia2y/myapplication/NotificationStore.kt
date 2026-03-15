@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import org.json.JSONArray
 import org.json.JSONObject
 
+// Cette classe organise cette partie de l'app.
 data class AppNotification(
     val id: String,
     val title: String,
@@ -13,16 +14,19 @@ data class AppNotification(
     var isRead: Boolean = false
 )
 
+// Cette classe organise cette partie de l'app.
 object NotificationStore {
     private const val PREFS_NAME = "fatiweb_notifications"
     private const val KEY_NOTIFICATIONS = "notifications_json"
     private const val KEY_FIRST_LAUNCH = "notification_first_launch"
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun getPrefs(context: Context): SharedPreferences {
         val uid = FirebaseAuthManager.currentUser?.uid ?: "guest"
         return context.getSharedPreferences("${uid}_$PREFS_NAME", Context.MODE_PRIVATE)
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     fun getAll(context: Context): List<AppNotification> {
         checkFirstLaunch(context)
 
@@ -44,16 +48,19 @@ object NotificationStore {
         return list.sortedByDescending { it.timestamp }
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     fun hasUnread(context: Context): Boolean {
         return getAll(context).any { !it.isRead }
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     fun markAllAsRead(context: Context) {
         val notifications = getAll(context)
         notifications.forEach { it.isRead = true }
         saveAll(context, notifications)
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun saveAll(context: Context, notifications: List<AppNotification>) {
         val cappedList = notifications.sortedByDescending { it.timestamp }.take(50)
         val array = JSONArray()
@@ -70,6 +77,7 @@ object NotificationStore {
         getPrefs(context).edit().putString(KEY_NOTIFICATIONS, array.toString()).apply()
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun checkFirstLaunch(context: Context) {
         val prefs = getPrefs(context)
         if (prefs.getBoolean(KEY_FIRST_LAUNCH, true)) {

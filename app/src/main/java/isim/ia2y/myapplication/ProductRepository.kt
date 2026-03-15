@@ -1,7 +1,8 @@
-package isim.ia2y.myapplication
+﻿package isim.ia2y.myapplication
 
 import androidx.annotation.DrawableRes
 
+// Cette classe organise cette partie de l'app.
 data class Product(
     val id: String,
     val title: String,
@@ -27,6 +28,7 @@ data class Product(
     }
 }
 
+// Cette classe organise cette partie de l'app.
 object ProductCatalog {
     private val products = listOf(
         Product(
@@ -37,9 +39,9 @@ object ProductCatalog {
             rating = 4.7,
             reviewsCount = 132,
             tags = listOf("TUNISIE", "EN STOCK"),
-            description = "Confectionnée à la main dans la médina de Tunis, cette chéchia conserve la forme authentique et le confort de la laine naturelle.",
+            description = "Confectionnée à la main dans la médina de Tunis, cette chechia conserve sa silhouette emblématique et le confort d'une laine naturelle soigneusement travaillée.",
             bullets = listOf(
-                "Laine 100% naturelle",
+                "Laine 100 % naturelle",
                 "Teinture stable sans dégorgement",
                 "Finition artisanale tunisienne"
             ),
@@ -53,7 +55,7 @@ object ProductCatalog {
             rating = 4.6,
             reviewsCount = 89,
             tags = listOf("TUNISIE", "EN STOCK"),
-            description = "Pièce d'inspiration berbère réalisée en atelier local avec un travail de gravure délicat et durable.",
+            description = "Pièce d'inspiration berbère réalisée en atelier local, avec un travail de gravure délicat et une finition pensée pour durer.",
             bullets = listOf(
                 "Argent 925 certifié",
                 "Finition polie anti-ternissement",
@@ -69,7 +71,7 @@ object ProductCatalog {
             rating = 4.9,
             reviewsCount = 64,
             tags = listOf("TUNISIE", "DERNIÈRES PIÈCES"),
-            description = "Tapis marqoum tissé sur métier traditionnel avec motifs géométriques typiques de Kairouan.",
+            description = "Tapis marqoum tissé sur métier traditionnel avec des motifs géométriques inspirés du patrimoine de Kairouan.",
             bullets = listOf(
                 "Nouage artisanal haute densité",
                 "Motifs traditionnels kairouanais",
@@ -85,7 +87,7 @@ object ProductCatalog {
             rating = 4.5,
             reviewsCount = 176,
             tags = listOf("TUNISIE", "EN STOCK"),
-            description = "Balgha classique de la médina avec cuir véritable et semelle confortable adaptée à un usage quotidien.",
+            description = "Balgha classique de la médina, façonnée en cuir véritable avec une ligne sobre et une semelle confortable au quotidien.",
             bullets = listOf(
                 "Cuir véritable tunisien",
                 "Semelle anti-glisse",
@@ -101,11 +103,11 @@ object ProductCatalog {
             rating = 4.8,
             reviewsCount = 124,
             tags = listOf("TUNISIE", "EN STOCK"),
-            description = "Produite au cœur des oliveraies tunisiennes, notre huile d'olive extra vierge est extraite à froid pour garantir une saveur fruitée exceptionnelle et des qualités nutritionnelles préservées.",
+            description = "Produite au cœur des oliveraies tunisiennes, cette huile d'olive extra vierge est extraite à froid pour préserver sa fraîcheur, sa rondeur et ses qualités nutritionnelles.",
             bullets = listOf(
                 "Première pression à froid",
                 "Origine: Zaghouan, Tunisie",
-                "Acidité inférieure à 0.8%"
+                "Acidité inférieure à 0,8 %"
             ),
             imageRes = R.drawable.categorie1
         ),
@@ -117,7 +119,7 @@ object ProductCatalog {
             rating = 4.4,
             reviewsCount = 211,
             tags = listOf("TUNISIE", "EN STOCK"),
-            description = "Recette familiale préparée avec piments rouges, ail frais et huile d'olive locale.",
+            description = "Recette familiale préparée avec des piments rouges séchés, de l'ail frais et une huile d'olive locale au goût équilibré.",
             bullets = listOf(
                 "Sans conservateurs",
                 "Piments de Cap Bon",
@@ -133,9 +135,9 @@ object ProductCatalog {
             rating = 4.7,
             reviewsCount = 53,
             tags = listOf("TUNISIE", "DERNIÈRES PIÈCES"),
-            description = "Filaments de safran soigneusement récoltés et séchés pour une puissance aromatique intense.",
+            description = "Filaments de safran soigneusement récoltés puis séchés pour offrir une signature aromatique fine et intense.",
             bullets = listOf(
-                "Filaments 100% purs",
+                "Filaments 100 % purs",
                 "Récolte manuelle",
                 "Arrière-goût floral fin"
             ),
@@ -149,7 +151,7 @@ object ProductCatalog {
             rating = 4.3,
             reviewsCount = 97,
             tags = listOf("TUNISIE", "EN STOCK"),
-            description = "Savon doux enrichi en huiles végétales et néroli pour une peau propre et hydratée.",
+            description = "Savon doux enrichi en huiles végétales et en néroli, idéal pour nettoyer la peau sans l'agresser.",
             bullets = listOf(
                 "Formule sans sulfate",
                 "Parfum léger naturel",
@@ -165,7 +167,7 @@ object ProductCatalog {
             rating = 4.6,
             reviewsCount = 41,
             tags = listOf("TUNISIE", "EN STOCK"),
-            description = "Poterie traditionnelle aux motifs méditerranéens, idéale pour décoration intérieure.",
+            description = "Poterie traditionnelle aux motifs méditerranéens, pensée pour apporter une touche artisanale et lumineuse à l'intérieur.",
             bullets = listOf(
                 "Peinture manuelle",
                 "Cuisson haute température",
@@ -181,7 +183,7 @@ object ProductCatalog {
             rating = 4.5,
             reviewsCount = 118,
             tags = listOf("TUNISIE", "EN STOCK"),
-            description = "Fouta en coton doux polyvalente, parfaite pour plage, hammam ou déco.",
+            description = "Fouta en coton doux et polyvalente, parfaite pour la plage, le hammam ou une touche déco naturelle à la maison.",
             bullets = listOf(
                 "Coton peigné absorbant",
                 "Séchage rapide",
@@ -191,11 +193,15 @@ object ProductCatalog {
         )
     )
 
+    // Cette fonction fait une action de cette partie de l'app.
     fun byId(id: String): Product? = products.firstOrNull { it.id == id }
 
+    // Cette fonction fait une action de cette partie de l'app.
     fun orderedFavorites(ids: Set<String>): List<Product> {
         return products.filter { ids.contains(it.id) }
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     fun all(): List<Product> = products
 }
+

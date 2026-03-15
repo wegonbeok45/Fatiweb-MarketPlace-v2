@@ -15,6 +15,7 @@ import kotlinx.coroutines.tasks.await
  *   users/{uid}                    — user profile
  *   users/{uid}/orders/{orderId}   — order history per user
  */
+// Cette classe organise cette partie de l'app.
 object FirestoreService {
 
     private val db: FirebaseFirestore get() = FirebaseFirestore.getInstance()
@@ -22,7 +23,9 @@ object FirestoreService {
     // ─── Collection references ────────────────────────────────────────────────
 
     private val productsRef get() = db.collection("products")
+    // Cette fonction fait une action de cette partie de l'app.
     private fun ordersRef(uid: String) = db.collection("users").document(uid).collection("orders")
+    // Cette fonction fait une action de cette partie de l'app.
     private fun userRef(uid: String) = db.collection("users").document(uid)
 
     // ─── Products ─────────────────────────────────────────────────────────────
@@ -33,6 +36,7 @@ object FirestoreService {
      * Seed the local product catalog to Firestore (one-time migration).
      * Safe to call multiple times — uses set() which overwrites.
      */
+    // Cette fonction fait une action de cette partie de l'app.
     suspend fun seedProducts() {
         try {
             val snapshot = productsRef.limit(1).get().await()
@@ -53,6 +57,7 @@ object FirestoreService {
      * Save an order to Firestore under users/{uid}/orders/{orderId}.
      * @return the saved [AppOrder] with its assigned Firestore document ID.
      */
+    // Cette fonction fait une action de cette partie de l'app.
     suspend fun saveOrder(uid: String, order: AppOrder): AppOrder {
         val ref = ordersRef(uid).document()
         val withId = order.copy(id = ref.id)
@@ -63,6 +68,7 @@ object FirestoreService {
     /**
      * Fetch the order history for a given user, sorted newest-first.
      */
+    // Cette fonction fait une action de cette partie de l'app.
     suspend fun fetchOrders(uid: String): List<AppOrder> {
         return try {
             val snapshot = ordersRef(uid)
@@ -82,6 +88,7 @@ object FirestoreService {
      * Fetch ALL orders from ALL users — for the admin orders screen.
      * Returns a flat list sorted newest-first, each paired with the user uid.
      */
+    // Cette fonction fait une action de cette partie de l'app.
     suspend fun fetchAllOrders(): List<Pair<String, AppOrder>> {
         return try {
             val ordersSnapshot = db.collectionGroup("orders")
@@ -100,6 +107,7 @@ object FirestoreService {
         }
     }
 
+    // Cette classe organise cette partie de l'app.
     data class ClientInfo(
         val uid: String = "",
         val name: String = "",
@@ -111,6 +119,7 @@ object FirestoreService {
     /**
      * Fetch all registered clients from Firestore users collection.
      */
+    // Cette fonction fait une action de cette partie de l'app.
     suspend fun fetchAllClients(): List<ClientInfo> {
         return try {
             val usersSnapshot = db.collection("users")
@@ -150,6 +159,7 @@ object FirestoreService {
     /**
      * Update the status of an existing order (admin use).
      */
+    // Cette fonction fait une action de cette partie de l'app.
     suspend fun updateOrderStatus(uid: String, orderId: String, newStatus: String) {
         try {
             ordersRef(uid).document(orderId).update("status", newStatus).await()
@@ -161,6 +171,7 @@ object FirestoreService {
     /**
      * Save or overwrite a user profile document in Firestore.
      */
+    // Cette fonction fait une action de cette partie de l'app.
     suspend fun saveUserProfile(uid: String, name: String, email: String) {
         try {
             val data = mapOf(
@@ -173,6 +184,7 @@ object FirestoreService {
         } catch (_: Exception) {}
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     suspend fun fetchUserName(uid: String): String? {
         return try {
             val doc = userRef(uid).get().await()
@@ -187,6 +199,7 @@ object FirestoreService {
     /**
      * Fetch a user's role from Firestore.
      */
+    // Cette fonction fait une action de cette partie de l'app.
     suspend fun fetchUserRole(uid: String): String? {
         cachedUserRole?.let {
             if (it.first == uid) return it.second
@@ -205,6 +218,7 @@ object FirestoreService {
 
     // ─── Admin Stats ──────────────────────────────────────────────────────────
 
+    // Cette classe organise cette partie de l'app.
     data class AdminStats(
         val totalOrders: Int = 0,
         val totalRevenue: Double = 0.0,
@@ -216,6 +230,7 @@ object FirestoreService {
      * Fetch aggregated stats for the admin dashboard.
      * Note: this does a shallow count — suitable for small-to-medium catalogs.
      */
+    // Cette fonction fait une action de cette partie de l'app.
     suspend fun fetchAdminStats(): AdminStats {
         return try {
             val usersCount = db.collection("users").count().get(AggregateSource.SERVER).await().count
@@ -240,6 +255,7 @@ object FirestoreService {
 
     // ─── Serialization helpers ────────────────────────────────────────────────
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun productToMap(p: Product): Map<String, Any> = mapOf(
         "id"           to p.id,
         "title"        to p.title,
@@ -254,6 +270,7 @@ object FirestoreService {
     )
 
     @Suppress("UNCHECKED_CAST")
+    // Cette fonction fait une action de cette partie de l'app.
     private fun productFromMap(id: String, data: Map<String, Any>): Product? {
         return try {
             // Look up the local product by id to get the correct imageRes

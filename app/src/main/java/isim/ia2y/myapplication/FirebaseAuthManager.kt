@@ -11,6 +11,7 @@ import kotlinx.coroutines.tasks.await
  * Central wrapper around FirebaseAuth.
  * All auth operations are suspend functions to be called from a coroutine.
  */
+// Cette classe organise cette partie de l'app.
 object FirebaseAuthManager {
 
     private val auth: FirebaseAuth get() = FirebaseAuth.getInstance()
@@ -25,6 +26,7 @@ object FirebaseAuthManager {
      * Sign in with Facebook token.
      * @return Result.success(user) on success, Result.failure(exception) on error.
      */
+    // Cette fonction fait une action de cette partie de l'app.
     suspend fun signInWithFacebook(token: String): Result<FirebaseUser> {
         return try {
             val credential = FacebookAuthProvider.getCredential(token)
@@ -49,6 +51,7 @@ object FirebaseAuthManager {
      * Sign in with Google ID token.
      * @return Result.success(user) on success, Result.failure(exception) on error.
      */
+    // Cette fonction fait une action de cette partie de l'app.
     suspend fun signInWithGoogle(idToken: String): Result<FirebaseUser> {
         return try {
             val credential = GoogleAuthProvider.getCredential(idToken, null)
@@ -72,6 +75,7 @@ object FirebaseAuthManager {
      * Sign in with email and password.
      * @return Result.success(user) on success, Result.failure(exception) on error.
      */
+    // Cette fonction fait une action de cette partie de l'app.
     suspend fun signIn(email: String, password: String): Result<FirebaseUser> {
         return try {
             val result = auth.signInWithEmailAndPassword(email, password).await()
@@ -85,6 +89,7 @@ object FirebaseAuthManager {
      * Create a new account with email and password, then save a user profile doc in Firestore.
      * @return Result.success(user) on success, Result.failure(exception) on error.
      */
+    // Cette fonction fait une action de cette partie de l'app.
     suspend fun register(email: String, password: String, displayName: String): Result<FirebaseUser> {
         return try {
             val result = auth.createUserWithEmailAndPassword(email, password).await()
@@ -112,6 +117,7 @@ object FirebaseAuthManager {
     /**
      * Sign out the current user.
      */
+    // Cette fonction fait une action de cette partie de l'app.
     fun signOut() {
         auth.signOut()
     }
@@ -119,6 +125,7 @@ object FirebaseAuthManager {
     /**
      * Returns a friendly error message from a Firebase Auth exception.
      */
+    // Cette fonction fait une action de cette partie de l'app.
     fun friendlyError(e: Throwable): String {
         val msg = e.message?.lowercase() ?: ""
         return when {

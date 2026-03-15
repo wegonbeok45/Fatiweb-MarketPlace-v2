@@ -7,6 +7,7 @@ import java.util.Locale
 /**
  * Represents a customer order stored in Firestore under users/{uid}/orders/{orderId}.
  */
+// Cette classe organise cette partie de l'app.
 data class AppOrder(
     val id: String = "",
     /** Map of productId -> quantity */
@@ -42,6 +43,7 @@ data class AppOrder(
         }
 
     /** Convert to a Firestore-friendly map */
+    // Cette fonction fait une action de cette partie de l'app.
     fun toMap(): Map<String, Any> = mapOf(
         "id"            to id,
         "items"         to items,
@@ -57,6 +59,7 @@ data class AppOrder(
     companion object {
         /** Build an AppOrder from a Firestore document map */
         @Suppress("UNCHECKED_CAST")
+        // Cette fonction fait une action de cette partie de l'app.
         fun fromMap(map: Map<String, Any>): AppOrder = AppOrder(
             id            = map["id"] as? String ?: "",
             items         = (map["items"] as? Map<String, Any>)?.mapValues { (it.value as? Long)?.toInt() ?: 1 } ?: emptyMap(),
