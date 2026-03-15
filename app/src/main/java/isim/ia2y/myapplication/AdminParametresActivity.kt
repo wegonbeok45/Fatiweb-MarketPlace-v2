@@ -16,8 +16,10 @@ import android.widget.TextView
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
 
+// Cette classe organise cette partie de l'app.
 class AdminParametresActivity : AppCompatActivity() {
 
+    // Cette fonction fait une action de cette partie de l'app.
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -49,6 +51,7 @@ class AdminParametresActivity : AppCompatActivity() {
         }
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun setupWindowInsets() {
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.adminParametresAppBar)) { view, insets ->
             val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -62,11 +65,13 @@ class AdminParametresActivity : AppCompatActivity() {
         }
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     override fun onResume() {
         super.onResume()
         refreshAdminBottomNav(AdminNavTab.SETTINGS)
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun setupDeliveryEdits() {
         val standardGroup = findViewById<View>(R.id.adminParamLivrStandardEditGroup)
         val expressGroup = findViewById<View>(R.id.adminParamLivrExpressEditGroup)
@@ -92,6 +97,7 @@ class AdminParametresActivity : AppCompatActivity() {
         }
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun showEditPriceDialog(currentPrice: String, method: String, onSave: (String) -> Unit) {
         val dialog = Dialog(this, R.style.ThemeOverlay_MyApp_Dialog)
         dialog.setContentView(R.layout.dialog_admin_edit_price)
@@ -123,10 +129,8 @@ class AdminParametresActivity : AppCompatActivity() {
         dialog.show()
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun setupTopBar() {
-        findViewById<View?>(R.id.adminParametresIvBack)?.setOnClickListener {
-            navigateBackToMain()
-        }
-        applyPressFeedback(R.id.adminParametresIvBack)
+        setupAdminTopBar(getString(R.string.admin_title_settings))
     }
 }

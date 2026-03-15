@@ -11,9 +11,11 @@ import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 
+// Cette classe organise cette partie de l'app.
 class AdminClientsActivity : AppCompatActivity() {
 
 
+    // Cette fonction fait une action de cette partie de l'app.
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -43,6 +45,7 @@ class AdminClientsActivity : AppCompatActivity() {
         }
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun setupWindowInsets() {
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.adminClientsAppBar)) { view, insets ->
             val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -56,16 +59,19 @@ class AdminClientsActivity : AppCompatActivity() {
         }
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     override fun onResume() {
         super.onResume()
         refreshAdminBottomNav(AdminNavTab.CLIENTS)
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun setupTopBar() {
         findViewById<View?>(R.id.adminClientsIvBack)?.setOnClickListener { navigateBackToMain() }
         applyPressFeedback(R.id.adminClientsIvBack)
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun loadClients() {
         lifecycleScope.launch {
             val clients = FirestoreService.fetchAllClients()
@@ -73,6 +79,7 @@ class AdminClientsActivity : AppCompatActivity() {
         }
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun renderClients(clients: List<FirestoreService.ClientInfo>) {
         val container = findViewById<android.widget.LinearLayout>(R.id.adminClientsListContainer) ?: return
         container.removeAllViews()

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -40,17 +40,32 @@
                 app:tint="@color/profile_text_primary" />
 
             <TextView
+                android:id="@+id/adminProduitsTvTitle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="14dp"
-
                 android:text="Gestion des Produits"
                 android:textColor="@color/profile_text_primary"
                 android:textSize="18sp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/adminProduitsIvSettings"
                 app:layout_constraintStart_toEndOf="@id/adminProduitsIvBack"
                 app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/adminProduitsIvSettings"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_marginEnd="4dp"
+                android:contentDescription="@null"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?selectableItemBackgroundBorderless"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:srcCompat="@drawable/settings"
+                app:tint="@color/profile_text_primary" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <View
@@ -156,7 +171,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginStart="12dp"
 
-                            android:text="Artisanat • Stock: 15"
+                            android:text="Artisanat • Stock : 15"
                             android:textColor="@color/profile_text_secondary"
                             android:textSize="12sp"
                             app:layout_constraintBottom_toBottomOf="parent"
@@ -295,7 +310,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginStart="12dp"
 
-                            android:text="Mélange d'Épices Harissa"
+                            android:text="Mélange d'épices Harissa"
                             android:textColor="@color/profile_text_primary"
                             android:textSize="14sp"
                             app:layout_constraintBottom_toTopOf="@id/adminProduitSub3"
@@ -310,7 +325,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginStart="12dp"
 
-                            android:text="Épices • Stock: 42"
+                            android:text="Épices • Stock : 42"
                             android:textColor="@color/profile_text_secondary"
                             android:textSize="12sp"
                             app:layout_constraintBottom_toBottomOf="parent"
@@ -343,3 +358,4 @@
         android:layout_gravity="bottom" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
+

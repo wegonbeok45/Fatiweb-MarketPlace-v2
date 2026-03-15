@@ -11,6 +11,7 @@ import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 
+// Cette classe organise cette partie de l'app.
 class AdminCommandesActivity : AppCompatActivity() {
 
     // Each row slot in the layout (up to 4 visible rows)
@@ -22,6 +23,7 @@ class AdminCommandesActivity : AppCompatActivity() {
     // In-memory list so row taps can reference the right order
     private var loadedOrders: List<Pair<String, AppOrder>> = emptyList()
 
+    // Cette fonction fait une action de cette partie de l'app.
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -51,6 +53,7 @@ class AdminCommandesActivity : AppCompatActivity() {
         }
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun setupWindowInsets() {
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.adminCommandesAppBar)) { view, insets ->
             val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -64,16 +67,19 @@ class AdminCommandesActivity : AppCompatActivity() {
         }
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     override fun onResume() {
         super.onResume()
         refreshAdminBottomNav(AdminNavTab.COMMANDES)
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun setupTopBar() {
         findViewById<View?>(R.id.adminCommandesIvBack)?.setOnClickListener { navigateBackToMain() }
         applyPressFeedback(R.id.adminCommandesIvBack)
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun loadOrders() {
         lifecycleScope.launch {
             val orders = FirestoreService.fetchAllOrders()
@@ -82,6 +88,7 @@ class AdminCommandesActivity : AppCompatActivity() {
         }
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun renderOrders(orders: List<Pair<String, AppOrder>>) {
         // Hide all rows first
         rowIds.forEach { id -> findViewById<View>(id)?.visibility = View.GONE }
@@ -128,6 +135,7 @@ class AdminCommandesActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.adminCommandesTvDelivered)?.text = deliveredCount.toString()
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun showStatusDialog(uid: String, order: AppOrder, rowIndex: Int) {
         val statuses = arrayOf("En attente", "En préparation", "En livraison", "Livré")
         val keys     = arrayOf("pending",    "preparing",      "shipped",      "delivered")

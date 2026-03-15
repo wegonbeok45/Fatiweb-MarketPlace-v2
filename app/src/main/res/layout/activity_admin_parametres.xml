@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -18,40 +18,9 @@
         app:elevation="0dp"
         app:liftOnScroll="false">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <include
             android:id="@+id/adminParametresTopBar"
-            android:layout_width="match_parent"
-            android:layout_height="64dp"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp">
-
-            <ImageView
-                android:id="@+id/adminParametresIvBack"
-                android:layout_width="22dp"
-                android:layout_height="22dp"
-                android:contentDescription="@null"
-                android:clickable="true"
-                android:focusable="true"
-                android:background="?selectableItemBackgroundBorderless"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@drawable/back"
-                app:tint="@color/profile_text_primary" />
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="14dp"
-
-                android:text="Paramètres"
-                android:textColor="@color/profile_text_primary"
-                android:textSize="18sp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/adminParametresIvBack"
-                app:layout_constraintTop_toTopOf="parent" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
+            layout="@layout/include_admin_top_bar" />
 
         <View
             android:layout_width="match_parent"
@@ -118,7 +87,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
 
-                android:text="Méthodes de livraison"
+                android:text="Methodes de livraison"
                 android:textColor="@color/profile_text_primary"
                 android:textSize="15sp"
                 android:layout_marginBottom="10dp" />
@@ -342,7 +311,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
 
-                            android:text="Cash à la livraison"
+                            android:text="Cash a la livraison"
                             android:textColor="@color/profile_text_primary"
                             android:textSize="14sp"
                             app:layout_constraintBottom_toBottomOf="parent"
@@ -371,3 +340,4 @@
         android:layout_gravity="bottom" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
+

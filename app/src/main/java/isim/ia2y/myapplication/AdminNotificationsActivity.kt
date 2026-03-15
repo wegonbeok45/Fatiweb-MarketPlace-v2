@@ -10,8 +10,10 @@ import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 
+// Cette classe organise cette partie de l'app.
 class AdminNotificationsActivity : AppCompatActivity() {
 
+    // Cette fonction fait une action de cette partie de l'app.
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -43,11 +45,13 @@ class AdminNotificationsActivity : AppCompatActivity() {
         }
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     override fun onResume() {
         super.onResume()
         refreshAdminBottomNav(AdminNavTab.NOTIFICATIONS)
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun setupTopBar() {
         findViewById<View?>(R.id.adminNotifIvBack)?.setOnClickListener {
             navigateBackToMain()
@@ -55,6 +59,7 @@ class AdminNotificationsActivity : AppCompatActivity() {
         applyPressFeedback(R.id.adminNotifIvBack)
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun setupWindowInsets() {
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.adminBottomNav)) { view, insets ->
             val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())

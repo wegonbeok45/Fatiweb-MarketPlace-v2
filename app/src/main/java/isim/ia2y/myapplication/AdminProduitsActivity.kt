@@ -10,8 +10,10 @@ import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 
+// Cette classe organise cette partie de l'app.
 class AdminProduitsActivity : AppCompatActivity() {
 
+    // Cette fonction fait une action de cette partie de l'app.
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -49,11 +51,13 @@ class AdminProduitsActivity : AppCompatActivity() {
         }
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     override fun onResume() {
         super.onResume()
         refreshAdminBottomNav(AdminNavTab.PRODUITS)
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun setupTopBar() {
         findViewById<View?>(R.id.adminProduitsIvBack)?.setOnClickListener {
             navigateBackToMain()
@@ -61,6 +65,7 @@ class AdminProduitsActivity : AppCompatActivity() {
         applyPressFeedback(R.id.adminProduitsIvBack)
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun setupWindowInsets() {
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.adminProduitsAppBar)) { view, insets ->
             val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -46,12 +46,11 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="14dp"
-
                 android:text="Tableau de Bord"
                 android:textColor="@color/profile_text_primary"
                 android:textSize="18sp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/adminIvAvatar"
+                app:layout_constraintEnd_toStartOf="@id/adminIvSettings"
                 app:layout_constraintStart_toEndOf="@id/adminIvBack"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -77,6 +76,22 @@
                     app:srcCompat="@drawable/ic_admin_shield"
                     app:tint="@color/profile_edit_icon" />
             </com.google.android.material.card.MaterialCardView>
+
+            <!-- Settings icon (top nav) -->
+            <ImageView
+                android:id="@+id/adminIvSettings"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_marginEnd="12dp"
+                android:contentDescription="@null"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?selectableItemBackgroundBorderless"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/adminIvAvatar"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/settings"
+                app:tint="@color/profile_text_primary" />
 
             <!-- Admin avatar -->
             <com.google.android.material.card.MaterialCardView
@@ -691,7 +706,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
 
-                android:text="Dernières Commandes"
+                android:text="Dernières commandes"
                 android:textColor="@color/profile_text_primary"
                 android:textSize="16sp" />
 
@@ -954,6 +969,13 @@
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
+    <FrameLayout
+        android:id="@+id/adminInlineContentContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
     <!-- Bottom Nav (6-tab shared component) -->
     <include
         layout="@layout/include_admin_bottom_nav"
@@ -962,4 +984,5 @@
         android:layout_gravity="bottom" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
 

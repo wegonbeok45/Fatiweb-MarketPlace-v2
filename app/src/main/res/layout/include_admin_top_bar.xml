@@ -1,0 +1,101 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/admin_top_bar_height"
+    android:paddingStart="@dimen/home_horizontal_padding"
+    android:paddingEnd="@dimen/home_horizontal_padding">
+
+    <ImageView
+        android:id="@+id/adminIvBack"
+        android:layout_width="@dimen/admin_top_icon_size"
+        android:layout_height="@dimen/admin_top_icon_size"
+        android:background="?selectableItemBackgroundBorderless"
+        android:clickable="true"
+        android:contentDescription="@null"
+        android:focusable="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/back"
+        app:tint="@color/profile_text_primary" />
+
+    <LinearLayout
+        android:id="@+id/adminTopActions"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="@id/adminIvBack"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/adminIvBack">
+
+        <ImageView
+            android:id="@+id/adminIvSettings"
+            android:layout_width="@dimen/admin_top_icon_size"
+            android:layout_height="@dimen/admin_top_icon_size"
+            android:background="?selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:contentDescription="@null"
+            android:focusable="true"
+            app:srcCompat="@drawable/settings"
+            app:tint="@color/profile_text_primary" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/adminShieldBadge"
+            android:layout_width="@dimen/admin_top_badge_size"
+            android:layout_height="@dimen/admin_top_badge_size"
+            android:layout_marginStart="@dimen/space_8"
+            app:cardBackgroundColor="@color/colorPrimary"
+            app:cardCornerRadius="@dimen/corner_radius_round"
+            app:cardElevation="@dimen/space_0"
+            app:strokeWidth="@dimen/space_0">
+
+            <ImageView
+                android:layout_width="@dimen/admin_top_badge_icon_size"
+                android:layout_height="@dimen/admin_top_badge_icon_size"
+                android:layout_gravity="center"
+                android:contentDescription="@null"
+                app:srcCompat="@drawable/ic_admin_shield"
+                app:tint="@color/colorOnPrimary" />
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/adminIvAvatar"
+            android:layout_width="@dimen/admin_top_avatar_size"
+            android:layout_height="@dimen/admin_top_avatar_size"
+            android:layout_marginStart="@dimen/space_8"
+            app:cardCornerRadius="@dimen/corner_radius_round"
+            app:cardElevation="@dimen/space_0"
+            app:strokeColor="@color/profile_avatar_ring"
+            app:strokeWidth="@dimen/stroke_width_medium">
+
+            <ImageView
+                android:id="@+id/adminIvAvatarImg"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:contentDescription="@null"
+                android:scaleType="centerCrop"
+                app:srcCompat="@drawable/profile_avatar_art" />
+        </com.google.android.material.card.MaterialCardView>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/adminTvTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/admin_top_title_margin_start"
+        android:layout_marginEnd="@dimen/space_12"
+        android:ellipsize="end"
+        android:fontFamily="@font/plus_jakarta_sans_bold"
+        android:maxLines="1"
+        android:textColor="@color/profile_text_primary"
+        android:textSize="@dimen/admin_top_title_size"
+        app:layout_constraintBottom_toBottomOf="@id/adminIvBack"
+        app:layout_constraintEnd_toStartOf="@id/adminTopActions"
+        app:layout_constraintStart_toEndOf="@id/adminIvBack"
+        app:layout_constraintTop_toTopOf="@id/adminIvBack" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+

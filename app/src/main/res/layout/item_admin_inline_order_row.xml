@@ -1,0 +1,84 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="70dp"
+    android:background="?selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp">
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/adminInlineOrderIcon"
+        android:layout_width="38dp"
+        android:layout_height="38dp"
+        app:cardBackgroundColor="@color/profile_card_icon_bg"
+        app:cardCornerRadius="999dp"
+        app:cardElevation="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:strokeWidth="0dp">
+
+        <ImageView
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:layout_gravity="center"
+            android:contentDescription="@null"
+            app:srcCompat="@drawable/shoppingbag"
+            app:tint="@color/colorPrimary" />
+    </com.google.android.material.card.MaterialCardView>
+
+    <TextView
+        android:id="@+id/adminInlineOrderId"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:text="#FW-0000"
+        android:textColor="@color/profile_text_primary"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toTopOf="@id/adminInlineOrderName"
+        app:layout_constraintEnd_toStartOf="@id/adminInlineOrderBadge"
+        app:layout_constraintStart_toEndOf="@id/adminInlineOrderIcon"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed" />
+
+    <TextView
+        android:id="@+id/adminInlineOrderName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:text="Commande"
+        android:textColor="@color/profile_text_secondary"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/adminInlineOrderBadge"
+        app:layout_constraintStart_toEndOf="@id/adminInlineOrderIcon"
+        app:layout_constraintTop_toBottomOf="@id/adminInlineOrderId" />
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/adminInlineOrderBadge"
+        android:layout_width="wrap_content"
+        android:layout_height="26dp"
+        app:cardBackgroundColor="#FFF3E0"
+        app:cardCornerRadius="999dp"
+        app:cardElevation="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:strokeWidth="0dp">
+
+        <TextView
+            android:id="@+id/adminInlineOrderBadgeText"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:text="En attente"
+            android:textColor="#E65100"
+            android:textSize="11sp" />
+    </com.google.android.material.card.MaterialCardView>
+</androidx.constraintlayout.widget.ConstraintLayout>
+

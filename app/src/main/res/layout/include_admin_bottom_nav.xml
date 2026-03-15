@@ -1,5 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Shared Admin Bottom Nav — include in every admin screen CoordinatorLayout -->
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- Shared Admin Bottom Nav include in every admin screen CoordinatorLayout -->
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -75,7 +75,7 @@
                 android:textSize="9.5sp"
                 android:textColor="@color/home_nav_inactive"
                 android:layout_marginTop="5dp"
-                android:fontFamily="@font/poppins_regular"
+                android:fontFamily="@font/plus_jakarta_sans_regular"
                 android:maxLines="1"
                 android:ellipsize="end" />
         </LinearLayout>
@@ -111,7 +111,7 @@
                 android:textSize="9.5sp"
                 android:textColor="@color/home_nav_inactive"
                 android:layout_marginTop="5dp"
-                android:fontFamily="@font/poppins_regular"
+                android:fontFamily="@font/plus_jakarta_sans_regular"
                 android:maxLines="1"
                 android:ellipsize="end" />
         </LinearLayout>
@@ -147,7 +147,7 @@
                 android:textSize="9.5sp"
                 android:textColor="@color/home_nav_inactive"
                 android:layout_marginTop="5dp"
-                android:fontFamily="@font/poppins_regular"
+                android:fontFamily="@font/plus_jakarta_sans_regular"
                 android:maxLines="1"
                 android:ellipsize="end" />
         </LinearLayout>
@@ -183,7 +183,7 @@
                 android:textSize="9.5sp"
                 android:textColor="@color/home_nav_inactive"
                 android:layout_marginTop="5dp"
-                android:fontFamily="@font/poppins_regular"
+                android:fontFamily="@font/plus_jakarta_sans_regular"
                 android:maxLines="1"
                 android:ellipsize="end" />
         </LinearLayout>
@@ -219,12 +219,12 @@
                 android:textSize="9.5sp"
                 android:textColor="@color/home_nav_inactive"
                 android:layout_marginTop="5dp"
-                android:fontFamily="@font/poppins_regular"
+                android:fontFamily="@font/plus_jakarta_sans_regular"
                 android:maxLines="1"
                 android:ellipsize="end" />
         </LinearLayout>
 
-        <!-- Paramètres -->
+        <!-- Paramètres (hidden from bottom nav, now moved to top bar) -->
         <LinearLayout
             android:id="@+id/adminNavSettings"
             android:layout_width="0dp"
@@ -234,6 +234,7 @@
             android:orientation="vertical"
             android:clickable="true"
             android:focusable="true"
+            android:visibility="gone"
             android:background="?selectableItemBackgroundBorderless"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/adminNavNotifications"
@@ -255,10 +256,11 @@
                 android:textSize="9.5sp"
                 android:textColor="@color/home_nav_inactive"
                 android:layout_marginTop="5dp"
-                android:fontFamily="@font/poppins_regular"
+                android:fontFamily="@font/plus_jakarta_sans_regular"
                 android:maxLines="1"
                 android:ellipsize="end" />
         </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </LinearLayout>
+

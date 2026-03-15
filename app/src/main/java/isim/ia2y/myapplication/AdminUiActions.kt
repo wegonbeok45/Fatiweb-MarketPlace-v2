@@ -19,6 +19,7 @@ import androidx.transition.TransitionManager
 /**
  * Tab identifiers for the admin bottom navigation bar.
  */
+// Cette classe organise cette partie de l'app.
 enum class AdminNavTab {
     DASHBOARD,
     COMMANDES,
@@ -56,6 +57,54 @@ fun AppCompatActivity.resolveAdminTab(): AdminNavTab {
     val activityClass = this::class.java
     return TAB_TO_ACTIVITY.entries.firstOrNull { it.value == activityClass }?.key
         ?: AdminNavTab.DASHBOARD
+}
+
+fun AppCompatActivity.setupAdminTopBar(title: String) {
+    findViewById<TextView?>(R.id.adminTvTitle)?.text = title
+
+    findViewById<View?>(R.id.adminIvBack)?.setOnClickListener {
+        navigateBackToMain()
+    }
+    findViewById<View?>(R.id.adminIvSettings)?.setOnClickListener {
+        if (resolveAdminTab() != AdminNavTab.SETTINGS) {
+            navigateToAdminTab(AdminNavTab.SETTINGS)
+        }
+    }
+    findViewById<View?>(R.id.adminIvAvatar)?.setOnClickListener {
+        showToast(getString(R.string.coming_soon))
+    }
+    findViewById<View?>(R.id.adminShieldBadge)?.setOnClickListener {
+        showToast(getString(R.string.coming_soon))
+    }
+
+    applyPressFeedback(
+        R.id.adminIvBack,
+        R.id.adminIvSettings,
+        R.id.adminIvAvatar,
+        R.id.adminShieldBadge
+    )
+}
+
+fun AppCompatActivity.selectAdminBottomNav(activeTab: AdminNavTab, animate: Boolean = true) {
+    val activeColor = ContextCompat.getColor(this, R.color.profile_text_primary)
+    val inactiveColor = ContextCompat.getColor(this, R.color.home_nav_inactive)
+    val shouldAnimate = animate && !isReducedMotionEnabled()
+
+    TAB_TO_NAV_ID.forEach { (tab, viewId) ->
+        val isActive = tab == activeTab
+        if (shouldAnimate) {
+            animateAdminNavItemColor(viewId, if (isActive) activeColor else inactiveColor, isActive)
+        } else {
+            setAdminNavItemColor(viewId, if (isActive) activeColor else inactiveColor, isActive)
+        }
+    }
+
+    val targetId = TAB_TO_NAV_ID[activeTab] ?: return
+    if (shouldAnimate) {
+        animateAdminPillTo(targetId)
+    } else {
+        snapAdminPillTo(targetId)
+    }
 }
 
 /**
