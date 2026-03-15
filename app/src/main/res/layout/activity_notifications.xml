@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -78,13 +78,24 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/viewTopDivider">
 
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/ivNotificationsEmptyAnimation"
+            android:layout_width="156dp"
+            android:layout_height="156dp"
+            android:contentDescription="@null"
+            app:lottie_autoPlay="true"
+            app:lottie_loop="true"
+            app:lottie_rawRes="@raw/anim_empty_notifications" />
+
         <TextView
             android:id="@+id/tvNotificationsEmpty"
             style="@style/HomeText.SearchHint"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
             android:gravity="center"
             android:text="@string/notifications_empty_state" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/cardSearchProduct"
@@ -35,8 +35,9 @@
             android:layout_margin="@dimen/home_product_heart_margin"
             app:cardBackgroundColor="@color/home_heart_bg"
             app:cardCornerRadius="@dimen/corner_radius_round"
-            app:cardElevation="@dimen/space_2"
-            app:strokeWidth="@dimen/space_0">
+            app:cardElevation="@dimen/space_0"
+            app:strokeColor="@color/colorBorderLight"
+            app:strokeWidth="@dimen/stroke_width_default">
 
             <ImageView
                 android:id="@+id/ivSearchFavoriteIcon"
@@ -116,3 +117,4 @@
         </com.google.android.material.card.MaterialCardView>
     </LinearLayout>
 </LinearLayout>
+

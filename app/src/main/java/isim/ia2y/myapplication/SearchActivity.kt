@@ -31,6 +31,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.airbnb.lottie.LottieAnimationView
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
@@ -43,6 +44,7 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import kotlin.math.roundToInt
 
+// Cette classe organise cette partie de l'app.
 class SearchActivity : AppCompatActivity() {
     private lateinit var etSearch: EditText
     private lateinit var tvCancel: TextView
@@ -56,6 +58,7 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var sortDropdown: AutoCompleteTextView
     private lateinit var gridResults: GridLayout
     private lateinit var emptyState: View
+    private lateinit var emptyAnimation: LottieAnimationView
     private lateinit var skeleton: View
     private lateinit var scrollResults: View
     private lateinit var btnBrowseCategories: MaterialButton
@@ -95,6 +98,7 @@ class SearchActivity : AppCompatActivity() {
         "Fouta Hammamet"
     )
 
+    // Cette fonction fait une action de cette partie de l'app.
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -125,6 +129,7 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     override fun onDestroy() {
         skeletonAnimator?.cancel()
         uiHandler.removeCallbacksAndMessages(null)
@@ -132,6 +137,7 @@ class SearchActivity : AppCompatActivity() {
         super.onDestroy()
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun bindViews() {
         etSearch = findViewById(R.id.etSearch)
         tvCancel = findViewById(R.id.tvSearchCancel)
@@ -145,11 +151,13 @@ class SearchActivity : AppCompatActivity() {
         sortDropdown = findViewById(R.id.dropdownSort)
         gridResults = findViewById(R.id.gridSearchResults)
         emptyState = findViewById(R.id.layoutEmptyState)
+        emptyAnimation = findViewById(R.id.ivSearchEmptyAnimation)
         skeleton = findViewById(R.id.layoutSkeleton)
         scrollResults = findViewById(R.id.scrollResults)
         btnBrowseCategories = findViewById(R.id.btnBrowseCategories)
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun bindTopActions() {
         findViewById<View>(R.id.ivSearchBack).setOnClickListener { finishToTop() }
         findViewById<View>(R.id.ivSearchFilter).setOnClickListener { showFilterSheet() }
@@ -160,9 +168,12 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun bindSearchInput() {
         etSearch.addTextChangedListener(object : TextWatcher {
+            // Cette fonction fait une action de cette partie de l'app.
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
+            // Cette fonction fait une action de cette partie de l'app.
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 val query = s?.toString()?.trim().orEmpty()
                 toggleCancelButton(query.isNotEmpty())
@@ -173,6 +184,7 @@ class SearchActivity : AppCompatActivity() {
                     showSuggestionsState(animated = true)
                 }
             }
+            // Cette fonction fait une action de cette partie de l'app.
             override fun afterTextChanged(s: Editable?) = Unit
         })
 
@@ -188,6 +200,7 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun bindSortDropdown() {
         val labels = SortOption.values().map { getString(it.labelRes) }
         sortDropdown.setAdapter(ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, labels))
@@ -203,6 +216,7 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun bindPopularChips() {
         popularGroup.removeAllViews()
         popularSearches.forEach { term ->
@@ -214,7 +228,7 @@ class SearchActivity : AppCompatActivity() {
                 setTextColor(ContextCompat.getColor(context, R.color.home_chip_text))
                 chipBackgroundColor = ContextCompat.getColorStateList(context, R.color.home_chip_bg)
                 rippleColor = ContextCompat.getColorStateList(context, R.color.home_nav_selected_bg)
-                typeface = resources.getFont(R.font.poppins_regular)
+                typeface = resources.getFont(R.font.plus_jakarta_sans_regular)
                 setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
                 setOnClickListener {
                     etSearch.setText(term)
@@ -226,12 +240,14 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun bindBrowseCategories() {
         btnBrowseCategories.setOnClickListener {
             navigateToMainTab(MainActivity.Tab.EXPLORE)
         }
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun renderRecentSearches() {
         recentList.removeAllViews()
         val items = getRecentSearches().take(5)
@@ -240,7 +256,7 @@ class SearchActivity : AppCompatActivity() {
                 text = getString(R.string.search_recent_empty)
                 setTextColor(ContextCompat.getColor(context, R.color.home_text_secondary))
                 textSize = 13f
-                typeface = resources.getFont(R.font.poppins_regular)
+                typeface = resources.getFont(R.font.plus_jakarta_sans_regular)
             }
             recentList.addView(empty)
             return
@@ -254,6 +270,7 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun buildRecentRow(term: String): View {
         val row = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
@@ -275,7 +292,7 @@ class SearchActivity : AppCompatActivity() {
             this.text = term
             setTextColor(ContextCompat.getColor(context, R.color.home_text_primary))
             textSize = 14f
-            typeface = resources.getFont(R.font.poppins_regular)
+                typeface = resources.getFont(R.font.plus_jakarta_sans_regular)
             layoutParams = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f)
                 .apply { marginStart = 10.dp }
             setOnClickListener {
@@ -301,6 +318,7 @@ class SearchActivity : AppCompatActivity() {
         return row
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun renderSuggestions(query: String) {
         suggestionsList.removeAllViews()
         val normalized = query.lowercase(Locale.getDefault())
@@ -318,6 +336,7 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun buildSuggestionRow(query: String, suggestion: String): View {
         val row = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
@@ -344,7 +363,7 @@ class SearchActivity : AppCompatActivity() {
             layoutParams = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f)
                 .apply { marginStart = 10.dp }
             textSize = 15f
-            typeface = resources.getFont(R.font.poppins_regular)
+            typeface = resources.getFont(R.font.plus_jakarta_sans_regular)
             this.text = createSuggestionSpan(query, suggestion)
         }
 
@@ -353,6 +372,7 @@ class SearchActivity : AppCompatActivity() {
         return row
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun createSuggestionSpan(query: String, suggestion: String): SpannableString {
         val span = SpannableString(suggestion)
         val start = suggestion.lowercase(Locale.getDefault())
@@ -398,6 +418,7 @@ class SearchActivity : AppCompatActivity() {
         return span
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun performSearch(query: String) {
         val requestToken = ++searchRequestToken
         currentQuery = query
@@ -443,14 +464,17 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun renderSearchResults(query: String, items: List<Product>) {
         resultsCount.text = getString(R.string.search_results_count, items.size, query)
         gridResults.removeAllViews()
         if (items.isEmpty()) {
             emptyState.visibility = View.VISIBLE
+            emptyAnimation.playAnimation()
             return
         }
         emptyState.visibility = View.GONE
+        emptyAnimation.pauseAnimation()
 
         items.forEachIndexed { index, product ->
             val card = layoutInflater.inflate(R.layout.item_search_product_card, gridResults, false)
@@ -474,13 +498,15 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun bindResultCard(view: View, product: Product) {
-        view.findViewById<ImageView>(R.id.ivSearchProductImage).setImageResource(product.imageRes)
+        view.findViewById<ImageView>(R.id.ivSearchProductImage).loadCatalogImage(product.imageRes)
         view.findViewById<TextView>(R.id.tvSearchProductTitle).text = product.title
         view.findViewById<TextView>(R.id.tvSearchProductSubtitle).text = product.subtitle
         view.findViewById<TextView>(R.id.tvSearchPriceAmount).text = String.format(Locale.US, "%.3f", product.price)
 
         val favoriteIcon = view.findViewById<ImageView>(R.id.ivSearchFavoriteIcon)
+        // Cette fonction fait une action de cette partie de l'app.
         fun refreshFavoriteTint() {
             val isFavorite = FavoritesStore.isFavorite(this, product.id)
             val tint = if (isFavorite) R.color.home_heart_active else R.color.home_text_primary
@@ -499,6 +525,7 @@ class SearchActivity : AppCompatActivity() {
         view.setOnClickListener { navigateToProductDetails(product.id) }
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun applyFilters(
         query: String,
         source: List<Product>,
@@ -527,6 +554,7 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun applySort(items: List<Product>, sort: SortOption): List<Product> = when (sort) {
         SortOption.PRICE_LOW -> items.sortedBy { it.price }
         SortOption.PRICE_HIGH -> items.sortedByDescending { it.price }
@@ -534,6 +562,7 @@ class SearchActivity : AppCompatActivity() {
         SortOption.NEWEST -> items.sortedByDescending { it.id.hashCode() }
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun mapLocationToKeyword(value: String): String? = when (value) {
         "medina" -> "medina"
         "djerba" -> "djerba"
@@ -541,6 +570,7 @@ class SearchActivity : AppCompatActivity() {
         else -> null
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun showFilterSheet() {
         val dialog = BottomSheetDialog(this)
         val sheet = layoutInflater.inflate(R.layout.bottom_sheet_search_filters, null)
@@ -554,6 +584,7 @@ class SearchActivity : AppCompatActivity() {
         val btnReset = sheet.findViewById<MaterialButton>(R.id.btnFilterReset)
         val btnApply = sheet.findViewById<MaterialButton>(R.id.btnFilterApply)
 
+        // Cette fonction fait une action de cette partie de l'app.
         fun syncRangeLabel(values: List<Float>) {
             tvRange.text = getString(
                 R.string.search_filter_price_value,
@@ -612,10 +643,14 @@ class SearchActivity : AppCompatActivity() {
         dialog.show()
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun showDefaultState(animated: Boolean) = fadeTo(defaultState, animated)
+    // Cette fonction fait une action de cette partie de l'app.
     private fun showSuggestionsState(animated: Boolean) = fadeTo(suggestionsState, animated)
+    // Cette fonction fait une action de cette partie de l'app.
     private fun showResultsState(animated: Boolean) = fadeTo(resultsState, animated)
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun fadeTo(target: View, animated: Boolean) {
         val states = listOf(defaultState, suggestionsState, resultsState)
         states.forEach { view ->
@@ -643,6 +678,7 @@ class SearchActivity : AppCompatActivity() {
             .start()
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun toggleCancelButton(show: Boolean) {
         if (show && tvCancel.visibility != View.VISIBLE) {
             tvCancel.visibility = View.VISIBLE
@@ -656,6 +692,7 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun buildDivider(): View = View(this).apply {
         layoutParams = LinearLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
@@ -664,6 +701,7 @@ class SearchActivity : AppCompatActivity() {
         setBackgroundColor(ContextCompat.getColor(context, R.color.home_divider))
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun startSkeleton() {
         scrollResults.visibility = View.GONE
         skeleton.visibility = View.VISIBLE
@@ -677,6 +715,7 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun stopSkeleton() {
         skeletonAnimator?.cancel()
         skeleton.alpha = 1f
@@ -686,6 +725,7 @@ class SearchActivity : AppCompatActivity() {
         scrollResults.animate().alpha(1f).setDuration(180L).start()
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun focusAndOpenKeyboard() {
         etSearch.requestFocus()
         etSearch.post {
@@ -694,11 +734,13 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun hideKeyboard() {
         val imm = getSystemService(InputMethodManager::class.java)
         imm?.hideSoftInputFromWindow(etSearch.windowToken, 0)
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun getRecentSearches(): MutableList<String> {
         val raw = getSharedPreferences(PREFS_SEARCH, Context.MODE_PRIVATE)
             .getString(KEY_RECENT_SEARCHES_CSV, "")
@@ -719,6 +761,7 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun saveRecentListToPrefs(list: List<String>) {
         val array = org.json.JSONArray()
         list.forEach { array.put(it) }
@@ -728,6 +771,7 @@ class SearchActivity : AppCompatActivity() {
             .apply()
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun saveRecentSearch(query: String) {
         val normalized = query.trim()
         if (normalized.isEmpty()) return
@@ -737,6 +781,7 @@ class SearchActivity : AppCompatActivity() {
         saveRecentListToPrefs(recent.take(5))
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun removeRecentSearch(query: String) {
         val filtered = getRecentSearches().filterNot { it.equals(query, ignoreCase = true) }
         saveRecentListToPrefs(filtered)
@@ -745,6 +790,7 @@ class SearchActivity : AppCompatActivity() {
     private val Int.dp: Int
         get() = (this * resources.displayMetrics.density).roundToInt()
 
+    // Cette classe organise cette partie de l'app.
     private enum class SortOption(val labelRes: Int) {
         PRICE_LOW(R.string.search_sort_price_low),
         PRICE_HIGH(R.string.search_sort_price_high),

@@ -10,7 +10,9 @@ import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+// Cette classe organise cette partie de l'app.
 class NotificationsActivity : AppCompatActivity() {
+    // Cette fonction fait une action de cette partie de l'app.
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -29,17 +31,21 @@ class NotificationsActivity : AppCompatActivity() {
         revealViewsInOrder(R.id.layoutTopBar, R.id.viewTopDivider)
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun setupNotifications() {
         val rv = findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.rvNotifications)
         val emptyState = findViewById<View>(R.id.layoutEmptyState)
+        val emptyAnimation = findViewById<com.airbnb.lottie.LottieAnimationView>(R.id.ivNotificationsEmptyAnimation)
         val notifications = NotificationStore.getAll(this)
 
         if (notifications.isEmpty()) {
             rv.visibility = View.GONE
             emptyState.visibility = View.VISIBLE
+            emptyAnimation?.playAnimation()
         } else {
             rv.visibility = View.VISIBLE
             emptyState.visibility = View.GONE
+            emptyAnimation?.pauseAnimation()
             rv.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this)
             rv.adapter = NotificationsAdapter(notifications)
             

@@ -11,8 +11,10 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 
+// Cette classe organise cette partie de l'app.
 class OrdersHistoryActivity : AppCompatActivity() {
 
+    // Cette fonction fait une action de cette partie de l'app.
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -28,6 +30,7 @@ class OrdersHistoryActivity : AppCompatActivity() {
         loadOrders()
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun loadOrders() {
         val uid = FirebaseAuthManager.currentUser?.uid
         if (uid == null) {
@@ -42,23 +45,35 @@ class OrdersHistoryActivity : AppCompatActivity() {
         }
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun showEmpty() {
         val empty = findViewById<TextView>(R.id.tvEmptyOrders) ?: return
+        val emptyState = findViewById<View>(R.id.layoutEmptyOrdersState) ?: return
+        val emptyAnimation = findViewById<com.airbnb.lottie.LottieAnimationView>(R.id.ivEmptyOrdersAnimation)
         val container = findViewById<LinearLayout>(R.id.layoutOrdersContainer) ?: return
         container.removeAllViews()
+        emptyState.visibility = View.VISIBLE
         empty.visibility = View.VISIBLE
+        emptyAnimation?.playAnimation()
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun renderOrders(orders: List<AppOrder>) {
         val container = findViewById<LinearLayout>(R.id.layoutOrdersContainer) ?: return
         val empty = findViewById<TextView>(R.id.tvEmptyOrders) ?: return
+        val emptyState = findViewById<View>(R.id.layoutEmptyOrdersState) ?: return
+        val emptyAnimation = findViewById<com.airbnb.lottie.LottieAnimationView>(R.id.ivEmptyOrdersAnimation)
         container.removeAllViews()
 
         if (orders.isEmpty()) {
+            emptyState.visibility = View.VISIBLE
             empty.visibility = View.VISIBLE
+            emptyAnimation?.playAnimation()
             return
         }
+        emptyState.visibility = View.GONE
         empty.visibility = View.GONE
+        emptyAnimation?.pauseAnimation()
 
         orders.forEachIndexed { index, order ->
             val row = layoutInflater.inflate(R.layout.item_order_history, container, false)
