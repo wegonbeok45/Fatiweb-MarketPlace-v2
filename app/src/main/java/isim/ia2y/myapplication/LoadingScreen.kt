@@ -19,6 +19,7 @@ import com.google.android.material.progressindicator.LinearProgressIndicator
 import java.util.concurrent.Executors
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 
+// Cette classe organise cette partie de l'app.
 class LoadingScreen : AppCompatActivity() {
 
     private val handler = Handler(Looper.getMainLooper())
@@ -31,6 +32,7 @@ class LoadingScreen : AppCompatActivity() {
      *  - [progress] : target progress value (0–100)
      *  - [work]     : real background task that must FINISH before the bar advances
      */
+    // Cette classe organise cette partie de l'app.
     private data class Milestone(
         val label: Int,
         val progress: Int,
@@ -91,6 +93,7 @@ class LoadingScreen : AppCompatActivity() {
         )
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
         super.onCreate(savedInstanceState)
@@ -130,6 +133,7 @@ class LoadingScreen : AppCompatActivity() {
      * Only after the work COMPLETES does the UI progress bar animate forward.
      * 100% is only reached when every real task is done — app is fully warm.
      */
+    // Cette fonction fait une action de cette partie de l'app.
     private fun runRealMilestoneLoading() {
         val progressBar = findViewById<LinearProgressIndicator>(R.id.progressBar) ?: return
         val progressText = findViewById<TextView>(R.id.tvProgressPercent) ?: return
@@ -154,6 +158,7 @@ class LoadingScreen : AppCompatActivity() {
 
         var currentIndex = 0
 
+        // Cette fonction fait une action de cette partie de l'app.
         fun runNext() {
             if (currentIndex >= milestones.size) {
                 handler.postDelayed({ navigateAway() }, 120)
@@ -197,6 +202,7 @@ class LoadingScreen : AppCompatActivity() {
         runNext()
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun revealViewsInOrder(
         vararg ids: Int,
         fromTranslationDp: Float = 18f,
@@ -222,6 +228,7 @@ class LoadingScreen : AppCompatActivity() {
         }
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun navigateAway() {
         val root = findViewById<View>(R.id.layoutLoadingRoot)
         if (!isReducedMotionEnabled()) {
@@ -235,6 +242,7 @@ class LoadingScreen : AppCompatActivity() {
         }
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun performNavigation() {
         if (isOnboardingCompleted()) {
             launchMainFromLoader(MainActivity.Tab.HOME)
@@ -244,6 +252,7 @@ class LoadingScreen : AppCompatActivity() {
         finish()
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     override fun onDestroy() {
         handler.removeCallbacksAndMessages(null)
         ioExecutor.shutdownNow()

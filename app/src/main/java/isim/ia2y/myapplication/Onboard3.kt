@@ -4,10 +4,13 @@ import android.os.Bundle
 import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.motion.widget.MotionLayout
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 
+// Cette classe organise cette partie de l'app.
 class Onboard3 : AppCompatActivity() {
+    // Cette fonction fait une action de cette partie de l'app.
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (isOnboardingCompleted() || !intent.getBooleanExtra(EXTRA_FROM_ONBOARDING, false)) {
@@ -34,18 +37,19 @@ class Onboard3 : AppCompatActivity() {
             insets
         }
         setupOnboardingActions()
-        revealViewsInOrder(
-            R.id.ivBack,
-            R.id.tvSkip,
-            R.id.cardDeliveryIllustration,
-            R.id.tvHeadline,
-            R.id.tvDescription,
-            R.id.layoutPagerIndicator,
-            R.id.btnGetStarted
-        )
+        val motionLayout = findViewById<MotionLayout?>(R.id.layoutOnboardSlideThreeRoot)
+        motionLayout?.post {
+            if (isReducedMotionEnabled()) {
+                motionLayout.progress = 1f
+            } else {
+                motionLayout.progress = 0f
+                motionLayout.transitionToEnd()
+            }
+        }
         emphasizeCta(R.id.btnGetStarted)
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun setupOnboardingActions() {
         findViewById<View>(R.id.ivBack)?.setOnClickListener {
             navigateWithMotion(Onboard2::class.java, isForward = false)

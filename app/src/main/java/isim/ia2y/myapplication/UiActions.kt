@@ -37,6 +37,7 @@ import com.google.android.material.snackbar.Snackbar
 
 const val NOTIFICATION_PERMISSION_REQUEST_CODE = 951
 
+// Cette classe organise cette partie de l'app.
 private object MotionTokens {
     const val QUICK = 140L
     const val STANDARD = 220L
@@ -192,6 +193,7 @@ fun AppCompatActivity.navigateBackToMain() {
 
 fun AppCompatActivity.bindBackToMainForBottomNavScreens() {
     onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+        // Cette fonction fait une action de cette partie de l'app.
         override fun handleOnBackPressed() {
             navigateBackToMain()
         }
@@ -403,11 +405,13 @@ fun AppCompatActivity.startTypingHintAnimation(
     var index = 0
     var cancelled = false
 
+    // Cette fonction fait une action de cette partie de l'app.
     fun updateOutput(content: String) {
         if (isEditText) (textView as EditText).hint = content else textView.text = content
     }
 
     val typer = object : Runnable {
+        // Cette fonction fait une action de cette partie de l'app.
         override fun run() {
             if (cancelled || !textView.isAttachedToWindow) return
             index += 1
@@ -418,6 +422,7 @@ fun AppCompatActivity.startTypingHintAnimation(
         }
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     fun finishAnimation() {
         if (cancelled) return
         cancelled = true
@@ -533,6 +538,7 @@ private fun AppCompatActivity.setNavItemColorImmediate(@IdRes itemId: Int, color
     icon?.setColorFilter(color)
 }
 
+// Cette fonction fait une action de cette partie de l'app.
 private fun animateNavItemColor(item: View, toColor: Int) {
     val navItem = item as? LinearLayout ?: return
     val firstChild = navItem.getChildAt(0)
@@ -712,6 +718,7 @@ fun AppCompatActivity.animateListItemEntry(
         .start()
 }
 
+// Cette classe organise cette partie de l'app.
 enum class InputFieldState {
     NEUTRAL,
     FOCUSED,
@@ -739,8 +746,11 @@ fun AppCompatActivity.bindInputFieldMotion(
 
     input.setOnFocusChangeListener { _, _ -> updateByFocus() }
     input.addTextChangedListener(object : TextWatcher {
+        // Cette fonction fait une action de cette partie de l'app.
         override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
+        // Cette fonction fait une action de cette partie de l'app.
         override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = Unit
+        // Cette fonction fait une action de cette partie de l'app.
         override fun afterTextChanged(s: Editable?) {
             if (!input.hasFocus()) updateByFocus()
         }
