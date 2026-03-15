@@ -16,6 +16,8 @@ coroutines = "1.8.1"
 facebookLogin = "17.0.0"
 googlePlayServicesAuth = "21.3.0"
 lottie = "6.4.0"
+coil = "2.7.0"
+profileinstaller = "1.4.1"
 
 [libraries]
 androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "coreSplashscreen" }
@@ -36,9 +38,10 @@ kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-
 facebook-login = { group = "com.facebook.android", name = "facebook-login", version.ref = "facebookLogin" }
 play-services-auth = { group = "com.google.android.gms", name = "play-services-auth", version.ref = "googlePlayServicesAuth" }
 lottie = { group = "com.airbnb.android", name = "lottie", version.ref = "lottie" }
+coil = { group = "io.coil-kt", name = "coil", version.ref = "coil" }
+androidx-profileinstaller = { group = "androidx.profileinstaller", name = "profileinstaller", version.ref = "profileinstaller" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }
-

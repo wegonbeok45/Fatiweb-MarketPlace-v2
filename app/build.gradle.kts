@@ -59,6 +59,8 @@ dependencies {
     implementation(libs.facebook.login)
     implementation(libs.play.services.auth)
     implementation(libs.lottie)
+    implementation(libs.coil)
+    implementation(libs.androidx.profileinstaller)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
