@@ -1,0 +1,156 @@
+﻿rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    function isAdmin() {
+      return signedIn()
+        && exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == "admin";
+    }
+
+    function approxEq(actual, expected, tolerance) {
+      return actual >= expected - tolerance && actual <= expected + tolerance;
+    }
+
+    function validProductPayload(productId) {
+      return request.resource.data.keys().hasAll([
+          "id", "title", "subtitle", "price", "rating",
+          "reviewsCount", "tags", "description", "bullets"
+        ])
+        && request.resource.data.keys().hasOnly([
+          "id", "title", "subtitle", "price", "rating",
+          "reviewsCount", "tags", "description", "bullets", "stock"
+        ])
+        && request.resource.data.id == productId
+        && request.resource.data.title is string
+        && request.resource.data.title.size() >= 2
+        && request.resource.data.title.size() <= 120
+        && request.resource.data.subtitle is string
+        && request.resource.data.subtitle.size() <= 180
+        && request.resource.data.price is number
+        && request.resource.data.price >= 0
+        && request.resource.data.rating is number
+        && request.resource.data.rating >= 0
+        && request.resource.data.rating <= 5
+        && request.resource.data.reviewsCount is int
+        && request.resource.data.reviewsCount >= 0
+        && request.resource.data.tags is list
+        && request.resource.data.bullets is list
+        && request.resource.data.description is string
+        && request.resource.data.description.size() <= 4000
+        && (!('stock' in request.resource.data)
+          || (request.resource.data.stock is int && request.resource.data.stock >= 0));
+    }
+
+    function validUserCreate(uid) {
+      return request.resource.data.keys().hasAll(["uid", "name", "email", "createdAt"])
+        && request.resource.data.keys().hasOnly(["uid", "name", "email", "createdAt"])
+        && request.resource.data.uid == uid
+        && request.resource.data.name is string
+        && request.resource.data.name.size() >= 2
+        && request.resource.data.name.size() <= 80
+        && request.resource.data.email is string
+        && request.resource.data.email.size() <= 254
+        && request.resource.data.createdAt is int
+        && request.resource.data.createdAt > 0;
+    }
+
+    function validUserOwnerUpdate(uid) {
+      return request.resource.data.uid == uid
+        && request.resource.data.name is string
+        && request.resource.data.name.size() >= 2
+        && request.resource.data.name.size() <= 80
+        && request.resource.data.email is string
+        && request.resource.data.email.size() <= 254
+        && request.resource.data.diff(resource.data).changedKeys().hasOnly(["uid", "name", "email"]);
+    }
+
+    function validUserAdminWrite(uid) {
+      return request.resource.data.keys().hasAll(["uid", "name", "email"])
+        && request.resource.data.keys().hasOnly(["uid", "name", "email", "createdAt", "role"])
+        && request.resource.data.uid == uid
+        && request.resource.data.name is string
+        && request.resource.data.name.size() >= 2
+        && request.resource.data.name.size() <= 80
+        && request.resource.data.email is string
+        && request.resource.data.email.size() <= 254
+        && (!('createdAt' in request.resource.data)
+          || (request.resource.data.createdAt is int && request.resource.data.createdAt > 0))
+        && (!('role' in request.resource.data)
+          || (request.resource.data.role is string && request.resource.data.role in ["admin", "client"]));
+    }
+
+    function validOrderCreate(orderId) {
+      return request.resource.data.keys().hasAll([
+          "id", "items", "subtotal", "shippingFee", "total",
+          "deliveryType", "paymentMethod", "status", "createdAt"
+        ])
+        && request.resource.data.keys().hasOnly([
+          "id", "items", "subtotal", "shippingFee", "total",
+          "deliveryType", "paymentMethod", "status", "createdAt"
+        ])
+        && request.resource.data.id == orderId
+        && request.resource.data.items is map
+        && request.resource.data.items.size() > 0
+        && request.resource.data.items.size() <= 50
+        && request.resource.data.subtotal is number
+        && request.resource.data.subtotal >= 0
+        && request.resource.data.shippingFee is number
+        && request.resource.data.shippingFee >= 0
+        && request.resource.data.total is number
+        && request.resource.data.total >= 0
+        && request.resource.data.deliveryType in ["standard", "express"]
+        && request.resource.data.paymentMethod in ["card", "edinar", "cash"]
+        && request.resource.data.status == "pending"
+        && request.resource.data.createdAt is int
+        && request.resource.data.createdAt > 0
+        && ((request.resource.data.deliveryType == "standard"
+            && approxEq(request.resource.data.shippingFee, 7.0, 0.05))
+          || (request.resource.data.deliveryType == "express"
+            && approxEq(request.resource.data.shippingFee, 12.5, 0.05)))
+        && approxEq(
+          request.resource.data.total,
+          request.resource.data.subtotal + request.resource.data.shippingFee,
+          0.05
+        );
+    }
+
+    function validOrderStatusUpdate() {
+      return request.resource.data.diff(resource.data).changedKeys().hasOnly(["status"])
+        && request.resource.data.status in ["pending", "preparing", "shipped", "delivered"];
+    }
+
+    match /products/{productId} {
+      allow get, list: if true;
+      allow create, update: if isAdmin() && validProductPayload(productId);
+      allow delete: if isAdmin();
+    }
+
+    match /users/{uid} {
+      allow create: if isOwner(uid) && validUserCreate(uid);
+      allow get: if isOwner(uid) || isAdmin();
+      allow list: if isAdmin();
+      allow update: if (isOwner(uid) && validUserOwnerUpdate(uid)) || (isAdmin() && validUserAdminWrite(uid));
+      allow delete: if isAdmin();
+
+      match /orders/{orderId} {
+        allow create: if isOwner(uid) && validOrderCreate(orderId);
+        allow get, list: if isOwner(uid) || isAdmin();
+        allow update: if isAdmin() && validOrderStatusUpdate();
+        allow delete: if isAdmin();
+      }
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
