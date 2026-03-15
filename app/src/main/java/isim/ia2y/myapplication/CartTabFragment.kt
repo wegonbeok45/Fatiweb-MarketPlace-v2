@@ -9,10 +9,14 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isGone
 import androidx.fragment.app.Fragment
+import com.airbnb.lottie.LottieAnimationView
 import com.google.android.material.button.MaterialButton
 
+// Cette classe organise cette partie de l'app.
 class CartTabFragment : Fragment(R.layout.fragment_cart_tab) {
+    private lateinit var emptyState: View
     private lateinit var emptyText: TextView
+    private lateinit var emptyAnimation: LottieAnimationView
     private lateinit var itemsContainer: LinearLayout
     private lateinit var summaryGap: View
     private lateinit var summaryCard: View
@@ -21,6 +25,7 @@ class CartTabFragment : Fragment(R.layout.fragment_cart_tab) {
     private lateinit var totalValue: TextView
     private var shouldAnimateListOnNextRender = true
 
+    // Cette fonction fait une action de cette partie de l'app.
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         view.findViewById<View?>(R.id.layoutBottomNav)?.isGone = true
@@ -41,18 +46,21 @@ class CartTabFragment : Fragment(R.layout.fragment_cart_tab) {
         )
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     override fun onStart() {
         super.onStart()
         // Reset animation flag each time the fragment becomes visible again
         shouldAnimateListOnNextRender = true
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     override fun onResume() {
         super.onResume()
         renderCart()
         (activity as? MainActivity)?.updateHostCartBadge()
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     override fun onHiddenChanged(hidden: Boolean) {
         super.onHiddenChanged(hidden)
         if (hidden) return
@@ -62,6 +70,7 @@ class CartTabFragment : Fragment(R.layout.fragment_cart_tab) {
         (activity as? MainActivity)?.updateHostCartBadge()
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun setupPanierActions(root: View) {
         root.findViewById<View>(R.id.ivHomeLogo)?.setOnClickListener {
             (activity as? MainActivity)?.selectTab(MainActivity.Tab.HOME, animate = false)
@@ -70,7 +79,7 @@ class CartTabFragment : Fragment(R.layout.fragment_cart_tab) {
             (activity as? MainActivity)?.selectTab(MainActivity.Tab.HOME, animate = false)
         }
         root.findViewById<View>(R.id.ivTopCart)?.setOnClickListener {
-            (activity as? AppCompatActivity)?.navigateFromTop(FavoritesActivity::class.java)
+            (activity as? MainActivity)?.selectTab(MainActivity.Tab.CART, animate = false)
         }
         (activity as? AppCompatActivity)?.bindNotificationEntry(R.id.ivTopNotifications)
 
@@ -81,8 +90,11 @@ class CartTabFragment : Fragment(R.layout.fragment_cart_tab) {
         }
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun bindViews(root: View) {
+        emptyState = root.findViewById(R.id.layoutEmptyCartState)
         emptyText = root.findViewById(R.id.tvEmptyCart)
+        emptyAnimation = root.findViewById(R.id.ivEmptyCartAnimation)
         itemsContainer = root.findViewById(R.id.layoutCartItemsContainer)
         summaryGap = root.findViewById(R.id.spaceBeforeSummary)
         summaryCard = root.findViewById(R.id.cardSummary)
@@ -91,6 +103,7 @@ class CartTabFragment : Fragment(R.layout.fragment_cart_tab) {
         totalValue = root.findViewById(R.id.tvTotalValue)
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun renderCart() {
         (activity as? MainActivity)?.updateHostCartBadge()
         itemsContainer.removeAllViews()
@@ -102,13 +115,18 @@ class CartTabFragment : Fragment(R.layout.fragment_cart_tab) {
         }
 
         val hasItems = lines.isNotEmpty()
-        emptyText.visibility = if (hasItems) View.GONE else View.VISIBLE
+        emptyState.visibility = if (hasItems) View.GONE else View.VISIBLE
         itemsContainer.visibility = if (hasItems) View.VISIBLE else View.GONE
         summaryGap.visibility = if (hasItems) View.VISIBLE else View.GONE
         summaryCard.visibility = if (hasItems) View.VISIBLE else View.GONE
         view?.findViewById<MaterialButton?>(R.id.btnCheckout)?.isEnabled = hasItems
 
-        if (!hasItems) return
+        if (!hasItems) {
+            emptyAnimation.playAnimation()
+            return
+        }
+
+        emptyAnimation.pauseAnimation()
 
         val inflater = LayoutInflater.from(requireContext())
         lines.forEachIndexed { index, (product, qty) ->
@@ -121,7 +139,7 @@ class CartTabFragment : Fragment(R.layout.fragment_cart_tab) {
             params.topMargin = if (index == 0) 0 else resources.getDimensionPixelSize(R.dimen.panier_product_card_spacing)
             row.layoutParams = params
 
-            row.findViewById<ImageView>(R.id.ivCartItemImage)?.setImageResource(product.imageRes)
+            row.findViewById<ImageView>(R.id.ivCartItemImage)?.loadCatalogImage(product.imageRes)
             row.findViewById<TextView>(R.id.tvCartItemTitle)?.text = product.title
             row.findViewById<TextView>(R.id.tvCartItemSubtitle)?.text = product.subtitle
             row.findViewById<TextView>(R.id.tvCartItemPrice)?.text = formatDt(product.unitPrice * qty)

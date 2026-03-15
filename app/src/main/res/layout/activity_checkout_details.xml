@@ -5,9 +5,9 @@
     android:id="@+id/layoutCheckoutRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F9F6F0">
+    android:background="@color/details_background">
 
-    <!-- ── Top bar ── -->
+    <!-- Top bar -->
     <LinearLayout
         android:id="@+id/layoutCheckoutTopBar"
         android:layout_width="0dp"
@@ -29,9 +29,9 @@
             android:layout_height="48dp"
             android:text="‹"
             android:textSize="32sp"
-            android:textColor="#111111"
+            android:textColor="@color/colorOnSurface"
             android:gravity="center"
-            android:fontFamily="sans-serif-medium"
+            android:fontFamily="@font/plus_jakarta_sans_medium"
             android:paddingBottom="4dp" />
 
         <!-- Title -->
@@ -42,10 +42,10 @@
             android:layout_weight="1"
             android:text="Détails de la commande"
             android:textSize="18sp"
-            android:textColor="#111111"
+            android:textColor="@color/colorOnSurface"
             android:gravity="center"
             android:textStyle="bold"
-            android:fontFamily="serif" />
+            android:fontFamily="@font/plus_jakarta_sans" />
 
         <!-- Spacer to keep title centred -->
         <View
@@ -59,12 +59,12 @@
         android:id="@+id/viewCheckoutTopDivider"
         android:layout_width="0dp"
         android:layout_height="1dp"
-        android:background="#EFEBE4"
+        android:background="@color/colorBorderLight"
         app:layout_constraintTop_toBottomOf="@id/layoutCheckoutTopBar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- ── Step Indicator ── -->
+    <!-- Step indicator -->
     <LinearLayout
         android:id="@+id/layoutCheckoutSteps"
         android:layout_width="0dp"
@@ -91,10 +91,10 @@
                 android:layout_height="match_parent"
                 android:text="1"
                 android:textSize="14sp"
-                android:textColor="#111111"
+                android:textColor="@color/colorOnSurface"
                 android:textStyle="bold"
                 android:gravity="center"
-                android:fontFamily="serif" />
+                android:fontFamily="@font/plus_jakarta_sans" />
         </FrameLayout>
 
         <!-- Line 1-2 -->
@@ -103,7 +103,7 @@
             android:layout_width="32dp"
             android:layout_height="1dp"
             android:layout_marginHorizontal="8dp"
-            android:background="#EFEBE4" />
+            android:background="@color/colorBorderLight" />
 
         <!-- Step 2 -->
         <FrameLayout
@@ -120,9 +120,9 @@
                 android:layout_height="match_parent"
                 android:text="2"
                 android:textSize="14sp"
-                android:textColor="#A0A0A0"
+                android:textColor="@color/profile_text_muted"
                 android:gravity="center"
-                android:fontFamily="serif" />
+                android:fontFamily="@font/plus_jakarta_sans" />
         </FrameLayout>
 
         <!-- Line 2-3 -->
@@ -131,7 +131,7 @@
             android:layout_width="32dp"
             android:layout_height="1dp"
             android:layout_marginHorizontal="8dp"
-            android:background="#EFEBE4" />
+            android:background="@color/colorBorderLight" />
 
         <!-- Step 3 -->
         <FrameLayout
@@ -148,14 +148,14 @@
                 android:layout_height="match_parent"
                 android:text="3"
                 android:textSize="14sp"
-                android:textColor="#A0A0A0"
+                android:textColor="@color/profile_text_muted"
                 android:gravity="center"
-                android:fontFamily="serif" />
+                android:fontFamily="@font/plus_jakarta_sans" />
         </FrameLayout>
 
     </LinearLayout>
 
-    <!-- ── Scrollable content ── -->
+    <!-- Scrollable content -->
     <androidx.core.widget.NestedScrollView
         android:id="@+id/scrollCheckoutContent"
         android:layout_width="0dp"
@@ -181,7 +181,7 @@
                 android:paddingHorizontal="24dp"
                 android:paddingTop="24dp">
 
-            <!-- ╔═ ADRESSE DE LIVRAISON ═╗ -->
+            <!-- Adresse de livraison -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -196,9 +196,9 @@
                     android:text="ADRESSE DE LIVRAISON"
                     android:textSize="11sp"
                     android:letterSpacing="0.10"
-                    android:textColor="#CDAA7D"
+                    android:textColor="@color/colorPrimary"
                     android:textStyle="bold"
-                    android:fontFamily="serif" />
+                    android:fontFamily="@font/plus_jakarta_sans" />
 
                 <TextView
                     android:id="@+id/tvCheckoutModifyAddress"
@@ -206,9 +206,9 @@
                     android:layout_height="wrap_content"
                     android:text="Modifier"
                     android:textSize="13sp"
-                    android:textColor="#CDAA7D"
+                    android:textColor="@color/colorPrimary"
                     android:textStyle="bold"
-                    android:fontFamily="serif" />
+                    android:fontFamily="@font/plus_jakarta_sans" />
 
             </LinearLayout>
 
@@ -220,7 +220,7 @@
                 android:layout_marginBottom="32dp"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="0dp"
-                app:cardBackgroundColor="#FFFFFF">
+                app:cardBackgroundColor="@color/colorSurface">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -236,7 +236,7 @@
                         android:layout_marginEnd="16dp"
                         android:layout_marginTop="2dp"
                         app:cardCornerRadius="8dp"
-                        app:cardBackgroundColor="#FDFBF7"
+                        app:cardBackgroundColor="@color/colorSurfaceVariant"
                         app:cardElevation="0dp">
 
                         <ImageView
@@ -261,9 +261,9 @@
                             android:layout_height="wrap_content"
                             android:text="Sophie Martin"
                             android:textSize="16sp"
-                            android:textColor="#111111"
+                            android:textColor="@color/colorOnSurface"
                             android:textStyle="bold"
-                            android:fontFamily="serif"
+                            android:fontFamily="@font/plus_jakarta_sans"
                             android:layout_marginBottom="4dp" />
 
                         <TextView
@@ -272,8 +272,8 @@
                             android:layout_height="wrap_content"
                             android:text="12 Rue de la Paix"
                             android:textSize="14sp"
-                            android:textColor="#556"
-                            android:fontFamily="serif" />
+                            android:textColor="@color/colorOnSurfaceVariant"
+                            android:fontFamily="@font/plus_jakarta_sans" />
 
                         <TextView
                             android:id="@+id/tvCheckoutAddressLine2"
@@ -281,8 +281,8 @@
                             android:layout_height="wrap_content"
                             android:text="75002 Paris, France"
                             android:textSize="14sp"
-                            android:textColor="#556"
-                            android:fontFamily="serif" />
+                            android:textColor="@color/colorOnSurfaceVariant"
+                            android:fontFamily="@font/plus_jakarta_sans" />
 
                         <TextView
                             android:id="@+id/tvCheckoutAddressPhone"
@@ -290,8 +290,8 @@
                             android:layout_height="wrap_content"
                             android:text="+33 1 23 45 67 89"
                             android:textSize="14sp"
-                            android:textColor="#556"
-                            android:fontFamily="serif" />
+                            android:textColor="@color/colorOnSurfaceVariant"
+                            android:fontFamily="@font/plus_jakarta_sans" />
 
                     </LinearLayout>
 
@@ -299,16 +299,16 @@
 
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- ╔═ MÉTHODE DE LIVRAISON ═╗ -->
+            <!-- Méthode de livraison -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="MÉTHODE DE LIVRAISON"
                 android:textSize="11sp"
                 android:letterSpacing="0.10"
-                android:textColor="#CDAA7D"
+                android:textColor="@color/colorPrimary"
                 android:textStyle="bold"
-                android:fontFamily="serif"
+                android:fontFamily="@font/plus_jakarta_sans"
                 android:layout_marginBottom="12dp" />
 
             <!-- Standard delivery card -->
@@ -319,8 +319,8 @@
                 android:layout_marginBottom="16dp"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="0dp"
-                app:cardBackgroundColor="#FFFFFF"
-                app:strokeColor="#CDAA7D"
+                app:cardBackgroundColor="@color/colorSurface"
+                app:strokeColor="@color/colorPrimary"
                 app:strokeWidth="1.5dp">
 
                 <LinearLayout
@@ -336,7 +336,7 @@
                         android:layout_height="44dp"
                         android:layout_marginEnd="16dp"
                         app:cardCornerRadius="8dp"
-                        app:cardBackgroundColor="#D3B186"
+                        app:cardBackgroundColor="@color/colorSecondary"
                         app:cardElevation="0dp">
 
                         <ImageView
@@ -360,17 +360,17 @@
                             android:layout_height="wrap_content"
                             android:text="Standard"
                             android:textSize="16sp"
-                            android:textColor="#111111"
+                        android:textColor="@color/colorOnSurface"
                             android:textStyle="bold"
-                            android:fontFamily="serif" />
+                        android:fontFamily="@font/plus_jakarta_sans" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Livraison sous 3-5 jours"
                             android:textSize="13sp"
-                            android:textColor="#7A8089"
-                            android:fontFamily="serif" />
+                        android:textColor="@color/colorOnSurfaceVariant"
+                        android:fontFamily="@font/plus_jakarta_sans" />
 
                     </LinearLayout>
 
@@ -387,9 +387,9 @@
                             android:text="GRATUIT"
                             android:textSize="11sp"
                             android:letterSpacing="0.05"
-                            android:textColor="#CDAA7D"
+                        android:textColor="@color/colorPrimary"
                             android:textStyle="bold"
-                            android:fontFamily="serif"
+                        android:fontFamily="@font/plus_jakarta_sans"
                             android:layout_marginBottom="4dp" />
 
                         <ImageView
@@ -412,7 +412,7 @@
                 android:layout_marginBottom="32dp"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="0dp"
-                app:cardBackgroundColor="#FFFFFF">
+                app:cardBackgroundColor="@color/colorSurface">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -427,7 +427,7 @@
                         android:layout_height="44dp"
                         android:layout_marginEnd="16dp"
                         app:cardCornerRadius="8dp"
-                        app:cardBackgroundColor="#F7F7F7"
+                        app:cardBackgroundColor="@color/colorSurfaceVariant"
                         app:cardElevation="0dp">
 
                         <ImageView
@@ -451,17 +451,17 @@
                             android:layout_height="wrap_content"
                             android:text="Express"
                             android:textSize="16sp"
-                            android:textColor="#111111"
+                            android:textColor="@color/colorOnSurface"
                             android:textStyle="bold"
-                            android:fontFamily="serif" />
+                            android:fontFamily="@font/plus_jakarta_sans" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Demain avant 13h00"
                             android:textSize="13sp"
-                            android:textColor="#7A8089"
-                            android:fontFamily="serif" />
+                            android:textColor="@color/colorOnSurfaceVariant"
+                            android:fontFamily="@font/plus_jakarta_sans" />
 
                     </LinearLayout>
 
@@ -475,11 +475,11 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="12,50 €"
+                            android:text="12,50 DT"
                             android:textSize="14sp"
-                            android:textColor="#111111"
+                            android:textColor="@color/colorOnSurface"
                             android:textStyle="bold"
-                            android:fontFamily="serif"
+                            android:fontFamily="@font/plus_jakarta_sans"
                             android:layout_marginBottom="4dp" />
 
                         <ImageView
@@ -494,16 +494,16 @@
 
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- ╔═ ARTICLES ═╗ -->
+            <!-- Articles -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="ARTICLES"
                 android:textSize="11sp"
                 android:letterSpacing="0.10"
-                android:textColor="#CDAA7D"
+                android:textColor="@color/colorPrimary"
                 android:textStyle="bold"
-                android:fontFamily="serif"
+                android:fontFamily="@font/plus_jakarta_sans"
                 android:layout_marginBottom="12dp" />
 
             <!-- Product thumbnails row -->
@@ -521,7 +521,7 @@
                     android:layout_marginEnd="12dp"
                     app:cardCornerRadius="8dp"
                     app:cardElevation="0dp"
-                    app:cardBackgroundColor="#F5F5F3">
+                    app:cardBackgroundColor="@color/colorSurfaceVariant">
 
                     <ImageView
                         android:layout_width="wrap_content"
@@ -537,7 +537,7 @@
                     android:layout_height="84dp"
                     app:cardCornerRadius="8dp"
                     app:cardElevation="0dp"
-                    app:cardBackgroundColor="#111111">
+                    app:cardBackgroundColor="@color/colorAccentDeep">
 
                     <ImageView
                         android:layout_width="wrap_content"
@@ -549,16 +549,16 @@
 
             </LinearLayout>
 
-            <!-- ╔═ RÉSUMÉ ═╗ -->
+            <!-- Résumé -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="RÉSUMÉ"
                 android:textSize="11sp"
                 android:letterSpacing="0.10"
-                android:textColor="#CDAA7D"
+                android:textColor="@color/colorPrimary"
                 android:textStyle="bold"
-                android:fontFamily="serif"
+                android:fontFamily="@font/plus_jakarta_sans"
                 android:layout_marginBottom="8dp" />
 
             <!-- Subtotal Row -->
@@ -575,18 +575,18 @@
                     android:layout_weight="1"
                     android:text="Sous-total"
                     android:textSize="14sp"
-                    android:textColor="#556"
-                    android:fontFamily="serif" />
+                    android:textColor="@color/colorOnSurfaceVariant"
+                    android:fontFamily="@font/plus_jakarta_sans" />
 
                 <TextView
                     android:id="@+id/tvCheckoutSubtotal"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="458,00 €"
+                    android:text="458,00 DT"
                     android:textSize="14sp"
-                    android:textColor="#111111"
+                    android:textColor="@color/colorOnSurface"
                     android:textStyle="bold"
-                    android:fontFamily="serif" />
+                    android:fontFamily="@font/plus_jakarta_sans" />
 
             </LinearLayout>
 
@@ -609,9 +609,9 @@
                     android:text="CHOISIR UNE MÉTHODE"
                     android:textSize="11sp"
                     android:letterSpacing="0.10"
-                    android:textColor="#CDAA7D"
+                    android:textColor="@color/colorPrimary"
                     android:textStyle="bold"
-                    android:fontFamily="serif"
+                    android:fontFamily="@font/plus_jakarta_sans"
                     android:layout_marginBottom="12dp" />
 
                 <!-- 1. Carte Bancaire -->
@@ -622,8 +622,8 @@
                     android:layout_marginBottom="12dp"
                     app:cardCornerRadius="12dp"
                     app:cardElevation="0dp"
-                    app:cardBackgroundColor="#FFFFFF"
-                    app:strokeColor="#CDAA7D"
+                    app:cardBackgroundColor="@color/colorSurface"
+                    app:strokeColor="@color/colorPrimary"
                     app:strokeWidth="1.5dp">
 
                     <LinearLayout
@@ -638,7 +638,7 @@
                             android:layout_height="44dp"
                             android:layout_marginEnd="16dp"
                             app:cardCornerRadius="8dp"
-                            app:cardBackgroundColor="#FDFBF7"
+                            app:cardBackgroundColor="@color/colorSurfaceVariant"
                             app:cardElevation="0dp">
                             <ImageView
                                 android:layout_width="match_parent"
@@ -658,16 +658,16 @@
                                 android:layout_height="wrap_content"
                                 android:text="Carte Bancaire"
                                 android:textSize="16sp"
-                                android:textColor="#111111"
+                                android:textColor="@color/colorOnSurface"
                                 android:textStyle="bold"
-                                android:fontFamily="serif" />
+                                android:fontFamily="@font/plus_jakarta_sans" />
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Visa, Mastercard, etc."
                                 android:textSize="13sp"
-                                android:textColor="#7A8089"
-                                android:fontFamily="serif" />
+                                android:textColor="@color/colorOnSurfaceVariant"
+                                android:fontFamily="@font/plus_jakarta_sans" />
                         </LinearLayout>
 
                         <ImageView
@@ -687,8 +687,8 @@
                     android:layout_marginBottom="12dp"
                     app:cardCornerRadius="12dp"
                     app:cardElevation="0dp"
-                    app:cardBackgroundColor="#FFFFFF"
-                    app:strokeColor="#EFEBE4"
+                    app:cardBackgroundColor="@color/colorSurface"
+                    app:strokeColor="@color/colorBorderLight"
                     app:strokeWidth="1dp">
 
                     <LinearLayout
@@ -703,7 +703,7 @@
                             android:layout_height="44dp"
                             android:layout_marginEnd="16dp"
                             app:cardCornerRadius="8dp"
-                            app:cardBackgroundColor="#F5F5F3"
+                            app:cardBackgroundColor="@color/colorSurfaceVariant"
                             app:cardElevation="0dp">
                             <ImageView
                                 android:layout_width="match_parent"
@@ -723,15 +723,15 @@
                                 android:layout_height="wrap_content"
                                 android:text="E-Dinar"
                                 android:textSize="16sp"
-                                android:textColor="#111111"
-                                android:fontFamily="serif" />
+                                android:textColor="@color/colorOnSurface"
+                                android:fontFamily="@font/plus_jakarta_sans" />
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Porte-feuille numérique"
                                 android:textSize="13sp"
-                                android:textColor="#7A8089"
-                                android:fontFamily="serif" />
+                                android:textColor="@color/colorOnSurfaceVariant"
+                                android:fontFamily="@font/plus_jakarta_sans" />
                         </LinearLayout>
 
                         <ImageView
@@ -751,8 +751,8 @@
                     android:layout_marginBottom="32dp"
                     app:cardCornerRadius="12dp"
                     app:cardElevation="0dp"
-                    app:cardBackgroundColor="#FFFFFF"
-                    app:strokeColor="#EFEBE4"
+                    app:cardBackgroundColor="@color/colorSurface"
+                    app:strokeColor="@color/colorBorderLight"
                     app:strokeWidth="1dp">
 
                     <LinearLayout
@@ -767,7 +767,7 @@
                             android:layout_height="44dp"
                             android:layout_marginEnd="16dp"
                             app:cardCornerRadius="8dp"
-                            app:cardBackgroundColor="#F5F5F3"
+                            app:cardBackgroundColor="@color/colorSurfaceVariant"
                             app:cardElevation="0dp">
                             <ImageView
                                 android:layout_width="match_parent"
@@ -787,15 +787,15 @@
                                 android:layout_height="wrap_content"
                                 android:text="Paiement à la livraison"
                                 android:textSize="16sp"
-                                android:textColor="#111111"
-                                android:fontFamily="serif" />
+                                android:textColor="@color/colorOnSurface"
+                                android:fontFamily="@font/plus_jakarta_sans" />
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Espèces ou Chèque"
+                                android:text="Espèces ou chèque"
                                 android:textSize="13sp"
-                                android:textColor="#7A8089"
-                                android:fontFamily="serif" />
+                                android:textColor="@color/colorOnSurfaceVariant"
+                                android:fontFamily="@font/plus_jakarta_sans" />
                         </LinearLayout>
 
                         <ImageView
@@ -821,9 +821,9 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="16dp"
                         app:cardCornerRadius="8dp"
-                        app:cardBackgroundColor="#FDFBF7"
+                        app:cardBackgroundColor="@color/colorSurfaceVariant"
                         app:cardElevation="0dp"
-                        app:strokeColor="#CDAA7D"
+                        app:strokeColor="@color/colorPrimary"
                         app:strokeWidth="1.5dp">
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -843,9 +843,9 @@
                                 android:layout_weight="1"
                                 android:text="**** **** **** 1234"
                                 android:textSize="14sp"
-                                android:textColor="#111111"
+                                android:textColor="@color/colorOnSurface"
                                 android:textStyle="bold"
-                                android:fontFamily="serif" />
+                                android:fontFamily="@font/plus_jakarta_sans" />
                             <ImageView
                                 android:id="@+id/ivSavedCardSelected"
                                 android:layout_width="24dp"
@@ -860,9 +860,9 @@
                         android:layout_height="wrap_content"
                         android:text="+ Ajouter une autre carte"
                         android:textSize="14sp"
-                        android:textColor="#CDAA7D"
+                        android:textColor="@color/colorPrimary"
                         android:textStyle="bold"
-                        android:fontFamily="serif"
+                        android:fontFamily="@font/plus_jakarta_sans"
                         android:layout_marginBottom="16dp"
                         android:paddingVertical="8dp"/>
                 </LinearLayout>
@@ -880,9 +880,9 @@
                         android:text="DÉTAILS DE LA CARTE"
                         android:textSize="11sp"
                         android:letterSpacing="0.10"
-                        android:textColor="#8B8B8B"
+                        android:textColor="@color/profile_text_muted"
                         android:textStyle="bold"
-                        android:fontFamily="serif"
+                        android:fontFamily="@font/plus_jakarta_sans"
                         android:layout_marginBottom="16dp" />
 
                     <LinearLayout
@@ -900,14 +900,14 @@
                             app:boxCornerRadiusTopEnd="8dp"
                             app:boxCornerRadiusBottomStart="8dp"
                             app:boxCornerRadiusBottomEnd="8dp"
-                            app:boxStrokeColor="#EFEBE4"
+                            app:boxStrokeColor="@color/colorBorderLight"
                             android:hint="Nom sur la carte">
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/etCardName"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:inputType="textPersonName"
-                                android:fontFamily="serif" />
+                                android:fontFamily="@font/plus_jakarta_sans" />
                         </com.google.android.material.textfield.TextInputLayout>
                     </LinearLayout>
 
@@ -926,7 +926,7 @@
                             app:boxCornerRadiusTopEnd="8dp"
                             app:boxCornerRadiusBottomStart="8dp"
                             app:boxCornerRadiusBottomEnd="8dp"
-                            app:boxStrokeColor="#EFEBE4"
+                            app:boxStrokeColor="@color/colorBorderLight"
                             android:hint="Numéro de carte">
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/etCardNumber"
@@ -934,7 +934,7 @@
                                 android:layout_height="wrap_content"
                                 android:inputType="number"
                                 android:maxLength="19"
-                                android:fontFamily="serif" />
+                                android:fontFamily="@font/plus_jakarta_sans" />
                         </com.google.android.material.textfield.TextInputLayout>
                         <ImageView
                             android:layout_width="32dp"
@@ -958,7 +958,7 @@
                             app:boxCornerRadiusTopEnd="8dp"
                             app:boxCornerRadiusBottomStart="8dp"
                             app:boxCornerRadiusBottomEnd="8dp"
-                            app:boxStrokeColor="#EFEBE4"
+                            app:boxStrokeColor="@color/colorBorderLight"
                             android:hint="Expiration (MM/YY)">
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/etCardExpiry"
@@ -966,7 +966,7 @@
                                 android:layout_height="wrap_content"
                                 android:inputType="number"
                                 android:maxLength="5"
-                                android:fontFamily="serif" />
+                                android:fontFamily="@font/plus_jakarta_sans" />
                         </com.google.android.material.textfield.TextInputLayout>
                         <com.google.android.material.textfield.TextInputLayout
                             android:layout_width="0dp"
@@ -977,7 +977,7 @@
                             app:boxCornerRadiusTopEnd="8dp"
                             app:boxCornerRadiusBottomStart="8dp"
                             app:boxCornerRadiusBottomEnd="8dp"
-                            app:boxStrokeColor="#EFEBE4"
+                            app:boxStrokeColor="@color/colorBorderLight"
                             android:hint="CVV">
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/etCardCvv"
@@ -985,7 +985,7 @@
                                 android:layout_height="wrap_content"
                                 android:inputType="numberPassword"
                                 android:maxLength="4"
-                                android:fontFamily="serif" />
+                                android:fontFamily="@font/plus_jakarta_sans" />
                         </com.google.android.material.textfield.TextInputLayout>
                     </LinearLayout>
 
@@ -995,8 +995,8 @@
                         android:layout_height="wrap_content"
                         android:text="Enregistrer cette carte pour plus tard"
                         android:textSize="14sp"
-                        android:textColor="#556"
-                        android:fontFamily="serif" />
+                        android:textColor="@color/colorOnSurfaceVariant"
+                        android:fontFamily="@font/plus_jakarta_sans" />
                 </LinearLayout>
 
                 <!-- Expandable: E-Dinar Message -->
@@ -1014,9 +1014,9 @@
                         android:layout_height="wrap_content"
                         android:text="Instruction E-Dinar"
                         android:textSize="14sp"
-                        android:textColor="#A27D2B"
+                        android:textColor="@color/colorAccentDeep"
                         android:textStyle="bold"
-                        android:fontFamily="serif"
+                        android:fontFamily="@font/plus_jakarta_sans"
                         android:layout_marginBottom="8dp" />
                         
                     <TextView
@@ -1024,9 +1024,9 @@
                         android:layout_height="wrap_content"
                         android:text="Veuillez envoyer le montant total au numéro 53200087. Votre commande sera confirmée une fois le transfert reçu."
                         android:textSize="13sp"
-                        android:textColor="#556"
+                        android:textColor="@color/colorOnSurfaceVariant"
                         android:lineSpacingExtra="4dp"
-                        android:fontFamily="serif" />
+                        android:fontFamily="@font/plus_jakarta_sans" />
                 </LinearLayout>
 
             </LinearLayout>
@@ -1050,7 +1050,7 @@
                     android:layout_width="160dp"
                     android:layout_height="160dp"
                     android:layout_gravity="center"
-                    app:lottie_rawRes="@raw/anim_success"
+                    app:lottie_rawRes="@raw/anim_checkout_success"
                     app:lottie_autoPlay="true"
                     app:lottie_loop="false"
                     android:layout_marginBottom="24dp" />
@@ -1058,23 +1058,23 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Commande Confirmée\n!"
+                    android:text="Commande confirmée"
                     android:textSize="28sp"
-                    android:textColor="#0E1724"
+                    android:textColor="@color/colorOnSurface"
                     android:textStyle="bold"
-                    android:fontFamily="serif"
+                    android:fontFamily="@font/plus_jakarta_sans"
                     android:gravity="center"
                     android:layout_marginBottom="16dp" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Merci pour votre achat chez\nFatiWeb. Votre élégance est notre\npriorité."
+                    android:text="Merci pour votre achat chez FatiWeb.\nVotre sélection est en route."
                     android:textSize="15sp"
-                    android:textColor="#556"
+                    android:textColor="@color/colorOnSurfaceVariant"
                     android:gravity="center"
                     android:lineSpacingExtra="4dp"
-                    android:fontFamily="serif"
+                    android:fontFamily="@font/plus_jakarta_sans"
                     android:layout_marginBottom="40dp" />
 
                 <!-- Order Info Card -->
@@ -1083,9 +1083,9 @@
                     android:layout_height="wrap_content"
                     app:cardCornerRadius="16dp"
                     app:cardElevation="0dp"
-                    app:strokeColor="#F4F2EE"
+                    app:strokeColor="@color/colorBorderLight"
                     app:strokeWidth="1dp"
-                    app:cardBackgroundColor="#FFFFFF"
+                    app:cardBackgroundColor="@color/colorSurface"
                     android:layout_marginBottom="32dp">
 
                     <LinearLayout
@@ -1105,23 +1105,24 @@
                                 android:layout_weight="1"
                                 android:text="NUMÉRO DE COMMANDE"
                                 android:textSize="11sp"
-                                android:textColor="#8B8B8B"
+                                android:textColor="@color/profile_text_muted"
                                 android:letterSpacing="0.1"
-                                android:fontFamily="serif" />
+                                android:fontFamily="@font/plus_jakarta_sans" />
                             <TextView
+                                android:id="@+id/tvConfirmationOrderNumber"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="#FW-82941"
                                 android:textSize="13sp"
-                                android:textColor="#111111"
+                                android:textColor="@color/colorOnSurface"
                                 android:textStyle="bold"
-                                android:fontFamily="serif" />
+                                android:fontFamily="@font/plus_jakarta_sans" />
                         </LinearLayout>
 
                         <View
                             android:layout_width="match_parent"
                             android:layout_height="1dp"
-                            android:background="#F9F5EE"
+                            android:background="@color/colorSurfaceVariant"
                             android:layout_marginBottom="16dp" />
 
                         <!-- Dynamic items will be injected here -->
@@ -1143,15 +1144,16 @@
                                 android:layout_weight="1"
                                 android:text="Estimation de livraison"
                                 android:textSize="13sp"
-                                android:textColor="#8B8B8B"
-                                android:fontFamily="serif" />
+                                android:textColor="@color/profile_text_muted"
+                                android:fontFamily="@font/plus_jakarta_sans" />
                             <TextView
+                                android:id="@+id/tvConfirmationEta"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="14 - 16 Octobre"
                                 android:textSize="13sp"
-                                android:textColor="#111111"
-                                android:fontFamily="serif" />
+                                android:textColor="@color/colorOnSurface"
+                                android:fontFamily="@font/plus_jakarta_sans" />
                         </LinearLayout>
 
                         <LinearLayout
@@ -1165,17 +1167,17 @@
                                 android:layout_weight="1"
                                 android:text="Total payé"
                                 android:textSize="13sp"
-                                android:textColor="#8B8B8B"
-                                android:fontFamily="serif" />
+                                android:textColor="@color/profile_text_muted"
+                                android:fontFamily="@font/plus_jakarta_sans" />
                             <TextView
                                 android:id="@+id/tvConfirmationTotal"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="0,00 DT"
                                 android:textSize="14sp"
-                                android:textColor="#111111"
+                                android:textColor="@color/colorOnSurface"
                                 android:textStyle="bold"
-                                android:fontFamily="serif" />
+                                android:fontFamily="@font/plus_jakarta_sans" />
                         </LinearLayout>
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
@@ -1188,14 +1190,14 @@
                     android:text="Suivre ma commande"
                     android:textAllCaps="false"
                     android:textSize="16sp"
-                    android:textColor="#FFFFFF"
+                    android:textColor="@color/colorOnPrimary"
                     android:textStyle="bold"
-                    android:fontFamily="serif"
+                    android:fontFamily="@font/plus_jakarta_sans"
                     app:icon="@drawable/ic_checkout_truck"
                     app:iconGravity="textStart"
                     app:iconPadding="12dp"
-                    app:iconTint="#FFFFFF"
-                    app:backgroundTint="#D1B187"
+                    app:iconTint="@color/colorOnPrimary"
+                    app:backgroundTint="@color/colorPrimary"
                     app:cornerRadius="12dp"
                     android:elevation="0dp"
                     android:layout_marginBottom="12dp" />
@@ -1207,11 +1209,11 @@
                     android:text="Retour à l'accueil"
                     android:textAllCaps="false"
                     android:textSize="16sp"
-                    android:textColor="#111111"
+                    android:textColor="@color/colorOnSurface"
                     android:textStyle="bold"
-                    android:fontFamily="serif"
+                    android:fontFamily="@font/plus_jakarta_sans"
                     style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                    app:strokeColor="#111111"
+                    app:strokeColor="@color/colorOnSurface"
                     app:strokeWidth="1.5dp"
                     app:cornerRadius="12dp"
                     android:layout_marginBottom="40dp" />
@@ -1219,11 +1221,11 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="FATIWEB MARKET • PREMIUM EXPERIENCE"
+                    android:text="FATIWEB MARKET • SÉLECTION TUNISIENNE"
                     android:textSize="10sp"
                     android:letterSpacing="0.15"
-                    android:textColor="#B0B0B0"
-                    android:fontFamily="serif" />
+                    android:textColor="@color/profile_text_muted"
+                    android:fontFamily="@font/plus_jakarta_sans" />
 
             </LinearLayout>
 
@@ -1231,13 +1233,13 @@
 
     </androidx.core.widget.NestedScrollView>
 
-    <!-- ── Sticky bottom bar ── -->
+    <!-- Sticky bottom bar -->
     <LinearLayout
         android:id="@+id/layoutCheckoutBottomBar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:background="#F9F6F0"
+        android:background="@color/details_background"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
@@ -1250,15 +1252,15 @@
             android:layout_marginHorizontal="24dp"
             android:layout_marginTop="16dp"
             android:layout_marginBottom="8dp"
-            android:text="Continuer vers le paiement →"
+            android:text="Continuer vers le paiement"
             android:textAllCaps="false"
             android:textSize="16sp"
-            android:textColor="#111111"
+            android:textColor="@color/colorOnPrimary"
             android:textStyle="bold"
-            android:fontFamily="serif"
+            android:fontFamily="@font/plus_jakarta_sans"
             android:insetTop="0dp"
             android:insetBottom="0dp"
-            app:backgroundTint="#D1B187"
+            app:backgroundTint="@color/colorPrimary"
             app:cornerRadius="8dp"
             android:elevation="0dp" />
 
@@ -1279,8 +1281,8 @@
                 android:layout_weight="1"
                 android:text="Frais de port (Standard)"
                 android:textSize="14sp"
-                android:textColor="#556"
-                android:fontFamily="serif" />
+                android:textColor="@color/colorOnSurfaceVariant"
+                android:fontFamily="@font/plus_jakarta_sans" />
 
             <TextView
                 android:id="@+id/tvCheckoutShippingValue"
@@ -1288,9 +1290,9 @@
                 android:layout_height="wrap_content"
                 android:text="GRATUIT"
                 android:textSize="12sp"
-                android:textColor="#CDAA7D"
+                android:textColor="@color/colorPrimary"
                 android:textStyle="bold"
-                android:fontFamily="serif" />
+                android:fontFamily="@font/plus_jakarta_sans" />
 
         </LinearLayout>
 
@@ -1298,7 +1300,7 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="#EFEBE4"
+            android:background="@color/colorBorderLight"
             android:layout_marginHorizontal="24dp"
             android:layout_marginTop="16dp"
             android:layout_marginBottom="16dp" />
@@ -1317,9 +1319,9 @@
                 android:text="TOTAL À PAYER"
                 android:textSize="10.5sp"
                 android:letterSpacing="0.10"
-                android:textColor="#7A8089"
+                android:textColor="@color/colorOnSurfaceVariant"
                 android:textStyle="bold"
-                android:fontFamily="serif"
+                android:fontFamily="@font/plus_jakarta_sans"
                 android:layout_marginBottom="4dp" />
 
             <LinearLayout
@@ -1333,20 +1335,20 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="458,00 €"
+                    android:text="458,00 DT"
                     android:textSize="28sp"
-                    android:textColor="#111111"
+                    android:textColor="@color/colorOnSurface"
                     android:textStyle="bold"
-                    android:fontFamily="serif" />
+                    android:fontFamily="@font/plus_jakarta_sans" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="TVA incluse"
                     android:textSize="13sp"
-                    android:textColor="#9E9E9E"
+                    android:textColor="@color/profile_text_muted"
                     android:textStyle="italic"
-                    android:fontFamily="serif"
+                    android:fontFamily="@font/plus_jakarta_sans"
                     android:paddingBottom="6dp" />
 
             </LinearLayout>
@@ -1360,7 +1362,7 @@
         android:id="@+id/layoutLottieLoading"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#80FFFFFF"
+        android:background="@color/colorLoadingScrim"
         android:visibility="gone"
         android:elevation="10dp"
         android:clickable="true"
@@ -1370,10 +1372,11 @@
             android:layout_width="160dp"
             android:layout_height="160dp"
             android:layout_gravity="center"
-            app:lottie_rawRes="@raw/anim_loading"
+            app:lottie_rawRes="@raw/anim_checkout_loading"
             app:lottie_autoPlay="true"
             app:lottie_loop="true" />
             
     </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+

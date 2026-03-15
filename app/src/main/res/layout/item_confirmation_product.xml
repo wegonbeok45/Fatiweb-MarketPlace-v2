@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -32,17 +32,17 @@
             android:layout_height="wrap_content"
             android:text="Produit"
             android:textSize="14sp"
-            android:textColor="#111111"
+            android:textColor="@color/colorOnSurface"
             android:textStyle="bold"
-            android:fontFamily="serif" />
+            android:fontFamily="@font/plus_jakarta_sans" />
         <TextView
             android:id="@+id/tvConfirmItemDetails"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Taille: M • Couleur: Standard"
+            android:text="Taille : M • Couleur : Standard"
             android:textSize="12sp"
-            android:textColor="#8B8B8B"
-            android:fontFamily="serif" />
+            android:textColor="@color/profile_text_muted"
+            android:fontFamily="@font/plus_jakarta_sans" />
     </LinearLayout>
 
     <TextView
@@ -51,8 +51,9 @@
         android:layout_height="wrap_content"
         android:text="0,00\nDT"
         android:textSize="14sp"
-        android:textColor="#111111"
+        android:textColor="@color/colorOnSurface"
         android:textStyle="bold"
-        android:fontFamily="serif"
+        android:fontFamily="@font/plus_jakarta_sans"
         android:gravity="end" />
 </LinearLayout>
+

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -72,185 +72,14 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <include
         android:id="@+id/layoutBottomNav"
+        layout="@layout/include_bottom_nav"
         android:layout_width="0dp"
         android:layout_height="@dimen/profile_bottom_nav_height_exact"
-        android:background="@color/profile_nav_bg"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
-
-        <LinearLayout
-            android:id="@+id/navHome"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:gravity="center_horizontal"
-            android:orientation="vertical"
-            android:paddingTop="@dimen/profile_nav_item_padding_top"
-            android:paddingBottom="@dimen/profile_nav_item_padding_bottom"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/navExplore"
-            app:layout_constraintHorizontal_chainStyle="spread"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <ImageView
-                android:layout_width="@dimen/profile_bottom_nav_icon_size"
-                android:layout_height="@dimen/profile_bottom_nav_icon_size"
-                android:contentDescription="@null"
-                app:srcCompat="@drawable/ic_bottom_nav_home"
-                app:tint="@color/profile_nav_inactive" />
-
-            <TextView
-                style="@style/ProfileText.NavInactive"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/profile_nav_text_margin_top"
-                android:text="@string/auto_text_007" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/navExplore"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:gravity="center_horizontal"
-            android:orientation="vertical"
-            android:paddingTop="@dimen/profile_nav_item_padding_top"
-            android:paddingBottom="@dimen/profile_nav_item_padding_bottom"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/navCart"
-            app:layout_constraintStart_toEndOf="@id/navHome"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <ImageView
-                android:layout_width="@dimen/profile_bottom_nav_icon_size"
-                android:layout_height="@dimen/profile_bottom_nav_icon_size"
-                android:contentDescription="@null"
-                app:srcCompat="@drawable/ic_bottom_nav_categories"
-                app:tint="@color/profile_nav_inactive" />
-
-            <TextView
-                style="@style/ProfileText.NavInactive"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/profile_nav_text_margin_top"
-                android:text="@string/auto_text_008" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/navFavorites"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:visibility="gone"
-            android:gravity="center_horizontal"
-            android:orientation="vertical"
-            android:paddingTop="@dimen/profile_nav_item_padding_top"
-            android:paddingBottom="@dimen/profile_nav_item_padding_bottom"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/navCart"
-            app:layout_constraintStart_toEndOf="@id/navExplore"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <ImageView
-                android:layout_width="@dimen/profile_bottom_nav_icon_size"
-                android:layout_height="@dimen/profile_bottom_nav_icon_size"
-                android:contentDescription="@null"
-                app:srcCompat="@drawable/ic_bottom_nav_favorites"
-                app:tint="@color/profile_nav_inactive" />
-
-            <TextView
-                style="@style/ProfileText.NavInactive"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/profile_nav_text_margin_top"
-                android:text="@string/auto_text_003" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/navCart"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:gravity="center_horizontal"
-            android:orientation="vertical"
-            android:paddingTop="@dimen/profile_nav_item_padding_top"
-            android:paddingBottom="@dimen/profile_nav_item_padding_bottom"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/navProfile"
-            app:layout_constraintStart_toEndOf="@id/navExplore"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <FrameLayout
-                android:layout_width="@dimen/profile_bottom_nav_icon_size"
-                android:layout_height="@dimen/profile_bottom_nav_icon_size">
-
-                <ImageView
-                    android:id="@+id/ivBottomCartIcon"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:contentDescription="@null"
-                    app:srcCompat="@drawable/ic_bottom_nav_cart"
-                    app:tint="@color/profile_nav_active" />
-
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/cardBottomCartBadge"
-                    android:layout_width="12dp"
-                    android:layout_height="12dp"
-                    android:layout_gravity="end|top"
-                    android:visibility="gone"
-                    app:cardBackgroundColor="@color/home_chip_bg"
-                    app:cardCornerRadius="@dimen/corner_radius_round"
-                    app:cardElevation="@dimen/space_0"
-                    app:strokeWidth="@dimen/space_0">
-
-                    <TextView
-                        android:id="@+id/tvBottomCartBadge"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:gravity="center"
-                        android:textColor="@color/home_text_primary"
-                        android:textSize="7sp"
-                        android:textStyle="bold"
-                        tools:text="2" />
-                </com.google.android.material.card.MaterialCardView>
-            </FrameLayout>
-
-            <TextView
-                style="@style/ProfileText.NavActive"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/profile_nav_text_margin_top"
-                android:text="@string/auto_text_009" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/navProfile"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:gravity="center_horizontal"
-            android:orientation="vertical"
-            android:paddingTop="@dimen/profile_nav_item_padding_top"
-            android:paddingBottom="@dimen/profile_nav_item_padding_bottom"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/navCart"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <ImageView
-                android:layout_width="@dimen/profile_bottom_nav_icon_size"
-                android:layout_height="@dimen/profile_bottom_nav_icon_size"
-                android:contentDescription="@null"
-                app:srcCompat="@drawable/ic_bottom_nav_profile"
-                app:tint="@color/profile_nav_inactive" />
-
-            <TextView
-                style="@style/ProfileText.NavInactive"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/profile_nav_text_margin_top"
-                android:text="@string/auto_text_010" />
-        </LinearLayout>
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        app:layout_constraintStart_toStartOf="parent" />
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/scrollPanierContent"
@@ -418,5 +247,6 @@
     </androidx.core.widget.NestedScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+
 
 

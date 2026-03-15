@@ -13,7 +13,9 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.button.MaterialButton
 
+// Cette classe organise cette partie de l'app.
 class AddressesActivity : AppCompatActivity() {
+    // Cette fonction fait une action de cette partie de l'app.
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -30,6 +32,7 @@ class AddressesActivity : AppCompatActivity() {
         renderAddresses()
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun renderAddresses() {
         val addresses = AddressBookStore.getAddresses(this)
         val current = addresses.firstOrNull().orEmpty()
@@ -63,6 +66,7 @@ class AddressesActivity : AppCompatActivity() {
         }
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun showAddAddressDialog() {
         val dialog = Dialog(this, R.style.ThemeOverlay_MyApp_Dialog)
         dialog.setContentView(R.layout.dialog_add_address)

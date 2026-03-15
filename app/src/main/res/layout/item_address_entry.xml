@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -32,7 +32,7 @@
             android:layout_weight="1"
             android:textColor="@color/home_text_primary"
             android:textSize="14sp"
-            android:fontFamily="@font/poppins_regular" />
+            android:fontFamily="@font/plus_jakarta_sans_regular" />
 
         <TextView
             android:id="@+id/tvAddressState"
@@ -41,7 +41,7 @@
             android:layout_marginEnd="10dp"
             android:textColor="@color/home_text_secondary"
             android:textSize="12sp"
-            android:fontFamily="@font/poppins_medium" />
+            android:fontFamily="@font/plus_jakarta_sans_medium" />
 
         <ImageView
             android:id="@+id/ivAddressRemove"
@@ -52,3 +52,4 @@
             app:tint="@color/profile_logout_text" />
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>
+
