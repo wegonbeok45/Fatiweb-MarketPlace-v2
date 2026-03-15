@@ -23,6 +23,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import kotlinx.coroutines.launch
 
+// Cette classe organise cette partie de l'app.
 class RegisterActivity : AppCompatActivity() {
     private var passwordVisible = false
     private lateinit var callbackManager: CallbackManager
@@ -40,6 +41,7 @@ class RegisterActivity : AppCompatActivity() {
         }
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -73,6 +75,7 @@ class RegisterActivity : AppCompatActivity() {
         emphasizeCta(R.id.btnRegister)
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun setupRegisterActions() {
         findViewById<View>(R.id.ivBack)?.setOnClickListener {
             navigateToMainTab(MainActivity.Tab.PROFILE)
@@ -165,6 +168,7 @@ class RegisterActivity : AppCompatActivity() {
         )
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun setupFacebookLogin() {
         val btnFacebook = findViewById<View>(R.id.btnFacebook) ?: return
         
@@ -177,20 +181,24 @@ class RegisterActivity : AppCompatActivity() {
         }
 
         LoginManager.getInstance().registerCallback(callbackManager, object : FacebookCallback<LoginResult> {
+            // Cette fonction fait une action de cette partie de l'app.
             override fun onSuccess(result: LoginResult) {
                 handleFacebookAccessToken(result.accessToken.token)
             }
 
+            // Cette fonction fait une action de cette partie de l'app.
             override fun onCancel() {
                 showMotionSnackbar("Connexion annulée")
             }
 
+            // Cette fonction fait une action de cette partie de l'app.
             override fun onError(error: FacebookException) {
                 showMotionSnackbar("Erreur Facebook: ${error.message}")
             }
         })
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun handleFacebookAccessToken(token: String) {
         lifecycleScope.launch {
             val result = FirebaseAuthManager.signInWithFacebook(token)
@@ -208,17 +216,20 @@ class RegisterActivity : AppCompatActivity() {
 
     // Forward Facebook activity results to its callback manager
     @Suppress("DEPRECATION")
+    // Cette fonction fait une action de cette partie de l'app.
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: android.content.Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         callbackManager.onActivityResult(requestCode, resultCode, data)
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun setupGoogleLogin() {
         findViewById<View>(R.id.btnGoogle)?.setOnClickListener {
             googleSignInLauncher.launch(googleSignInClient.signInIntent)
         }
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun handleGoogleIdToken(idToken: String) {
         lifecycleScope.launch {
             val result = FirebaseAuthManager.signInWithGoogle(idToken)

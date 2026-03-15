@@ -10,10 +10,12 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import android.content.res.ColorStateList
 
+// Cette classe organise cette partie de l'app.
 class LanguageSettingsActivity : AppCompatActivity() {
     private lateinit var buttonFrench: MaterialButton
     private lateinit var buttonEnglish: MaterialButton
 
+    // Cette fonction fait une action de cette partie de l'app.
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -38,6 +40,7 @@ class LanguageSettingsActivity : AppCompatActivity() {
         revealViewsInOrder(R.id.layoutTopBar, R.id.cardLanguageOptions)
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun onLanguageSelected(languageCode: String) {
         updateLanguageButtons(languageCode)
         if (languageCode != LanguageManager.getSelectedLanguage(this)) {
@@ -46,6 +49,7 @@ class LanguageSettingsActivity : AppCompatActivity() {
         }
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun updateLanguageButtons(selectedLanguage: String) {
         val selectedBg = ContextCompat.getColor(this, R.color.profile_language_selected_bg)
         val selectedText = ContextCompat.getColor(this, R.color.profile_language_selected_text)
@@ -80,6 +84,7 @@ class LanguageSettingsActivity : AppCompatActivity() {
         )
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun styleLanguageButton(
         button: MaterialButton,
         selected: Boolean,
