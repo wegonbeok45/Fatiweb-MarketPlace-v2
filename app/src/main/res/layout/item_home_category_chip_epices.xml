@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/itemCategoryEpices"
@@ -11,18 +11,21 @@
     <com.google.android.material.card.MaterialCardView
         android:layout_width="@dimen/home_category_circle_size"
         android:layout_height="@dimen/home_category_circle_size"
-        app:cardBackgroundColor="@color/home_category_bg"
+        app:cardBackgroundColor="@color/colorSurface"
         app:cardCornerRadius="@dimen/corner_radius_round"
         app:cardElevation="@dimen/space_0"
-        app:strokeWidth="@dimen/space_0">
+        app:strokeColor="@color/colorOutline"
+        app:strokeWidth="@dimen/stroke_width_default">
 
-        <ImageView
-            android:layout_width="@dimen/home_category_icon_size"
-            android:layout_height="@dimen/home_category_icon_size"
-            android:layout_gravity="center"
-            android:contentDescription="@string/auto_text_016"
-            app:srcCompat="@drawable/ic_home_cat_epices"
-            app:tint="@color/home_text_primary" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="E"
+            android:textColor="@color/colorPrimary"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:fontFamily="@font/plus_jakarta_sans" />
     </com.google.android.material.card.MaterialCardView>
 
     <TextView
@@ -32,3 +35,4 @@
         android:layout_marginTop="@dimen/home_category_label_margin_top"
         android:text="@string/auto_text_052" />
 </LinearLayout>
+

@@ -6,7 +6,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isGone
 import androidx.fragment.app.Fragment
 
+// Cette classe organise cette partie de l'app.
 class ExploreTabFragment : Fragment(R.layout.fragment_explore_tab) {
+    // Cette fonction fait une action de cette partie de l'app.
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         view.findViewById<View?>(R.id.layoutBottomNav)?.isGone = true
@@ -16,17 +18,20 @@ class ExploreTabFragment : Fragment(R.layout.fragment_explore_tab) {
         polishExploreUi()
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     override fun onResume() {
         super.onResume()
         (activity as? MainActivity)?.updateHostCartBadge()
         updateNotificationBadge()
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun updateNotificationBadge() {
         val badge = view?.findViewById<View>(R.id.notificationBadge) ?: return
         badge.visibility = if (NotificationStore.hasUnread(requireContext())) View.VISIBLE else View.GONE
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun setupHeaderAndExploreActions(root: View) {
         root.findViewById<View>(R.id.ivHomeLogo)?.setOnClickListener {
             (activity as? MainActivity)?.selectTab(MainActivity.Tab.HOME)
@@ -35,7 +40,7 @@ class ExploreTabFragment : Fragment(R.layout.fragment_explore_tab) {
             (activity as? MainActivity)?.selectTab(MainActivity.Tab.HOME)
         }
         root.findViewById<View>(R.id.ivTopCart)?.setOnClickListener {
-            (activity as? AppCompatActivity)?.navigateFromTop(FavoritesActivity::class.java)
+            (activity as? MainActivity)?.selectTab(MainActivity.Tab.CART)
         }
 
         (activity as? AppCompatActivity)?.bindNotificationEntry(R.id.ivTopNotifications)
@@ -49,6 +54,7 @@ class ExploreTabFragment : Fragment(R.layout.fragment_explore_tab) {
         )
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun polishExploreUi() {
         (activity as? AppCompatActivity)?.applyPressFeedback(
             R.id.ivHomeLogo,

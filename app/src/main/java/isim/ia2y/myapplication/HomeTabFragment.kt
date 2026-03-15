@@ -14,6 +14,7 @@ import androidx.core.view.isGone
 import androidx.fragment.app.Fragment
 import kotlin.math.roundToInt
 
+// Cette classe organise cette partie de l'app.
 class HomeTabFragment : Fragment(R.layout.fragment_home_tab) {
     private val favoriteState = mutableMapOf<Int, Boolean>()
     private val sliderHandler = Handler(Looper.getMainLooper())
@@ -35,6 +36,7 @@ class HomeTabFragment : Fragment(R.layout.fragment_home_tab) {
     private val sliderFrameDelayMs: Long = 16L
     private var hasPlayedEntrance = false
 
+    // Cette fonction fait une action de cette partie de l'app.
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         view.findViewById<View?>(R.id.layoutBottomNav)?.isGone = true
@@ -47,6 +49,7 @@ class HomeTabFragment : Fragment(R.layout.fragment_home_tab) {
         setupMotionPolish()
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     override fun onResume() {
         super.onResume()
         (activity as? MainActivity)?.updateHostCartBadge()
@@ -85,12 +88,14 @@ class HomeTabFragment : Fragment(R.layout.fragment_home_tab) {
         }
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     override fun onPause() {
         stopCategoryAutoSlide()
         stopAnnouncementAutoSlide()
         super.onPause()
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     override fun onDestroyView() {
         stopCategoryAutoSlide()
         stopAnnouncementAutoSlide()
@@ -107,6 +112,7 @@ class HomeTabFragment : Fragment(R.layout.fragment_home_tab) {
         super.onDestroyView()
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun setupHeaderAndContentActions(root: View) {
         root.findViewById<View>(R.id.ivHomeLogo)?.setOnClickListener {
             (activity as? MainActivity)?.selectTab(MainActivity.Tab.HOME)
@@ -115,7 +121,7 @@ class HomeTabFragment : Fragment(R.layout.fragment_home_tab) {
             (activity as? MainActivity)?.selectTab(MainActivity.Tab.HOME)
         }
         root.findViewById<View>(R.id.ivTopCart)?.setOnClickListener {
-            (activity as? AppCompatActivity)?.navigateFromTop(FavoritesActivity::class.java)
+            (activity as? MainActivity)?.selectTab(MainActivity.Tab.CART)
         }
         listOf(
             R.id.itemCategoryArtisanat,
@@ -136,6 +142,7 @@ class HomeTabFragment : Fragment(R.layout.fragment_home_tab) {
             R.id.cardBannerSecondary,
             R.id.btnAddCartBalgha
         )
+        // Cette fonction fait une action de cette partie de l'app.
         fun openSearch(source: View) {
             val host = activity as? AppCompatActivity ?: return
             source.animate()
@@ -164,6 +171,7 @@ class HomeTabFragment : Fragment(R.layout.fragment_home_tab) {
         bindProductDetailsNavigation(root, R.id.cardProductBalgha, "balgha")
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun setupFavoriteActions(root: View) {
         val host = activity as? AppCompatActivity ?: return
         val favorites = listOf(
@@ -206,12 +214,14 @@ class HomeTabFragment : Fragment(R.layout.fragment_home_tab) {
         }
     }
 
+    // Cette classe organise cette partie de l'app.
     private data class FavoriteBinding(
         val buttonId: Int,
         val iconId: Int,
         val productId: String
     )
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun bindAddToCart(root: View, buttonId: Int, productId: String) {
         root.findViewById<View>(buttonId)?.setOnClickListener {
             val product = ProductCatalog.byId(productId) ?: return@setOnClickListener
@@ -223,12 +233,14 @@ class HomeTabFragment : Fragment(R.layout.fragment_home_tab) {
         }
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun bindProductDetailsNavigation(root: View, cardId: Int, productId: String) {
         root.findViewById<View>(cardId)?.setOnClickListener {
             (activity as? AppCompatActivity)?.navigateToProductDetails(productId)
         }
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun setupMotionPolish() {
         (activity as? AppCompatActivity)?.applyPressFeedback(
             R.id.ivHomeLogo,
@@ -260,12 +272,14 @@ class HomeTabFragment : Fragment(R.layout.fragment_home_tab) {
         )
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun setupCategoryAutoSlide(root: View) {
         val categoriesScroll = root.findViewById<HorizontalScrollView>(R.id.hsvCategories) ?: return
         categoriesScroll.post {
             categoryCycleWidthPx = computeLoopCycleWidth(categoriesScroll)
             categoryScrollOffsetPx = categoriesScroll.scrollX.toFloat()
             categorySliderRunnable = object : Runnable {
+                // Cette fonction fait une action de cette partie de l'app.
                 override fun run() {
                     val content = categoriesScroll.getChildAt(0) ?: return
                     val cycleWidth = if (categoryCycleWidthPx > 0) {
@@ -327,6 +341,7 @@ class HomeTabFragment : Fragment(R.layout.fragment_home_tab) {
         }
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun setupAnnouncementAutoSlide(root: View) {
         val announcementsScroll = root.findViewById<HorizontalScrollView>(R.id.hsvAnnouncements) ?: return
         announcementsScroll.post {
@@ -336,6 +351,7 @@ class HomeTabFragment : Fragment(R.layout.fragment_home_tab) {
             announcementDirection = 1
             announcementsScroll.scrollTo(0, 0)
             announcementSliderRunnable = object : Runnable {
+                // Cette fonction fait une action de cette partie de l'app.
                 override fun run() {
                     if (announcementMaxScrollPx <= 0) {
                         val c = announcementsScroll.getChildAt(0)
@@ -383,6 +399,7 @@ class HomeTabFragment : Fragment(R.layout.fragment_home_tab) {
         }
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun startCategoryAutoSlide() {
         val runnable = categorySliderRunnable ?: return
         sliderHandler.removeCallbacks(runnable)
@@ -398,11 +415,13 @@ class HomeTabFragment : Fragment(R.layout.fragment_home_tab) {
         sliderHandler.postDelayed(runnable, 100)
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun stopCategoryAutoSlide() {
         categorySliderRunnable?.let { sliderHandler.removeCallbacks(it) }
         isCategoryAutoSliding = false
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun startAnnouncementAutoSlide() {
         val runnable = announcementSliderRunnable ?: return
         sliderHandler.removeCallbacks(runnable)
@@ -418,6 +437,7 @@ class HomeTabFragment : Fragment(R.layout.fragment_home_tab) {
         sliderHandler.postDelayed(runnable, 100)
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun stopAnnouncementAutoSlide() {
         announcementSliderRunnable?.let { sliderHandler.removeCallbacks(it) }
         isAnnouncementAutoSliding = false
@@ -426,10 +446,12 @@ class HomeTabFragment : Fragment(R.layout.fragment_home_tab) {
     private var categoryIdleRunnable: Runnable? = null
     private var announcementIdleRunnable: Runnable? = null
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun waitForCategoryIdle(hsv: HorizontalScrollView) {
         categoryIdleRunnable?.let { sliderHandler.removeCallbacks(it) }
         var lastX = hsv.scrollX
         categoryIdleRunnable = object : Runnable {
+            // Cette fonction fait une action de cette partie de l'app.
             override fun run() {
                 val currentX = hsv.scrollX
                 if (currentX == lastX) {
@@ -444,10 +466,12 @@ class HomeTabFragment : Fragment(R.layout.fragment_home_tab) {
         sliderHandler.postDelayed(categoryIdleRunnable!!, 100)
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun waitForAnnouncementIdle(hsv: HorizontalScrollView) {
         announcementIdleRunnable?.let { sliderHandler.removeCallbacks(it) }
         var lastX = hsv.scrollX
         announcementIdleRunnable = object : Runnable {
+            // Cette fonction fait une action de cette partie de l'app.
             override fun run() {
                 val currentX = hsv.scrollX
                 if (currentX == lastX) {
@@ -463,6 +487,7 @@ class HomeTabFragment : Fragment(R.layout.fragment_home_tab) {
     }
 
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun computeLoopCycleWidth(scroll: HorizontalScrollView): Int {
         val track = scroll.getChildAt(0) as? ViewGroup ?: return 0
         val childCount = track.childCount
@@ -481,6 +506,7 @@ class HomeTabFragment : Fragment(R.layout.fragment_home_tab) {
         return widthPx.coerceAtLeast(0)
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun updateNotificationBadge() {
         val badge = view?.findViewById<View>(R.id.notificationBadge) ?: return
         badge.visibility = if (NotificationStore.hasUnread(requireContext())) View.VISIBLE else View.GONE

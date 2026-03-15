@@ -22,6 +22,7 @@ import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import java.util.Locale
 
+// Cette classe organise cette partie de l'app.
 class ProfileTabFragment : Fragment(R.layout.fragment_profile_tab) {
 
     private val avatarPrefsName = "profile_prefs"
@@ -40,6 +41,7 @@ class ProfileTabFragment : Fragment(R.layout.fragment_profile_tab) {
         }
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         runCatching {
@@ -68,6 +70,7 @@ class ProfileTabFragment : Fragment(R.layout.fragment_profile_tab) {
         }
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     override fun onResume() {
         super.onResume()
         (activity as? MainActivity)?.updateHostCartBadge()
@@ -77,6 +80,7 @@ class ProfileTabFragment : Fragment(R.layout.fragment_profile_tab) {
 
 
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun setupProfileActions(root: View) {
         root.findViewById<View>(R.id.ivBack)?.setOnClickListener {
             (activity as? MainActivity)?.selectTab(MainActivity.Tab.HOME, animate = false)
@@ -127,6 +131,7 @@ class ProfileTabFragment : Fragment(R.layout.fragment_profile_tab) {
         )
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun openAvatarPicker() {
         pickAvatarLauncher.launch("image/*")
     }
@@ -135,6 +140,7 @@ class ProfileTabFragment : Fragment(R.layout.fragment_profile_tab) {
      * Copies the picked image into internal app storage and returns the absolute file path.
      * Storing a raw file path (not a file:// URI) avoids FileUriExposedException on Android 7+.
      */
+    // Cette fonction fait une action de cette partie de l'app.
     private fun copyUriToInternalStorage(uri: Uri): String? {
         return runCatching {
             val context = requireContext()
@@ -147,6 +153,7 @@ class ProfileTabFragment : Fragment(R.layout.fragment_profile_tab) {
         }.getOrNull()
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun saveAvatarPath(path: String) {
         requireContext().getSharedPreferences(avatarPrefsName, Context.MODE_PRIVATE)
             .edit()
@@ -154,6 +161,7 @@ class ProfileTabFragment : Fragment(R.layout.fragment_profile_tab) {
             .apply()
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun loadAvatarFromPath(path: String) {
         val imageView = view?.findViewById<ImageView>(R.id.ivAvatar) ?: return
         runCatching {
@@ -185,6 +193,7 @@ class ProfileTabFragment : Fragment(R.layout.fragment_profile_tab) {
         }
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun restoreAvatar() {
         val context = context ?: return
         val saved = context.getSharedPreferences(avatarPrefsName, Context.MODE_PRIVATE)
@@ -210,6 +219,7 @@ class ProfileTabFragment : Fragment(R.layout.fragment_profile_tab) {
     }
 
     /** Refresh the displayed user name/email from Firebase Auth. */
+    // Cette fonction fait une action de cette partie de l'app.
     private fun refreshUserInfo() {
         val root = view ?: return
         val firebaseUser = FirebaseAuthManager.currentUser
@@ -244,6 +254,7 @@ class ProfileTabFragment : Fragment(R.layout.fragment_profile_tab) {
         }
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun refreshProfileLocation() {
         runCatching {
             val context = context ?: return

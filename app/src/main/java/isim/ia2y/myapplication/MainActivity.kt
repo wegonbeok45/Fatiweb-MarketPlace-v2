@@ -24,8 +24,10 @@ import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.transition.ChangeBounds
 import androidx.transition.TransitionManager
 
+// Cette classe organise cette partie de l'app.
 class MainActivity : AppCompatActivity() {
 
+    // Cette classe organise cette partie de l'app.
     enum class Tab {
         HOME, EXPLORE, CART, PROFILE
     }
@@ -41,6 +43,7 @@ class MainActivity : AppCompatActivity() {
     private val mainHandler = Handler(Looper.getMainLooper())
     private lateinit var tabDataPrefetcher: TabDataPrefetcher
 
+    // Cette fonction fait une action de cette partie de l'app.
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -90,6 +93,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     override fun onResume() {
         super.onResume()
         val selected = pendingTabSelection ?: currentTab
@@ -99,16 +103,19 @@ class MainActivity : AppCompatActivity() {
         updateHostNotificationBadge()
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     override fun onDestroy() {
         tabDataPrefetcher.shutdown()
         super.onDestroy()
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     override fun onSaveInstanceState(outState: Bundle) {
         outState.putString(KEY_SELECTED_TAB, currentTab.name)
         super.onSaveInstanceState(outState)
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     override fun onNewIntent(intent: android.content.Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
@@ -120,6 +127,7 @@ class MainActivity : AppCompatActivity() {
         updateHostNotificationBadge()
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -135,6 +143,7 @@ class MainActivity : AppCompatActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     fun selectTab(tab: Tab, animate: Boolean = true) {
         if (isTabLoading) return
 
@@ -160,6 +169,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun createTabFragment(tab: Tab): Fragment = when (tab) {
         Tab.HOME -> HomeTabFragment()
         Tab.EXPLORE -> ExploreTabFragment()
@@ -167,6 +177,7 @@ class MainActivity : AppCompatActivity() {
         Tab.PROFILE -> ProfileTabFragment()
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     fun updateHostCartBadge() {
         val badgeContainer = findViewById<View>(R.id.cardBottomCartBadge)
         val badgeText = findViewById<TextView>(R.id.tvBottomCartBadge)
@@ -179,11 +190,13 @@ class MainActivity : AppCompatActivity() {
         badgeText.text = count.toString()
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     fun updateHostNotificationBadge() {
         val badge = findViewById<View>(R.id.hostNotificationBadge) ?: return
         badge.visibility = if (NotificationStore.hasUnread(this)) View.VISIBLE else View.GONE
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun setupBottomNav() {
         findViewById<View>(R.id.hostNavHome).setOnClickListener { selectTab(Tab.HOME) }
         findViewById<View>(R.id.hostNavExplore).setOnClickListener { selectTab(Tab.EXPLORE) }
@@ -191,6 +204,7 @@ class MainActivity : AppCompatActivity() {
         findViewById<View>(R.id.hostNavProfile).setOnClickListener { selectTab(Tab.PROFILE) }
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun setupTabLoadingUi() {
         findViewById<View>(R.id.hostBtnTabRetry)?.setOnClickListener {
             val retryTab = loadingErrorTab ?: pendingTabSelection ?: return@setOnClickListener
@@ -199,10 +213,11 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun setupHostHeader() {
         findViewById<View>(R.id.hostIvHomeLogo).setOnClickListener { selectTab(Tab.HOME, animate = false) }
         findViewById<View>(R.id.hostTvBrand).setOnClickListener { selectTab(Tab.HOME, animate = false) }
-        findViewById<View>(R.id.hostIvTopCart).setOnClickListener { navigateFromTop(FavoritesActivity::class.java) }
+        findViewById<View>(R.id.hostIvTopCart).setOnClickListener { selectTab(Tab.CART) }
         bindNotificationEntry(R.id.hostIvTopNotifications)
         applyPressFeedback(
             R.id.hostIvHomeLogo,
@@ -212,6 +227,7 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun updateBottomNavSelection(selected: Tab) {
         setNavItemState(
             containerId = R.id.hostNavHome,
@@ -239,6 +255,7 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun beginTabSelectionWithLoading(
         tab: Tab,
         animate: Boolean,
@@ -281,6 +298,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun openTabContent(tab: Tab, animate: Boolean, requestToken: Int) {
         runCatching {
             val transaction = supportFragmentManager.beginTransaction().setReorderingAllowed(true)
@@ -322,6 +340,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun openTabContentDirect(tab: Tab, animate: Boolean) {
         runCatching {
             val transaction = supportFragmentManager.beginTransaction().setReorderingAllowed(true)
@@ -356,6 +375,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun showTabLoading(loading: Boolean, errorMessage: String?) {
         val overlay = findViewById<View>(R.id.hostTabLoadingOverlay) ?: return
         val spinner = findViewById<View>(R.id.hostTabLoadingSpinner)
@@ -371,6 +391,7 @@ class MainActivity : AppCompatActivity() {
         retry?.visibility = if (errorMessage != null) View.VISIBLE else View.GONE
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun setBottomNavEnabled(enabled: Boolean) {
         listOf(
             R.id.hostNavHome,
@@ -384,6 +405,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun setNavItemState(
         containerId: Int,
         iconId: Int,
@@ -430,6 +452,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun requestLocationPermissionIfNeeded() {
         val coarse = ContextCompat.checkSelfPermission(
             this,
@@ -451,6 +474,7 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun playTabEnterAnimation(enabled: Boolean) {
         if (!enabled || isReducedMotionEnabled()) return
         val content = findViewById<View>(R.id.hostFragmentContainer)
@@ -470,6 +494,7 @@ class MainActivity : AppCompatActivity() {
             .start()
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun updateTabIndicator(tab: Tab, animate: Boolean) {
         val navContainer = findViewById<ConstraintLayout>(R.id.hostLayoutBottomNav) ?: return
         val indicator = navContainer.findViewById<View>(R.id.nav_indicator) ?: return
@@ -494,6 +519,7 @@ class MainActivity : AppCompatActivity() {
         constraintSet.applyTo(navContainer)
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun getTabContainerId(tab: Tab): Int = when (tab) {
         Tab.HOME -> R.id.hostNavHome
         Tab.EXPLORE -> R.id.hostNavExplore
@@ -507,6 +533,7 @@ class MainActivity : AppCompatActivity() {
      * When the user later taps EXPLORE/CART/PROFILE, [selectTab] finds the existing
      * fragment and just shows it instantly — zero inflation delay.
      */
+    // Cette fonction fait une action de cette partie de l'app.
     private fun preWarmAllTabs() {
         if (isFinishing || isDestroyed) return
         runCatching {

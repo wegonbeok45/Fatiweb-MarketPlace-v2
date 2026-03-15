@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -72,7 +72,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:contentDescription="@string/auto_text_003"
-                        app:srcCompat="@drawable/ic_bottom_nav_favorites"
+                        app:srcCompat="@drawable/ic_bottom_nav_cart"
                         app:tint="@color/home_text_primary" />
                 </FrameLayout>
 
@@ -149,7 +149,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:fontFamily="@font/poppins_medium"
+                android:fontFamily="@font/plus_jakarta_sans_medium"
                 android:text="@string/tab_loading"
                 android:textColor="@color/home_text_primary"
                 android:textSize="14sp" />
@@ -251,7 +251,7 @@
                 android:textSize="@dimen/nav_item_text_size"
                 android:textColor="@color/home_nav_active"
                 android:layout_marginTop="6dp"
-                android:fontFamily="@font/poppins_regular"
+                android:fontFamily="@font/plus_jakarta_sans_regular"
                 android:textStyle="normal" />
         </LinearLayout>
 
@@ -286,7 +286,7 @@
                 android:textSize="@dimen/nav_item_text_size"
                 android:textColor="@color/home_nav_inactive"
                 android:layout_marginTop="6dp"
-                android:fontFamily="@font/poppins_regular" />
+                android:fontFamily="@font/plus_jakarta_sans_regular" />
         </LinearLayout>
 
         <!-- Cart Item -->
@@ -322,7 +322,7 @@
                     android:layout_height="18dp"
                     android:layout_gravity="end|top"
                     android:visibility="gone"
-                    app:cardBackgroundColor="@color/home_chip_bg"
+                    app:cardBackgroundColor="@color/panier_notification_dot"
                     app:cardCornerRadius="@dimen/corner_radius_round"
                     app:cardElevation="@dimen/space_0"
                     app:strokeWidth="@dimen/space_0">
@@ -332,8 +332,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:gravity="center"
-                        android:textColor="@color/home_text_primary"
-                        android:textSize="8sp"
+                        android:textColor="@color/colorOnError"
+                        android:textSize="10sp"
                         android:textStyle="bold"
                         tools:text="2" />
                 </com.google.android.material.card.MaterialCardView>
@@ -347,7 +347,7 @@
                 android:textSize="@dimen/nav_item_text_size"
                 android:textColor="@color/home_nav_inactive"
                 android:layout_marginTop="6dp"
-                android:fontFamily="@font/poppins_regular" />
+                android:fontFamily="@font/plus_jakarta_sans_regular" />
         </LinearLayout>
 
         <!-- Profile Item -->
@@ -381,9 +381,10 @@
                 android:textSize="@dimen/nav_item_text_size"
                 android:textColor="@color/home_nav_inactive"
                 android:layout_marginTop="6dp"
-                android:fontFamily="@font/poppins_regular" />
+                android:fontFamily="@font/plus_jakarta_sans_regular" />
         </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/cardProductMarqoum"
@@ -29,16 +29,25 @@
 
         <FrameLayout
             android:id="@+id/btnFavoriteMarqoum"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
             android:layout_gravity="end|top"
-            android:layout_margin="4dp">
+            android:layout_margin="8dp"
+            android:background="@drawable/bg_home_product_heart">
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_gravity="center"
+                app:srcCompat="@drawable/ic_home_heart"
+                app:tint="@color/home_text_primary" />
 
             <com.airbnb.lottie.LottieAnimationView
                 android:id="@+id/ivFavoriteMarqoum"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:scaleType="fitCenter"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_gravity="center"
+                android:scaleType="centerCrop"
                 app:lottie_rawRes="@raw/anim_heart"
                 app:lottie_autoPlay="false"
                 app:lottie_loop="false" />
@@ -69,7 +78,7 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/home_product_price_row_height"
         android:layout_marginTop="@dimen/home_product_price_row_margin_top"
-        android:gravity="center_vertical"
+        android:gravity="bottom|center_vertical"
         android:orientation="horizontal">
 
         <LinearLayout
@@ -93,22 +102,33 @@
                 android:text="@string/currency_dt" />
         </LinearLayout>
 
-        <com.google.android.material.card.MaterialCardView
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btnAddCartMarqoum"
-            android:layout_width="@dimen/home_add_cart_button_size"
-            android:layout_height="@dimen/home_add_cart_button_size"
-            app:cardBackgroundColor="@color/home_text_primary"
-            app:cardCornerRadius="@dimen/home_add_cart_button_radius"
-            app:cardElevation="@dimen/space_0"
-            app:strokeWidth="@dimen/space_0">
-
-            <ImageView
-                android:layout_width="@dimen/home_add_cart_icon_size"
-                android:layout_height="@dimen/home_add_cart_icon_size"
-                android:layout_gravity="center"
-                android:contentDescription="@string/auto_text_074"
-                app:srcCompat="@drawable/ic_home_add_cart"
-                app:tint="@color/colorSurface" />
-        </com.google.android.material.card.MaterialCardView>
+            android:layout_width="@dimen/home_add_cart_button_width"
+            android:layout_height="@dimen/home_add_cart_button_height"
+            android:layout_marginStart="8dp"
+            android:fontFamily="@font/plus_jakarta_sans_medium"
+            android:insetTop="@dimen/space_0"
+            android:insetBottom="@dimen/space_0"
+            android:insetLeft="@dimen/space_0"
+            android:insetRight="@dimen/space_0"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:text="@string/home_add_to_cart_short"
+            android:textAllCaps="false"
+            android:textColor="@color/colorOnAccentDeep"
+            android:textSize="10sp"
+            app:backgroundTint="@color/home_add_cart_bg"
+            app:cornerRadius="@dimen/home_add_cart_button_radius"
+            app:icon="@drawable/ic_home_add_cart"
+            app:iconGravity="textStart"
+            app:iconPadding="4dp"
+            app:iconSize="@dimen/icon_size_small"
+            app:iconTint="@color/colorOnAccentDeep"
+            app:strokeWidth="@dimen/space_0" />
     </LinearLayout>
 </LinearLayout>
+
+

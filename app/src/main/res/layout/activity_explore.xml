@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -15,15 +15,16 @@
         android:background="@color/home_nav_bg"
         android:orientation="vertical"
         android:paddingBottom="@dimen/home_top_section_bottom_padding"
+        android:paddingTop="@dimen/home_top_spacing"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
+        <!-- Top bar: logo, title, actions -->
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/home_horizontal_padding"
-            android:layout_marginTop="@dimen/home_top_spacing"
             android:layout_marginEnd="@dimen/home_horizontal_padding">
 
             <ImageView
@@ -37,19 +38,33 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/fatiweblogo" />
 
-            <TextView
-                android:id="@+id/tvBrand"
-                style="@style/HomeText.Brand"
+            <LinearLayout
+                android:id="@+id/layoutTitle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/home_brand_start_margin"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:text="@string/auto_text_002"
-                app:layout_constraintBottom_toBottomOf="@id/ivHomeLogo"
-                app:layout_constraintEnd_toStartOf="@id/layoutTopActions"
+                android:orientation="vertical"
                 app:layout_constraintStart_toEndOf="@id/ivHomeLogo"
-                app:layout_constraintTop_toTopOf="@id/ivHomeLogo" />
+                app:layout_constraintEnd_toStartOf="@id/layoutTopActions"
+                app:layout_constraintTop_toTopOf="@id/ivHomeLogo"
+                app:layout_constraintBottom_toBottomOf="@id/ivHomeLogo"
+                android:layout_marginStart="@dimen/home_brand_start_margin">
+
+                <TextView
+                    android:id="@+id/tvBrand"
+                    style="@style/HomeText.Brand"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/auto_text_002" />
+
+                <TextView
+                    android:id="@+id/tvBrandSubtitle"
+                    style="@style/HomeText.CategoryLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_2"
+                    android:text="@string/auto_text_011"
+                    android:textAllCaps="false" />
+            </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/layoutTopActions"
@@ -87,6 +102,7 @@
             </LinearLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
 
+        <!-- Search pill -->
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/layoutSearchBar"
             android:layout_width="match_parent"
@@ -146,184 +162,14 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <include
         android:id="@+id/layoutBottomNav"
+        layout="@layout/include_bottom_nav"
         android:layout_width="0dp"
         android:layout_height="@dimen/profile_bottom_nav_height_exact"
-        android:background="@color/profile_nav_bg"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
-
-        <LinearLayout
-            android:id="@+id/navHome"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:gravity="center_horizontal"
-            android:orientation="vertical"
-            android:paddingTop="@dimen/profile_nav_item_padding_top"
-            android:paddingBottom="@dimen/profile_nav_item_padding_bottom"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/navExplore"
-            app:layout_constraintHorizontal_chainStyle="spread"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <ImageView
-                android:layout_width="@dimen/profile_bottom_nav_icon_size"
-                android:layout_height="@dimen/profile_bottom_nav_icon_size"
-                android:contentDescription="@null"
-                app:srcCompat="@drawable/ic_bottom_nav_home"
-                app:tint="@color/profile_nav_inactive" />
-
-            <TextView
-                style="@style/ProfileText.NavInactive"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/profile_nav_text_margin_top"
-                android:text="@string/auto_text_007" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/navExplore"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:gravity="center_horizontal"
-            android:orientation="vertical"
-            android:paddingTop="@dimen/profile_nav_item_padding_top"
-            android:paddingBottom="@dimen/profile_nav_item_padding_bottom"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/navCart"
-            app:layout_constraintStart_toEndOf="@id/navHome"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <ImageView
-                android:layout_width="@dimen/profile_bottom_nav_icon_size"
-                android:layout_height="@dimen/profile_bottom_nav_icon_size"
-                android:contentDescription="@null"
-                app:srcCompat="@drawable/ic_bottom_nav_categories"
-                app:tint="@color/profile_nav_active" />
-
-            <TextView
-                style="@style/ProfileText.NavActive"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/profile_nav_text_margin_top"
-                android:text="@string/auto_text_008" />
-        </LinearLayout>
-        <LinearLayout
-            android:id="@+id/navFavorites"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:visibility="gone"
-            android:gravity="center_horizontal"
-            android:orientation="vertical"
-            android:paddingTop="@dimen/profile_nav_item_padding_top"
-            android:paddingBottom="@dimen/profile_nav_item_padding_bottom"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/navCart"
-            app:layout_constraintStart_toEndOf="@id/navExplore"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <ImageView
-                android:layout_width="@dimen/profile_bottom_nav_icon_size"
-                android:layout_height="@dimen/profile_bottom_nav_icon_size"
-                android:contentDescription="@null"
-                app:srcCompat="@drawable/ic_bottom_nav_favorites"
-                app:tint="@color/profile_nav_inactive" />
-
-            <TextView
-                style="@style/ProfileText.NavInactive"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/profile_nav_text_margin_top"
-                android:text="@string/auto_text_003" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/navCart"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:gravity="center_horizontal"
-            android:orientation="vertical"
-            android:paddingTop="@dimen/profile_nav_item_padding_top"
-            android:paddingBottom="@dimen/profile_nav_item_padding_bottom"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/navProfile"
-            app:layout_constraintStart_toEndOf="@id/navExplore"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <FrameLayout
-                android:layout_width="@dimen/profile_bottom_nav_icon_size"
-                android:layout_height="@dimen/profile_bottom_nav_icon_size">
-
-                <ImageView
-                    android:id="@+id/ivBottomCartIcon"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:contentDescription="@null"
-                    app:srcCompat="@drawable/ic_bottom_nav_cart"
-                    app:tint="@color/profile_nav_inactive" />
-
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/cardBottomCartBadge"
-                    android:layout_width="12dp"
-                    android:layout_height="12dp"
-                    android:layout_gravity="end|top"
-                    android:visibility="gone"
-                    app:cardBackgroundColor="@color/home_chip_bg"
-                    app:cardCornerRadius="@dimen/corner_radius_round"
-                    app:cardElevation="@dimen/space_0"
-                    app:strokeWidth="@dimen/space_0">
-
-                    <TextView
-                        android:id="@+id/tvBottomCartBadge"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:gravity="center"
-                        android:textColor="@color/home_text_primary"
-                        android:textSize="7sp"
-                        android:textStyle="bold"
-                        tools:text="2" />
-                </com.google.android.material.card.MaterialCardView>
-            </FrameLayout>
-
-            <TextView
-                style="@style/ProfileText.NavInactive"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/profile_nav_text_margin_top"
-                android:text="@string/auto_text_009" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/navProfile"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:gravity="center_horizontal"
-            android:orientation="vertical"
-            android:paddingTop="@dimen/profile_nav_item_padding_top"
-            android:paddingBottom="@dimen/profile_nav_item_padding_bottom"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/navCart"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <ImageView
-                android:layout_width="@dimen/profile_bottom_nav_icon_size"
-                android:layout_height="@dimen/profile_bottom_nav_icon_size"
-                android:contentDescription="@null"
-                app:srcCompat="@drawable/ic_bottom_nav_profile"
-                app:tint="@color/profile_nav_inactive" />
-
-            <TextView
-                style="@style/ProfileText.NavInactive"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/profile_nav_text_margin_top"
-                android:text="@string/auto_text_010" />
-        </LinearLayout>
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        app:layout_constraintStart_toStartOf="parent" />
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/scrollExploreContent"
@@ -351,258 +197,289 @@
                 android:layout_marginTop="@dimen/home_section_margin_top"
                 android:text="@string/auto_text_011" />
 
-            <LinearLayout
+            <androidx.gridlayout.widget.GridLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/home_horizontal_padding"
                 android:layout_marginTop="@dimen/home_category_list_margin_top"
                 android:layout_marginEnd="@dimen/home_horizontal_padding"
-                android:gravity="center_horizontal"
-                android:layoutAnimation="@anim/layout_animation_fall_down"
-                android:orientation="vertical">
+                android:columnCount="2"
+                android:alignmentMode="alignMargins"
+                android:useDefaultMargins="false">
 
-                    <!-- Vertical Card List (Stitch V2 Style) -->
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/cardCategoryArtisanat"
+                <!-- Grid Card: Artisanat -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardCategoryArtisanat"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/explore_category_card_height"
+                    android:layout_margin="@dimen/explore_category_card_spacing"
+                    android:layout_columnWeight="1"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
+                    app:cardCornerRadius="@dimen/corner_radius_large"
+                    app:cardElevation="2dp"
+                    app:cardUseCompatPadding="true"
+                    app:cardPreventCornerOverlap="true"
+                    app:strokeColor="@color/colorBorderLight"
+                    app:strokeWidth="@dimen/stroke_width_default">
+
+                    <FrameLayout
                         android:layout_width="match_parent"
-                        android:layout_height="@dimen/explore_category_card_height"
-                        android:layout_marginBottom="@dimen/explore_category_card_spacing"
-                        app:cardCornerRadius="@dimen/home_banner_radius"
-                        app:cardElevation="@dimen/space_0"
-                        app:cardUseCompatPadding="false"
-                        app:strokeColor="@android:color/transparent"
-                        app:strokeWidth="@dimen/space_0">
+                        android:layout_height="match_parent">
 
-                        <FrameLayout
+                        <ImageView
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent">
+                            android:layout_height="match_parent"
+                            android:contentDescription="@string/auto_text_012"
+                            android:scaleType="centerCrop"
+                            app:srcCompat="@drawable/img_explore_artisanat" />
 
-                            <ImageView
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:contentDescription="@string/auto_text_012"
-                                android:scaleType="centerCrop"
-                                app:srcCompat="@drawable/img_explore_artisanat" />
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/bg_explore_category_gradient" />
 
-                            <View
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:background="@drawable/bg_explore_category_gradient" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="start|bottom"
+                            android:layout_marginStart="@dimen/explore_category_title_start_margin"
+                            android:layout_marginBottom="@dimen/space_8"
+                            style="@style/HomeText.ProductName"
+                            android:textColor="@color/home_banner_text"
+                            android:text="@string/auto_text_013" />
+                    </FrameLayout>
+                </com.google.android.material.card.MaterialCardView>
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="start|center_vertical"
-                                android:layout_marginStart="@dimen/explore_category_title_start_margin"
-                                android:textColor="#FFFFFF"
-                                android:textSize="21sp"
-                                android:textStyle="bold"
-                                android:letterSpacing="0.05"
-                                android:text="@string/auto_text_013" />
-                        </FrameLayout>
-                    </com.google.android.material.card.MaterialCardView>
+                <!-- Grid Card: Cosmetiques -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardCategoryCosmetiques"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/explore_category_card_height"
+                    android:layout_margin="@dimen/explore_category_card_spacing"
+                    android:layout_columnWeight="1"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
+                    app:cardCornerRadius="@dimen/corner_radius_large"
+                    app:cardElevation="2dp"
+                    app:cardUseCompatPadding="true"
+                    app:cardPreventCornerOverlap="true"
+                    app:strokeColor="@color/colorBorderLight"
+                    app:strokeWidth="@dimen/stroke_width_default">
 
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/cardCategoryCosmetiques"
+                    <FrameLayout
                         android:layout_width="match_parent"
-                        android:layout_height="@dimen/explore_category_card_height"
-                        android:layout_marginBottom="@dimen/explore_category_card_spacing"
-                        app:cardCornerRadius="@dimen/home_banner_radius"
-                        app:cardElevation="@dimen/space_0"
-                        app:cardUseCompatPadding="false"
-                        app:strokeColor="@android:color/transparent"
-                        app:strokeWidth="@dimen/space_0">
+                        android:layout_height="match_parent">
 
-                        <FrameLayout
+                        <ImageView
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent">
+                            android:layout_height="match_parent"
+                            android:contentDescription="@string/auto_text_014"
+                            android:scaleType="centerCrop"
+                            app:srcCompat="@drawable/img_explore_cosmetiques" />
 
-                            <ImageView
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:contentDescription="@string/auto_text_014"
-                                android:scaleType="centerCrop"
-                                app:srcCompat="@drawable/img_explore_cosmetiques" />
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/bg_explore_category_gradient" />
 
-                            <View
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:background="@drawable/bg_explore_category_gradient" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="start|bottom"
+                            android:layout_marginStart="@dimen/explore_category_title_start_margin"
+                            android:layout_marginBottom="@dimen/space_8"
+                            style="@style/HomeText.ProductName"
+                            android:textColor="@color/home_banner_text"
+                            android:text="@string/auto_text_015" />
+                    </FrameLayout>
+                </com.google.android.material.card.MaterialCardView>
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="start|center_vertical"
-                                android:layout_marginStart="@dimen/explore_category_title_start_margin"
-                                android:textColor="#FFFFFF"
-                                android:textSize="21sp"
-                                android:textStyle="bold"
-                                android:letterSpacing="0.05"
-                                android:text="@string/auto_text_015" />
-                        </FrameLayout>
-                    </com.google.android.material.card.MaterialCardView>
+                <!-- Grid Card: Epices -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardCategoryEpices"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/explore_category_card_height"
+                    android:layout_margin="@dimen/explore_category_card_spacing"
+                    android:layout_columnWeight="1"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
+                    app:cardCornerRadius="@dimen/corner_radius_large"
+                    app:cardElevation="2dp"
+                    app:cardUseCompatPadding="true"
+                    app:cardPreventCornerOverlap="true"
+                    app:strokeColor="@color/colorBorderLight"
+                    app:strokeWidth="@dimen/stroke_width_default">
 
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/cardCategoryEpices"
+                    <FrameLayout
                         android:layout_width="match_parent"
-                        android:layout_height="@dimen/explore_category_card_height"
-                        android:layout_marginBottom="@dimen/explore_category_card_spacing"
-                        app:cardCornerRadius="@dimen/home_banner_radius"
-                        app:cardElevation="@dimen/space_0"
-                        app:cardUseCompatPadding="false"
-                        app:strokeColor="@android:color/transparent"
-                        app:strokeWidth="@dimen/space_0">
+                        android:layout_height="match_parent">
 
-                        <FrameLayout
+                        <ImageView
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent">
+                            android:layout_height="match_parent"
+                            android:contentDescription="@string/auto_text_016"
+                            android:scaleType="centerCrop"
+                            app:srcCompat="@drawable/img_explore_epices" />
 
-                            <ImageView
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:contentDescription="@string/auto_text_016"
-                                android:scaleType="centerCrop"
-                                app:srcCompat="@drawable/img_explore_epices" />
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/bg_explore_category_gradient" />
 
-                            <View
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:background="@drawable/bg_explore_category_gradient" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="start|bottom"
+                            android:layout_marginStart="@dimen/explore_category_title_start_margin"
+                            android:layout_marginBottom="@dimen/space_8"
+                            style="@style/HomeText.ProductName"
+                            android:textColor="@color/home_banner_text"
+                            android:text="@string/auto_text_017" />
+                    </FrameLayout>
+                </com.google.android.material.card.MaterialCardView>
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="start|center_vertical"
-                                android:layout_marginStart="@dimen/explore_category_title_start_margin"
-                                android:textColor="#FFFFFF"
-                                android:textSize="21sp"
-                                android:textStyle="bold"
-                                android:letterSpacing="0.05"
-                                android:text="@string/auto_text_017" />
-                        </FrameLayout>
-                    </com.google.android.material.card.MaterialCardView>
+                <!-- Grid Card: Vêtements -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardCategoryVetements"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/explore_category_card_height"
+                    android:layout_margin="@dimen/explore_category_card_spacing"
+                    android:layout_columnWeight="1"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
+                    app:cardCornerRadius="@dimen/corner_radius_large"
+                    app:cardElevation="2dp"
+                    app:cardUseCompatPadding="true"
+                    app:cardPreventCornerOverlap="true"
+                    app:strokeColor="@color/colorBorderLight"
+                    app:strokeWidth="@dimen/stroke_width_default">
 
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/cardCategoryVetements"
+                    <FrameLayout
                         android:layout_width="match_parent"
-                        android:layout_height="@dimen/explore_category_card_height"
-                        android:layout_marginBottom="@dimen/explore_category_card_spacing"
-                        app:cardCornerRadius="@dimen/home_banner_radius"
-                        app:cardElevation="@dimen/space_0"
-                        app:cardUseCompatPadding="false"
-                        app:strokeColor="@android:color/transparent"
-                        app:strokeWidth="@dimen/space_0">
+                        android:layout_height="match_parent">
 
-                        <FrameLayout
+                        <ImageView
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent">
+                            android:layout_height="match_parent"
+                            android:contentDescription="@string/auto_text_018"
+                            android:scaleType="centerCrop"
+                            app:srcCompat="@drawable/img_explore_vetements" />
 
-                            <ImageView
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:contentDescription="@string/auto_text_018"
-                                android:scaleType="centerCrop"
-                                app:srcCompat="@drawable/img_explore_vetements" />
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/bg_explore_category_gradient" />
 
-                            <View
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:background="@drawable/bg_explore_category_gradient" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="start|bottom"
+                            android:layout_marginStart="@dimen/explore_category_title_start_margin"
+                            android:layout_marginBottom="@dimen/space_8"
+                            style="@style/HomeText.ProductName"
+                            android:textColor="@color/home_banner_text"
+                            android:text="@string/auto_text_019" />
+                    </FrameLayout>
+                </com.google.android.material.card.MaterialCardView>
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="start|center_vertical"
-                                android:layout_marginStart="@dimen/explore_category_title_start_margin"
-                                android:textColor="#FFFFFF"
-                                android:textSize="21sp"
-                                android:textStyle="bold"
-                                android:letterSpacing="0.05"
-                                android:text="@string/auto_text_019" />
-                        </FrameLayout>
-                    </com.google.android.material.card.MaterialCardView>
+                <!-- Grid Card: Décoration -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardCategoryDecoration"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/explore_category_card_height"
+                    android:layout_margin="@dimen/explore_category_card_spacing"
+                    android:layout_columnWeight="1"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
+                    app:cardCornerRadius="@dimen/corner_radius_large"
+                    app:cardElevation="2dp"
+                    app:cardUseCompatPadding="true"
+                    app:cardPreventCornerOverlap="true"
+                    app:strokeColor="@color/colorBorderLight"
+                    app:strokeWidth="@dimen/stroke_width_default">
 
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/cardCategoryDecoration"
+                    <FrameLayout
                         android:layout_width="match_parent"
-                        android:layout_height="@dimen/explore_category_card_height"
-                        android:layout_marginBottom="@dimen/explore_category_card_spacing"
-                        app:cardCornerRadius="@dimen/home_banner_radius"
-                        app:cardElevation="@dimen/space_0"
-                        app:cardUseCompatPadding="false"
-                        app:strokeColor="@android:color/transparent"
-                        app:strokeWidth="@dimen/space_0">
+                        android:layout_height="match_parent">
 
-                        <FrameLayout
+                        <ImageView
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent">
+                            android:layout_height="match_parent"
+                            android:contentDescription="@string/auto_text_020"
+                            android:scaleType="centerCrop"
+                            app:srcCompat="@drawable/img_explore_decoration" />
 
-                            <ImageView
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:contentDescription="@string/auto_text_020"
-                                android:scaleType="centerCrop"
-                                app:srcCompat="@drawable/img_explore_decoration" />
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/bg_explore_category_gradient" />
 
-                            <View
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:background="@drawable/bg_explore_category_gradient" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="start|bottom"
+                            android:layout_marginStart="@dimen/explore_category_title_start_margin"
+                            android:layout_marginBottom="@dimen/space_8"
+                            style="@style/HomeText.ProductName"
+                            android:textColor="@color/home_banner_text"
+                            android:text="@string/auto_text_021" />
+                    </FrameLayout>
+                </com.google.android.material.card.MaterialCardView>
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="start|center_vertical"
-                                android:layout_marginStart="@dimen/explore_category_title_start_margin"
-                                android:textColor="#FFFFFF"
-                                android:textSize="21sp"
-                                android:textStyle="bold"
-                                android:letterSpacing="0.05"
-                                android:text="@string/auto_text_021" />
-                        </FrameLayout>
-                    </com.google.android.material.card.MaterialCardView>
+                <!-- Grid Card: Huiles -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardCategoryHuiles"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/explore_category_card_height"
+                    android:layout_margin="@dimen/explore_category_card_spacing"
+                    android:layout_columnWeight="1"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
+                    app:cardCornerRadius="@dimen/corner_radius_large"
+                    app:cardElevation="2dp"
+                    app:cardUseCompatPadding="true"
+                    app:cardPreventCornerOverlap="true"
+                    app:strokeColor="@color/colorBorderLight"
+                    app:strokeWidth="@dimen/stroke_width_default">
 
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/cardCategoryHuiles"
+                    <FrameLayout
                         android:layout_width="match_parent"
-                        android:layout_height="@dimen/explore_category_card_height"
-                        android:layout_marginBottom="@dimen/explore_category_card_spacing"
-                        app:cardCornerRadius="@dimen/home_banner_radius"
-                        app:cardElevation="@dimen/space_0"
-                        app:cardUseCompatPadding="false"
-                        app:strokeColor="@android:color/transparent"
-                        app:strokeWidth="@dimen/space_0">
+                        android:layout_height="match_parent">
 
-                        <FrameLayout
+                        <ImageView
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent">
+                            android:layout_height="match_parent"
+                            android:contentDescription="@string/auto_text_022"
+                            android:scaleType="centerCrop"
+                            app:srcCompat="@drawable/img_explore_huiles" />
 
-                            <ImageView
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:contentDescription="@string/auto_text_022"
-                                android:scaleType="centerCrop"
-                                app:srcCompat="@drawable/img_explore_huiles" />
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/bg_explore_category_gradient" />
 
-                            <View
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:background="@drawable/bg_explore_category_gradient" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="start|bottom"
+                            android:layout_marginStart="@dimen/explore_category_title_start_margin"
+                            android:layout_marginBottom="@dimen/space_8"
+                            style="@style/HomeText.ProductName"
+                            android:textColor="@color/home_banner_text"
+                            android:text="@string/auto_text_023" />
+                    </FrameLayout>
+                </com.google.android.material.card.MaterialCardView>
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="start|center_vertical"
-                                android:layout_marginStart="@dimen/explore_category_title_start_margin"
-                                android:textColor="#FFFFFF"
-                                android:textSize="21sp"
-                                android:textStyle="bold"
-                                android:letterSpacing="0.05"
-                                android:text="@string/auto_text_023" />
-                        </FrameLayout>
-                    </com.google.android.material.card.MaterialCardView>
-            </LinearLayout>
+            </androidx.gridlayout.widget.GridLayout>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+

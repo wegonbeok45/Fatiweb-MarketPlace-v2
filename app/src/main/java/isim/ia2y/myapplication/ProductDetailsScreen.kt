@@ -11,10 +11,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 
+// Cette classe organise cette partie de l'app.
 class ProductDetailsScreen : AppCompatActivity() {
     private var quantity: Int = 1
     private lateinit var product: Product
 
+    // Cette fonction fait une action de cette partie de l'app.
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -49,8 +51,9 @@ class ProductDetailsScreen : AppCompatActivity() {
         animateEntry()
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun bindUi() {
-        findViewById<ImageView>(R.id.ivProductImage)?.setImageResourceSafe(product.imageRes)
+        findViewById<ImageView>(R.id.ivProductImage)?.loadCatalogImage(product.imageRes)
         findViewById<TextView>(R.id.tvTag1)?.text = product.tags.getOrNull(0).orEmpty()
 
         val tag2 = findViewById<TextView>(R.id.tvTag2)
@@ -85,11 +88,19 @@ class ProductDetailsScreen : AppCompatActivity() {
         }
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun bindActions() {
         findViewById<View>(R.id.ivBack)?.setOnClickListener { finishWithMotion() }
 
         findViewById<View>(R.id.ivShare)?.setOnClickListener {
-            showMotionSnackbar(getString(R.string.details_share_todo))
+            val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                type = "text/plain"
+                putExtra(
+                    Intent.EXTRA_TEXT,
+                    "${product.title}\n${formatDt(product.price)}\n${product.description}"
+                )
+            }
+            startActivity(Intent.createChooser(shareIntent, getString(R.string.details_share)))
         }
 
         findViewById<View>(R.id.btnMinus)?.setOnClickListener {
@@ -127,11 +138,13 @@ class ProductDetailsScreen : AppCompatActivity() {
         applyPressFeedback(R.id.ivBack, R.id.ivShare, R.id.btnMinus, R.id.btnPlus, R.id.btnAddToCart)
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun updateQuantityUi() {
         findViewById<TextView>(R.id.tvQuantity)?.text = quantity.toString()
         findViewById<TextView>(R.id.tvTotalValue)?.text = formatDt(product.price * quantity)
     }
 
+    // Cette fonction fait une action de cette partie de l'app.
     private fun animateEntry() {
         if (isReducedMotionEnabled()) return
 
@@ -146,17 +159,14 @@ class ProductDetailsScreen : AppCompatActivity() {
             .start()
     }
 
-    private fun ImageView.setImageResourceSafe(imageRes: Int) {
-        runCatching { setImageResource(imageRes) }
-            .onFailure { setImageResource(R.drawable.placeholder) }
-    }
-
     companion object {
         const val ROUTE_PATTERN = "details/{productId}"
         private const val EXTRA_PRODUCT_ID = "extra_product_id"
 
+        // Cette fonction fait une action de cette partie de l'app.
         fun route(productId: String): String = "details/$productId"
 
+        // Cette fonction fait une action de cette partie de l'app.
         fun createIntent(context: Context, productId: String): Intent {
             return Intent(context, ProductDetailsScreen::class.java)
                 .putExtra(EXTRA_PRODUCT_ID, productId)
