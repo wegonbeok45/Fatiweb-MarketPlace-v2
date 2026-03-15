@@ -14,8 +14,10 @@ import org.junit.Assert.*
  * See [testing documentation](http://d.android.com/tools/testing).
  */
 @RunWith(AndroidJUnit4::class)
+// Cette classe organise cette partie de l'app.
 class ExampleInstrumentedTest {
     @Test
+    // Cette fonction fait une action de cette partie de l'app.
     fun useAppContext() {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
