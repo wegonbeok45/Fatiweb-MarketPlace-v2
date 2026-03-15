@@ -1,5 +1,5 @@
-﻿<resources>
-    <string name="app_name">MyApplication</string>
+<resources>
+    <string name="app_name">FatiWeb Market</string>
     <string name="coming_soon">Coming soon</string>
     <string name="search_coming_soon">Search coming soon</string>
     <string name="login_placeholder_success">Login successful</string>
@@ -48,6 +48,13 @@
     <string name="settings_back">Back</string>
     <string name="settings_language_title">Language</string>
     <string name="settings_language_subtitle">French or English</string>
+    <string name="admin_title_dashboard">Dashboard</string>
+    <string name="admin_title_orders">Orders</string>
+    <string name="admin_title_clients">Clients</string>
+    <string name="admin_title_products">Products</string>
+    <string name="admin_title_notifications">Notifications</string>
+    <string name="admin_title_settings">Settings</string>
+    <string name="home_add_to_cart_short">Add</string>
     <string name="language_settings_title">Language</string>
     <string name="language_option_french">French</string>
     <string name="language_option_english">English</string>
@@ -81,9 +88,9 @@
     <string name="auto_text_051">See all</string>
     <string name="auto_text_055">Featured products</string>
     <string name="auto_text_081">Skip</string>
-    <string name="auto_text_082">Welcome to FatiWeb Market</string>
+    <string name="auto_text_082">Curated Tunisian craft, beautifully presented</string>
     <string name="auto_text_084">Next &gt;</string>
-    <string name="auto_text_093">Fast delivery and secure payment</string>
+    <string name="auto_text_093">Tracked delivery and secure payment</string>
     <string name="auto_text_095">Get started &gt;</string>
     <string name="auto_text_096">My cart</string>
     <string name="auto_text_097">Your cart is empty.</string>
@@ -115,7 +122,7 @@
     <string name="search_recent_empty">No recent searches yet.</string>
     <string name="search_popular_title">Popular in Tunisia</string>
     <string name="search_suggestions_title">Suggestions</string>
-    <string name="search_results_count">%1$d results for \'%2$s\'</string>
+    <string name="search_results_count">%1$d results for "%2$s"</string>
     <string name="search_sort_price_low">Price low to high</string>
     <string name="search_sort_price_high">Price high to low</string>
     <string name="search_sort_popular">Popular</string>
@@ -148,5 +155,4 @@
     <string name="address_add_confirm">Add</string>
     <string name="address_add_validation">Please enter an address.</string>
 </resources>
-
 
