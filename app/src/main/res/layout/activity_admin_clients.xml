@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -14,7 +14,7 @@
         android:id="@+id/adminClientsAppBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/profile_header_bg"
+        android:background="@drawable/bg_details_top_surface"
         app:elevation="0dp"
         app:liftOnScroll="false">
 
@@ -23,49 +23,73 @@
             android:layout_width="match_parent"
             android:layout_height="64dp"
             android:paddingStart="16dp"
-            android:paddingEnd="16dp">
+            android:paddingTop="8dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="8dp">
 
-            <ImageView
+            <com.google.android.material.card.MaterialCardView
                 android:id="@+id/adminClientsIvBack"
-                android:layout_width="22dp"
-                android:layout_height="22dp"
-                android:contentDescription="@null"
-                android:clickable="true"
-                android:focusable="true"
-                android:background="?selectableItemBackgroundBorderless"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                app:cardBackgroundColor="@color/profile_card_bg"
+                app:cardCornerRadius="22dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/colorBorderLight"
+                app:strokeWidth="1dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@drawable/back"
-                app:tint="@color/profile_text_primary" />
+                app:layout_constraintTop_toTopOf="parent">
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="?selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:contentDescription="@string/cd_stat_icon"
+                    android:focusable="true"
+                    android:padding="12dp"
+                    app:srcCompat="@drawable/back"
+                    app:tint="@color/profile_text_primary" />
+            </com.google.android.material.card.MaterialCardView>
 
             <TextView
                 android:id="@+id/adminClientsTvTitle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="14dp"
-                android:text="Clients"
+                android:text="@string/auto_clients_0f55"
                 android:textColor="@color/profile_text_primary"
-                android:textSize="18sp"
+                android:fontFamily="@font/plus_jakarta_sans_bold"
+                android:textSize="@dimen/text_size_subtitle"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/adminClientsIvSettings"
                 app:layout_constraintStart_toEndOf="@id/adminClientsIvBack"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <ImageView
+            <com.google.android.material.card.MaterialCardView
                 android:id="@+id/adminClientsIvSettings"
-                android:layout_width="22dp"
-                android:layout_height="22dp"
-                android:layout_marginEnd="4dp"
-                android:contentDescription="@null"
-                android:clickable="true"
-                android:focusable="true"
-                android:background="?selectableItemBackgroundBorderless"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                app:cardBackgroundColor="@color/profile_card_bg"
+                app:cardCornerRadius="22dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/colorBorderLight"
+                app:strokeWidth="1dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:srcCompat="@drawable/settings"
-                app:tint="@color/profile_text_primary" />
+                app:layout_constraintBottom_toBottomOf="parent">
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="?selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:contentDescription="@string/cd_stat_icon"
+                    android:focusable="true"
+                    android:padding="12dp"
+                    app:srcCompat="@drawable/settings"
+                    app:tint="@color/profile_text_primary" />
+            </com.google.android.material.card.MaterialCardView>
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <View
@@ -93,20 +117,30 @@
             android:paddingTop="20dp">
 
             <!-- Stats Row -->
-            <LinearLayout
-                android:id="@+id/adminClientsStatsRow"
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginBottom="20dp">
+                android:layout_marginBottom="20dp"
+                app:cardBackgroundColor="@android:color/transparent"
+                app:cardCornerRadius="28dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="0dp">
+
+                <LinearLayout
+                    android:id="@+id/adminClientsStatsRow"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_admin_hero_card"
+                    android:orientation="horizontal"
+                    android:padding="18dp">
 
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="0dp"
                     android:layout_height="80dp"
                     android:layout_weight="1"
                     android:layout_marginEnd="8dp"
-                    app:cardBackgroundColor="@color/colorPrimary"
-                    app:cardCornerRadius="14dp"
+                    app:cardBackgroundColor="@color/overlay_white_12"
+                    app:cardCornerRadius="20dp"
                     app:cardElevation="0dp"
                     app:strokeWidth="0dp">
 
@@ -118,20 +152,22 @@
                         android:padding="12dp">
 
                         <TextView
+                            android:id="@+id/adminClientsTvTotal"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
 
-                            android:text="..."
-                            android:textColor="#FFFFFF"
-                            android:textSize="24sp" />
+                            android:text="@string/str_2f43b4"
+                            android:fontFamily="@font/plus_jakarta_sans_bold"
+                            android:textColor="@android:color/white"
+                            android:textSize="@dimen/text_size_title_large" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
 
-                            android:text="Total Clients"
-                            android:textColor="#CCFFFFFF"
-                            android:textSize="12sp" />
+                            android:text="@string/auto_total_clients_ba58"
+                            android:textColor="@color/surface_warm_muted"
+                            android:textSize="@dimen/text_size_overline" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
@@ -140,11 +176,10 @@
                     android:layout_height="80dp"
                     android:layout_weight="1"
                     android:layout_marginStart="8dp"
-                    app:cardBackgroundColor="@color/profile_card_bg"
-                    app:cardCornerRadius="14dp"
+                    app:cardBackgroundColor="@color/overlay_white_8"
+                    app:cardCornerRadius="20dp"
                     app:cardElevation="0dp"
-                    app:strokeColor="@color/colorBorderLight"
-                    app:strokeWidth="1dp">
+                    app:strokeWidth="0dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -154,24 +189,27 @@
                         android:padding="12dp">
 
                         <TextView
+                            android:id="@+id/adminClientsTvNew"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
 
                             android:text=""
                             android:visibility="gone"
-                            android:textColor="#34A853"
-                            android:textSize="24sp" />
+                            android:fontFamily="@font/plus_jakarta_sans_bold"
+                            android:textColor="@android:color/white"
+                            android:textSize="@dimen/text_size_title_large" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
 
-                            android:text="Nouveaux"
-                            android:textColor="@color/profile_text_secondary"
-                            android:textSize="12sp" />
+                            android:text="@string/auto_nouveaux_e8b5"
+                            android:textColor="@color/surface_warm_muted"
+                            android:textSize="@dimen/text_size_overline" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
-            </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
             <!-- Section Header -->
             <TextView
@@ -179,9 +217,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
 
-                android:text="Liste des Clients"
+                android:text="@string/auto_liste_des_clients_b230"
                 android:textColor="@color/profile_text_primary"
-                android:textSize="16sp"
+                android:fontFamily="@font/plus_jakarta_sans_bold"
+                android:textSize="@dimen/text_size_subtitle"
                 android:layout_marginBottom="12dp" />
 
             <!-- Clients Card -->
@@ -190,18 +229,25 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:cardBackgroundColor="@color/profile_card_bg"
-                app:cardCornerRadius="16dp"
+                app:cardCornerRadius="24dp"
                 app:cardElevation="0dp"
                 app:strokeColor="@color/colorBorderLight"
                 app:strokeWidth="1dp">
 
-                <LinearLayout
-                    android:id="@+id/adminClientsListContainer"
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/adminClientsList"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
-                </LinearLayout>
+                    android:nestedScrollingEnabled="false" />
             </com.google.android.material.card.MaterialCardView>
+
+            <ProgressBar
+                android:id="@+id/loadingIndicator"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="32dp"
+                android:visibility="gone" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 

@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <!-- Shared Admin Bottom Nav include in every admin screen CoordinatorLayout -->
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
@@ -13,23 +13,23 @@
         android:id="@+id/adminBottomNavDivider"
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/home_divider" />
+        android:background="@color/colorBorderLight" />
 
     <!-- Nav bar -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/adminBottomNav"
         android:layout_width="match_parent"
-        android:layout_height="76dp"
-        android:background="@color/home_nav_bg"
+        android:layout_height="82dp"
+        android:background="@color/profile_nav_bg"
         android:elevation="0dp"
-        android:paddingTop="2dp">
+        android:paddingTop="4dp">
 
         <!-- Animated Pill Indicator -->
         <View
             android:id="@+id/admin_nav_indicator"
             android:layout_width="@dimen/nav_pill_width"
             android:layout_height="@dimen/nav_pill_height"
-            android:background="@drawable/bg_nav_pill"
+            android:background="@drawable/bg_home_meta_pill"
             android:layout_marginTop="6dp"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toTopOf="@id/admin_guide_pill_bottom"
@@ -63,7 +63,9 @@
                 android:id="@+id/adminNavDashboardIcon"
                 android:layout_width="22dp"
                 android:layout_height="22dp"
-                android:contentDescription="@null"
+                android:minWidth="48dp"
+                android:minHeight="48dp"
+                android:contentDescription="@string/cd_admin_dashboard"
                 app:srcCompat="@drawable/ic_admin_shield"
                 app:tint="@color/home_nav_inactive" />
 
@@ -71,8 +73,8 @@
                 android:id="@+id/adminNavDashboardLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Dashboard"
-                android:textSize="9.5sp"
+                android:text="@string/auto_dashboard_2938"
+                android:textSize="@dimen/text_size_overline"
                 android:textColor="@color/home_nav_inactive"
                 android:layout_marginTop="5dp"
                 android:fontFamily="@font/plus_jakarta_sans_regular"
@@ -99,7 +101,7 @@
                 android:id="@+id/adminNavCommandesIcon"
                 android:layout_width="22dp"
                 android:layout_height="22dp"
-                android:contentDescription="@null"
+                android:contentDescription="@string/cd_admin_orders"
                 app:srcCompat="@drawable/ic_admin_nav_commandes"
                 app:tint="@color/home_nav_inactive" />
 
@@ -107,8 +109,8 @@
                 android:id="@+id/adminNavCommandesLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Commandes"
-                android:textSize="9.5sp"
+                android:text="@string/auto_commandes_66c3"
+                android:textSize="@dimen/text_size_overline"
                 android:textColor="@color/home_nav_inactive"
                 android:layout_marginTop="5dp"
                 android:fontFamily="@font/plus_jakarta_sans_regular"
@@ -135,7 +137,9 @@
                 android:id="@+id/adminNavProduitsIcon"
                 android:layout_width="22dp"
                 android:layout_height="22dp"
-                android:contentDescription="@null"
+                android:minWidth="48dp"
+                android:minHeight="48dp"
+                android:contentDescription="@string/cd_admin_products"
                 app:srcCompat="@drawable/ic_admin_nav_produits"
                 app:tint="@color/home_nav_inactive" />
 
@@ -143,8 +147,8 @@
                 android:id="@+id/adminNavProduitsLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Produits"
-                android:textSize="9.5sp"
+                android:text="@string/auto_produits_88c6"
+                android:textSize="@dimen/text_size_overline"
                 android:textColor="@color/home_nav_inactive"
                 android:layout_marginTop="5dp"
                 android:fontFamily="@font/plus_jakarta_sans_regular"
@@ -171,7 +175,9 @@
                 android:id="@+id/adminNavClientsIcon"
                 android:layout_width="22dp"
                 android:layout_height="22dp"
-                android:contentDescription="@null"
+                android:minWidth="48dp"
+                android:minHeight="48dp"
+                android:contentDescription="@string/cd_admin_clients"
                 app:srcCompat="@drawable/ic_admin_nav_clients"
                 app:tint="@color/home_nav_inactive" />
 
@@ -179,8 +185,8 @@
                 android:id="@+id/adminNavClientsLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Clients"
-                android:textSize="9.5sp"
+                android:text="@string/auto_clients_0f55"
+                android:textSize="@dimen/text_size_overline"
                 android:textColor="@color/home_nav_inactive"
                 android:layout_marginTop="5dp"
                 android:fontFamily="@font/plus_jakarta_sans_regular"
@@ -207,7 +213,7 @@
                 android:id="@+id/adminNavNotificationsIcon"
                 android:layout_width="22dp"
                 android:layout_height="22dp"
-                android:contentDescription="@null"
+                android:contentDescription="@string/cd_admin_notifications"
                 app:srcCompat="@drawable/ic_admin_nav_notifications"
                 app:tint="@color/home_nav_inactive" />
 
@@ -215,8 +221,8 @@
                 android:id="@+id/adminNavNotificationsLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Notifs"
-                android:textSize="9.5sp"
+                android:text="@string/auto_notifs_b962"
+                android:textSize="@dimen/text_size_overline"
                 android:textColor="@color/home_nav_inactive"
                 android:layout_marginTop="5dp"
                 android:fontFamily="@font/plus_jakarta_sans_regular"
@@ -244,7 +250,9 @@
                 android:id="@+id/adminNavSettingsIcon"
                 android:layout_width="22dp"
                 android:layout_height="22dp"
-                android:contentDescription="@null"
+                android:minWidth="48dp"
+                android:minHeight="48dp"
+                android:contentDescription="@string/cd_admin_settings"
                 app:srcCompat="@drawable/ic_admin_nav_settings"
                 app:tint="@color/home_nav_inactive" />
 
@@ -252,8 +260,8 @@
                 android:id="@+id/adminNavSettingsLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Paramètres"
-                android:textSize="9.5sp"
+                android:text="@string/auto_paramtres_e778"
+                android:textSize="@dimen/text_size_overline"
                 android:textColor="@color/home_nav_inactive"
                 android:layout_marginTop="5dp"
                 android:fontFamily="@font/plus_jakarta_sans_regular"

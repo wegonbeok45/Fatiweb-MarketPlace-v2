@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -20,7 +20,7 @@
             android:layout_width="match_parent"
             android:layout_height="80dp"
             android:layout_marginBottom="16dp"
-            app:cardBackgroundColor="@color/colorPrimary"
+            app:cardBackgroundColor="?attr/colorPrimary"
             app:cardCornerRadius="14dp"
             app:cardElevation="0dp"
             app:strokeWidth="0dp">
@@ -36,16 +36,16 @@
                     android:id="@+id/adminInlineClientsTvTotal"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="0"
-                    android:textColor="#FFFFFF"
-                    android:textSize="24sp" />
+                    android:text="@string/auto_0_cfcd"
+                    android:textColor="@android:color/white"
+                    android:textSize="@dimen/text_size_title" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Total Clients"
-                    android:textColor="#CCFFFFFF"
-                    android:textSize="12sp" />
+                    android:text="@string/auto_total_clients_ba58"
+                    android:textColor="@color/overlay_white_80"
+                    android:textSize="@dimen/text_size_overline" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
@@ -53,9 +53,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
-            android:text="Liste des Clients"
+            android:text="@string/auto_liste_des_clients_b230"
             android:textColor="@color/profile_text_primary"
-            android:textSize="16sp" />
+            android:textSize="@dimen/text_size_body" />
 
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
@@ -66,11 +66,12 @@
             app:strokeColor="@color/colorBorderLight"
             app:strokeWidth="1dp">
 
-            <LinearLayout
-                android:id="@+id/adminInlineClientsListContainer"
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/adminInlineClientsRecyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical" />
+                android:nestedScrollingEnabled="false"
+                android:overScrollMode="never" />
         </com.google.android.material.card.MaterialCardView>
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

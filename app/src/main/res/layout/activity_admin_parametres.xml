@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -14,7 +14,7 @@
         android:id="@+id/adminParametresAppBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/profile_header_bg"
+        android:background="@drawable/bg_details_top_surface"
         app:elevation="0dp"
         app:liftOnScroll="false">
 
@@ -52,14 +52,15 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                app:cardBackgroundColor="@color/colorPrimary"
-                app:cardCornerRadius="16dp"
+                app:cardBackgroundColor="@android:color/transparent"
+                app:cardCornerRadius="28dp"
                 app:cardElevation="0dp"
                 app:strokeWidth="0dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:background="@drawable/bg_admin_hero_card"
                     android:orientation="vertical"
                     android:padding="20dp">
 
@@ -67,18 +68,19 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
 
-                        android:text="FatiWeb Market"
-                        android:textColor="#FFFFFF"
-                        android:textSize="18sp" />
+                        android:text="@string/auto_fatiweb_market_9c85"
+                        android:fontFamily="@font/plus_jakarta_sans_bold"
+                        android:textColor="@android:color/white"
+                        android:textSize="@dimen/text_size_title" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
 
-                        android:text="Gestion de la boutique"
-                        android:textColor="#CCFFFFFF"
-                        android:textSize="13sp" />
+                        android:text="@string/auto_gestion_de_la_boutique_fde7"
+                        android:textColor="@color/surface_warm_muted"
+                        android:textSize="@dimen/text_size_caption" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -87,9 +89,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
 
-                android:text="Methodes de livraison"
+                android:text="@string/auto_methodes_de_livraison_c439"
                 android:textColor="@color/profile_text_primary"
-                android:textSize="15sp"
+                android:fontFamily="@font/plus_jakarta_sans_bold"
+                android:textSize="@dimen/text_size_subtitle"
                 android:layout_marginBottom="10dp" />
 
             <com.google.android.material.card.MaterialCardView
@@ -98,7 +101,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="20dp"
                 app:cardBackgroundColor="@color/profile_card_bg"
-                app:cardCornerRadius="16dp"
+                app:cardCornerRadius="24dp"
                 app:cardElevation="0dp"
                 app:strokeColor="@color/colorBorderLight"
                 app:strokeWidth="1dp">
@@ -119,9 +122,9 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
 
-                            android:text="Standard"
+                            android:text="@string/auto_standard_eb6d"
                             android:textColor="@color/profile_text_primary"
-                            android:textSize="14sp"
+                            android:textSize="@dimen/text_size_caption"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
@@ -145,15 +148,15 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
 
-                                android:text="7 DT"
-                                android:textColor="@color/colorPrimary"
-                                android:textSize="14sp" />
+                                android:text="@string/auto_7_dt_297c"
+                                android:textColor="?attr/colorPrimary"
+                                android:textSize="@dimen/text_size_caption" />
 
                             <ImageView
                                 android:layout_width="16dp"
                                 android:layout_height="16dp"
                                 android:layout_marginStart="8dp"
-                                android:contentDescription="@null"
+                                android:contentDescription="@string/cd_stat_icon"
                                 app:srcCompat="@drawable/ic_admin_edit"
                                 app:tint="@color/profile_text_secondary" />
                         </LinearLayout>
@@ -174,9 +177,9 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
 
-                            android:text="Express"
+                            android:text="@string/auto_express_b144"
                             android:textColor="@color/profile_text_primary"
-                            android:textSize="14sp"
+                            android:textSize="@dimen/text_size_caption"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
@@ -200,15 +203,15 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
 
-                                android:text="15 DT"
-                                android:textColor="@color/colorPrimary"
-                                android:textSize="14sp" />
+                                android:text="@string/auto_15_dt_2b20"
+                                android:textColor="?attr/colorPrimary"
+                                android:textSize="@dimen/text_size_caption" />
 
                             <ImageView
                                 android:layout_width="16dp"
                                 android:layout_height="16dp"
                                 android:layout_marginStart="8dp"
-                                android:contentDescription="@null"
+                                android:contentDescription="@string/cd_stat_icon"
                                 app:srcCompat="@drawable/ic_admin_edit"
                                 app:tint="@color/profile_text_secondary" />
                         </LinearLayout>
@@ -221,9 +224,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
 
-                android:text="Modes de paiement"
+                android:text="@string/auto_modes_de_paiement_a7ff"
                 android:textColor="@color/profile_text_primary"
-                android:textSize="15sp"
+                android:fontFamily="@font/plus_jakarta_sans_bold"
+                android:textSize="@dimen/text_size_subtitle"
                 android:layout_marginBottom="10dp" />
 
             <com.google.android.material.card.MaterialCardView
@@ -232,7 +236,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
                 app:cardBackgroundColor="@color/profile_card_bg"
-                app:cardCornerRadius="16dp"
+                app:cardCornerRadius="24dp"
                 app:cardElevation="0dp"
                 app:strokeColor="@color/colorBorderLight"
                 app:strokeWidth="1dp">
@@ -251,16 +255,16 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
 
-                            android:text="Carte Bancaire"
+                            android:text="@string/auto_carte_bancaire_d999"
                             android:textColor="@color/profile_text_primary"
-                            android:textSize="14sp"
+                            android:textSize="@dimen/text_size_caption"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
                         <ImageView
                             android:layout_width="18dp"
                             android:layout_height="18dp"
-                            android:contentDescription="@null"
+                            android:contentDescription="@string/cd_stat_icon"
                             app:srcCompat="@drawable/ic_profile_chevron_right"
                             app:tint="@color/profile_chevron"
                             app:layout_constraintBottom_toBottomOf="parent"
@@ -281,16 +285,16 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
 
-                            android:text="E-Dinar"
+                            android:text="@string/auto_edinar_92ac"
                             android:textColor="@color/profile_text_primary"
-                            android:textSize="14sp"
+                            android:textSize="@dimen/text_size_caption"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
                         <ImageView
                             android:layout_width="18dp"
                             android:layout_height="18dp"
-                            android:contentDescription="@null"
+                            android:contentDescription="@string/cd_stat_icon"
                             app:srcCompat="@drawable/ic_profile_chevron_right"
                             app:tint="@color/profile_chevron"
                             app:layout_constraintBottom_toBottomOf="parent"
@@ -311,16 +315,16 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
 
-                            android:text="Cash a la livraison"
+                            android:text="@string/auto_cash_a_la_livraison_2636"
                             android:textColor="@color/profile_text_primary"
-                            android:textSize="14sp"
+                            android:textSize="@dimen/text_size_caption"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
                         <ImageView
                             android:layout_width="18dp"
                             android:layout_height="18dp"
-                            android:contentDescription="@null"
+                            android:contentDescription="@string/cd_stat_icon"
                             app:srcCompat="@drawable/ic_profile_chevron_right"
                             app:tint="@color/profile_chevron"
                             app:layout_constraintBottom_toBottomOf="parent"
