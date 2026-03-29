@@ -12,11 +12,9 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.button.MaterialButton
 
-// Cette classe organise cette partie de l'app.
 class FavoritesActivity : AppCompatActivity() {
     private var shouldAnimateListOnNextRender = true
 
-    // Cette fonction fait une action de cette partie de l'app.
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -31,6 +29,7 @@ class FavoritesActivity : AppCompatActivity() {
         applyPressFeedback(
             R.id.ivBack,
             R.id.flNotifications,
+            R.id.btnFavoritesBrowseHome,
             R.id.navHome,
             R.id.navExplore,
             R.id.navCart,
@@ -43,14 +42,13 @@ class FavoritesActivity : AppCompatActivity() {
         )
     }
 
-    // Cette fonction fait une action de cette partie de l'app.
     override fun onResume() {
         super.onResume()
         updateBottomCartBadge()
         renderFavorites()
     }
 
-    // Cette fonction fait une action de cette partie de l'app.
+    @Suppress("DEPRECATION")
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -60,7 +58,6 @@ class FavoritesActivity : AppCompatActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
-    // Cette fonction fait une action de cette partie de l'app.
     private fun setupBottomNavigation() {
         bindBottomNav(
             homeId = R.id.navHome,
@@ -71,19 +68,22 @@ class FavoritesActivity : AppCompatActivity() {
         )
     }
 
-    // Cette fonction fait une action de cette partie de l'app.
     private fun setupFavorisActions() {
         findViewById<View>(R.id.ivBack)?.setOnClickListener { finishWithMotion() }
+        findViewById<View>(R.id.btnFavoritesBrowseHome)?.setOnClickListener {
+            navigateToMainTab(MainActivity.Tab.HOME)
+        }
         bindNotificationEntry(R.id.flNotifications)
     }
 
-    // Cette fonction fait une action de cette partie de l'app.
     private fun renderFavorites() {
         val container = findViewById<LinearLayout>(R.id.layoutFavoritesContainer) ?: return
         val emptyText = findViewById<TextView>(R.id.tvEmptyFavorites) ?: return
+        val emptyLayout = findViewById<View>(R.id.layoutEmptyFavorites) ?: return
         container.removeAllViews()
 
         val favorites = ProductCatalog.orderedFavorites(FavoritesStore.getFavorites(this))
+        emptyLayout.visibility = if (favorites.isEmpty()) View.VISIBLE else View.GONE
         emptyText.visibility = if (favorites.isEmpty()) View.VISIBLE else View.GONE
 
         val inflater = LayoutInflater.from(this)
@@ -97,7 +97,8 @@ class FavoritesActivity : AppCompatActivity() {
             params.topMargin = if (index == 0) 0 else resources.getDimensionPixelSize(R.dimen.home_products_row_gap)
             card.layoutParams = params
 
-            card.findViewById<ImageView>(R.id.ivFavoriteProductImage)?.loadCatalogImage(product.imageRes)
+            card.findViewById<ImageView>(R.id.ivFavoriteProductImage)
+                ?.loadCatalogImage(product.imageUrl, product.imageRes)
             card.findViewById<TextView>(R.id.tvFavoriteTag)?.text = product.tag
             card.findViewById<TextView>(R.id.tvFavoriteTitle)?.text = product.title
             card.findViewById<TextView>(R.id.tvFavoritePrice)?.text = formatDt(product.unitPrice)
@@ -113,7 +114,11 @@ class FavoritesActivity : AppCompatActivity() {
             }
 
             card.findViewById<MaterialButton>(R.id.btnFavoriteAddCart)?.setOnClickListener {
-                CartStore.addOne(this, product.id)
+                val addedQuantity = CartStore.add(this, product.id)
+                if (addedQuantity <= 0) {
+                    showMotionSnackbar(getString(R.string.product_stock_limit_reached), R.id.layoutBottomNav)
+                    return@setOnClickListener
+                }
                 updateBottomCartBadge()
                 showMotionSnackbar(
                     getString(R.string.product_added_to_cart, product.title),
@@ -131,7 +136,7 @@ class FavoritesActivity : AppCompatActivity() {
         }
         shouldAnimateListOnNextRender = false
         if (favorites.isEmpty()) {
-            revealSingleView(R.id.tvEmptyFavorites)
+            revealSingleView(R.id.layoutEmptyFavorites)
         }
     }
 }

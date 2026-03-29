@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/main"
@@ -33,13 +33,23 @@
             android:layout_height="wrap_content"
             android:text="@string/addresses_title"
             android:textColor="@color/home_text_primary"
-            android:textSize="18sp"
+            android:textSize="@dimen/text_size_subtitle"
             android:fontFamily="@font/plus_jakarta_sans_bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <ProgressBar
+        android:id="@+id/loadingIndicator"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/layoutTopBar" />
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/scrollAddresses"
@@ -80,7 +90,7 @@
                         android:layout_height="wrap_content"
                         android:text="@string/address_current_label"
                         android:textColor="@color/home_text_secondary"
-                        android:textSize="12sp"
+                        android:textSize="@dimen/text_size_overline"
                         android:fontFamily="@font/plus_jakarta_sans_regular" />
 
                     <TextView
@@ -89,7 +99,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="6dp"
                         android:textColor="@color/home_text_primary"
-                        android:textSize="15sp"
+                        android:textSize="@dimen/text_size_body"
                         android:fontFamily="@font/plus_jakarta_sans_bold" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -98,16 +108,67 @@
                 android:id="@+id/btnAddAddress"
                 style="@style/AppButton.Primary"
                 android:layout_width="match_parent"
-                android:layout_height="48dp"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
                 android:layout_marginTop="12dp"
                 android:text="@string/address_add_button" />
 
             <LinearLayout
-                android:id="@+id/layoutAddressesContainer"
+                android:id="@+id/layoutAddressesEmpty"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="24dp"
+                android:visibility="gone">
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="140dp"
+                    android:layout_height="140dp"
+                    app:cardBackgroundColor="@color/home_surface_raised"
+                    app:cardCornerRadius="28dp"
+                    app:cardElevation="0dp"
+                    app:strokeColor="@color/colorOutline"
+                    app:strokeWidth="1dp">
+
+                    <com.airbnb.lottie.LottieAnimationView
+                        android:id="@+id/ivAddressesEmptyAnimation"
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
+                        android:layout_gravity="center"
+                        app:lottie_autoPlay="true"
+                        app:lottie_loop="true"
+                        app:lottie_rawRes="@raw/anim_onboarding_delivery" />
+                </com.google.android.material.card.MaterialCardView>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:gravity="center"
+                    android:text="@string/address_empty_title"
+                    android:textColor="@color/home_text_primary"
+                    android:textSize="@dimen/text_size_subtitle"
+                    android:fontFamily="@font/plus_jakarta_sans_bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:gravity="center"
+                    android:text="@string/address_empty_subtitle"
+                    android:textColor="@color/home_text_secondary"
+                    android:textSize="@dimen/text_size_caption"
+                    android:fontFamily="@font/plus_jakarta_sans_regular" />
+            </LinearLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvAddresses"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:orientation="vertical" />
+                android:nestedScrollingEnabled="false" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

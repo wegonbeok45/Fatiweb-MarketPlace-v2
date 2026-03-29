@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -23,7 +23,7 @@
             android:id="@+id/ivBack"
             android:layout_width="@dimen/profile_top_bar_icon_size"
             android:layout_height="@dimen/profile_top_bar_icon_size"
-            android:contentDescription="@null"
+            android:contentDescription="@string/cd_back"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -45,7 +45,7 @@
             android:id="@+id/ivNotifications"
             android:layout_width="@dimen/profile_top_bar_icon_size"
             android:layout_height="@dimen/profile_top_bar_icon_size"
-            android:contentDescription="@null"
+            android:contentDescription="@string/cd_notifications"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -65,7 +65,8 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layoutHeader"
         android:layout_width="0dp"
-        android:layout_height="@dimen/profile_header_visual_height"
+        android:layout_height="wrap_content"
+        android:paddingBottom="40dp"
         android:background="@color/profile_header_bg"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -89,7 +90,7 @@
                 android:layout_width="16dp"
                 android:layout_height="16dp"
                 android:layout_gravity="center"
-                android:contentDescription="@null"
+                android:importantForAccessibility="no"
                 app:srcCompat="@drawable/ic_admin_shield"
                 app:tint="@color/profile_edit_icon" />
         </com.google.android.material.card.MaterialCardView>
@@ -112,7 +113,7 @@
                 android:id="@+id/ivAvatar"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:contentDescription="@null"
+                android:contentDescription="@string/cd_profile_avatar"
                 android:scaleType="centerCrop"
                 app:srcCompat="@drawable/profile_avatar_art"
                 tools:src="@drawable/profile_avatar_art" />
@@ -138,7 +139,7 @@
                 android:layout_width="@dimen/profile_edit_icon_size"
                 android:layout_height="@dimen/profile_edit_icon_size"
                 android:layout_gravity="center"
-                android:contentDescription="@null"
+                android:contentDescription="@string/cd_edit"
                 app:srcCompat="@drawable/ic_profile_edit"
                 app:tint="@color/profile_edit_icon" />
         </com.google.android.material.card.MaterialCardView>
@@ -207,7 +208,7 @@
                     android:id="@+id/ivLocation"
                     android:layout_width="@dimen/profile_location_icon_size"
                     android:layout_height="@dimen/profile_location_icon_size"
-                    android:contentDescription="@null"
+                    android:contentDescription="@string/cd_location"
                     app:srcCompat="@drawable/location"
                     app:tint="@color/profile_location_icon" />
 
@@ -288,7 +289,7 @@
                             android:layout_width="@dimen/profile_menu_icon_size"
                             android:layout_height="@dimen/profile_menu_icon_size"
                             android:layout_gravity="center"
-                            android:contentDescription="@null"
+                            android:contentDescription="@string/cd_nav_cart"
                                 app:srcCompat="@drawable/ic_bottom_nav_cart"
                             app:tint="@color/profile_text_primary" />
                     </com.google.android.material.card.MaterialCardView>
@@ -320,7 +321,7 @@
                         android:id="@+id/ivOrdersChevron"
                         android:layout_width="@dimen/profile_chevron_size"
                         android:layout_height="@dimen/profile_chevron_size"
-                        android:contentDescription="@null"
+                        android:importantForAccessibility="no"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
@@ -365,7 +366,7 @@
                             android:layout_width="@dimen/profile_menu_icon_size"
                             android:layout_height="@dimen/profile_menu_icon_size"
                             android:layout_gravity="center"
-                            android:contentDescription="@null"
+                            android:contentDescription="@string/cd_location"
                             app:srcCompat="@drawable/map"
                             app:tint="@color/profile_text_primary" />
                     </com.google.android.material.card.MaterialCardView>
@@ -397,7 +398,7 @@
                         android:id="@+id/ivAddressesChevron"
                         android:layout_width="@dimen/profile_chevron_size"
                         android:layout_height="@dimen/profile_chevron_size"
-                        android:contentDescription="@null"
+                        android:importantForAccessibility="no"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
@@ -441,7 +442,7 @@
                             android:layout_width="@dimen/profile_menu_icon_size"
                             android:layout_height="@dimen/profile_menu_icon_size"
                             android:layout_gravity="center"
-                            android:contentDescription="@null"
+                            android:contentDescription="@string/cd_settings"
                             app:srcCompat="@drawable/settings"
                             app:tint="@color/profile_text_primary" />
                     </com.google.android.material.card.MaterialCardView>
@@ -473,7 +474,7 @@
                         android:id="@+id/ivSettingsChevron"
                         android:layout_width="@dimen/profile_chevron_size"
                         android:layout_height="@dimen/profile_chevron_size"
-                        android:contentDescription="@null"
+                        android:importantForAccessibility="no"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
@@ -518,7 +519,7 @@
                             android:layout_width="@dimen/profile_menu_icon_size"
                             android:layout_height="@dimen/profile_menu_icon_size"
                             android:layout_gravity="center"
-                            android:contentDescription="@null"
+                            android:contentDescription="@string/cd_menu"
                             app:srcCompat="@drawable/ic_profile_help"
                             app:tint="@null" />
                     </com.google.android.material.card.MaterialCardView>
@@ -550,7 +551,7 @@
                         android:id="@+id/ivHelpChevron"
                         android:layout_width="@dimen/profile_chevron_size"
                         android:layout_height="@dimen/profile_chevron_size"
-                        android:contentDescription="@null"
+                        android:importantForAccessibility="no"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
@@ -562,7 +563,8 @@
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardLogout"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/profile_logout_height_exact"
+                android:layout_height="wrap_content"
+                android:minHeight="@dimen/profile_logout_height_exact"
                 android:layout_marginTop="@dimen/profile_logout_top_margin"
                 app:cardBackgroundColor="@color/profile_logout_bg"
                 app:cardCornerRadius="@dimen/profile_logout_corner_radius"
@@ -573,14 +575,15 @@
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingVertical="16dp"
                     android:gravity="center"
                     android:orientation="horizontal">
 
                     <ImageView
                         android:layout_width="@dimen/profile_logout_icon_size"
                         android:layout_height="@dimen/profile_logout_icon_size"
-                        android:contentDescription="@null"
+                        android:contentDescription="@string/cd_close"
                         app:srcCompat="@drawable/ic_profile_logout"
                         app:tint="@color/profile_logout_text" />
 

@@ -5,18 +5,18 @@
     android:viewportWidth="140"
     android:viewportHeight="140">
     <path
-        android:fillColor="#FFE4BD9E"
+        android:fillColor="@color/profile_avatar_placeholder_bg"
         android:pathData="M0,0h140v140h-140z" />
     <path
-        android:fillColor="#FFEDE1D5"
+        android:fillColor="@color/profile_avatar_placeholder_head"
         android:pathData="M70,54m-26,0a26,26 0,1 1,52 0a26,26 0,1 1,-52 0" />
     <path
-        android:fillColor="#FFA68C74"
+        android:fillColor="@color/profile_avatar_placeholder_shadow"
         android:pathData="M99,35c11.37,7.95 18.81,21.12 18.81,36.02c0,24.24 -19.65,43.89 -43.89,43.89c-9.6,0 -18.48,-3.08 -25.7,-8.32c16.56,-3.4 28.65,-11.49 37.34,-25.24z" />
     <path
-        android:fillColor="#FFD4AA88"
+        android:fillColor="@color/profile_avatar_placeholder_body"
         android:pathData="M0,96h140v44h-140z" />
     <path
-        android:fillColor="#FFF8F3EC"
+        android:fillColor="@color/profile_avatar_placeholder_accent"
         android:pathData="M41,95h58v2h-58z" />
 </vector>

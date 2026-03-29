@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -12,7 +12,7 @@
         android:id="@+id/layoutTopBar"
         android:layout_width="0dp"
         android:layout_height="@dimen/profile_top_bar_height"
-        android:background="@color/profile_header_bg"
+        android:background="@color/colorSurface"
         android:paddingStart="@dimen/profile_horizontal_margin"
         android:paddingEnd="@dimen/profile_horizontal_margin"
         app:layout_constraintEnd_toEndOf="parent"
@@ -21,9 +21,9 @@
 
         <ImageView
             android:id="@+id/ivBack"
-            android:layout_width="@dimen/profile_top_bar_icon_size"
-            android:layout_height="@dimen/profile_top_bar_icon_size"
-            android:contentDescription="@null"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:contentDescription="@string/cd_back"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -35,7 +35,8 @@
             style="@style/ProfileText.TopBarTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/auto_text_010"
+            android:text="@string/auto_profile_cce9"
+            android:textColor="@color/profile_text_primary"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -43,9 +44,9 @@
 
         <ImageView
             android:id="@+id/ivNotifications"
-            android:layout_width="@dimen/profile_top_bar_icon_size"
-            android:layout_height="@dimen/profile_top_bar_icon_size"
-            android:contentDescription="@null"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:contentDescription="@string/cd_settings"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -66,8 +67,9 @@
         android:id="@+id/layoutHeader"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:paddingBottom="30dp"
-        android:background="@color/profile_header_bg"
+        android:paddingTop="24dp"
+        android:paddingBottom="40dp"
+        android:background="@color/colorSurface"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/viewTopDivider">
@@ -90,58 +92,51 @@
                 android:layout_width="16dp"
                 android:layout_height="16dp"
                 android:layout_gravity="center"
-                android:contentDescription="@null"
+                android:importantForAccessibility="no"
                 app:srcCompat="@drawable/ic_admin_shield"
                 app:tint="@color/profile_edit_icon" />
         </com.google.android.material.card.MaterialCardView>
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardAvatar"
-            android:layout_width="@dimen/profile_avatar_size_exact"
-            android:layout_height="@dimen/profile_avatar_size_exact"
-            android:layout_marginTop="@dimen/profile_avatar_margin_top"
-            app:cardCornerRadius="@dimen/corner_radius_round"
-            app:cardElevation="@dimen/profile_avatar_elevation"
-            app:cardUseCompatPadding="false"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            app:cardCornerRadius="50dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="0dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:strokeColor="@color/profile_avatar_ring"
-            app:strokeWidth="@dimen/profile_avatar_stroke_width">
+            app:layout_constraintTop_toTopOf="parent">
 
             <ImageView
                 android:id="@+id/ivAvatar"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:contentDescription="@null"
+                android:contentDescription="@string/cd_profile_avatar"
                 android:scaleType="centerCrop"
-                app:srcCompat="@drawable/profile_avatar_art"
-                tools:src="@drawable/profile_avatar_art" />
+                app:srcCompat="@drawable/profile_avatar_art" />
         </com.google.android.material.card.MaterialCardView>
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardEdit"
-            android:layout_width="@dimen/profile_edit_button_size_exact"
-            android:layout_height="@dimen/profile_edit_button_size_exact"
-            android:translationX="@dimen/profile_edit_translation"
-            android:translationY="@dimen/profile_edit_translation"
-            app:cardBackgroundColor="@color/profile_edit_bg"
-            app:cardCornerRadius="@dimen/corner_radius_round"
-            app:cardElevation="@dimen/profile_avatar_elevation"
-            app:cardUseCompatPadding="false"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginEnd="-4dp"
+            android:layout_marginBottom="-4dp"
+            app:cardBackgroundColor="?attr/colorPrimary"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="2dp"
+            app:strokeWidth="2dp"
+            app:strokeColor="@color/colorSurface"
             app:layout_constraintBottom_toBottomOf="@id/cardAvatar"
-            app:layout_constraintEnd_toEndOf="@id/cardAvatar"
-            app:strokeColor="@color/profile_avatar_ring"
-            app:strokeWidth="@dimen/profile_edit_stroke_width">
+            app:layout_constraintEnd_toEndOf="@id/cardAvatar">
 
             <ImageView
-                android:id="@+id/ivEdit"
-                android:layout_width="@dimen/profile_edit_icon_size"
-                android:layout_height="@dimen/profile_edit_icon_size"
+                android:layout_width="14dp"
+                android:layout_height="14dp"
                 android:layout_gravity="center"
-                android:contentDescription="@null"
                 app:srcCompat="@drawable/ic_profile_edit"
-                app:tint="@color/profile_edit_icon" />
+                app:tint="@color/white"  android:contentDescription="@string/cd_edit" />
         </com.google.android.material.card.MaterialCardView>
 
         <TextView
@@ -149,86 +144,59 @@
             style="@style/ProfileText.Name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/profile_name_margin_top"
-            android:text="@string/auto_text_111"
+            android:layout_marginTop="16dp"
+            android:text="@string/auto_john_doe_4c2a"
+            android:textColor="@color/profile_text_primary"
+            android:textSize="@dimen/text_size_title"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/cardAvatar" />
 
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/cardRole"
+        <LinearLayout
+            android:id="@+id/layoutMeta"
             android:layout_width="wrap_content"
-            android:layout_height="@dimen/profile_role_chip_height_exact"
-            android:layout_marginTop="@dimen/profile_role_margin_top"
-            app:cardBackgroundColor="@color/profile_accent"
-            app:cardCornerRadius="@dimen/corner_radius_round"
-            app:cardElevation="@dimen/space_0"
-            app:cardUseCompatPadding="false"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:orientation="horizontal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvUserName"
-            app:strokeColor="@android:color/transparent"
-            app:strokeWidth="@dimen/space_0">
+            app:layout_constraintTop_toBottomOf="@id/tvUserName">
 
             <TextView
                 android:id="@+id/tvRole"
-                style="@style/ProfileText.Role"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:paddingStart="@dimen/profile_role_horizontal_padding"
-                android:paddingEnd="@dimen/profile_role_horizontal_padding"
-                android:text="@string/auto_text_043" />
-        </com.google.android.material.card.MaterialCardView>
+                android:layout_height="wrap_content"
+                android:text="@string/auto_premium_maker_9a8b"
+                android:textColor="@color/colorAccentDeep"
+                android:textSize="@dimen/text_size_caption"
+                android:textStyle="bold"
+                android:fontFamily="@font/plus_jakarta_sans_bold" />
 
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/cardLocation"
-            android:layout_width="wrap_content"
-            android:layout_height="@dimen/profile_location_chip_height_exact"
-            android:layout_marginTop="@dimen/profile_location_margin_top"
-            app:cardBackgroundColor="@color/profile_location_bg"
-            app:cardCornerRadius="@dimen/corner_radius_round"
-            app:cardElevation="@dimen/space_0"
-            app:cardUseCompatPadding="false"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/cardRole"
-            app:strokeColor="@android:color/transparent"
-            app:strokeWidth="@dimen/space_0">
+            <View
+                android:layout_width="4dp"
+                android:layout_height="4dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/bg_notification_badge"
+                android:backgroundTint="@color/profile_text_muted" />
 
-            <LinearLayout
+            <TextView
+                android:id="@+id/tvLocation"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:paddingStart="@dimen/profile_location_horizontal_padding"
-                android:paddingEnd="@dimen/profile_location_horizontal_padding">
-
-                <ImageView
-                    android:id="@+id/ivLocation"
-                    android:layout_width="@dimen/profile_location_icon_size"
-                    android:layout_height="@dimen/profile_location_icon_size"
-                    android:contentDescription="@null"
-                    app:srcCompat="@drawable/location"
-                    app:tint="@color/profile_location_icon" />
-
-                <TextView
-                    android:id="@+id/tvLocation"
-                    style="@style/ProfileText.Location"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/profile_location_text_gap"
-                    android:text="@string/auto_text_112" />
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
-
+                android:layout_height="wrap_content"
+                android:text="@string/auto_tunis_tunisia_94e7"
+                android:textColor="@color/profile_text_secondary"
+                android:textSize="@dimen/text_size_caption"
+                android:fontFamily="@font/plus_jakarta_sans_regular" />
+        </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/scrollProfileContent"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="-12dp"
+        android:layout_marginTop="-18dp"
         android:background="@drawable/bg_profile_content"
         android:clipToPadding="false"
         android:fillViewport="true"
@@ -246,345 +214,243 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardOrders"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/profile_menu_item_height_exact"
-                app:cardBackgroundColor="@color/profile_card_bg"
-                app:cardCornerRadius="@dimen/profile_menu_card_radius"
-                app:cardElevation="@dimen/profile_menu_card_elevation"
-                app:cardUseCompatPadding="false"
-                app:strokeColor="@color/colorBorderLight"
-                app:strokeWidth="@dimen/stroke_width_default">
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:paddingStart="@dimen/profile_menu_content_horizontal_padding"
-                    android:paddingEnd="@dimen/profile_menu_content_horizontal_padding">
-
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/cardOrdersIcon"
-                        android:layout_width="@dimen/profile_menu_icon_container_size_exact"
-                        android:layout_height="@dimen/profile_menu_icon_container_size_exact"
-                        app:cardBackgroundColor="@color/profile_card_icon_bg"
-                        app:cardCornerRadius="@dimen/corner_radius_round"
-                        app:cardElevation="@dimen/space_0"
-                        app:cardUseCompatPadding="false"
-                        app:strokeColor="@android:color/transparent"
-                        app:strokeWidth="@dimen/space_0"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent">
-
-                        <ImageView
-                            android:layout_width="@dimen/profile_menu_icon_size"
-                            android:layout_height="@dimen/profile_menu_icon_size"
-                            android:layout_gravity="center"
-                            android:contentDescription="@null"
-                                app:srcCompat="@drawable/ic_bottom_nav_cart"
-                            app:tint="@color/profile_text_primary" />
-                    </com.google.android.material.card.MaterialCardView>
-
-                    <TextView
-                        android:id="@+id/tvOrdersTitle"
-                        style="@style/ProfileText.MenuTitle"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/profile_menu_text_start_margin"
-                        android:text="@string/auto_text_113"
-                        app:layout_constraintEnd_toStartOf="@id/ivOrdersChevron"
-                        app:layout_constraintStart_toEndOf="@id/cardOrdersIcon"
-                        app:layout_constraintTop_toTopOf="@id/cardOrdersIcon" />
-
-                    <TextView
-                        android:id="@+id/tvOrdersSubtitle"
-                        style="@style/ProfileText.MenuSubtitle"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/profile_menu_text_start_margin"
-                        android:layout_marginTop="@dimen/profile_menu_subtitle_margin_top"
-                        android:text="@string/auto_text_114"
-                        app:layout_constraintEnd_toStartOf="@id/ivOrdersChevron"
-                        app:layout_constraintStart_toEndOf="@id/cardOrdersIcon"
-                        app:layout_constraintTop_toBottomOf="@id/tvOrdersTitle" />
-
-                    <ImageView
-                        android:id="@+id/ivOrdersChevron"
-                        android:layout_width="@dimen/profile_chevron_size"
-                        android:layout_height="@dimen/profile_chevron_size"
-                        android:contentDescription="@null"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:srcCompat="@drawable/ic_profile_chevron_right"
-                        app:tint="@color/profile_chevron" />
-                </androidx.constraintlayout.widget.ConstraintLayout>
-            </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardAddresses"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/profile_menu_item_height_exact"
-                android:layout_marginTop="@dimen/profile_menu_card_spacing"
-                app:cardBackgroundColor="@color/profile_card_bg"
-                app:cardCornerRadius="@dimen/profile_menu_card_radius"
-                app:cardElevation="@dimen/profile_menu_card_elevation"
-                app:cardUseCompatPadding="false"
-                app:strokeColor="@color/colorBorderLight"
-                app:strokeWidth="@dimen/stroke_width_default">
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:paddingStart="@dimen/profile_menu_content_horizontal_padding"
-                    android:paddingEnd="@dimen/profile_menu_content_horizontal_padding">
-
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/cardAddressesIcon"
-                        android:layout_width="@dimen/profile_menu_icon_container_size_exact"
-                        android:layout_height="@dimen/profile_menu_icon_container_size_exact"
-                        app:cardBackgroundColor="@color/profile_card_icon_bg"
-                        app:cardCornerRadius="@dimen/corner_radius_round"
-                        app:cardElevation="@dimen/space_0"
-                        app:cardUseCompatPadding="false"
-                        app:strokeColor="@android:color/transparent"
-                        app:strokeWidth="@dimen/space_0"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent">
-
-                        <ImageView
-                            android:layout_width="@dimen/profile_menu_icon_size"
-                            android:layout_height="@dimen/profile_menu_icon_size"
-                            android:layout_gravity="center"
-                            android:contentDescription="@null"
-                            app:srcCompat="@drawable/map"
-                            app:tint="@color/profile_text_primary" />
-                    </com.google.android.material.card.MaterialCardView>
-
-                    <TextView
-                        android:id="@+id/tvAddressesTitle"
-                        style="@style/ProfileText.MenuTitle"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/profile_menu_text_start_margin"
-                        android:text="@string/auto_text_115"
-                        app:layout_constraintEnd_toStartOf="@id/ivAddressesChevron"
-                        app:layout_constraintStart_toEndOf="@id/cardAddressesIcon"
-                        app:layout_constraintTop_toTopOf="@id/cardAddressesIcon" />
-
-                    <TextView
-                        android:id="@+id/tvAddressesSubtitle"
-                        style="@style/ProfileText.MenuSubtitle"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/profile_menu_text_start_margin"
-                        android:layout_marginTop="@dimen/profile_menu_subtitle_margin_top"
-                        android:text="@string/auto_text_116"
-                        app:layout_constraintEnd_toStartOf="@id/ivAddressesChevron"
-                        app:layout_constraintStart_toEndOf="@id/cardAddressesIcon"
-                        app:layout_constraintTop_toBottomOf="@id/tvAddressesTitle" />
-
-                    <ImageView
-                        android:id="@+id/ivAddressesChevron"
-                        android:layout_width="@dimen/profile_chevron_size"
-                        android:layout_height="@dimen/profile_chevron_size"
-                        android:contentDescription="@null"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:srcCompat="@drawable/ic_profile_chevron_right"
-                        app:tint="@color/profile_chevron" />
-                </androidx.constraintlayout.widget.ConstraintLayout>
-            </com.google.android.material.card.MaterialCardView>
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardSettings"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/profile_menu_item_height_exact"
-                android:layout_marginTop="@dimen/profile_menu_card_spacing"
-                app:cardBackgroundColor="@color/profile_card_bg"
-                app:cardCornerRadius="@dimen/profile_menu_card_radius"
-                app:cardElevation="@dimen/profile_menu_card_elevation"
-                app:cardUseCompatPadding="false"
-                app:strokeColor="@color/colorBorderLight"
-                app:strokeWidth="@dimen/stroke_width_default">
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:paddingStart="@dimen/profile_menu_content_horizontal_padding"
-                    android:paddingEnd="@dimen/profile_menu_content_horizontal_padding">
-
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/cardSettingsIcon"
-                        android:layout_width="@dimen/profile_menu_icon_container_size_exact"
-                        android:layout_height="@dimen/profile_menu_icon_container_size_exact"
-                        app:cardBackgroundColor="@color/profile_card_icon_bg"
-                        app:cardCornerRadius="@dimen/corner_radius_round"
-                        app:cardElevation="@dimen/space_0"
-                        app:cardUseCompatPadding="false"
-                        app:strokeColor="@android:color/transparent"
-                        app:strokeWidth="@dimen/space_0"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent">
-
-                        <ImageView
-                            android:layout_width="@dimen/profile_menu_icon_size"
-                            android:layout_height="@dimen/profile_menu_icon_size"
-                            android:layout_gravity="center"
-                            android:contentDescription="@null"
-                            app:srcCompat="@drawable/settings"
-                            app:tint="@color/profile_text_primary" />
-                    </com.google.android.material.card.MaterialCardView>
-
-                    <TextView
-                        android:id="@+id/tvSettingsTitle"
-                        style="@style/ProfileText.MenuTitle"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/profile_menu_text_start_margin"
-                        android:text="@string/auto_text_117"
-                        app:layout_constraintEnd_toStartOf="@id/ivSettingsChevron"
-                        app:layout_constraintStart_toEndOf="@id/cardSettingsIcon"
-                        app:layout_constraintTop_toTopOf="@id/cardSettingsIcon" />
-
-                    <TextView
-                        android:id="@+id/tvSettingsSubtitle"
-                        style="@style/ProfileText.MenuSubtitle"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/profile_menu_text_start_margin"
-                        android:layout_marginTop="@dimen/profile_menu_subtitle_margin_top"
-                        android:text="@string/auto_text_118"
-                        app:layout_constraintEnd_toStartOf="@id/ivSettingsChevron"
-                        app:layout_constraintStart_toEndOf="@id/cardSettingsIcon"
-                        app:layout_constraintTop_toBottomOf="@id/tvSettingsTitle" />
-
-                    <ImageView
-                        android:id="@+id/ivSettingsChevron"
-                        android:layout_width="@dimen/profile_chevron_size"
-                        android:layout_height="@dimen/profile_chevron_size"
-                        android:contentDescription="@null"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:srcCompat="@drawable/ic_profile_chevron_right"
-                        app:tint="@color/profile_chevron" />
-                </androidx.constraintlayout.widget.ConstraintLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardHelp"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/profile_menu_item_height_exact"
-                android:layout_marginTop="@dimen/profile_menu_card_spacing"
-                app:cardBackgroundColor="@color/profile_card_bg"
-                app:cardCornerRadius="@dimen/profile_menu_card_radius"
-                app:cardElevation="@dimen/profile_menu_card_elevation"
-                app:cardUseCompatPadding="false"
-                app:strokeColor="@color/colorBorderLight"
-                app:strokeWidth="@dimen/stroke_width_default">
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:paddingStart="@dimen/profile_menu_content_horizontal_padding"
-                    android:paddingEnd="@dimen/profile_menu_content_horizontal_padding">
-
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/cardHelpIcon"
-                        android:layout_width="@dimen/profile_menu_icon_container_size_exact"
-                        android:layout_height="@dimen/profile_menu_icon_container_size_exact"
-                        app:cardBackgroundColor="@color/profile_card_icon_bg"
-                        app:cardCornerRadius="@dimen/corner_radius_round"
-                        app:cardElevation="@dimen/space_0"
-                        app:cardUseCompatPadding="false"
-                        app:strokeColor="@android:color/transparent"
-                        app:strokeWidth="@dimen/space_0"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent">
-
-                        <ImageView
-                            android:layout_width="@dimen/profile_menu_icon_size"
-                            android:layout_height="@dimen/profile_menu_icon_size"
-                            android:layout_gravity="center"
-                            android:contentDescription="@null"
-                            app:srcCompat="@drawable/ic_profile_help"
-                            app:tint="@null" />
-                    </com.google.android.material.card.MaterialCardView>
-
-                    <TextView
-                        android:id="@+id/tvHelpTitle"
-                        style="@style/ProfileText.MenuTitle"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/profile_menu_text_start_margin"
-                        android:text="@string/auto_text_119"
-                        app:layout_constraintEnd_toStartOf="@id/ivHelpChevron"
-                        app:layout_constraintStart_toEndOf="@id/cardHelpIcon"
-                        app:layout_constraintTop_toTopOf="@id/cardHelpIcon" />
-
-                    <TextView
-                        android:id="@+id/tvHelpSubtitle"
-                        style="@style/ProfileText.MenuSubtitle"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/profile_menu_text_start_margin"
-                        android:layout_marginTop="@dimen/profile_menu_subtitle_margin_top"
-                        android:text="@string/auto_text_120"
-                        app:layout_constraintEnd_toStartOf="@id/ivHelpChevron"
-                        app:layout_constraintStart_toEndOf="@id/cardHelpIcon"
-                        app:layout_constraintTop_toBottomOf="@id/tvHelpTitle" />
-
-                    <ImageView
-                        android:id="@+id/ivHelpChevron"
-                        android:layout_width="@dimen/profile_chevron_size"
-                        android:layout_height="@dimen/profile_chevron_size"
-                        android:contentDescription="@null"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:srcCompat="@drawable/ic_profile_chevron_right"
-                        app:tint="@color/profile_chevron" />
-                </androidx.constraintlayout.widget.ConstraintLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardLogout"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/profile_logout_height_exact"
-                android:layout_marginTop="@dimen/profile_logout_top_margin"
-                app:cardBackgroundColor="@color/profile_logout_bg"
-                app:cardCornerRadius="@dimen/profile_logout_corner_radius"
-                app:cardElevation="@dimen/space_0"
-                app:cardUseCompatPadding="false"
-                app:strokeColor="@color/profile_logout_border"
-                app:strokeWidth="@dimen/profile_logout_stroke_width">
+                android:layout_height="wrap_content"
+                app:cardBackgroundColor="@color/colorSurface"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="2dp"
+                app:strokeWidth="0dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:orientation="horizontal">
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
 
-                    <ImageView
-                        android:layout_width="@dimen/profile_logout_icon_size"
-                        android:layout_height="@dimen/profile_logout_icon_size"
-                        android:contentDescription="@null"
-                        app:srcCompat="@drawable/ic_profile_logout"
-                        app:tint="@color/profile_logout_text" />
+                    <!-- Orders -->
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/cardOrders"
+                        android:layout_width="match_parent"
+                        android:layout_height="72dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?attr/selectableItemBackground"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp">
 
-                    <TextView
-                        style="@style/ProfileText.Logout"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/profile_logout_text_start_margin"
-                        android:text="@string/auto_text_121" />
+                        <ImageView
+                            android:id="@+id/ivOrdersIcon"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:srcCompat="@drawable/ic_bottom_nav_cart"
+                            app:tint="@color/profile_text_primary"  android:contentDescription="@string/cd_nav_cart" />
+
+                        <TextView
+                            android:id="@+id/tvOrdersTitle"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="16dp"
+                            android:fontFamily="@font/plus_jakarta_sans_bold"
+                            android:text="@string/auto_my_orders_f915"
+                            android:textColor="@color/profile_text_primary"
+                            android:textSize="@dimen/text_size_body"
+                            android:textStyle="bold"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toStartOf="@id/ivOrdersChevron"
+                            app:layout_constraintStart_toEndOf="@id/ivOrdersIcon"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <ImageView
+                            android:id="@+id/ivOrdersChevron"
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:srcCompat="@drawable/ic_profile_chevron_right"
+                            app:tint="@color/profile_chevron"  android:importantForAccessibility="no" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginStart="56dp"
+                        android:background="@color/colorOutline" />
+
+                    <!-- Addresses -->
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/cardAddresses"
+                        android:layout_width="match_parent"
+                        android:layout_height="72dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?attr/selectableItemBackground"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp">
+
+                        <ImageView
+                            android:id="@+id/ivAddressesIcon"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:srcCompat="@drawable/map"
+                            app:tint="@color/profile_text_primary"  android:contentDescription="@string/cd_location" />
+
+                        <TextView
+                            android:id="@+id/tvAddressesTitle"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="16dp"
+                            android:fontFamily="@font/plus_jakarta_sans_bold"
+                            android:text="@string/auto_shipping_addresses_0511"
+                            android:textColor="@color/profile_text_primary"
+                            android:textSize="@dimen/text_size_body"
+                            android:textStyle="bold"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toStartOf="@id/ivAddressesChevron"
+                            app:layout_constraintStart_toEndOf="@id/ivAddressesIcon"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <ImageView
+                            android:id="@+id/ivAddressesChevron"
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:srcCompat="@drawable/ic_profile_chevron_right"
+                            app:tint="@color/profile_chevron"  android:importantForAccessibility="no" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginStart="56dp"
+                        android:background="@color/colorOutline" />
+
+                    <!-- Settings -->
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/cardSettings"
+                        android:layout_width="match_parent"
+                        android:layout_height="72dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?attr/selectableItemBackground"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp">
+
+                        <ImageView
+                            android:id="@+id/ivSettingsIcon"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:srcCompat="@drawable/settings"
+                            app:tint="@color/profile_text_primary"  android:contentDescription="@string/cd_settings" />
+
+                        <TextView
+                            android:id="@+id/tvSettingsTitle"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="16dp"
+                            android:fontFamily="@font/plus_jakarta_sans_bold"
+                            android:text="@string/auto_account_settings_ff73"
+                            android:textColor="@color/profile_text_primary"
+                            android:textSize="@dimen/text_size_body"
+                            android:textStyle="bold"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toStartOf="@id/ivSettingsChevron"
+                            app:layout_constraintStart_toEndOf="@id/ivSettingsIcon"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <ImageView
+                            android:id="@+id/ivSettingsChevron"
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:srcCompat="@drawable/ic_profile_chevron_right"
+                            app:tint="@color/profile_chevron"  android:importantForAccessibility="no" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginStart="56dp"
+                        android:background="@color/colorOutline" />
+
+                    <!-- Help -->
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/cardHelp"
+                        android:layout_width="match_parent"
+                        android:layout_height="72dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?attr/selectableItemBackground"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp">
+
+                        <ImageView
+                            android:id="@+id/ivHelpIcon"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:srcCompat="@drawable/ic_profile_help"
+                            app:tint="@color/profile_text_primary"  android:contentDescription="@string/cd_menu" />
+
+                        <TextView
+                            android:id="@+id/tvHelpTitle"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="16dp"
+                            android:fontFamily="@font/plus_jakarta_sans_bold"
+                            android:text="@string/auto_help_center_efda"
+                            android:textColor="@color/profile_text_primary"
+                            android:textSize="@dimen/text_size_body"
+                            android:textStyle="bold"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toStartOf="@id/ivHelpChevron"
+                            app:layout_constraintStart_toEndOf="@id/ivHelpIcon"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <ImageView
+                            android:id="@+id/ivHelpChevron"
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:srcCompat="@drawable/ic_profile_chevron_right"
+                            app:tint="@color/profile_chevron"  android:importantForAccessibility="no" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/cardLogout"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="56dp"
+                android:layout_marginTop="48dp"
+                android:text="@string/auto_log_out_b0c2"
+                android:textColor="?attr/colorError"
+                android:fontFamily="@font/plus_jakarta_sans_bold"
+                android:textAllCaps="false"
+                android:textSize="@dimen/text_size_body"
+                app:icon="@drawable/ic_profile_logout"
+                app:iconTint="?attr/colorError"
+                app:iconGravity="textStart" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
     <View

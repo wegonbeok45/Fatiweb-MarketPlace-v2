@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -99,31 +99,71 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <LinearLayout
-                android:id="@+id/layoutEmptyFavorites"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="vertical"
-                android:paddingTop="64dp"
-                android:paddingBottom="64dp">
+                <LinearLayout
+                    android:id="@+id/layoutEmptyFavorites"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:paddingTop="120dp"
+                    android:paddingBottom="32dp">
 
-                <ImageView
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"
-                    android:alpha="0.2"
-                    android:contentDescription="@null"
-                    app:srcCompat="@drawable/ic_bottom_nav_favorites"
-                    app:tint="@color/home_text_primary" />
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    app:cardBackgroundColor="@color/home_surface_raised"
+                    app:cardCornerRadius="26dp"
+                    app:cardElevation="0dp"
+                    app:strokeColor="@color/colorOutline"
+                    app:strokeWidth="1dp">
+
+                    <ImageView
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:layout_gravity="center"
+                        android:alpha="0.8"
+                        android:contentDescription="@string/cd_back"
+                        app:srcCompat="@drawable/ic_bottom_nav_favorites"
+                        app:tint="?attr/colorPrimary" />
+                </com.google.android.material.card.MaterialCardView>
 
                 <TextView
                     android:id="@+id/tvEmptyFavorites"
-                    style="@style/HomeText.SearchHint"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="22dp"
+                    android:fontFamily="@font/plus_jakarta_sans_bold"
+                    android:gravity="center"
+                    android:text="@string/auto_text_025"
+                    android:textColor="@color/home_text_primary"
+                    android:textSize="@dimen/text_size_subtitle"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvEmptyFavoritesSubtitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:fontFamily="@font/plus_jakarta_sans_regular"
+                    android:gravity="center"
+                    android:lineSpacingExtra="2dp"
+                    android:text="@string/favorites_empty_subtitle"
+                    android:textColor="@color/home_text_secondary"
+                    android:textSize="@dimen/text_size_caption" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnFavoritesBrowseHome"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="24dp"
-                    android:gravity="center"
-                    android:text="@string/auto_text_025" />
+                    android:minHeight="52dp"
+                    android:layout_marginTop="20dp"
+                    android:text="@string/favorites_empty_action"
+                    android:textAllCaps="false"
+                    android:textColor="@android:color/white"
+                    android:paddingHorizontal="32dp"
+                    app:backgroundTint="?attr/colorPrimary"
+                    app:cornerRadius="26dp"
+                    app:elevation="0dp" />
             </LinearLayout>
 
             <LinearLayout
