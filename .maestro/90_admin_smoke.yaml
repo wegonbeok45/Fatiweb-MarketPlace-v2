@@ -1,0 +1,53 @@
+appId: isim.ia2y.myapplication
+tags:
+  - admin
+  - smoke
+---
+- launchApp
+- extendedWaitUntil:
+    visible:
+      id: "hostNavProfile"
+    timeout: 15000
+- tapOn:
+    id: "hostNavProfile"
+- extendedWaitUntil:
+    visible:
+      id: "cardLogout"
+    timeout: 10000
+- tapOn:
+    id: "cardLogout"
+- extendedWaitUntil:
+    visible:
+      id: "btnLogin"
+    timeout: 10000
+- tapOn:
+    id: "etEmail"
+- inputText: "${QA_ADMIN_EMAIL}"
+- tapOn:
+    id: "etPassword"
+- inputText: "${QA_ADMIN_PASSWORD}"
+- hideKeyboard
+- tapOn:
+    id: "btnLogin"
+- extendedWaitUntil:
+    visible:
+      id: "hostNavProfile"
+    timeout: 20000
+- tapOn:
+    id: "hostNavProfile"
+- extendedWaitUntil:
+    visible:
+      id: "cardAdmin"
+    timeout: 10000
+- takeScreenshot: "90-profile-admin"
+- tapOn:
+    id: "cardAdmin"
+- extendedWaitUntil:
+    visible:
+      id: "adminNavDashboard"
+    timeout: 15000
+- assertVisible:
+    id: "adminNavCommandes"
+- assertVisible:
+    id: "adminNavClients"
+- takeScreenshot: "91-admin-dashboard"

@@ -1,0 +1,10 @@
+appId: isim.ia2y.myapplication
+---
+- launchApp
+- extendedWaitUntil:
+    visible:
+      id: "layoutSearchBar"
+    timeout: 15000
+- tapOn:
+    id: "hostNavCart"
+- takeScreenshot: "cart_screen"

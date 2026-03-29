@@ -1,0 +1,61 @@
+appId: isim.ia2y.myapplication
+tags:
+  - shopper
+  - smoke
+---
+- launchApp:
+    clearState: true
+- extendedWaitUntil:
+    visible:
+      id: "btnNext"
+    timeout: 15000
+- takeScreenshot: "01-onboarding-1"
+- tapOn:
+    id: "btnNext"
+- extendedWaitUntil:
+    visible:
+      id: "btnContinue"
+    timeout: 10000
+- takeScreenshot: "02-onboarding-2"
+- tapOn:
+    id: "btnContinue"
+- extendedWaitUntil:
+    visible:
+      id: "btnGetStarted"
+    timeout: 10000
+- takeScreenshot: "03-onboarding-3"
+- tapOn:
+    id: "btnGetStarted"
+- extendedWaitUntil:
+    visible:
+      id: "hostNavProfile"
+    timeout: 15000
+- assertVisible:
+    id: "layoutSearchBar"
+- swipe:
+    start: 50%, 82%
+    end: 50%, 30%
+    duration: 500
+- assertVisible:
+    id: "rvLatestProducts"
+- tapOn:
+    id: "hostNavProfile"
+- extendedWaitUntil:
+    visible:
+      id: "cardOrders"
+    timeout: 10000
+- takeScreenshot: "04-profile-guest"
+- tapOn:
+    id: "cardOrders"
+- extendedWaitUntil:
+    visible:
+      id: "btnAuthCreateAccount"
+    timeout: 10000
+- assertVisible:
+    id: "btnAuthExistingClient"
+- takeScreenshot: "05-auth-gate"
+- pressKey: back
+- extendedWaitUntil:
+    visible:
+      id: "cardOrders"
+    timeout: 10000

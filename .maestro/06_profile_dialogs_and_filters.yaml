@@ -1,0 +1,137 @@
+appId: isim.ia2y.myapplication
+tags:
+  - shopper
+  - extended
+  - dialogs
+---
+- launchApp
+- extendedWaitUntil:
+    visible:
+      id: "hostNavProfile"
+    timeout: 25000
+- tapOn:
+    id: "hostNavProfile"
+- extendedWaitUntil:
+    visible:
+      id: "cardLogout"
+    timeout: 10000
+- tapOn:
+    id: "cardLogout"
+- extendedWaitUntil:
+    visible:
+      id: "btnLogin"
+    timeout: 10000
+- tapOn:
+    id: "tvForgotPassword"
+- extendedWaitUntil:
+    visible:
+      id: "etResetPasswordEmail"
+    timeout: 10000
+- takeScreenshot: "50-reset-password-dialog"
+- tapOn: "Annuler"
+- extendedWaitUntil:
+    visible:
+      id: "btnLogin"
+    timeout: 10000
+- tapOn:
+    id: "etEmail"
+- inputText: "${QA_SHOPPER_EMAIL}"
+- tapOn:
+    id: "etPassword"
+- inputText: "${QA_SHOPPER_PASSWORD}"
+- hideKeyboard
+- tapOn:
+    id: "btnLogin"
+- extendedWaitUntil:
+    visible:
+      id: "hostNavProfile"
+    timeout: 30000
+- tapOn:
+    id: "hostNavProfile"
+- extendedWaitUntil:
+    visible:
+      id: "cardHelp"
+    timeout: 10000
+- tapOn:
+    id: "tvUserName"
+- extendedWaitUntil:
+    visible:
+      id: "etEditProfileName"
+    timeout: 10000
+- takeScreenshot: "51-edit-profile-dialog"
+- tapOn: "Annuler"
+- extendedWaitUntil:
+    visible:
+      id: "cardHelp"
+    timeout: 10000
+- tapOn:
+    id: "cardHelp"
+- extendedWaitUntil:
+    visible:
+      id: "alertTitle"
+    timeout: 10000
+- takeScreenshot: "52-help-dialog"
+- tapOn: "Fermer"
+- extendedWaitUntil:
+    visible:
+      id: "cardAddresses"
+    timeout: 10000
+- tapOn:
+    id: "cardAddresses"
+- extendedWaitUntil:
+    visible:
+      id: "btnAddAddress"
+    timeout: 15000
+- extendedWaitUntil:
+    visible:
+      id: "tvAddressRemove"
+    timeout: 15000
+- tapOn:
+    id: "tvAddressRemove"
+- extendedWaitUntil:
+    visible: "Supprimer cette adresse ?"
+    timeout: 10000
+- takeScreenshot: "53-address-delete-dialog"
+- tapOn: "Annuler"
+- extendedWaitUntil:
+    visible:
+      id: "tvAddressEdit"
+    timeout: 10000
+- tapOn:
+    id: "tvAddressEdit"
+- extendedWaitUntil:
+    visible:
+      id: "etAddressLabel"
+    timeout: 10000
+- takeScreenshot: "54-edit-address-dialog"
+- tapOn: "Annuler"
+- extendedWaitUntil:
+    visible:
+      id: "rvAddresses"
+    timeout: 10000
+- pressKey: back
+- extendedWaitUntil:
+    visible:
+      id: "hostNavHome"
+    timeout: 10000
+- tapOn:
+    id: "hostNavHome"
+- extendedWaitUntil:
+    visible:
+      id: "layoutSearchBar"
+    timeout: 10000
+- tapOn:
+    id: "layoutSearchBar"
+- extendedWaitUntil:
+    visible:
+      id: "etSearch"
+    timeout: 10000
+- tapOn:
+    id: "ivSearchFilter"
+- extendedWaitUntil:
+    visible:
+      id: "btnFilterApply"
+    timeout: 10000
+- takeScreenshot: "55-search-filters"
+- tapOn:
+    id: "btnFilterApply"

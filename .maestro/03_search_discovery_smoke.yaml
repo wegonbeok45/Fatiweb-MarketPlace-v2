@@ -1,0 +1,36 @@
+appId: isim.ia2y.myapplication
+tags:
+  - shopper
+  - smoke
+  - search
+---
+- launchApp
+- extendedWaitUntil:
+    visible:
+      id: "layoutSearchBar"
+    timeout: 15000
+- tapOn:
+    id: "layoutSearchBar"
+- extendedWaitUntil:
+    visible:
+      id: "etSearch"
+    timeout: 10000
+- tapOn:
+    id: "etSearch"
+- inputText: "Chechia"
+- pressKey: enter
+- extendedWaitUntil:
+    visible:
+      id: "tvResultsCount"
+    timeout: 10000
+- takeScreenshot: "20-search-results"
+- assertVisible:
+    id: "rvSearchResults"
+- pressKey: back
+- extendedWaitUntil:
+    visible:
+      id: "hostNavExplore"
+    timeout: 10000
+- tapOn:
+    id: "hostNavExplore"
+- takeScreenshot: "22-browse-categories"

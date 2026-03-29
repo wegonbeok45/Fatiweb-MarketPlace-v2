@@ -17,3 +17,9 @@ tmp_*.zip
 tmp/
 .gradle-user-home/
 settings.jason
+artifacts/
+%INSTALL%/
+build_log.txt
+final_build.log
+gradlew_out.txt
+fatiweb-marketplace-firebase-adminsdk-fbsvc-ee9d682cc5.json

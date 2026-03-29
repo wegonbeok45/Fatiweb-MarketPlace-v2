@@ -1,0 +1,92 @@
+appId: isim.ia2y.myapplication
+tags:
+  - shopper
+  - smoke
+  - account
+---
+- launchApp
+- extendedWaitUntil:
+    visible:
+      id: "hostNavProfile"
+    timeout: 15000
+- tapOn:
+    id: "hostNavProfile"
+- extendedWaitUntil:
+    visible:
+      id: "cardOrders"
+    timeout: 10000
+- tapOn:
+    id: "cardLogout"
+- extendedWaitUntil:
+    visible:
+      id: "btnLogin"
+    timeout: 10000
+- tapOn:
+    id: "etEmail"
+- inputText: "${QA_SHOPPER_EMAIL}"
+- tapOn:
+    id: "etPassword"
+- inputText: "${QA_SHOPPER_PASSWORD}"
+- hideKeyboard
+- tapOn:
+    id: "btnLogin"
+- extendedWaitUntil:
+    visible:
+      id: "hostNavProfile"
+    timeout: 30000
+- tapOn:
+    id: "hostNavProfile"
+- extendedWaitUntil:
+    visible:
+      id: "cardOrders"
+    timeout: 10000
+- takeScreenshot: "30-profile-authenticated"
+- tapOn:
+    id: "cardOrders"
+- extendedWaitUntil:
+    visible:
+      id: "scrollOrders"
+    timeout: 20000
+- takeScreenshot: "31-orders-history"
+- pressKey: back
+- extendedWaitUntil:
+    visible:
+      id: "cardSettings"
+    timeout: 10000
+- tapOn:
+    id: "ivNotifications"
+- extendedWaitUntil:
+    visible:
+      id: "tvTitle"
+    timeout: 10000
+- takeScreenshot: "33-notifications"
+- pressKey: back
+- extendedWaitUntil:
+    visible:
+      id: "cardSettings"
+    timeout: 10000
+- tapOn:
+    id: "cardSettings"
+- extendedWaitUntil:
+    visible:
+      id: "cardLanguage"
+    timeout: 10000
+- tapOn:
+    id: "cardLanguage"
+- extendedWaitUntil:
+    visible:
+      id: "cardLanguageOptions"
+    timeout: 10000
+- tapOn:
+    id: "btnEnglish"
+- takeScreenshot: "34-language-settings"
+- pressKey: back
+- extendedWaitUntil:
+    visible:
+      id: "cardLanguage"
+    timeout: 10000
+- pressKey: back
+- extendedWaitUntil:
+    visible:
+      id: "cardSettings"
+    timeout: 10000

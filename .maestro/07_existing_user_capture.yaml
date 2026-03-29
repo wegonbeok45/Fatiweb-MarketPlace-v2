@@ -1,0 +1,205 @@
+appId: isim.ia2y.myapplication
+tags:
+  - shopper
+  - capture
+  - existing-user
+---
+- launchApp
+- extendedWaitUntil:
+    visible:
+      id: "hostNavProfile"
+    timeout: 25000
+- tapOn:
+    id: "hostNavProfile"
+- extendedWaitUntil:
+    visible:
+      id: "cardOrders"
+    timeout: 10000
+- tapOn:
+    id: "cardOrders"
+- extendedWaitUntil:
+    visible:
+      id: "btnAuthCreateAccount"
+    timeout: 10000
+- takeScreenshot: "07-auth-gate"
+- tapOn:
+    id: "btnAuthExistingClient"
+- extendedWaitUntil:
+    visible:
+      id: "btnLogin"
+    timeout: 10000
+- takeScreenshot: "08-login-screen"
+- tapOn:
+    id: "etEmail"
+- inputText: "${QA_SHOPPER_EMAIL}"
+- tapOn:
+    id: "etPassword"
+- inputText: "${QA_SHOPPER_PASSWORD}"
+- hideKeyboard
+- tapOn:
+    id: "btnLogin"
+- extendedWaitUntil:
+    visible:
+      id: "hostNavHome"
+    timeout: 30000
+- takeScreenshot: "09-home"
+- tapOn:
+    id: "layoutSearchBar"
+- extendedWaitUntil:
+    visible:
+      id: "layoutDefaultState"
+    timeout: 10000
+- takeScreenshot: "20-search-screen"
+- pressKey: back
+- extendedWaitUntil:
+    visible:
+      id: "hostNavExplore"
+    timeout: 10000
+- tapOn:
+    id: "hostNavExplore"
+- extendedWaitUntil:
+    visible:
+      id: "scrollExploreContent"
+    timeout: 10000
+- takeScreenshot: "22-browse-categories"
+- tapOn:
+    id: "hostNavProfile"
+- extendedWaitUntil:
+    visible:
+      id: "cardAddresses"
+    timeout: 10000
+- takeScreenshot: "30-profile-authenticated"
+- tapOn:
+    id: "cardOrders"
+- extendedWaitUntil:
+    visible:
+      id: "contentContainer"
+    timeout: 15000
+- takeScreenshot: "31-orders-history"
+- tapOn:
+    id: "ivBack"
+- extendedWaitUntil:
+    visible:
+      id: "cardSettings"
+    timeout: 10000
+- tapOn:
+    id: "ivNotifications"
+- extendedWaitUntil:
+    visible:
+      id: "rvNotifications"
+    timeout: 10000
+- takeScreenshot: "33-notifications"
+- tapOn:
+    id: "ivBack"
+- extendedWaitUntil:
+    visible:
+      id: "cardSettings"
+    timeout: 10000
+- tapOn:
+    id: "cardSettings"
+- extendedWaitUntil:
+    visible:
+      id: "cardLanguage"
+    timeout: 10000
+- takeScreenshot: "34-settings"
+- tapOn:
+    id: "cardLanguage"
+- extendedWaitUntil:
+    visible:
+      id: "cardLanguageOptions"
+    timeout: 10000
+- takeScreenshot: "35-language-settings"
+- tapOn:
+    id: "ivBack"
+- extendedWaitUntil:
+    visible:
+      id: "cardLanguage"
+    timeout: 10000
+- tapOn:
+    id: "ivBack"
+- extendedWaitUntil:
+    visible:
+      id: "cardAddresses"
+    timeout: 10000
+- tapOn:
+    id: "cardAddresses"
+- extendedWaitUntil:
+    visible:
+      id: "scrollAddresses"
+    timeout: 10000
+- takeScreenshot: "36-addresses"
+- tapOn:
+    id: "ivBack"
+- extendedWaitUntil:
+    visible:
+      id: "hostNavHome"
+    timeout: 10000
+- tapOn:
+    id: "hostNavHome"
+- extendedWaitUntil:
+    visible:
+      id: "layoutSearchBar"
+    timeout: 10000
+- swipe:
+    start: 50%, 82%
+    end: 50%, 30%
+    duration: 500
+- swipe:
+    start: 50%, 82%
+    end: 50%, 34%
+    duration: 500
+- extendedWaitUntil:
+    visible:
+      id: "homeDynamicProductTitle"
+    timeout: 10000
+- tapOn:
+    id: "homeDynamicProductTitle"
+- extendedWaitUntil:
+    visible:
+      id: "btnAddToCart"
+    timeout: 10000
+- takeScreenshot: "37-product-details"
+- tapOn:
+    id: "btnAddToCart"
+- takeScreenshot: "38-product-added"
+- tapOn:
+    id: "ivBack"
+- extendedWaitUntil:
+    visible:
+      id: "hostNavCart"
+    timeout: 10000
+- tapOn:
+    id: "hostNavCart"
+- extendedWaitUntil:
+    visible:
+      id: "btnCheckout"
+    timeout: 10000
+- takeScreenshot: "39-cart"
+- tapOn:
+    id: "btnCheckout"
+- extendedWaitUntil:
+    visible:
+      id: "btnCheckoutContinue"
+    timeout: 10000
+- takeScreenshot: "43-checkout-step-1"
+- tapOn:
+    id: "btnCheckoutContinue"
+- extendedWaitUntil:
+    visible:
+      id: "cardPayCash"
+    timeout: 10000
+- takeScreenshot: "44-checkout-step-2"
+- tapOn:
+    id: "btnCheckoutContinue"
+- extendedWaitUntil:
+    visible:
+      id: "btnTrackOrder"
+    timeout: 20000
+- takeScreenshot: "45-checkout-confirmation"
+- tapOn:
+    id: "btnTrackOrder"
+- extendedWaitUntil:
+    visible:
+      id: "tvOrderDetailsId"
+    timeout: 10000
+- takeScreenshot: "46-order-details"

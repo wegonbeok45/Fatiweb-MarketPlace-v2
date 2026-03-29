@@ -1,0 +1,161 @@
+appId: isim.ia2y.myapplication
+tags:
+  - shopper
+  - capture
+  - checkout
+---
+- launchApp
+- extendedWaitUntil:
+    visible:
+      id: "hostNavProfile"
+    timeout: 25000
+- tapOn:
+    id: "hostNavProfile"
+- extendedWaitUntil:
+    visible:
+      id: "cardOrders"
+    timeout: 10000
+- tapOn:
+    id: "cardOrders"
+- extendedWaitUntil:
+    visible:
+      id: "btnAuthCreateAccount"
+    timeout: 10000
+- tapOn:
+    id: "btnAuthCreateAccount"
+- extendedWaitUntil:
+    visible:
+      id: "btnRegister"
+    timeout: 10000
+- tapOn:
+    id: "etFullName"
+- inputText: "${QA_SHOPPER_NAME}"
+- tapOn:
+    id: "etEmail"
+- inputText: "${QA_SHOPPER_EMAIL}"
+- tapOn:
+    id: "etPassword"
+- inputText: "${QA_SHOPPER_PASSWORD}"
+- hideKeyboard
+- takeScreenshot: "10-register-filled"
+- tapOn:
+    id: "btnRegister"
+- extendedWaitUntil:
+    visible:
+      id: "hostNavProfile"
+    timeout: 30000
+- tapOn:
+    id: "hostNavProfile"
+- extendedWaitUntil:
+    visible:
+      id: "cardAddresses"
+    timeout: 10000
+- takeScreenshot: "11-profile-authenticated"
+- tapOn:
+    id: "cardAddresses"
+- extendedWaitUntil:
+    visible:
+      id: "btnAddAddress"
+    timeout: 10000
+- takeScreenshot: "11c-addresses-empty"
+- tapOn:
+    id: "btnAddAddress"
+- extendedWaitUntil:
+    visible:
+      id: "etAddressLabel"
+    timeout: 10000
+- tapOn:
+    id: "etAddressLabel"
+- inputText: "${QA_ADDRESS_LABEL}"
+- tapOn:
+    id: "etAddressPhone"
+- inputText: "${QA_ADDRESS_PHONE}"
+- tapOn:
+    id: "etAddressGovernorate"
+- inputText: "${QA_ADDRESS_GOVERNORATE}"
+- tapOn:
+    id: "etAddressCity"
+- inputText: "${QA_ADDRESS_CITY}"
+- tapOn:
+    id: "etAddressLine1"
+- inputText: "${QA_ADDRESS_LINE1}"
+- hideKeyboard
+- takeScreenshot: "12-address-filled"
+- tapOn: "Ajouter"
+- extendedWaitUntil:
+    visible:
+      id: "rvAddresses"
+    timeout: 10000
+- takeScreenshot: "12b-address-saved"
+- pressKey: back
+- extendedWaitUntil:
+    visible:
+      id: "hostNavHome"
+    timeout: 10000
+- tapOn:
+    id: "hostNavHome"
+- extendedWaitUntil:
+    visible:
+      id: "layoutSearchBar"
+    timeout: 10000
+- swipe:
+    start: 50%, 82%
+    end: 50%, 30%
+    duration: 500
+- swipe:
+    start: 50%, 82%
+    end: 50%, 34%
+    duration: 500
+- extendedWaitUntil:
+    visible:
+      id: "homeDynamicProductTitle"
+    timeout: 10000
+- tapOn:
+    id: "homeDynamicProductTitle"
+- extendedWaitUntil:
+    visible:
+      id: "btnAddToCart"
+    timeout: 10000
+- tapOn:
+    id: "btnAddToCart"
+- takeScreenshot: "13-product-added"
+- pressKey: back
+- extendedWaitUntil:
+    visible:
+      id: "hostNavCart"
+    timeout: 10000
+- tapOn:
+    id: "hostNavCart"
+- extendedWaitUntil:
+    visible:
+      id: "btnCheckout"
+    timeout: 10000
+- takeScreenshot: "14-cart"
+- tapOn:
+    id: "btnCheckout"
+- extendedWaitUntil:
+    visible:
+      id: "btnCheckoutContinue"
+    timeout: 10000
+- takeScreenshot: "15-checkout-step-1"
+- tapOn:
+    id: "btnCheckoutContinue"
+- extendedWaitUntil:
+    visible:
+      id: "cardPayCash"
+    timeout: 10000
+- takeScreenshot: "16-checkout-step-2"
+- tapOn:
+    id: "btnCheckoutContinue"
+- extendedWaitUntil:
+    visible:
+      id: "btnTrackOrder"
+    timeout: 20000
+- takeScreenshot: "17-checkout-confirmation"
+- tapOn:
+    id: "btnTrackOrder"
+- extendedWaitUntil:
+    visible:
+      id: "tvOrderDetailsId"
+    timeout: 10000
+- takeScreenshot: "18-order-details"

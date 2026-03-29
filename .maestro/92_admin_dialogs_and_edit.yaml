@@ -1,0 +1,141 @@
+appId: isim.ia2y.myapplication
+tags:
+  - admin
+  - extended
+---
+- launchApp
+- extendedWaitUntil:
+    visible:
+      id: "hostNavProfile"
+    timeout: 15000
+- tapOn:
+    id: "hostNavProfile"
+- extendedWaitUntil:
+    visible:
+      id: "cardLogout"
+    timeout: 10000
+- tapOn:
+    id: "cardLogout"
+- extendedWaitUntil:
+    visible:
+      id: "btnLogin"
+    timeout: 10000
+- tapOn:
+    id: "etEmail"
+- inputText: "${QA_ADMIN_EMAIL}"
+- tapOn:
+    id: "etPassword"
+- inputText: "${QA_ADMIN_PASSWORD}"
+- hideKeyboard
+- tapOn:
+    id: "btnLogin"
+- extendedWaitUntil:
+    visible:
+      id: "hostNavProfile"
+    timeout: 20000
+- tapOn:
+    id: "hostNavProfile"
+- extendedWaitUntil:
+    visible:
+      id: "cardAdmin"
+    timeout: 10000
+- tapOn:
+    id: "cardAdmin"
+- extendedWaitUntil:
+    visible:
+      id: "adminNavDashboard"
+    timeout: 15000
+- extendedWaitUntil:
+    visible:
+      id: "adminBtnAddProduct"
+    timeout: 10000
+- tapOn:
+    id: "adminNavCommandes"
+- extendedWaitUntil:
+    visible:
+      id: "adminInlineCommandesTvTotal"
+    timeout: 15000
+- assertVisible:
+    id: "adminInlineOrdersContainer"
+- extendedWaitUntil:
+    visible:
+      id: "adminInlineOrderRow"
+    timeout: 20000
+- tapOn:
+    id: "adminInlineOrderRow"
+- extendedWaitUntil:
+    visible: "Annuler"
+    timeout: 10000
+- takeScreenshot: "99-admin-status-dialog"
+- tapOn: "Annuler"
+- extendedWaitUntil:
+    visible:
+      id: "adminInlineOrdersContainer"
+    timeout: 10000
+- tapOn:
+    id: "adminNavProduits"
+- extendedWaitUntil:
+    visible:
+      id: "adminProductBtnEdit"
+    timeout: 10000
+- tapOn:
+    id: "adminProductBtnEdit"
+- extendedWaitUntil:
+    visible:
+      id: "adminProductEditorBtnSave"
+    timeout: 10000
+- takeScreenshot: "100-admin-product-editor-edit"
+- tapOn:
+    id: "adminProductEditorIvBack"
+- extendedWaitUntil:
+    visible:
+      id: "adminProduitsBtnAdd"
+    timeout: 10000
+- tapOn:
+    id: "adminNavNotifications"
+- extendedWaitUntil:
+    visible:
+      id: "adminNotifBtnSend"
+    timeout: 10000
+- tapOn:
+    id: "adminNavCommandes"
+- extendedWaitUntil:
+    visible:
+      id: "adminCommandesCard"
+    timeout: 15000
+- extendedWaitUntil:
+    visible:
+      id: "adminCommRow1"
+    timeout: 25000
+- tapOn:
+    id: "adminCommRow1"
+- extendedWaitUntil:
+    visible: "Annuler"
+    timeout: 10000
+- takeScreenshot: "100-admin-orders-screen-dialog"
+- tapOn: "Annuler"
+- extendedWaitUntil:
+    visible:
+      id: "adminCommRow1"
+    timeout: 10000
+- tapOn:
+    id: "adminNavNotifications"
+- extendedWaitUntil:
+    visible:
+      id: "adminNotifBtnSend"
+    timeout: 10000
+- tapOn:
+    id: "adminNotifIvSettings"
+- extendedWaitUntil:
+    visible:
+      id: "adminParamCardLivraison"
+    timeout: 15000
+- tapOn:
+    id: "adminParamLivrStandardEditGroup"
+- extendedWaitUntil:
+    visible:
+      id: "etEditPrice"
+    timeout: 10000
+- takeScreenshot: "101-admin-price-edit-dialog"
+- tapOn:
+    id: "btnEditPriceCancel"
