@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -17,7 +17,7 @@
         android:layout_height="match_parent"
         android:layout_gravity="center"
         android:scaleType="centerInside"
-        android:padding="8dp" />
+        android:padding="8dp"  android:contentDescription="@string/cd_product_image" />
 
 </com.google.android.material.card.MaterialCardView>
 

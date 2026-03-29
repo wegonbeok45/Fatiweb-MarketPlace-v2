@@ -2,19 +2,22 @@ package isim.ia2y.myapplication
 
 import android.os.Bundle
 import android.view.View
-import android.widget.LinearLayout
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.launch
 
-// Cette classe organise cette partie de l'app.
 class OrdersHistoryActivity : AppCompatActivity() {
 
-    // Cette fonction fait une action de cette partie de l'app.
+    private val ordersAdapter = OrdersHistoryAdapter { order ->
+        startActivity(OrderDetailsActivity.createIntent(this, order.id))
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -26,72 +29,87 @@ class OrdersHistoryActivity : AppCompatActivity() {
         }
 
         findViewById<View>(R.id.ivBack)?.setOnClickListener { finishWithMotion(isForward = false) }
-        applyPressFeedback(R.id.ivBack)
+        findViewById<View>(R.id.btnOrdersBrowseHome)?.setOnClickListener {
+            navigateToMainTab(MainActivity.Tab.HOME)
+        }
+        findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.rvOrders)?.layoutManager =
+            LinearLayoutManager(this)
+        applyPressFeedback(R.id.ivBack, R.id.btnOrdersBrowseHome)
         loadOrders()
     }
 
-    // Cette fonction fait une action de cette partie de l'app.
     private fun loadOrders() {
         val uid = FirebaseAuthManager.currentUser?.uid
         if (uid == null) {
-            // Not logged in — show empty state
-            showEmpty()
+            renderState(ScreenState.Empty())
             return
+        }
+        val localOrders = LocalOrderStore.getAll(this)
+        if (localOrders.isNotEmpty()) {
+            renderState(ScreenState.Content(localOrders))
         }
 
         lifecycleScope.launch {
-            val orders = FirestoreService.fetchOrders(uid)
-            renderOrders(orders)
+            val result = runCatching { FirestoreService.fetchOrders(uid) }
+            val state: ScreenState<List<AppOrder>> = result.fold(
+                onSuccess = { orders ->
+                    val merged = if (orders.isEmpty()) localOrders else {
+                        LocalOrderStore.mergeRemote(this@OrdersHistoryActivity, orders)
+                        LocalOrderStore.getAll(this@OrdersHistoryActivity)
+                    }
+                    if (merged.isEmpty()) ScreenState.Empty() else ScreenState.Content(merged)
+                },
+                onFailure = {
+                    if (localOrders.isEmpty()) {
+                        ScreenState.Error("Impossible de charger vos commandes.")
+                    } else {
+                        ScreenState.Content(localOrders)
+                    }
+                }
+            )
+            renderState(state)
         }
     }
 
-    // Cette fonction fait une action de cette partie de l'app.
-    private fun showEmpty() {
+    private fun renderState(state: ScreenState<List<AppOrder>>) {
+        val recycler = findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.rvOrders) ?: return
         val empty = findViewById<TextView>(R.id.tvEmptyOrders) ?: return
         val emptyState = findViewById<View>(R.id.layoutEmptyOrdersState) ?: return
         val emptyAnimation = findViewById<com.airbnb.lottie.LottieAnimationView>(R.id.ivEmptyOrdersAnimation)
-        val container = findViewById<LinearLayout>(R.id.layoutOrdersContainer) ?: return
-        container.removeAllViews()
-        emptyState.visibility = View.VISIBLE
-        empty.visibility = View.VISIBLE
-        emptyAnimation?.playAnimation()
-    }
+        val loading = findViewById<ProgressBar>(R.id.loadingIndicator)
 
-    // Cette fonction fait une action de cette partie de l'app.
-    private fun renderOrders(orders: List<AppOrder>) {
-        val container = findViewById<LinearLayout>(R.id.layoutOrdersContainer) ?: return
-        val empty = findViewById<TextView>(R.id.tvEmptyOrders) ?: return
-        val emptyState = findViewById<View>(R.id.layoutEmptyOrdersState) ?: return
-        val emptyAnimation = findViewById<com.airbnb.lottie.LottieAnimationView>(R.id.ivEmptyOrdersAnimation)
-        container.removeAllViews()
-
-        if (orders.isEmpty()) {
-            emptyState.visibility = View.VISIBLE
-            empty.visibility = View.VISIBLE
-            emptyAnimation?.playAnimation()
-            return
-        }
-        emptyState.visibility = View.GONE
-        empty.visibility = View.GONE
-        emptyAnimation?.pauseAnimation()
-
-        orders.forEachIndexed { index, order ->
-            val row = layoutInflater.inflate(R.layout.item_order_history, container, false)
-
-            // Summarise items: "Chechia x1, Bijoux x2, …"
-            val itemsSummary = order.items.entries.take(2).joinToString(", ") { (id, qty) ->
-                val name = ProductCatalog.byId(id)?.title?.split(" ")?.firstOrNull() ?: id
-                "$name x$qty"
-            }.let { if (order.items.size > 2) "$it…" else it }
-
-            row.findViewById<TextView>(R.id.tvOrderId)?.text = order.displayId
-            row.findViewById<TextView>(R.id.tvOrderDate)?.text = order.formattedDate
-            row.findViewById<TextView>(R.id.tvOrderItems)?.text = itemsSummary
-            row.findViewById<TextView>(R.id.tvOrderTotal)?.text = formatDt(order.total)
-            row.findViewById<TextView>(R.id.tvOrderStatus)?.text = order.statusLabel
-            container.addView(row)
-            animateListItemEntry(row, index, startDelayMs = 35L)
+        when (state) {
+            is ScreenState.Content -> {
+                loading?.visibility = View.GONE
+                recycler.visibility = View.VISIBLE
+                emptyState.visibility = View.GONE
+                empty.visibility = View.GONE
+                emptyAnimation?.pauseAnimation()
+                if (recycler.adapter == null) {
+                    recycler.adapter = ordersAdapter
+                }
+                ordersAdapter.submitList(state.data)
+            }
+            is ScreenState.Empty -> {
+                loading?.visibility = View.GONE
+                recycler.visibility = View.GONE
+                emptyState.visibility = View.VISIBLE
+                empty.visibility = View.VISIBLE
+                emptyAnimation?.playAnimation()
+            }
+            is ScreenState.Error -> {
+                loading?.visibility = View.GONE
+                recycler.visibility = View.GONE
+                emptyState.visibility = View.VISIBLE
+                empty.visibility = View.VISIBLE
+                emptyAnimation?.playAnimation()
+                showMotionSnackbar(state.message)
+            }
+            ScreenState.Loading -> {
+                loading?.visibility = View.VISIBLE
+                recycler.visibility = View.GONE
+                emptyState.visibility = View.GONE
+            }
         }
     }
 }
-

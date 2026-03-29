@@ -5,18 +5,18 @@
     android:viewportHeight="120">
     <!-- Outer ring (very faint) -->
     <path
-        android:fillColor="#FDFBF7"
+        android:fillColor="@color/auth_gradient_end"
         android:pathData="M60,60m-50,0a50,50 0,1 1,100 0a50,50 0,1 1,-100 0" />
     <!-- Inner circle -->
     <path
-        android:fillColor="#F9F5EE"
+        android:fillColor="@color/details_background"
         android:pathData="M60,60m-35,0a35,35 0,1 1,70 0a35,35 0,1 1,-70 0" />
     <!-- White check circle -->
     <path
-        android:fillColor="#FFFFFF"
+        android:fillColor="@color/colorOnPrimary"
         android:pathData="M60,60m-20,0a20,20 0,1 1,40 0a20,20 0,1 1,-40 0" />
     <!-- Gold checkmark -->
     <path
-        android:fillColor="#CDAA7D"
+        android:fillColor="@color/colorAccentDeep"
         android:pathData="M60,60m-20,0a20,20 0,1 1,40 0a20,20 0,1 1,-40 0M54.5,65l-6,-6l-2,2l8,8l16,-16l-2,-2z" />
 </vector>

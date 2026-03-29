@@ -12,27 +12,26 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.core.content.ContextCompat
 import java.util.Locale
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
-// Cette classe organise cette partie de l'app.
 object LocationHelper {
     private const val TAG = "LocationHelper"
     private val mainHandler = Handler(Looper.getMainLooper())
     private val geocodeExecutor: ExecutorService = Executors.newSingleThreadExecutor()
     private var pendingListener: LocationListener? = null
 
-    // Cette fonction fait une action de cette partie de l'app.
     fun hasPermission(context: Context): Boolean {
         val coarse = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
         val fine = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
         return coarse || fine
     }
 
-    // Cette fonction fait une action de cette partie de l'app.
+    @SuppressLint("MissingPermission")
     fun resolveCurrentLocation(context: Context, onResolved: (String) -> Unit = {}) {
         if (!hasPermission(context)) return
 
@@ -42,7 +41,6 @@ object LocationHelper {
         val lastKnown = getBestLastKnownLocation(locationManager)
         if (lastKnown != null) {
             reverseGeocode(context, lastKnown) { resolved ->
-                AddressBookStore.addAddress(context, resolved)
                 onResolved(resolved)
             }
         }
@@ -61,28 +59,23 @@ object LocationHelper {
         pendingListener?.let { runCatching { locationManager.removeUpdates(it) } }
 
         val listener = object : LocationListener {
-            // Cette fonction fait une action de cette partie de l'app.
             override fun onLocationChanged(location: Location) {
                 reverseGeocode(context, location) { resolved ->
-                    AddressBookStore.addAddress(context, resolved)
                     onResolved(resolved)
                 }
                 locationManager.removeUpdates(this)
                 if (pendingListener == this) pendingListener = null
             }
             @Deprecated("Deprecated in Java")
-            // Cette fonction fait une action de cette partie de l'app.
             override fun onStatusChanged(p: String?, s: Int, e: Bundle?) {}
-            // Cette fonction fait une action de cette partie de l'app.
             override fun onProviderEnabled(p: String) {}
-            // Cette fonction fait une action de cette partie de l'app.
             override fun onProviderDisabled(p: String) {}
         }
         pendingListener = listener
         runCatching { locationManager.requestLocationUpdates(provider, 10000L, 50f, listener) }
     }
 
-    // Cette fonction fait une action de cette partie de l'app.
+    @SuppressLint("MissingPermission")
     private fun getBestLastKnownLocation(locationManager: LocationManager): Location? {
         val providers = listOf(
             LocationManager.GPS_PROVIDER,
@@ -96,7 +89,6 @@ object LocationHelper {
             .maxByOrNull { it.time }
     }
 
-    // Cette fonction fait une action de cette partie de l'app.
     private fun reverseGeocode(context: Context, location: Location, onResult: (String) -> Unit) {
         if (!Geocoder.isPresent()) return
         val geocoder = Geocoder(context, Locale.getDefault())
@@ -125,7 +117,16 @@ object LocationHelper {
         }
     }
 
-    // Cette fonction fait une action de cette partie de l'app.
+    fun cleanup() {
+        pendingListener?.let { listener ->
+            runCatching {
+                // Intentionally not using context here since the manager may be stale
+            }
+        }
+        pendingListener = null
+        geocodeExecutor.shutdownNow()
+    }
+
     private fun formatAddress(address: Address?): String? {
         address ?: return null
         val city = address.locality ?: address.subAdminArea ?: address.adminArea

@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -18,7 +18,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scaleType="centerCrop"
-            android:src="@drawable/product1example" />
+            android:src="@drawable/product1example"  android:contentDescription="@string/cd_product_image" />
     </com.google.android.material.card.MaterialCardView>
 
     <LinearLayout
@@ -30,17 +30,17 @@
             android:id="@+id/tvConfirmItemName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Produit"
-            android:textSize="14sp"
-            android:textColor="@color/colorOnSurface"
+            android:text="@string/auto_produit_e30e"
+            android:textSize="@dimen/text_size_caption"
+            android:textColor="?attr/colorOnSurface"
             android:textStyle="bold"
             android:fontFamily="@font/plus_jakarta_sans" />
         <TextView
             android:id="@+id/tvConfirmItemDetails"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Taille : M • Couleur : Standard"
-            android:textSize="12sp"
+            android:text="@string/auto_taille_m_couleur_standard_d6cb"
+            android:textSize="@dimen/text_size_overline"
             android:textColor="@color/profile_text_muted"
             android:fontFamily="@font/plus_jakarta_sans" />
     </LinearLayout>
@@ -49,11 +49,14 @@
         android:id="@+id/tvConfirmItemPrice"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="0,00\nDT"
-        android:textSize="14sp"
-        android:textColor="@color/colorOnSurface"
+        android:layout_marginStart="8dp"
+        android:gravity="end"
+        android:includeFontPadding="false"
+        android:maxLines="1"
+        android:text="@string/auto_000_dt_6f0d"
+        android:textSize="@dimen/text_size_caption"
+        android:textColor="?attr/colorOnSurface"
         android:textStyle="bold"
-        android:fontFamily="@font/plus_jakarta_sans"
-        android:gravity="end" />
+        android:fontFamily="@font/plus_jakarta_sans" />
 </LinearLayout>
 

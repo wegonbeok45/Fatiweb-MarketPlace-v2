@@ -12,7 +12,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
+import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -20,537 +22,514 @@ import kotlinx.coroutines.withContext
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
-import java.util.UUID
+import isim.ia2y.myapplication.databinding.ActivityCheckoutDetailsBinding
 
-// Cette classe organise cette partie de l'app.
 class CheckoutDetailsActivity : AppCompatActivity() {
 
-    private val EXPRESS_FEE = 12.500
-
-    /** true = Standard selected, false = Express selected */
-    private var isStandardSelected = true
-    
-    // Payment State
-    private var currentStep = 1
-    private var selectedPaymentMethod = PaymentMethod.CARD // Default
-    private var isUsingSavedCard = true
+    private val viewModel: CheckoutViewModel by viewModels()
+    private lateinit var binding: ActivityCheckoutDetailsBinding
+    private var selectedPaymentMethod = PaymentMethod.CASH
     private var confirmationOrderNumber = ""
     private var confirmationDeliveryEstimate = ""
-    private val appPreferences by lazy(LazyThreadSafetyMode.NONE) {
-        getSharedPreferences("AppPrefs", MODE_PRIVATE)
-    }
+    private var standardShippingFee = CartStore.LIVRAISON_FEE
+    private var expressShippingFee = 12.500
+    private var lastSavedOrder: AppOrder? = null
+    private val btnContinue: MaterialButton
+        get() = binding.btnCheckoutContinue
 
-    // Cette classe organise cette partie de l'app.
     enum class PaymentMethod { CARD, EDINAR, CASH }
 
-    // Cette fonction fait une action de cette partie de l'app.
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_checkout_details)
+        binding = ActivityCheckoutDetailsBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.layoutCheckoutRoot)) { v, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(binding.layoutCheckoutRoot) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
 
         setupActions()
+        observeOrderResult()
         bindDynamicData()
         applyDeliverySelection()
+        applyDeliverySelection()
+        applyPaymentSelection()
         updateCheckoutChrome()
         renderStepState()
-        
+        loadCommerceConfig()
+
         revealViewsInOrder(
             R.id.layoutCheckoutTopBar,
             R.id.scrollCheckoutContent,
             R.id.layoutCheckoutBottomBar
         )
-        
-        // System back button handling
+
         onBackPressedDispatcher.addCallback(this, object : androidx.activity.OnBackPressedCallback(true) {
-            // Cette fonction fait une action de cette partie de l'app.
             override fun handleOnBackPressed() {
                 handleBackNavigation()
             }
         })
 
         applyPressFeedback(
-            R.id.tvCheckoutBack,
+            R.id.ivCheckoutBack,
             R.id.tvCheckoutModifyAddress,
             R.id.cardCheckoutAddress,
             R.id.cardDeliveryStandard,
             R.id.cardDeliveryExpress,
-            R.id.cardPayCard,
-            R.id.cardPayEdinar,
             R.id.cardPayCash,
             R.id.btnCheckoutContinue
         )
     }
 
-    // Cette fonction fait une action de cette partie de l'app.
+    override fun onResume() {
+        super.onResume()
+        bindDynamicData()
+        applyDeliverySelection()
+        applyPaymentSelection()
+    }
+
     private fun setupActions() {
-        // Back navigation
-        findViewById<View>(R.id.tvCheckoutBack)?.setOnClickListener {
+        binding.ivCheckoutBack.setOnClickListener {
             handleBackNavigation()
         }
 
-        // Modify address placeholder
-        findViewById<View>(R.id.tvCheckoutModifyAddress)?.setOnClickListener {
-            showMotionSnackbar(getString(R.string.coming_soon))
+        binding.tvCheckoutModifyAddress.setOnClickListener {
+            navigateNoShift(AddressesActivity::class.java)
         }
 
-        // Delivery method toggle
-        findViewById<View>(R.id.cardDeliveryStandard)?.setOnClickListener {
-            if (!isStandardSelected) {
-                isStandardSelected = true
-                applyDeliverySelection()
+        binding.cardDeliveryStandard.setOnClickListener {
+            it.performLightHapticFeedback()
+            if (viewModel.isStandardSelected.value == false) {
+                viewModel.setShippingType(true)
             }
         }
-        findViewById<View>(R.id.cardDeliveryExpress)?.setOnClickListener {
-            if (isStandardSelected) {
-                isStandardSelected = false
-                applyDeliverySelection()
+        binding.cardDeliveryExpress.setOnClickListener {
+            it.performLightHapticFeedback()
+            if (viewModel.isStandardSelected.value == true) {
+                viewModel.setShippingType(false)
             }
         }
 
-        // Payment Method toggles
-        findViewById<View>(R.id.cardPayCard)?.setOnClickListener {
-            selectedPaymentMethod = PaymentMethod.CARD
-            applyPaymentSelection()
-        }
-        
-        findViewById<View>(R.id.tvAddNewCard)?.setOnClickListener {
-            isUsingSavedCard = false
-            applyPaymentSelection()
-        }
-        findViewById<View>(R.id.cardPayEdinar)?.setOnClickListener {
-            selectedPaymentMethod = PaymentMethod.EDINAR
-            applyPaymentSelection()
-        }
-        findViewById<View>(R.id.cardPayCash)?.setOnClickListener {
+        binding.cardPayCash.setOnClickListener {
+            it.performLightHapticFeedback()
             selectedPaymentMethod = PaymentMethod.CASH
             applyPaymentSelection()
         }
 
-        // CTA
-        findViewById<View>(R.id.btnCheckoutContinue)?.setOnClickListener {
-            if (currentStep == 1) {
+        binding.btnCheckoutContinue.setOnClickListener {
+            it.performLightHapticFeedback()
+            if ((viewModel.currentStep.value ?: 1) == 1) {
                 transitionToStep2()
             } else {
                 confirmOrder()
             }
         }
     }
-    
-    // Cette fonction fait une action de cette partie de l'app.
-    private fun confirmOrder() {
-        if (selectedPaymentMethod == PaymentMethod.CARD) {
-            val hasSavedCard = appPreferences.getBoolean("has_saved_card", false)
-            if (isUsingSavedCard && hasSavedCard) {
-                saveOrderAndProceed()
-            } else {
-                val switchSave = findViewById<com.google.android.material.switchmaterial.SwitchMaterial>(R.id.switchSaveCard)
-                if (switchSave?.isChecked == true) {
-                    appPreferences.edit().putBoolean("has_saved_card", true).apply()
+
+    private fun observeOrderResult() {
+        viewModel.orderResult.observe(this) { result ->
+            result ?: return@observe
+            result.fold(
+                onSuccess = { order ->
+                    lastSavedOrder = order
+                    btnContinue.isEnabled = true
+                    transitionToStep3()
+                    viewModel.resetOrderResult()
+                },
+                onFailure = { e ->
+                    btnContinue.isEnabled = true
+                    btnContinue.text = getString(R.string.checkout_confirm_order)
+                    showMotionSnackbar(getString(R.string.checkout_order_failed))
+                    viewModel.resetOrderResult()
                 }
-                saveOrderAndProceed()
+            )
+        }
+
+        viewModel.isProcessing.observe(this) { processing ->
+            if (processing) {
+                btnContinue.isEnabled = false
+                btnContinue.text = getString(R.string.checkout_processing)
             }
-        } else {
-            saveOrderAndProceed()
         }
     }
 
-    // Cette fonction fait une action de cette partie de l'app.
-    private fun saveOrderAndProceed() {
-        val uid = FirebaseAuthManager.currentUser?.uid ?: "anonymous_${UUID.randomUUID()}"
-        val cart = CartStore.getCart(this)
-        if (cart.isEmpty()) {
-            showMotionSnackbar("Votre panier est vide.")
+    private fun loadCommerceConfig() {
+        lifecycleScope.launch {
+            runCatching { FirestoreService.fetchCommerceConfig() }
+                .onSuccess { config ->
+                    standardShippingFee = config.standardShippingFee
+                    expressShippingFee = config.expressShippingFee
+                    updateSummary()
+                }
+                .onFailure {
+                    updateSummary()
+                }
+        }
+    }
+
+    private fun confirmOrder() {
+        if (FirebaseAuthManager.currentUser == null) {
+            showAuthChoiceDialog(
+                onCreateAccount = { navigateNoShift(RegisterActivity::class.java) },
+                onExistingClient = { navigateNoShift(LoginActivity::class.java) }
+            )
             return
         }
-        val subtotal = CartStore.subtotal(this)
-        val shippingFee = if (isStandardSelected) CartStore.LIVRAISON_FEE else EXPRESS_FEE
-        val order = AppOrder(
-            items         = cart,
-            subtotal      = subtotal,
-            shippingFee   = shippingFee,
-            total         = subtotal + shippingFee,
-            deliveryType  = if (isStandardSelected) "standard" else "express",
-            paymentMethod = when (selectedPaymentMethod) {
-                PaymentMethod.CARD   -> "card"
-                PaymentMethod.EDINAR -> "edinar"
-                PaymentMethod.CASH   -> "cash"
-            }
-        )
-
-        val btnContinue = findViewById<TextView>(R.id.btnCheckoutContinue)
-        val originalText = btnContinue?.text
-        btnContinue?.text = "Enregistrement..."
-        btnContinue?.isEnabled = false
-        
-        val loadingOverlay = findViewById<View>(R.id.layoutLottieLoading)
-        loadingOverlay?.visibility = View.VISIBLE
-
-        lifecycleScope.launch(Dispatchers.Main) {
-            val result = withContext(Dispatchers.IO) {
-                kotlin.runCatching { FirestoreService.saveOrder(uid, order) }
-            }
-            btnContinue?.isEnabled = true
-            btnContinue?.text = originalText
-            loadingOverlay?.visibility = View.GONE
-
-            result.onSuccess {
-                transitionToStep3()
-            }.onFailure { e ->
-                showMotionSnackbar("Erreur de validation : ${e.localizedMessage}")
-            }
+        if (AddressBookStore.getCurrent(this) == null) {
+            showMotionSnackbar(getString(R.string.checkout_add_address_first))
+            navigateNoShift(AddressesActivity::class.java)
+            return
         }
+        if (selectedPaymentMethod != PaymentMethod.CASH) {
+            showMotionSnackbar(getString(R.string.checkout_cod_only))
+            return
+        }
+        saveOrderAndProceed()
     }
 
-    // Cette fonction fait une action de cette partie de l'app.
-    private fun transitionToStep2() {
-        if (currentStep == 2) return
-        currentStep = 2
+    private fun saveOrderAndProceed() {
+        val cart = CartStore.getCart(this)
+        if (cart.isEmpty()) {
+            showMotionSnackbar(getString(R.string.checkout_cart_empty))
+            return
+        }
 
-        val layoutStep1 = findViewById<View>(R.id.layoutStep1Content)
-        val layoutStep2 = findViewById<View>(R.id.layoutStep2Content)
+        val subtotal = CartStore.subtotal(this)
+        val isStandard = viewModel.isStandardSelected.value ?: true
+        val shippingFee = if (isStandard) standardShippingFee else expressShippingFee
+        val deliveryAddress = AddressBookStore.getCurrent(this) ?: run {
+            showMotionSnackbar(getString(R.string.checkout_add_address_first))
+            return
+        }
+        val estimatedDeliveryDate = buildEstimatedDeliveryTimestamp()
+
+        val order = AppOrder(
+            id = "local_${System.currentTimeMillis()}",
+            items = cart,
+            subtotal = subtotal,
+            shippingFee = shippingFee,
+            total = subtotal + shippingFee,
+            deliveryType = if (isStandard) "standard" else "express",
+            paymentMethod = "cash",
+            deliveryAddressSnapshot = deliveryAddress.toSnapshot(),
+            customerPhone = deliveryAddress.phone,
+            estimatedDeliveryDate = estimatedDeliveryDate,
+            updatedAt = System.currentTimeMillis(),
+            statusTimeline = listOf(OrderStatusEntry("pending", System.currentTimeMillis()))
+        )
+
+        val uid = FirebaseAuthManager.currentUser?.uid ?: return
+        viewModel.submitOrder(uid, order)
+    }
+
+    private fun transitionToStep2() {
+        if (viewModel.currentStep.value == 2) return
+        viewModel.setStep(2)
+
+        val layoutStep1 = binding.layoutStep1Content
+        val layoutStep2 = binding.layoutStep2Content
         updateCheckoutChrome()
         renderStepState()
 
-        // Crossfade Animation
-        layoutStep2?.visibility = View.VISIBLE
-        layoutStep2?.alpha = 0f
+        layoutStep2.visibility = View.VISIBLE
+        layoutStep2.alpha = 0f
 
-        layoutStep1?.animate()?.alpha(0f)?.setDuration(300)?.withEndAction {
+        layoutStep1.animate().alpha(0f).setDuration(MotionTokens.EMPHASIS).withEndAction {
             layoutStep1.visibility = View.GONE
-            layoutStep2?.animate()?.alpha(1f)?.setDuration(300)?.start()
-        }?.start()
-        
+            layoutStep2.animate().alpha(1f).setDuration(MotionTokens.EMPHASIS).start()
+        }.start()
+
         applyPaymentSelection()
     }
 
-    // Cette fonction fait une action de cette partie de l'app.
     private fun transitionToStep3() {
-        if (currentStep == 3) return
-        currentStep = 3
+        if (viewModel.currentStep.value == 3) return
+        viewModel.setStep(3)
 
-        val layoutStep2 = findViewById<View>(R.id.layoutStep2Content)
-        val layoutStep3 = findViewById<View>(R.id.layoutStep3Content)
-        val bottomBar = findViewById<View>(R.id.layoutCheckoutBottomBar)
+        val layoutStep2 = binding.layoutStep2Content
+        val layoutStep3 = binding.layoutStep3Content
+        val bottomBar = binding.layoutCheckoutBottomBar
         updateCheckoutChrome()
         renderStepState()
 
-        // Populate Step 3 Items Summary
-        val container = findViewById<LinearLayout>(R.id.layoutStep3Items)
-        container?.removeAllViews()
+        val container = binding.layoutStep3Items
+        container.removeAllViews()
         val cart = CartStore.getCart(this)
         val inflater = LayoutInflater.from(this)
 
         cart.forEach { (id, qty) ->
             val product = ProductCatalog.byId(id) ?: return@forEach
             val itemView = inflater.inflate(R.layout.item_confirmation_product, container, false)
-            
-            itemView.findViewById<ImageView>(R.id.ivConfirmItemImage)?.loadCatalogImage(product.imageRes)
+
+            itemView.findViewById<ImageView>(R.id.ivConfirmItemImage)
+                ?.loadCatalogImage(product.imageUrl, product.imageRes)
             itemView.findViewById<TextView>(R.id.tvConfirmItemName)?.text = product.title
-            itemView.findViewById<TextView>(R.id.tvConfirmItemDetails)?.text = "Qté : $qty • ${product.subtitle}"
-            itemView.findViewById<TextView>(R.id.tvConfirmItemPrice)?.text = formatDt(product.price * qty).replace(" ", "\n")
-            
-            container?.addView(itemView)
+            itemView.findViewById<TextView>(R.id.tvConfirmItemDetails)?.text =
+                getString(R.string.order_details_item_meta, qty, product.subtitle)
+            itemView.findViewById<TextView>(R.id.tvConfirmItemPrice)?.text = formatDt(product.price * qty)
+
+            container.addView(itemView)
         }
 
-        // Update Total Paid to reflect exact shipping choice
-        val subtotal = CartStore.subtotal(this)
-        val finalTotal = subtotal + if (isStandardSelected) CartStore.LIVRAISON_FEE else EXPRESS_FEE
-        findViewById<TextView>(R.id.tvConfirmationTotal)?.text = formatDt(finalTotal)
+        binding.tvConfirmationTotal.text =
+            formatDt(lastSavedOrder?.total ?: (CartStore.subtotal(this) + if (viewModel.isStandardSelected.value == true) standardShippingFee else expressShippingFee))
         ensureConfirmationMetadata()
-        findViewById<TextView>(R.id.tvConfirmationOrderNumber)?.text = confirmationOrderNumber
-        findViewById<TextView>(R.id.tvConfirmationEta)?.text = confirmationDeliveryEstimate
+        binding.tvConfirmationOrderNumber.text = confirmationOrderNumber
+        binding.tvConfirmationEta.text = confirmationDeliveryEstimate
 
-        // Clear Cart only after successful order submission
         CartStore.clear(this)
 
-        // Buttons in Step 3
-        findViewById<View>(R.id.btnTrackOrder)?.setOnClickListener {
-            showMotionSnackbar("Le suivi détaillé sera disponible très bientôt.")
+        binding.btnTrackOrder.setOnClickListener {
+            val orderId = lastSavedOrder?.id
+            if (orderId.isNullOrBlank()) {
+                navigateNoShift(OrdersHistoryActivity::class.java)
+            } else {
+                startActivity(OrderDetailsActivity.createIntent(this, orderId))
+            }
         }
-        findViewById<View>(R.id.btnBackHome)?.setOnClickListener {
+        binding.btnBackHome.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
             startActivity(intent)
             finish()
         }
 
-        // Crossfade Animation
-        layoutStep3?.visibility = View.VISIBLE
-        layoutStep3?.alpha = 0f
+        layoutStep3.visibility = View.VISIBLE
+        layoutStep3.alpha = 0f
 
-        // Hide bottom bar
-        bottomBar?.animate()?.alpha(0f)?.setDuration(300)?.withEndAction {
+        bottomBar.animate().alpha(0f).setDuration(MotionTokens.EMPHASIS).withEndAction {
             bottomBar.visibility = View.GONE
-        }?.start()
+        }.start()
 
-        layoutStep2?.animate()?.alpha(0f)?.setDuration(300)?.withEndAction {
+        layoutStep2.animate().alpha(0f).setDuration(MotionTokens.EMPHASIS).withEndAction {
             layoutStep2.visibility = View.GONE
-            layoutStep3?.animate()?.alpha(1f)?.setDuration(300)?.start()
-        }?.start()
+            layoutStep3.animate().alpha(1f).setDuration(MotionTokens.EMPHASIS).start()
+        }.start()
     }
 
-    // Cette fonction fait une action de cette partie de l'app.
     private fun bindDynamicData() {
-        // 1. Address
-        val addressList = AddressBookStore.getAddresses(this)
-        val address = addressList.firstOrNull() ?: "Tunis, Tunisie"
-        
-        val tvName = findViewById<TextView>(R.id.tvCheckoutAddressName)
-        val tvLine1 = findViewById<TextView>(R.id.tvCheckoutAddressLine1)
-        
-        tvName?.text = getString(R.string.user_guest_name)
-        tvLine1?.text = address
-        findViewById<TextView>(R.id.tvCheckoutAddressLine2)?.visibility = View.GONE
-        findViewById<TextView>(R.id.tvCheckoutAddressPhone)?.visibility = View.GONE
+        val address = AddressBookStore.getCurrent(this)
+        val tvName = binding.tvCheckoutAddressName
+        val tvLine1 = binding.tvCheckoutAddressLine1
+        val tvLine2 = binding.tvCheckoutAddressLine2
+        val tvPhone = binding.tvCheckoutAddressPhone
 
-        // Auto-resolve if it's the default
-        if (address == "Tunis, Tunisie" && LocationHelper.hasPermission(this)) {
-            LocationHelper.resolveCurrentLocation(this) { resolved ->
-                tvLine1?.text = resolved
+        val firebaseUser = FirebaseAuthManager.currentUser
+        tvName.text = address?.recipientName?.takeIf { it.isNotBlank() }
+            ?: firebaseUser?.displayName?.takeIf { it.isNotBlank() }
+            ?: getString(R.string.user_guest_name)
+        tvLine1.text = address?.summaryLine ?: getString(R.string.checkout_address_placeholder)
+        tvLine2.text = address?.detailsLine.orEmpty()
+        tvLine2.visibility = if (address?.detailsLine.isNullOrBlank()) View.GONE else View.VISIBLE
+        tvPhone.text = address?.phone.orEmpty()
+        tvPhone.visibility = if (address?.phone.isNullOrBlank()) View.GONE else View.VISIBLE
+
+        firebaseUser?.uid?.let { uid ->
+            lifecycleScope.launch {
+                runCatching { FirestoreService.fetchUserProfile(uid) }
+                    .onSuccess { profile ->
+                        if (!isFinishing && !isDestroyed && profile != null) {
+                            tvName.text = profile.name.ifBlank { tvName.text }
+                        }
+                    }
+                    .onFailure {
+                        showMotionSnackbar(getString(R.string.profile_load_failed))
+                    }
             }
         }
 
-        // 2. Articles Thumbnails
-        val tray = findViewById<LinearLayout>(R.id.layoutCheckoutArticles)
-        tray?.removeAllViews()
+        val tray = binding.layoutCheckoutArticles
+        tray.removeAllViews()
         val cart = CartStore.getCart(this)
         val items = ProductCatalog.orderedFavorites(cart.keys)
-        
+
         val inflater = LayoutInflater.from(this)
         items.forEach { product ->
             val card = inflater.inflate(R.layout.item_checkout_thumbnail, tray, false) as MaterialCardView
-            card.findViewById<ImageView>(R.id.ivThumbnail)?.loadCatalogImage(product.imageRes)
-            tray?.addView(card)
+            card.findViewById<ImageView>(R.id.ivThumbnail)
+                ?.loadCatalogImage(product.imageUrl, product.imageRes)
+            tray.addView(card)
         }
 
-        // 3. Summary
         updateSummary()
     }
 
-    // Cette fonction fait une action de cette partie de l'app.
     private fun updateSummary() {
         val subtotal = CartStore.subtotal(this)
-        val shipping = if (isStandardSelected) CartStore.LIVRAISON_FEE else EXPRESS_FEE
+        val isStandard = viewModel.isStandardSelected.value ?: true
+        val shipping = if (isStandard) standardShippingFee else expressShippingFee
         val total = subtotal + shipping
 
-        findViewById<TextView>(R.id.tvCheckoutSubtotal)?.text = formatDt(subtotal)
-        
-        val tvShippingLabel = findViewById<TextView>(R.id.tvCheckoutShippingLabel)
-        val tvShippingValue = findViewById<TextView>(R.id.tvCheckoutShippingValue)
-        
-        if (isStandardSelected) {
-            tvShippingLabel?.text = "Livraison standard"
-            tvShippingValue?.text = if (CartStore.LIVRAISON_FEE <= 0.0) "Gratuite" else formatDt(CartStore.LIVRAISON_FEE)
+        binding.tvCheckoutSubtotal.text = formatDt(subtotal)
+        binding.tvDeliveryStandardPrice.text =
+            if (standardShippingFee <= 0.0) getString(R.string.checkout_shipping_free) else formatDt(standardShippingFee)
+        binding.tvDeliveryExpressPrice.text = formatDt(expressShippingFee)
+
+        val tvShippingLabel = binding.tvCheckoutShippingLabel
+        val tvShippingValue = binding.tvCheckoutShippingValue
+
+        if (isStandard) {
+            tvShippingLabel.text = getString(R.string.checkout_shipping_standard)
+            tvShippingValue.text = if (standardShippingFee <= 0.0) getString(R.string.checkout_shipping_free) else formatDt(standardShippingFee)
         } else {
-            tvShippingLabel?.text = "Livraison express"
-            tvShippingValue?.text = formatDt(EXPRESS_FEE)
+            tvShippingLabel.text = getString(R.string.checkout_shipping_express)
+            tvShippingValue.text = formatDt(expressShippingFee)
         }
 
-        findViewById<TextView>(R.id.tvCheckoutTotal)?.text = formatDt(total)
+        binding.tvCheckoutTotal.text = formatDt(total)
     }
 
-    // Cette fonction fait une action de cette partie de l'app.
     private fun applyDeliverySelection() {
-        val cardStandard = findViewById<MaterialCardView>(R.id.cardDeliveryStandard)
-        val cardExpress  = findViewById<MaterialCardView>(R.id.cardDeliveryExpress)
-        val checkStandard = findViewById<View>(R.id.ivStandardCheck)
-        val radioExpress  = findViewById<View>(R.id.ivExpressRadio)
+        val cardStandard = binding.cardDeliveryStandard
+        val cardExpress = binding.cardDeliveryExpress
+        val checkStandard = binding.ivStandardCheck
+        val radioExpress = binding.ivExpressRadio
 
         val colorSelected = ContextCompat.getColor(this, R.color.colorPrimary)
         val colorUnselected = ContextCompat.getColor(this, R.color.colorBorderLight)
         val strokeSelected = resources.getDimensionPixelSize(R.dimen.checkout_selected_stroke)
         val strokeUnselected = resources.getDimensionPixelSize(R.dimen.checkout_unselected_stroke)
 
-        if (isStandardSelected) {
-            cardStandard?.strokeColor = colorSelected
-            cardStandard?.strokeWidth = strokeSelected
-            checkStandard?.visibility = View.VISIBLE
+        val isStandard = viewModel.isStandardSelected.value ?: true
+        if (isStandard) {
+            cardStandard.strokeColor = colorSelected
+            cardStandard.strokeWidth = strokeSelected
+            checkStandard.visibility = View.VISIBLE
 
-            cardExpress?.strokeColor = colorUnselected
-            cardExpress?.strokeWidth = strokeUnselected
-            radioExpress?.visibility = View.VISIBLE
+            cardExpress.strokeColor = colorUnselected
+            cardExpress.strokeWidth = strokeUnselected
+            radioExpress.visibility = View.VISIBLE
         } else {
-            cardStandard?.strokeColor = colorUnselected
-            cardStandard?.strokeWidth = strokeUnselected
-            checkStandard?.visibility = View.GONE
+            cardStandard.strokeColor = colorUnselected
+            cardStandard.strokeWidth = strokeUnselected
+            checkStandard.visibility = View.GONE
 
-            cardExpress?.strokeColor = colorSelected
-            cardExpress?.strokeWidth = strokeSelected
-            radioExpress?.visibility = View.GONE
+            cardExpress.strokeColor = colorSelected
+            cardExpress.strokeWidth = strokeSelected
+            radioExpress.visibility = View.GONE
         }
-        
+
         updateSummary()
     }
 
-    // Cette fonction fait une action de cette partie de l'app.
     private fun applyPaymentSelection() {
-        val cardPayCard = findViewById<MaterialCardView>(R.id.cardPayCard)
-        val cardPayEdinar = findViewById<MaterialCardView>(R.id.cardPayEdinar)
-        val cardPayCash = findViewById<MaterialCardView>(R.id.cardPayCash)
-
-        val ivCard = findViewById<ImageView>(R.id.ivPayCardRadio)
-        val ivEdinar = findViewById<ImageView>(R.id.ivPayEdinarRadio)
-        val ivCash = findViewById<ImageView>(R.id.ivPayCashRadio)
-
-        val layoutCardForm = findViewById<View>(R.id.layoutCardForm)
-        val layoutSavedCard = findViewById<View>(R.id.layoutSavedCard)
-        val layoutEdinarMessage = findViewById<View>(R.id.layoutEdinarMessage)
+        val cardPayCash = binding.cardPayCash
+        val ivCash = binding.ivPayCashRadio
 
         val colorSelected = ContextCompat.getColor(this, R.color.colorPrimary)
-        val colorUnselected = ContextCompat.getColor(this, R.color.colorBorderLight)
         val strokeSelected = resources.getDimensionPixelSize(R.dimen.checkout_selected_stroke)
-        val strokeUnselected = resources.getDimensionPixelSize(R.dimen.checkout_unselected_stroke)
 
-        // Reset all
-        arrayOf(cardPayCard, cardPayEdinar, cardPayCash).forEach {
-            it?.strokeColor = colorUnselected
-            it?.strokeWidth = strokeUnselected
-        }
-        arrayOf(ivCard, ivEdinar, ivCash).forEach {
-            it?.setImageResource(R.drawable.ic_checkout_radio_empty)
-        }
-        layoutCardForm?.visibility = View.GONE
-        layoutSavedCard?.visibility = View.GONE
-        layoutEdinarMessage?.visibility = View.GONE
-
-        // Apply selected
-        when (selectedPaymentMethod) {
-            PaymentMethod.CARD -> {
-                cardPayCard?.strokeColor = colorSelected
-                cardPayCard?.strokeWidth = strokeSelected
-                ivCard?.setImageResource(R.drawable.ic_checkout_radio_filled)
-                
-                val hasSavedCard = appPreferences.getBoolean("has_saved_card", false)
-                if (hasSavedCard && isUsingSavedCard) {
-                    layoutSavedCard?.visibility = View.VISIBLE
-                } else {
-                    layoutCardForm?.visibility = View.VISIBLE
-                }
-            }
-            PaymentMethod.EDINAR -> {
-                cardPayEdinar?.strokeColor = colorSelected
-                cardPayEdinar?.strokeWidth = strokeSelected
-                ivEdinar?.setImageResource(R.drawable.ic_checkout_radio_filled)
-                layoutEdinarMessage?.visibility = View.VISIBLE
-            }
-            PaymentMethod.CASH -> {
-                cardPayCash?.strokeColor = colorSelected
-                cardPayCash?.strokeWidth = strokeSelected
-                ivCash?.setImageResource(R.drawable.ic_checkout_radio_filled)
-            }
-        }
+        cardPayCash.alpha = 1f
+        cardPayCash.strokeColor = colorSelected
+        cardPayCash.strokeWidth = strokeSelected
+        ivCash.setImageResource(R.drawable.ic_checkout_radio_filled)
+        selectedPaymentMethod = PaymentMethod.CASH
+        
+        binding.tvPayCashTitle.text = getString(R.string.checkout_pay_cod_title)
+        binding.tvPayCashSubtitle.text = getString(R.string.checkout_pay_cod_subtitle)
     }
 
-    // Cette fonction fait une action de cette partie de l'app.
     private fun handleBackNavigation() {
-        when (currentStep) {
+        when (viewModel.currentStep.value ?: 1) {
             3 -> transitionBackToStep2()
             2 -> transitionBackToStep1()
             else -> finishWithMotion()
         }
     }
 
-    // Cette fonction fait une action de cette partie de l'app.
     private fun transitionBackToStep1() {
-        if (currentStep == 1) return
-        currentStep = 1
+        if (viewModel.currentStep.value == 1) return
+        viewModel.setStep(1)
 
-        val layoutStep1 = findViewById<View>(R.id.layoutStep1Content)
-        val layoutStep2 = findViewById<View>(R.id.layoutStep2Content)
+        val layoutStep1 = binding.layoutStep1Content
+        val layoutStep2 = binding.layoutStep2Content
         updateCheckoutChrome()
         renderStepState()
 
-        // Crossfade Animation
-        layoutStep1?.visibility = View.VISIBLE
-        layoutStep1?.alpha = 0f
+        layoutStep1.visibility = View.VISIBLE
+        layoutStep1.alpha = 0f
 
-        layoutStep2?.animate()?.alpha(0f)?.setDuration(300)?.withEndAction {
+        layoutStep2.animate().alpha(0f).setDuration(MotionTokens.EMPHASIS).withEndAction {
             layoutStep2.visibility = View.GONE
-            layoutStep1?.animate()?.alpha(1f)?.setDuration(300)?.start()
-        }?.start()
+            layoutStep1.animate().alpha(1f).setDuration(MotionTokens.EMPHASIS).start()
+        }.start()
     }
 
-    // Cette fonction fait une action de cette partie de l'app.
     private fun transitionBackToStep2() {
-        if (currentStep == 2) return
-        currentStep = 2
+        if (viewModel.currentStep.value == 2) return
+        viewModel.setStep(2)
 
-        val layoutStep2 = findViewById<View>(R.id.layoutStep2Content)
-        val layoutStep3 = findViewById<View>(R.id.layoutStep3Content)
-        val bottomBar = findViewById<View>(R.id.layoutCheckoutBottomBar)
+        val layoutStep2 = binding.layoutStep2Content
+        val layoutStep3 = binding.layoutStep3Content
+        val bottomBar = binding.layoutCheckoutBottomBar
         updateCheckoutChrome()
         renderStepState()
 
-        // Show bottom bar again
-        bottomBar?.visibility = View.VISIBLE
-        bottomBar?.alpha = 0f
-        bottomBar?.animate()?.alpha(1f)?.setDuration(300)?.start()
+        bottomBar.visibility = View.VISIBLE
+        bottomBar.alpha = 0f
+        bottomBar.animate().alpha(1f).setDuration(MotionTokens.EMPHASIS).start()
 
-        // Crossfade Animation
-        layoutStep2?.visibility = View.VISIBLE
-        layoutStep2?.alpha = 0f
+        layoutStep2.visibility = View.VISIBLE
+        layoutStep2.alpha = 0f
 
-        layoutStep3?.animate()?.alpha(0f)?.setDuration(300)?.withEndAction {
+        layoutStep3.animate().alpha(0f).setDuration(MotionTokens.EMPHASIS).withEndAction {
             layoutStep3.visibility = View.GONE
-            layoutStep2?.animate()?.alpha(1f)?.setDuration(300)?.start()
-        }?.start()
+            layoutStep2.animate().alpha(1f).setDuration(MotionTokens.EMPHASIS).start()
+        }.start()
 
         applyPaymentSelection()
     }
 
     private fun updateCheckoutChrome() {
-        val title = findViewById<TextView>(R.id.tvCheckoutTitle)
-        val btnContinue = findViewById<TextView>(R.id.btnCheckoutContinue)
-        when (currentStep) {
+        val title = binding.tvCheckoutTitle
+        val step = viewModel.currentStep.value ?: 1
+        when (step) {
             1 -> {
-                title?.text = "Détails de la commande"
-                btnContinue?.text = "Continuer vers le paiement"
+                title.text = getString(R.string.checkout_step1_title)
+                btnContinue.text = getString(R.string.checkout_step1_continue)
             }
             2 -> {
-                title?.text = "Méthode de paiement"
-                btnContinue?.text = "Confirmer la commande"
+                title.text = getString(R.string.checkout_step2_title)
+                btnContinue.text = getString(R.string.checkout_confirm_order)
             }
             3 -> {
-                title?.text = "Confirmation"
+                title.text = getString(R.string.checkout_step3_title)
             }
         }
     }
 
     private fun renderStepState() {
-        updateStepIndicator(stepNumber = 1, isActive = currentStep == 1, isComplete = currentStep > 1)
-        updateStepIndicator(stepNumber = 2, isActive = currentStep == 2, isComplete = currentStep > 2)
-        updateStepIndicator(stepNumber = 3, isActive = currentStep == 3, isComplete = false)
+        val step = viewModel.currentStep.value ?: 1
+        updateStepIndicator(stepNumber = 1, isActive = step == 1, isComplete = step > 1)
+        updateStepIndicator(stepNumber = 2, isActive = step == 2, isComplete = step > 2)
+        updateStepIndicator(stepNumber = 3, isActive = step == 3, isComplete = false)
 
-        findViewById<View>(R.id.lineStep1to2)?.setBackgroundColor(
-            ContextCompat.getColor(this, if (currentStep >= 2) R.color.colorPrimary else R.color.colorBorderLight)
+        binding.lineStep1to2.setBackgroundColor(
+            ContextCompat.getColor(this, if (step >= 2) R.color.colorPrimary else R.color.colorBorderLight)
         )
-        findViewById<View>(R.id.lineStep2to3)?.setBackgroundColor(
-            ContextCompat.getColor(this, if (currentStep >= 3) R.color.colorPrimary else R.color.colorBorderLight)
+        binding.lineStep2to3.setBackgroundColor(
+            ContextCompat.getColor(this, if (step >= 3) R.color.colorPrimary else R.color.colorBorderLight)
         )
     }
 
     private fun updateStepIndicator(stepNumber: Int, isActive: Boolean, isComplete: Boolean) {
-        val bgId = when (stepNumber) {
-            1 -> R.id.bgStep1
-            2 -> R.id.bgStep2
-            else -> R.id.bgStep3
+        val bgView = when (stepNumber) {
+            1 -> binding.bgStep1
+            2 -> binding.bgStep2
+            else -> binding.bgStep3
         }
-        val textId = when (stepNumber) {
-            1 -> R.id.tvStep1
-            2 -> R.id.tvStep2
-            else -> R.id.tvStep3
+        val textView = when (stepNumber) {
+            1 -> binding.tvStep1
+            2 -> binding.tvStep2
+            else -> binding.tvStep3
         }
-        findViewById<View>(bgId)?.setBackgroundResource(
+        bgView.setBackgroundResource(
             if (isActive || isComplete) R.drawable.bg_checkout_step_active else R.drawable.bg_checkout_step_inactive
         )
-        findViewById<TextView>(textId)?.apply {
+        textView.apply {
             text = stepNumber.toString()
             setTextColor(
                 ContextCompat.getColor(
@@ -567,10 +546,11 @@ class CheckoutDetailsActivity : AppCompatActivity() {
     }
 
     private fun ensureConfirmationMetadata() {
+        val order = lastSavedOrder
         if (confirmationOrderNumber.isBlank()) {
-            confirmationOrderNumber = buildOrderNumber()
+            confirmationOrderNumber = order?.displayId ?: buildOrderNumber()
         }
-        confirmationDeliveryEstimate = buildDeliveryEstimate()
+        confirmationDeliveryEstimate = order?.estimatedDeliveryLabel.ifNullOrBlank { buildDeliveryEstimate() }
     }
 
     private fun buildOrderNumber(): String {
@@ -580,8 +560,9 @@ class CheckoutDetailsActivity : AppCompatActivity() {
 
     private fun buildDeliveryEstimate(): String {
         val today = LocalDate.now()
-        val start = if (isStandardSelected) today.plusDays(3) else today.plusDays(1)
-        val end = if (isStandardSelected) today.plusDays(5) else today.plusDays(2)
+        val isStandard = viewModel.isStandardSelected.value ?: true
+        val start = if (isStandard) today.plusDays(3) else today.plusDays(1)
+        val end = if (isStandard) today.plusDays(5) else today.plusDays(2)
         val formatter = DateTimeFormatter.ofPattern("d MMM", Locale.FRENCH)
         return if (start.month == end.month) {
             "${start.dayOfMonth} - ${end.format(formatter)}"
@@ -589,5 +570,14 @@ class CheckoutDetailsActivity : AppCompatActivity() {
             "${start.format(formatter)} - ${end.format(formatter)}"
         }
     }
-}
 
+    private fun buildEstimatedDeliveryTimestamp(): Long {
+        val isStandard = viewModel.isStandardSelected.value ?: true
+        val daysToAdd = if (isStandard) 4L else 2L
+        return System.currentTimeMillis() + daysToAdd * 24L * 60L * 60L * 1000L
+    }
+
+    private fun String?.ifNullOrBlank(fallback: () -> String): String {
+        return if (this.isNullOrBlank()) fallback() else this
+    }
+}

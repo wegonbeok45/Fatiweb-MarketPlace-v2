@@ -1,85 +1,81 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/layoutCheckoutRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/details_background">
 
-    <!-- Top bar -->
     <LinearLayout
         android:id="@+id/layoutCheckoutTopBar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        android:background="@drawable/bg_shell_top_surface"
         android:gravity="center_vertical"
-        android:paddingStart="8dp"
-        android:paddingEnd="20dp"
-        android:paddingTop="16dp"
-        android:paddingBottom="14dp"
-        app:layout_constraintTop_toTopOf="parent"
+        android:orientation="horizontal"
+        android:paddingStart="@dimen/space_16"
+        android:paddingTop="@dimen/space_12"
+        android:paddingEnd="@dimen/screen_padding_horizontal"
+        android:paddingBottom="@dimen/space_12"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintTop_toTopOf="parent">
 
-        <!-- Back button -->
-        <TextView
-            android:id="@+id/tvCheckoutBack"
+        <ImageView
+            android:id="@+id/ivCheckoutBack"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:text="‹"
-            android:textSize="32sp"
-            android:textColor="@color/colorOnSurface"
-            android:gravity="center"
-            android:fontFamily="@font/plus_jakarta_sans_medium"
-            android:paddingBottom="4dp" />
+            android:background="@drawable/bg_shell_action_chip"
+            android:padding="12dp"
+            android:src="@drawable/back"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/cd_back" />
 
-        <!-- Title -->
         <TextView
             android:id="@+id/tvCheckoutTitle"
+            style="@style/AppText.Subtitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Détails de la commande"
-            android:textSize="18sp"
-            android:textColor="@color/colorOnSurface"
             android:gravity="center"
-            android:textStyle="bold"
-            android:fontFamily="@font/plus_jakarta_sans" />
+            android:text="@string/auto_d233tails_de_la_commande_e15a"
+            android:textColor="?attr/colorOnSurface" />
 
-        <!-- Spacer to keep title centred -->
         <View
             android:layout_width="48dp"
             android:layout_height="48dp" />
-
     </LinearLayout>
 
-    <!-- Thin divider under top bar -->
     <View
         android:id="@+id/viewCheckoutTopDivider"
         android:layout_width="0dp"
         android:layout_height="1dp"
         android:background="@color/colorBorderLight"
-        app:layout_constraintTop_toBottomOf="@id/layoutCheckoutTopBar"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/layoutCheckoutTopBar" />
 
-    <!-- Step indicator -->
     <LinearLayout
         android:id="@+id/layoutCheckoutSteps"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
         android:gravity="center"
-        android:paddingTop="24dp"
-        app:layout_constraintTop_toBottomOf="@id/viewCheckoutTopDivider"
+        android:orientation="horizontal"
+        android:paddingTop="@dimen/space_16"
+        android:paddingBottom="@dimen/space_8"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintTop_toBottomOf="@id/viewCheckoutTopDivider">
 
-        <!-- Step 1 -->
         <FrameLayout
-            android:layout_width="32dp"
-            android:layout_height="32dp">
+            android:id="@+id/btnStep1"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackgroundBorderless">
             <View
                 android:id="@+id/bgStep1"
                 android:layout_width="match_parent"
@@ -89,26 +85,27 @@
                 android:id="@+id/tvStep1"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:text="1"
-                android:textSize="14sp"
-                android:textColor="@color/colorOnSurface"
-                android:textStyle="bold"
+                android:fontFamily="@font/plus_jakarta_sans_bold"
                 android:gravity="center"
-                android:fontFamily="@font/plus_jakarta_sans" />
+                android:text="@string/auto_1_c4ca"
+                android:textColor="?attr/colorOnSurface"
+                android:textSize="@dimen/text_size_caption" />
         </FrameLayout>
 
-        <!-- Line 1-2 -->
         <View
             android:id="@+id/lineStep1to2"
             android:layout_width="32dp"
             android:layout_height="1dp"
-            android:layout_marginHorizontal="8dp"
+            android:layout_marginHorizontal="@dimen/space_8"
             android:background="@color/colorBorderLight" />
 
-        <!-- Step 2 -->
         <FrameLayout
-            android:layout_width="32dp"
-            android:layout_height="32dp">
+            android:id="@+id/btnStep2"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackgroundBorderless">
             <View
                 android:id="@+id/bgStep2"
                 android:layout_width="match_parent"
@@ -118,25 +115,27 @@
                 android:id="@+id/tvStep2"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:text="2"
-                android:textSize="14sp"
-                android:textColor="@color/profile_text_muted"
+                android:fontFamily="@font/plus_jakarta_sans_bold"
                 android:gravity="center"
-                android:fontFamily="@font/plus_jakarta_sans" />
+                android:text="@string/auto_2_c81e"
+                android:textColor="@color/profile_text_muted"
+                android:textSize="@dimen/text_size_caption" />
         </FrameLayout>
 
-        <!-- Line 2-3 -->
         <View
             android:id="@+id/lineStep2to3"
             android:layout_width="32dp"
             android:layout_height="1dp"
-            android:layout_marginHorizontal="8dp"
+            android:layout_marginHorizontal="@dimen/space_8"
             android:background="@color/colorBorderLight" />
 
-        <!-- Step 3 -->
         <FrameLayout
-            android:layout_width="32dp"
-            android:layout_height="32dp">
+            android:id="@+id/btnStep3"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackgroundBorderless">
             <View
                 android:id="@+id/bgStep3"
                 android:layout_width="match_parent"
@@ -146,635 +145,368 @@
                 android:id="@+id/tvStep3"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:text="3"
-                android:textSize="14sp"
-                android:textColor="@color/profile_text_muted"
+                android:fontFamily="@font/plus_jakarta_sans_bold"
                 android:gravity="center"
-                android:fontFamily="@font/plus_jakarta_sans" />
+                android:text="@string/auto_3_eccb"
+                android:textColor="@color/profile_text_muted"
+                android:textSize="@dimen/text_size_caption" />
         </FrameLayout>
-
     </LinearLayout>
 
-    <!-- Scrollable content -->
     <androidx.core.widget.NestedScrollView
         android:id="@+id/scrollCheckoutContent"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:overScrollMode="never"
         android:clipToPadding="false"
-        android:paddingBottom="16dp"
-        app:layout_constraintTop_toBottomOf="@id/layoutCheckoutSteps"
+        android:overScrollMode="never"
+        android:paddingBottom="@dimen/space_16"
         app:layout_constraintBottom_toTopOf="@id/layoutCheckoutBottomBar"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintTop_toBottomOf="@id/layoutCheckoutSteps">
 
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <!-- STEP 1 CONTENT: Delivery & Summary -->
             <LinearLayout
                 android:id="@+id/layoutStep1Content"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:paddingHorizontal="24dp"
-                android:paddingTop="24dp">
-
-            <!-- Adresse de livraison -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="12dp">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="ADRESSE DE LIVRAISON"
-                    android:textSize="11sp"
-                    android:letterSpacing="0.10"
-                    android:textColor="@color/colorPrimary"
-                    android:textStyle="bold"
-                    android:fontFamily="@font/plus_jakarta_sans" />
-
-                <TextView
-                    android:id="@+id/tvCheckoutModifyAddress"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Modifier"
-                    android:textSize="13sp"
-                    android:textColor="@color/colorPrimary"
-                    android:textStyle="bold"
-                    android:fontFamily="@font/plus_jakarta_sans" />
-
-            </LinearLayout>
-
-            <!-- Address card -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardCheckoutAddress"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="32dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="0dp"
-                app:cardBackgroundColor="@color/colorSurface">
+                android:paddingHorizontal="@dimen/screen_padding_horizontal"
+                android:paddingTop="@dimen/space_24">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:padding="20dp"
-                    android:gravity="top">
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
 
-                    <!-- Location icon chip -->
-                    <com.google.android.material.card.MaterialCardView
-                        android:layout_width="38dp"
-                        android:layout_height="38dp"
-                        android:layout_marginEnd="16dp"
-                        android:layout_marginTop="2dp"
-                        app:cardCornerRadius="8dp"
-                        app:cardBackgroundColor="@color/colorSurfaceVariant"
-                        app:cardElevation="0dp">
-
-                        <ImageView
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:src="@drawable/ic_checkout_pin"
-                            android:scaleType="center"
-                            android:padding="8dp" />
-
-                    </com.google.android.material.card.MaterialCardView>
-
-                    <!-- Address text block -->
-                    <LinearLayout
+                    <TextView
+                        style="@style/AppText.Overline"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:orientation="vertical">
+                        android:text="@string/auto_adresse_de_livraison_46e1"
+                        android:textColor="?attr/colorPrimary" />
 
-                        <TextView
-                            android:id="@+id/tvCheckoutAddressName"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Sophie Martin"
-                            android:textSize="16sp"
-                            android:textColor="@color/colorOnSurface"
-                            android:textStyle="bold"
-                            android:fontFamily="@font/plus_jakarta_sans"
-                            android:layout_marginBottom="4dp" />
-
-                        <TextView
-                            android:id="@+id/tvCheckoutAddressLine1"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="12 Rue de la Paix"
-                            android:textSize="14sp"
-                            android:textColor="@color/colorOnSurfaceVariant"
-                            android:fontFamily="@font/plus_jakarta_sans" />
-
-                        <TextView
-                            android:id="@+id/tvCheckoutAddressLine2"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="75002 Paris, France"
-                            android:textSize="14sp"
-                            android:textColor="@color/colorOnSurfaceVariant"
-                            android:fontFamily="@font/plus_jakarta_sans" />
-
-                        <TextView
-                            android:id="@+id/tvCheckoutAddressPhone"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="+33 1 23 45 67 89"
-                            android:textSize="14sp"
-                            android:textColor="@color/colorOnSurfaceVariant"
-                            android:fontFamily="@font/plus_jakarta_sans" />
-
-                    </LinearLayout>
-
-                </LinearLayout>
-
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- Méthode de livraison -->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="MÉTHODE DE LIVRAISON"
-                android:textSize="11sp"
-                android:letterSpacing="0.10"
-                android:textColor="@color/colorPrimary"
-                android:textStyle="bold"
-                android:fontFamily="@font/plus_jakarta_sans"
-                android:layout_marginBottom="12dp" />
-
-            <!-- Standard delivery card -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardDeliveryStandard"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="0dp"
-                app:cardBackgroundColor="@color/colorSurface"
-                app:strokeColor="@color/colorPrimary"
-                app:strokeWidth="1.5dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:padding="20dp"
-                    android:gravity="center_vertical">
-
-                    <!-- Truck icon chip -->
-                    <com.google.android.material.card.MaterialCardView
-                        android:layout_width="44dp"
-                        android:layout_height="44dp"
-                        android:layout_marginEnd="16dp"
-                        app:cardCornerRadius="8dp"
-                        app:cardBackgroundColor="@color/colorSecondary"
-                        app:cardElevation="0dp">
-
-                        <ImageView
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:src="@drawable/ic_checkout_truck"
-                            android:scaleType="center"
-                            android:padding="9dp" />
-
-                    </com.google.android.material.card.MaterialCardView>
-
-                    <!-- Label + subtitle -->
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Standard"
-                            android:textSize="16sp"
-                        android:textColor="@color/colorOnSurface"
-                            android:textStyle="bold"
-                        android:fontFamily="@font/plus_jakarta_sans" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Livraison sous 3-5 jours"
-                            android:textSize="13sp"
-                        android:textColor="@color/colorOnSurfaceVariant"
-                        android:fontFamily="@font/plus_jakarta_sans" />
-
-                    </LinearLayout>
-
-                    <!-- Price + checkmark -->
-                    <LinearLayout
+                    <TextView
+                        android:id="@+id/tvCheckoutModifyAddress"
+                        style="@style/AppText.Caption"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:gravity="end">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="GRATUIT"
-                            android:textSize="11sp"
-                            android:letterSpacing="0.05"
-                        android:textColor="@color/colorPrimary"
-                            android:textStyle="bold"
-                        android:fontFamily="@font/plus_jakarta_sans"
-                            android:layout_marginBottom="4dp" />
-
-                        <ImageView
-                            android:id="@+id/ivStandardCheck"
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:src="@drawable/ic_checkout_check_filled" />
-
-                    </LinearLayout>
-
+                        android:fontFamily="@font/plus_jakarta_sans_bold"
+                        android:text="@string/auto_modifier_898c"
+                        android:textColor="?attr/colorPrimary" />
                 </LinearLayout>
 
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- Express delivery card -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardDeliveryExpress"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="32dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="0dp"
-                app:cardBackgroundColor="@color/colorSurface">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:padding="20dp"
-                    android:gravity="center_vertical">
-
-                    <!-- Lightning icon chip -->
-                    <com.google.android.material.card.MaterialCardView
-                        android:layout_width="44dp"
-                        android:layout_height="44dp"
-                        android:layout_marginEnd="16dp"
-                        app:cardCornerRadius="8dp"
-                        app:cardBackgroundColor="@color/colorSurfaceVariant"
-                        app:cardElevation="0dp">
-
-                        <ImageView
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:src="@drawable/ic_checkout_lightning"
-                            android:scaleType="center"
-                            android:padding="9dp" />
-
-                    </com.google.android.material.card.MaterialCardView>
-
-                    <!-- Label + subtitle -->
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Express"
-                            android:textSize="16sp"
-                            android:textColor="@color/colorOnSurface"
-                            android:textStyle="bold"
-                            android:fontFamily="@font/plus_jakarta_sans" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Demain avant 13h00"
-                            android:textSize="13sp"
-                            android:textColor="@color/colorOnSurfaceVariant"
-                            android:fontFamily="@font/plus_jakarta_sans" />
-
-                    </LinearLayout>
-
-                    <!-- Price + radio -->
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:gravity="end">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="12,50 DT"
-                            android:textSize="14sp"
-                            android:textColor="@color/colorOnSurface"
-                            android:textStyle="bold"
-                            android:fontFamily="@font/plus_jakarta_sans"
-                            android:layout_marginBottom="4dp" />
-
-                        <ImageView
-                            android:id="@+id/ivExpressRadio"
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:src="@drawable/ic_checkout_radio_empty" />
-
-                    </LinearLayout>
-
-                </LinearLayout>
-
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- Articles -->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="ARTICLES"
-                android:textSize="11sp"
-                android:letterSpacing="0.10"
-                android:textColor="@color/colorPrimary"
-                android:textStyle="bold"
-                android:fontFamily="@font/plus_jakarta_sans"
-                android:layout_marginBottom="12dp" />
-
-            <!-- Product thumbnails row -->
-            <LinearLayout
-                android:id="@+id/layoutCheckoutArticles"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginBottom="32dp">
-
-                <!-- Product 1: Bag -->
                 <com.google.android.material.card.MaterialCardView
-                    android:layout_width="84dp"
-                    android:layout_height="84dp"
-                    android:layout_marginEnd="12dp"
-                    app:cardCornerRadius="8dp"
-                    app:cardElevation="0dp"
-                    app:cardBackgroundColor="@color/colorSurfaceVariant">
+                    android:id="@+id/cardCheckoutAddress"
+                    style="@style/AppCard"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_12">
 
-                    <ImageView
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:src="@drawable/product3example" />
+                        android:gravity="top"
+                        android:orientation="horizontal"
+                        android:padding="@dimen/space_20">
 
+                        <com.google.android.material.card.MaterialCardView
+                            style="@style/AppCard.IconContainer"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:layout_marginEnd="@dimen/space_16">
+
+                            <ImageView
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:padding="@dimen/space_10"
+                                android:src="@drawable/ic_checkout_pin"  android:contentDescription="@string/cd_checkout_step" />
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/tvCheckoutAddressName"
+                                style="@style/AppText.Subtitle"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/auto_sophie_martin_f1e2" />
+
+                            <TextView
+                                android:id="@+id/tvCheckoutAddressLine1"
+                                style="@style/AppText.Body"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="@dimen/space_4"
+                                android:text="@string/auto_12_rue_de_la_4508" />
+
+                            <TextView
+                                android:id="@+id/tvCheckoutAddressLine2"
+                                style="@style/AppText.Body"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/auto_75002_paris_france_6d7d" />
+
+                            <TextView
+                                android:id="@+id/tvCheckoutAddressPhone"
+                                style="@style/AppText.Body"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/auto_33_1_23_45_3a9c" />
+                        </LinearLayout>
+                    </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- Product 2: Watch -->
+                <TextView
+                    style="@style/AppText.Overline"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_24"
+                    android:text="@string/auto_m201thode_de_livraison_9d30"
+                    android:textColor="?attr/colorPrimary" />
+
                 <com.google.android.material.card.MaterialCardView
-                    android:layout_width="84dp"
-                    android:layout_height="84dp"
-                    app:cardCornerRadius="8dp"
-                    app:cardElevation="0dp"
-                    app:cardBackgroundColor="@color/colorAccentDeep">
+                    android:id="@+id/cardDeliveryStandard"
+                    style="@style/AppCard"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_12"
+                    app:strokeColor="?attr/colorPrimary"
+                    app:strokeWidth="2dp">
 
-                    <ImageView
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:src="@drawable/product2example" />
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:padding="@dimen/space_20">
 
+                        <com.google.android.material.card.MaterialCardView
+                            style="@style/AppCard.IconContainer"
+                            android:layout_width="44dp"
+                            android:layout_height="44dp"
+                            android:layout_marginEnd="@dimen/space_16"
+                            app:cardBackgroundColor="@color/colorSecondary">
+
+                            <ImageView
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:padding="@dimen/space_10"
+                                android:src="@drawable/ic_checkout_truck"  android:contentDescription="@string/cd_checkout_step" />
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                style="@style/AppText.Subtitle"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/auto_standard_eb6d" />
+
+                            <TextView
+                                style="@style/AppText.Caption"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/auto_livraison_sous_3_224_361f" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="end"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/tvDeliveryStandardPrice"
+                                style="@style/AppText.Overline"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/auto_gratuite_6aa0"
+                                android:textColor="?attr/colorPrimary" />
+
+                            <ImageView
+                                android:id="@+id/ivStandardCheck"
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:src="@drawable/ic_checkout_check_filled"  android:importantForAccessibility="no" />
+                        </LinearLayout>
+                    </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
-            </LinearLayout>
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardDeliveryExpress"
+                    style="@style/AppCard"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_12">
 
-            <!-- Résumé -->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="RÉSUMÉ"
-                android:textSize="11sp"
-                android:letterSpacing="0.10"
-                android:textColor="@color/colorPrimary"
-                android:textStyle="bold"
-                android:fontFamily="@font/plus_jakarta_sans"
-                android:layout_marginBottom="8dp" />
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:padding="@dimen/space_20">
 
-            <!-- Subtotal Row -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="8dp">
+                        <com.google.android.material.card.MaterialCardView
+                            style="@style/AppCard.IconContainer"
+                            android:layout_width="44dp"
+                            android:layout_height="44dp"
+                            android:layout_marginEnd="@dimen/space_16">
+
+                            <ImageView
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:padding="@dimen/space_10"
+                                android:src="@drawable/ic_checkout_lightning"  android:contentDescription="@string/cd_checkout_step" />
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                style="@style/AppText.Subtitle"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/auto_express_b144" />
+
+                            <TextView
+                                style="@style/AppText.Caption"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/auto_demain_avant_13h00_d9d2" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="end"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/tvDeliveryExpressPrice"
+                                style="@style/AppText.Subtitle"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/auto_12500_dt_657b" />
+
+                            <ImageView
+                                android:id="@+id/ivExpressRadio"
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:src="@drawable/ic_checkout_radio_empty"  android:importantForAccessibility="no" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
 
                 <TextView
-                    android:layout_width="0dp"
+                    style="@style/AppText.Overline"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Sous-total"
-                    android:textSize="14sp"
-                    android:textColor="@color/colorOnSurfaceVariant"
-                    android:fontFamily="@font/plus_jakarta_sans" />
+                    android:layout_marginTop="@dimen/space_24"
+                    android:text="@string/auto_articles_39a1"
+                    android:textColor="?attr/colorPrimary" />
+
+                <LinearLayout
+                    android:id="@+id/layoutCheckoutArticles"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_12"
+                    android:layout_marginBottom="@dimen/space_24"
+                    android:orientation="horizontal" />
 
                 <TextView
-                    android:id="@+id/tvCheckoutSubtotal"
-                    android:layout_width="wrap_content"
+                    style="@style/AppText.Overline"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="458,00 DT"
-                    android:textSize="14sp"
-                    android:textColor="@color/colorOnSurface"
-                    android:textStyle="bold"
-                    android:fontFamily="@font/plus_jakarta_sans" />
+                    android:text="@string/auto_r201sum201_88af"
+                    android:textColor="?attr/colorPrimary" />
 
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_8"
+                    android:layout_marginBottom="@dimen/space_24"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        style="@style/AppText.Body"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/auto_soustotal_337d" />
+
+                    <TextView
+                        android:id="@+id/tvCheckoutSubtotal"
+                        style="@style/AppText.FieldLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/auto_458000_dt_e6ae" />
+                </LinearLayout>
             </LinearLayout>
 
-            </LinearLayout>
-
-            <!-- STEP 2 CONTENT: Payment Methods -->
             <LinearLayout
                 android:id="@+id/layoutStep2Content"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:alpha="0"
                 android:orientation="vertical"
-                android:paddingHorizontal="24dp"
-                android:paddingTop="24dp"
-                android:visibility="gone"
-                android:alpha="0">
+                android:paddingHorizontal="@dimen/screen_padding_horizontal"
+                android:paddingTop="@dimen/space_24"
+                android:visibility="gone">
 
                 <TextView
+                    style="@style/AppText.Overline"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="CHOISIR UNE MÉTHODE"
-                    android:textSize="11sp"
-                    android:letterSpacing="0.10"
-                    android:textColor="@color/colorPrimary"
-                    android:textStyle="bold"
-                    android:fontFamily="@font/plus_jakarta_sans"
-                    android:layout_marginBottom="12dp" />
+                    android:text="@string/auto_m201thode_de_paiement_2fe9"
+                    android:textColor="?attr/colorPrimary" />
 
-                <!-- 1. Carte Bancaire -->
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/cardPayCard"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="12dp"
-                    app:cardCornerRadius="12dp"
-                    app:cardElevation="0dp"
-                    app:cardBackgroundColor="@color/colorSurface"
-                    app:strokeColor="@color/colorPrimary"
-                    app:strokeWidth="1.5dp">
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:padding="16dp"
-                        android:gravity="center_vertical">
 
-                        <com.google.android.material.card.MaterialCardView
-                            android:layout_width="44dp"
-                            android:layout_height="44dp"
-                            android:layout_marginEnd="16dp"
-                            app:cardCornerRadius="8dp"
-                            app:cardBackgroundColor="@color/colorSurfaceVariant"
-                            app:cardElevation="0dp">
-                            <ImageView
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:src="@drawable/ic_checkout_card"
-                                android:scaleType="center"
-                                android:padding="10dp" />
-                        </com.google.android.material.card.MaterialCardView>
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Carte Bancaire"
-                                android:textSize="16sp"
-                                android:textColor="@color/colorOnSurface"
-                                android:textStyle="bold"
-                                android:fontFamily="@font/plus_jakarta_sans" />
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Visa, Mastercard, etc."
-                                android:textSize="13sp"
-                                android:textColor="@color/colorOnSurfaceVariant"
-                                android:fontFamily="@font/plus_jakarta_sans" />
-                        </LinearLayout>
-
-                        <ImageView
-                            android:id="@+id/ivPayCardRadio"
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:src="@drawable/ic_checkout_radio_filled" />
-
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
-
-                <!-- 2. E-Dinar -->
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/cardPayEdinar"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="12dp"
-                    app:cardCornerRadius="12dp"
-                    app:cardElevation="0dp"
-                    app:cardBackgroundColor="@color/colorSurface"
-                    app:strokeColor="@color/colorBorderLight"
-                    app:strokeWidth="1dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:padding="16dp"
-                        android:gravity="center_vertical">
-
-                        <com.google.android.material.card.MaterialCardView
-                            android:layout_width="44dp"
-                            android:layout_height="44dp"
-                            android:layout_marginEnd="16dp"
-                            app:cardCornerRadius="8dp"
-                            app:cardBackgroundColor="@color/colorSurfaceVariant"
-                            app:cardElevation="0dp">
-                            <ImageView
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:src="@drawable/ic_checkout_wallet"
-                                android:scaleType="center"
-                                android:padding="10dp" />
-                        </com.google.android.material.card.MaterialCardView>
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="E-Dinar"
-                                android:textSize="16sp"
-                                android:textColor="@color/colorOnSurface"
-                                android:fontFamily="@font/plus_jakarta_sans" />
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Porte-feuille numérique"
-                                android:textSize="13sp"
-                                android:textColor="@color/colorOnSurfaceVariant"
-                                android:fontFamily="@font/plus_jakarta_sans" />
-                        </LinearLayout>
-
-                        <ImageView
-                            android:id="@+id/ivPayEdinarRadio"
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:src="@drawable/ic_checkout_radio_empty" />
-
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
-
-                <!-- 3. Livraison -->
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/cardPayCash"
+                    style="@style/AppCard"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="32dp"
-                    app:cardCornerRadius="12dp"
-                    app:cardElevation="0dp"
-                    app:cardBackgroundColor="@color/colorSurface"
-                    app:strokeColor="@color/colorBorderLight"
-                    app:strokeWidth="1dp">
+                    android:layout_marginTop="@dimen/space_12"
+                    app:strokeColor="?attr/colorPrimary"
+                    app:strokeWidth="2dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
                         android:orientation="horizontal"
-                        android:padding="16dp"
-                        android:gravity="center_vertical">
+                        android:padding="@dimen/space_16">
 
                         <com.google.android.material.card.MaterialCardView
+                            style="@style/AppCard.IconContainer"
                             android:layout_width="44dp"
                             android:layout_height="44dp"
-                            android:layout_marginEnd="16dp"
-                            app:cardCornerRadius="8dp"
-                            app:cardBackgroundColor="@color/colorSurfaceVariant"
-                            app:cardElevation="0dp">
+                            android:layout_marginEnd="@dimen/space_16">
+
                             <ImageView
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
-                                android:src="@drawable/ic_checkout_truck_gray"
-                                android:scaleType="center"
-                                android:padding="10dp" />
+                                android:padding="@dimen/space_10"
+                                android:src="@drawable/ic_checkout_truck_gray"  android:contentDescription="@string/cd_checkout_step" />
                         </com.google.android.material.card.MaterialCardView>
 
                         <LinearLayout
@@ -782,601 +514,280 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:orientation="vertical">
+
                             <TextView
+                                android:id="@+id/tvPayCashTitle"
+                                style="@style/AppText.Subtitle"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Paiement à la livraison"
-                                android:textSize="16sp"
-                                android:textColor="@color/colorOnSurface"
-                                android:fontFamily="@font/plus_jakarta_sans" />
+                                android:text="@string/auto_paiement_224_la_livraison_03c3" />
+
                             <TextView
+                                android:id="@+id/tvPayCashSubtitle"
+                                style="@style/AppText.Caption"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Espèces ou chèque"
-                                android:textSize="13sp"
-                                android:textColor="@color/colorOnSurfaceVariant"
-                                android:fontFamily="@font/plus_jakarta_sans" />
+                                android:text="@string/auto_esp232ces_ou_ch232que_au_8693" />
                         </LinearLayout>
 
                         <ImageView
                             android:id="@+id/ivPayCashRadio"
                             android:layout_width="24dp"
                             android:layout_height="24dp"
-                            android:src="@drawable/ic_checkout_radio_empty" />
-
+                            android:src="@drawable/ic_checkout_radio_filled"  android:importantForAccessibility="no" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- Expandable: Card Details Form -->
-                <LinearLayout
-                    android:id="@+id/layoutSavedCard"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:visibility="gone">
-
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/cardSavedCard"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="16dp"
-                        app:cardCornerRadius="8dp"
-                        app:cardBackgroundColor="@color/colorSurfaceVariant"
-                        app:cardElevation="0dp"
-                        app:strokeColor="@color/colorPrimary"
-                        app:strokeWidth="1.5dp">
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:padding="16dp"
-                            android:gravity="center_vertical">
-                            <ImageView
-                                android:layout_width="32dp"
-                                android:layout_height="24dp"
-                                android:src="@drawable/ic_visa_mc"
-                                android:layout_marginEnd="12dp" />
-                            <TextView
-                                android:id="@+id/tvSavedCardNumber"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="**** **** **** 1234"
-                                android:textSize="14sp"
-                                android:textColor="@color/colorOnSurface"
-                                android:textStyle="bold"
-                                android:fontFamily="@font/plus_jakarta_sans" />
-                            <ImageView
-                                android:id="@+id/ivSavedCardSelected"
-                                android:layout_width="24dp"
-                                android:layout_height="24dp"
-                                android:src="@drawable/ic_checkout_radio_filled" />
-                        </LinearLayout>
-                    </com.google.android.material.card.MaterialCardView>
-
-                    <TextView
-                        android:id="@+id/tvAddNewCard"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="+ Ajouter une autre carte"
-                        android:textSize="14sp"
-                        android:textColor="@color/colorPrimary"
-                        android:textStyle="bold"
-                        android:fontFamily="@font/plus_jakarta_sans"
-                        android:layout_marginBottom="16dp"
-                        android:paddingVertical="8dp"/>
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/layoutCardForm"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:visibility="visible">
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="DÉTAILS DE LA CARTE"
-                        android:textSize="11sp"
-                        android:letterSpacing="0.10"
-                        android:textColor="@color/profile_text_muted"
-                        android:textStyle="bold"
-                        android:fontFamily="@font/plus_jakarta_sans"
-                        android:layout_marginBottom="16dp" />
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_marginBottom="16dp"
-                        android:gravity="center_vertical">
-                        <com.google.android.material.textfield.TextInputLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                            app:boxCornerRadiusTopStart="8dp"
-                            app:boxCornerRadiusTopEnd="8dp"
-                            app:boxCornerRadiusBottomStart="8dp"
-                            app:boxCornerRadiusBottomEnd="8dp"
-                            app:boxStrokeColor="@color/colorBorderLight"
-                            android:hint="Nom sur la carte">
-                            <com.google.android.material.textfield.TextInputEditText
-                                android:id="@+id/etCardName"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:inputType="textPersonName"
-                                android:fontFamily="@font/plus_jakarta_sans" />
-                        </com.google.android.material.textfield.TextInputLayout>
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_marginBottom="16dp"
-                        android:gravity="center_vertical">
-                        <com.google.android.material.textfield.TextInputLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                            app:boxCornerRadiusTopStart="8dp"
-                            app:boxCornerRadiusTopEnd="8dp"
-                            app:boxCornerRadiusBottomStart="8dp"
-                            app:boxCornerRadiusBottomEnd="8dp"
-                            app:boxStrokeColor="@color/colorBorderLight"
-                            android:hint="Numéro de carte">
-                            <com.google.android.material.textfield.TextInputEditText
-                                android:id="@+id/etCardNumber"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:inputType="number"
-                                android:maxLength="19"
-                                android:fontFamily="@font/plus_jakarta_sans" />
-                        </com.google.android.material.textfield.TextInputLayout>
-                        <ImageView
-                            android:layout_width="32dp"
-                            android:layout_height="24dp"
-                            android:layout_marginStart="12dp"
-                            android:src="@drawable/ic_visa_mc" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_marginBottom="24dp">
-                        <com.google.android.material.textfield.TextInputLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:layout_marginEnd="16dp"
-                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                            app:boxCornerRadiusTopStart="8dp"
-                            app:boxCornerRadiusTopEnd="8dp"
-                            app:boxCornerRadiusBottomStart="8dp"
-                            app:boxCornerRadiusBottomEnd="8dp"
-                            app:boxStrokeColor="@color/colorBorderLight"
-                            android:hint="Expiration (MM/YY)">
-                            <com.google.android.material.textfield.TextInputEditText
-                                android:id="@+id/etCardExpiry"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:inputType="number"
-                                android:maxLength="5"
-                                android:fontFamily="@font/plus_jakarta_sans" />
-                        </com.google.android.material.textfield.TextInputLayout>
-                        <com.google.android.material.textfield.TextInputLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                            app:boxCornerRadiusTopStart="8dp"
-                            app:boxCornerRadiusTopEnd="8dp"
-                            app:boxCornerRadiusBottomStart="8dp"
-                            app:boxCornerRadiusBottomEnd="8dp"
-                            app:boxStrokeColor="@color/colorBorderLight"
-                            android:hint="CVV">
-                            <com.google.android.material.textfield.TextInputEditText
-                                android:id="@+id/etCardCvv"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:inputType="numberPassword"
-                                android:maxLength="4"
-                                android:fontFamily="@font/plus_jakarta_sans" />
-                        </com.google.android.material.textfield.TextInputLayout>
-                    </LinearLayout>
-
-                    <com.google.android.material.switchmaterial.SwitchMaterial
-                        android:id="@+id/switchSaveCard"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Enregistrer cette carte pour plus tard"
-                        android:textSize="14sp"
-                        android:textColor="@color/colorOnSurfaceVariant"
-                        android:fontFamily="@font/plus_jakarta_sans" />
-                </LinearLayout>
-
-                <!-- Expandable: E-Dinar Message -->
-                <LinearLayout
-                    android:id="@+id/layoutEdinarMessage"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:visibility="gone"
-                    android:background="@drawable/bg_warning_box"
-                    android:padding="16dp">
-                    
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Instruction E-Dinar"
-                        android:textSize="14sp"
-                        android:textColor="@color/colorAccentDeep"
-                        android:textStyle="bold"
-                        android:fontFamily="@font/plus_jakarta_sans"
-                        android:layout_marginBottom="8dp" />
-                        
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Veuillez envoyer le montant total au numéro 53200087. Votre commande sera confirmée une fois le transfert reçu."
-                        android:textSize="13sp"
-                        android:textColor="@color/colorOnSurfaceVariant"
-                        android:lineSpacingExtra="4dp"
-                        android:fontFamily="@font/plus_jakarta_sans" />
-                </LinearLayout>
 
             </LinearLayout>
 
-            <!-- STEP 3 CONTENT: Order Confirmation -->
             <LinearLayout
                 android:id="@+id/layoutStep3Content"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingHorizontal="24dp"
-                android:paddingTop="32dp"
-                android:paddingBottom="48dp"
-                android:visibility="gone"
                 android:alpha="0"
-                android:gravity="center_horizontal">
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:paddingHorizontal="@dimen/screen_padding_horizontal"
+                android:paddingTop="@dimen/space_32"
+                android:paddingBottom="@dimen/space_48"
+                android:visibility="gone">
 
-                <!-- Success Illustration -->
-                <!-- Success Illustration (Lottie) -->
                 <com.airbnb.lottie.LottieAnimationView
                     android:layout_width="160dp"
                     android:layout_height="160dp"
-                    android:layout_gravity="center"
-                    app:lottie_rawRes="@raw/anim_checkout_success"
+                    android:layout_marginBottom="@dimen/space_24"
                     app:lottie_autoPlay="true"
                     app:lottie_loop="false"
-                    android:layout_marginBottom="24dp" />
+                    app:lottie_rawRes="@raw/anim_checkout_success" />
 
                 <TextView
+                    style="@style/AppText.Title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Commande confirmée"
-                    android:textSize="28sp"
-                    android:textColor="@color/colorOnSurface"
-                    android:textStyle="bold"
-                    android:fontFamily="@font/plus_jakarta_sans"
                     android:gravity="center"
-                    android:layout_marginBottom="16dp" />
+                    android:text="@string/auto_commande_confirm233e_e20b" />
 
                 <TextView
+                    style="@style/AppText.Body"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Merci pour votre achat chez FatiWeb.\nVotre sélection est en route."
-                    android:textSize="15sp"
-                    android:textColor="@color/colorOnSurfaceVariant"
+                    android:layout_marginTop="@dimen/space_8"
                     android:gravity="center"
-                    android:lineSpacingExtra="4dp"
-                    android:fontFamily="@font/plus_jakarta_sans"
-                    android:layout_marginBottom="40dp" />
+                    android:text="@string/auto_merci_pour_votre_achat_4d4b" />
 
-                <!-- Order Info Card -->
                 <com.google.android.material.card.MaterialCardView
+                    style="@style/AppCard"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:cardCornerRadius="16dp"
-                    app:cardElevation="0dp"
-                    app:strokeColor="@color/colorBorderLight"
-                    app:strokeWidth="1dp"
-                    app:cardBackgroundColor="@color/colorSurface"
-                    android:layout_marginBottom="32dp">
+                    android:layout_marginTop="@dimen/space_24">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:padding="20dp">
+                        android:padding="@dimen/space_20">
 
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:layout_marginBottom="16dp">
+                            android:orientation="horizontal">
                             <TextView
+                                style="@style/AppText.Overline"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:text="NUMÉRO DE COMMANDE"
-                                android:textSize="11sp"
-                                android:textColor="@color/profile_text_muted"
-                                android:letterSpacing="0.1"
-                                android:fontFamily="@font/plus_jakarta_sans" />
+                                android:text="@string/auto_num201ro_de_commande_5078" />
                             <TextView
                                 android:id="@+id/tvConfirmationOrderNumber"
+                                style="@style/AppText.FieldLabel"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="#FW-82941"
-                                android:textSize="13sp"
-                                android:textColor="@color/colorOnSurface"
-                                android:textStyle="bold"
-                                android:fontFamily="@font/plus_jakarta_sans" />
+                                android:text="@string/auto_fw82941_95c4" />
                         </LinearLayout>
 
                         <View
                             android:layout_width="match_parent"
                             android:layout_height="1dp"
-                            android:background="@color/colorSurfaceVariant"
-                            android:layout_marginBottom="16dp" />
+                            android:layout_marginTop="@dimen/space_16"
+                            android:layout_marginBottom="@dimen/space_16"
+                            android:background="?attr/colorOutline" />
 
-                        <!-- Dynamic items will be injected here -->
                         <LinearLayout
                             android:id="@+id/layoutStep3Items"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="vertical">
-                        </LinearLayout>
+                            android:orientation="vertical" />
 
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:layout_marginTop="20dp">
+                            android:layout_marginTop="@dimen/space_20"
+                            android:orientation="horizontal">
                             <TextView
+                                style="@style/AppText.Body"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:text="Estimation de livraison"
-                                android:textSize="13sp"
-                                android:textColor="@color/profile_text_muted"
-                                android:fontFamily="@font/plus_jakarta_sans" />
+                                android:text="@string/auto_estimation_de_livraison_0286" />
                             <TextView
                                 android:id="@+id/tvConfirmationEta"
+                                style="@style/AppText.FieldLabel"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="14 - 16 Octobre"
-                                android:textSize="13sp"
-                                android:textColor="@color/colorOnSurface"
-                                android:fontFamily="@font/plus_jakarta_sans" />
+                                android:text="@string/auto_14_16_octobre_4d92" />
                         </LinearLayout>
 
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:layout_marginTop="12dp">
+                            android:layout_marginTop="@dimen/space_12"
+                            android:orientation="horizontal">
                             <TextView
+                                style="@style/AppText.Body"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:text="Total payé"
-                                android:textSize="13sp"
-                                android:textColor="@color/profile_text_muted"
-                                android:fontFamily="@font/plus_jakarta_sans" />
+                                android:text="@string/auto_total_pay233_0e5e" />
                             <TextView
                                 android:id="@+id/tvConfirmationTotal"
+                                style="@style/AppText.FieldLabel"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="0,00 DT"
-                                android:textSize="14sp"
-                                android:textColor="@color/colorOnSurface"
-                                android:textStyle="bold"
-                                android:fontFamily="@font/plus_jakarta_sans" />
+                                android:text="@string/auto_0000_dt_e668" />
                         </LinearLayout>
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- Action Buttons -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnTrackOrder"
+                    style="@style/AppButton.Primary"
                     android:layout_width="match_parent"
-                    android:layout_height="56dp"
-                    android:text="Suivre ma commande"
-                    android:textAllCaps="false"
-                    android:textSize="16sp"
-                    android:textColor="@color/colorOnPrimary"
-                    android:textStyle="bold"
-                    android:fontFamily="@font/plus_jakarta_sans"
-                    app:icon="@drawable/ic_checkout_truck"
-                    app:iconGravity="textStart"
-                    app:iconPadding="12dp"
-                    app:iconTint="@color/colorOnPrimary"
-                    app:backgroundTint="@color/colorPrimary"
-                    app:cornerRadius="12dp"
-                    android:elevation="0dp"
-                    android:layout_marginBottom="12dp" />
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_24"
+                    android:text="@string/auto_suivre_ma_commande_7473" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnBackHome"
+                    style="@style/AppButton.Secondary"
                     android:layout_width="match_parent"
-                    android:layout_height="56dp"
-                    android:text="Retour à l'accueil"
-                    android:textAllCaps="false"
-                    android:textSize="16sp"
-                    android:textColor="@color/colorOnSurface"
-                    android:textStyle="bold"
-                    android:fontFamily="@font/plus_jakarta_sans"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                    app:strokeColor="@color/colorOnSurface"
-                    app:strokeWidth="1.5dp"
-                    app:cornerRadius="12dp"
-                    android:layout_marginBottom="40dp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="FATIWEB MARKET • SÉLECTION TUNISIENNE"
-                    android:textSize="10sp"
-                    android:letterSpacing="0.15"
-                    android:textColor="@color/profile_text_muted"
-                    android:fontFamily="@font/plus_jakarta_sans" />
-
+                    android:layout_marginTop="@dimen/space_12"
+                    android:text="@string/auto_retour_224_laccueil_f63e" />
             </LinearLayout>
-
         </FrameLayout>
-
     </androidx.core.widget.NestedScrollView>
 
-    <!-- Sticky bottom bar -->
     <LinearLayout
         android:id="@+id/layoutCheckoutBottomBar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
         android:background="@color/details_background"
+        android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
 
-        <!-- CTA button -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnCheckoutContinue"
+            style="@style/AppButton.Primary"
             android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:layout_marginHorizontal="24dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="8dp"
-            android:text="Continuer vers le paiement"
-            android:textAllCaps="false"
-            android:textSize="16sp"
-            android:textColor="@color/colorOnPrimary"
-            android:textStyle="bold"
-            android:fontFamily="@font/plus_jakarta_sans"
-            android:insetTop="0dp"
-            android:insetBottom="0dp"
-            app:backgroundTint="@color/colorPrimary"
-            app:cornerRadius="8dp"
-            android:elevation="0dp" />
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/screen_padding_horizontal"
+            android:layout_marginTop="@dimen/space_16"
+            android:text="@string/auto_continuer_vers_le_paiement_361d" />
 
-        <!-- Shipping cost row -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:paddingHorizontal="28dp"
-            android:paddingTop="12dp"
-            android:paddingBottom="4dp"
-            android:gravity="center_vertical">
+            android:paddingStart="28dp"
+            android:paddingTop="@dimen/space_12"
+            android:paddingEnd="28dp"
+            android:paddingBottom="@dimen/space_4">
 
             <TextView
                 android:id="@+id/tvCheckoutShippingLabel"
+                style="@style/AppText.Body"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Frais de port (Standard)"
-                android:textSize="14sp"
-                android:textColor="@color/colorOnSurfaceVariant"
-                android:fontFamily="@font/plus_jakarta_sans" />
+                android:text="@string/auto_livraison_standard_c598" />
 
             <TextView
                 android:id="@+id/tvCheckoutShippingValue"
+                style="@style/AppText.Overline"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="GRATUIT"
-                android:textSize="12sp"
-                android:textColor="@color/colorPrimary"
-                android:textStyle="bold"
-                android:fontFamily="@font/plus_jakarta_sans" />
-
+                android:text="@string/auto_gratuite_6aa0"
+                android:textColor="?attr/colorPrimary" />
         </LinearLayout>
 
-        <!-- Divider above total -->
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="@color/colorBorderLight"
-            android:layout_marginHorizontal="24dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="16dp" />
+            android:layout_marginHorizontal="@dimen/screen_padding_horizontal"
+            android:layout_marginTop="@dimen/space_16"
+            android:background="?attr/colorOutline" />
 
-        <!-- Total block -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingHorizontal="28dp"
-            android:paddingBottom="24dp">
+            android:paddingStart="28dp"
+            android:paddingTop="@dimen/space_16"
+            android:paddingEnd="28dp"
+            android:paddingBottom="@dimen/space_24">
 
             <TextView
+                style="@style/AppText.Overline"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="TOTAL À PAYER"
-                android:textSize="10.5sp"
-                android:letterSpacing="0.10"
-                android:textColor="@color/colorOnSurfaceVariant"
-                android:textStyle="bold"
-                android:fontFamily="@font/plus_jakarta_sans"
-                android:layout_marginBottom="4dp" />
+                android:text="@string/auto_total_192_payer_2c61" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="bottom">
+                android:gravity="bottom"
+                android:orientation="horizontal">
 
                 <TextView
                     android:id="@+id/tvCheckoutTotal"
+                    style="@style/AppText.Title"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="458,00 DT"
-                    android:textSize="28sp"
-                    android:textColor="@color/colorOnSurface"
-                    android:textStyle="bold"
-                    android:fontFamily="@font/plus_jakarta_sans" />
+                    android:layout_marginTop="@dimen/space_4"
+                    android:text="@string/auto_458000_dt_e6ae" />
 
                 <TextView
+                    style="@style/AppText.Caption"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="TVA incluse"
-                    android:textSize="13sp"
-                    android:textColor="@color/profile_text_muted"
-                    android:textStyle="italic"
-                    android:fontFamily="@font/plus_jakarta_sans"
-                    android:paddingBottom="6dp" />
-
+                    android:paddingBottom="6dp"
+                    android:text="@string/auto_tva_incluse_df75" />
             </LinearLayout>
-
         </LinearLayout>
-
     </LinearLayout>
 
-    <!-- LOADING OVERLAY (Lottie) -->
     <FrameLayout
         android:id="@+id/layoutLottieLoading"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/colorLoadingScrim"
-        android:visibility="gone"
-        android:elevation="10dp"
         android:clickable="true"
-        android:focusable="true">
-        
+        android:elevation="10dp"
+        android:focusable="true"
+        android:visibility="gone">
+
         <com.airbnb.lottie.LottieAnimationView
             android:layout_width="160dp"
             android:layout_height="160dp"
             android:layout_gravity="center"
-            app:lottie_rawRes="@raw/anim_checkout_loading"
             app:lottie_autoPlay="true"
-            app:lottie_loop="true" />
-            
+            app:lottie_loop="true"
+            app:lottie_rawRes="@raw/anim_checkout_loading" />
     </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
-
