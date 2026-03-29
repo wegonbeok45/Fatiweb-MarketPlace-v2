@@ -1,7 +1,8 @@
 package isim.ia2y.myapplication
-
 import android.animation.ValueAnimator
 import android.content.Context
+import android.content.Intent
+import android.graphics.Rect
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -21,60 +22,68 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.EditText
-import android.widget.GridLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+
 import androidx.activity.addCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.airbnb.lottie.LottieAnimationView
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.button.MaterialButton
-import com.google.android.material.card.MaterialCardView
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.slider.RangeSlider
 import com.google.android.material.switchmaterial.SwitchMaterial
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.Locale
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
+import isim.ia2y.myapplication.databinding.ActivitySearchBinding
 import kotlin.math.roundToInt
+import com.google.firebase.firestore.DocumentSnapshot
 
-// Cette classe organise cette partie de l'app.
 class SearchActivity : AppCompatActivity() {
-    private lateinit var etSearch: EditText
-    private lateinit var tvCancel: TextView
-    private lateinit var defaultState: View
-    private lateinit var suggestionsState: View
-    private lateinit var resultsState: View
-    private lateinit var recentList: LinearLayout
-    private lateinit var popularGroup: ChipGroup
-    private lateinit var suggestionsList: LinearLayout
-    private lateinit var resultsCount: TextView
-    private lateinit var sortDropdown: AutoCompleteTextView
-    private lateinit var gridResults: GridLayout
-    private lateinit var emptyState: View
-    private lateinit var emptyAnimation: LottieAnimationView
-    private lateinit var skeleton: View
-    private lateinit var scrollResults: View
-    private lateinit var btnBrowseCategories: MaterialButton
+    private lateinit var binding: ActivitySearchBinding
+    private val etSearch get() = binding.etSearch
+    private val tvCancel get() = binding.tvSearchCancel
+    private val defaultState get() = binding.layoutDefaultState
+    private val suggestionsState get() = binding.layoutSuggestionsState
+    private val resultsState get() = binding.layoutResultsState
+    private val recentList get() = binding.layoutRecentList
+    private val popularGroup get() = binding.chipGroupPopular
+    private val suggestionsList get() = binding.layoutSuggestionsList
+    private val resultsCount get() = binding.tvResultsCount
+    private val sortDropdown get() = binding.dropdownSort
+    private val resultsRecycler get() = binding.rvSearchResults
+    private val emptyState get() = binding.layoutEmptyState
+    private val emptyAnimation get() = binding.ivSearchEmptyAnimation
+    private val skeleton get() = binding.layoutSkeleton
+    private val scrollResults get() = binding.scrollResults
+    private val btnBrowseCategories get() = binding.btnBrowseCategories
+    private lateinit var resultsAdapter: SearchResultsAdapter
 
     private var currentQuery: String = ""
     private var currentSort: SortOption = SortOption.POPULAR
     private val uiHandler = Handler(Looper.getMainLooper())
-    private val searchExecutor: ExecutorService = Executors.newSingleThreadExecutor()
     private var skeletonAnimator: ValueAnimator? = null
     private var lastResults: List<Product> = emptyList()
     private var searchRequestToken: Int = 0
+    private var searchLastDoc: DocumentSnapshot? = null
+    private var isSearching: Boolean = false
+    private var hasMoreResults: Boolean = true
 
     private var filterCategory: String = "all"
     private var filterLocation: String = "all"
     private var filterMinPrice: Float = 0f
-    private var filterMaxPrice: Float = 400f
+    private var filterMaxPrice: Float = MAX_FILTER_PRICE
     private var filterBioNaturel: Boolean = false
 
     private val popularSearches = listOf(
@@ -98,12 +107,12 @@ class SearchActivity : AppCompatActivity() {
         "Fouta Hammamet"
     )
 
-    // Cette fonction fait une action de cette partie de l'app.
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_search)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+        binding = ActivitySearchBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        ViewCompat.setOnApplyWindowInsetsListener(binding.main) { v, insets ->
             val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(bars.left, bars.top, bars.right, bars.bottom)
             insets
@@ -118,49 +127,105 @@ class SearchActivity : AppCompatActivity() {
         renderRecentSearches()
         showDefaultState(animated = false)
         focusAndOpenKeyboard()
-        startTypingHintAnimation(
-            hintViewId = R.id.etSearch,
-            fullText = getString(R.string.search_hint_products),
-            stepDelayMs = 45L, // Faster for dedicated search screen
-            R.id.etSearch
-        )
+
+        if (savedInstanceState != null) {
+            currentQuery = savedInstanceState.getString(KEY_SEARCH_QUERY, "")
+            currentSort = SortOption.values().getOrElse(savedInstanceState.getInt(KEY_SORT_ORDINAL, SortOption.POPULAR.ordinal)) { SortOption.POPULAR }
+            filterCategory = savedInstanceState.getString(KEY_FILTER_CATEGORY, "all") ?: "all"
+            filterLocation = savedInstanceState.getString(KEY_FILTER_LOCATION, "all") ?: "all"
+            filterMinPrice = savedInstanceState.getFloat(KEY_FILTER_MIN_PRICE, 0f)
+            filterMaxPrice = savedInstanceState.getFloat(KEY_FILTER_MAX_PRICE, MAX_FILTER_PRICE)
+            filterBioNaturel = savedInstanceState.getBoolean(KEY_FILTER_BIO, false)
+            sortDropdown.setText(getString(currentSort.labelRes), false)
+            if (currentQuery.isNotBlank()) {
+                etSearch.setText(currentQuery)
+                etSearch.setSelection(currentQuery.length)
+            }
+        }
+
+        applyInitialSearchState()
+        lifecycleScope.launch {
+            CatalogSyncManager.ensureSynced(force = false)
+            if (isFinishing || isDestroyed) return@launch
+            if (currentQuery.isNotBlank() || filterCategory != "all") {
+                performSearch(currentQuery)
+            }
+        }
+        etSearch.hint = getString(R.string.search_hint_products)
         onBackPressedDispatcher.addCallback(this) {
-            finishToTop()
+            finishSearchScreen()
         }
     }
 
-    // Cette fonction fait une action de cette partie de l'app.
+    private fun applyInitialSearchState() {
+        filterCategory = intent.getStringExtra(EXTRA_INITIAL_CATEGORY)?.ifBlank { "all" } ?: filterCategory
+        val initialQuery = intent.getStringExtra(EXTRA_INITIAL_QUERY).orEmpty()
+        if (initialQuery.isNotBlank()) {
+            etSearch.setText(initialQuery)
+            etSearch.setSelection(initialQuery.length)
+            performSearch(initialQuery)
+        } else if (filterCategory != "all") {
+            toggleCancelButton(true)
+            performSearch("")
+        }
+    }
+
     override fun onDestroy() {
         skeletonAnimator?.cancel()
         uiHandler.removeCallbacksAndMessages(null)
-        searchExecutor.shutdownNow()
         super.onDestroy()
     }
 
-    // Cette fonction fait une action de cette partie de l'app.
     private fun bindViews() {
-        etSearch = findViewById(R.id.etSearch)
-        tvCancel = findViewById(R.id.tvSearchCancel)
-        defaultState = findViewById(R.id.layoutDefaultState)
-        suggestionsState = findViewById(R.id.layoutSuggestionsState)
-        resultsState = findViewById(R.id.layoutResultsState)
-        recentList = findViewById(R.id.layoutRecentList)
-        popularGroup = findViewById(R.id.chipGroupPopular)
-        suggestionsList = findViewById(R.id.layoutSuggestionsList)
-        resultsCount = findViewById(R.id.tvResultsCount)
-        sortDropdown = findViewById(R.id.dropdownSort)
-        gridResults = findViewById(R.id.gridSearchResults)
-        emptyState = findViewById(R.id.layoutEmptyState)
-        emptyAnimation = findViewById(R.id.ivSearchEmptyAnimation)
-        skeleton = findViewById(R.id.layoutSkeleton)
-        scrollResults = findViewById(R.id.scrollResults)
-        btnBrowseCategories = findViewById(R.id.btnBrowseCategories)
+        resultsAdapter = SearchResultsAdapter(
+            onToggleFavorite = { product -> FavoritesStore.toggleFavorite(this, product.id) },
+            onAddToCart = { product -> handleAddToCart(product) },
+            onOpenProduct = { product -> openProduct(product.id) }
+        )
+        resultsRecycler.layoutManager = GridLayoutManager(this, marketplaceGridSpanCount(maxSpanCount = 4))
+        resultsRecycler.adapter = resultsAdapter
+        if (resultsRecycler.itemDecorationCount == 0) {
+            resultsRecycler.addItemDecoration(object : RecyclerView.ItemDecoration() {
+                override fun getItemOffsets(
+                    outRect: Rect,
+                    view: View,
+                    parent: RecyclerView,
+                    state: RecyclerView.State
+                ) {
+                    val spanCount = (parent.layoutManager as? GridLayoutManager)?.spanCount ?: 1
+                    val spacing = 12.dp
+                    val halfSpacing = spacing / 2
+                    val position = parent.getChildAdapterPosition(view)
+                    if (position == RecyclerView.NO_POSITION) return
+
+                    val column = position % spanCount
+                    outRect.top = if (position < spanCount) 0 else spacing
+                    outRect.left = if (column == 0) 0 else halfSpacing
+                    outRect.right = if (column == spanCount - 1) 0 else halfSpacing
+                }
+            })
+        }
+        resultsRecycler.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                if (dy > 0) {
+                    val lm = recyclerView.layoutManager as? GridLayoutManager ?: return
+                    val visibleItemCount = lm.childCount
+                    val totalItemCount = lm.itemCount
+                    val pastVisibleItems = lm.findFirstVisibleItemPosition()
+
+                    if (!isSearching && hasMoreResults) {
+                        if ((visibleItemCount + pastVisibleItems) >= totalItemCount - 4) {
+                            performSearch(currentQuery, isLoadMore = true)
+                        }
+                    }
+                }
+            }
+        })
     }
 
-    // Cette fonction fait une action de cette partie de l'app.
     private fun bindTopActions() {
-        findViewById<View>(R.id.ivSearchBack).setOnClickListener { finishToTop() }
-        findViewById<View>(R.id.ivSearchFilter).setOnClickListener { showFilterSheet() }
+        binding.ivSearchBack.setOnClickListener { finishSearchScreen() }
+        binding.ivSearchFilter.setOnClickListener { showFilterSheet() }
         tvCancel.setOnClickListener {
             etSearch.text?.clear()
             focusAndOpenKeyboard()
@@ -168,23 +233,23 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
-    // Cette fonction fait une action de cette partie de l'app.
     private fun bindSearchInput() {
         etSearch.addTextChangedListener(object : TextWatcher {
-            // Cette fonction fait une action de cette partie de l'app.
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
-            // Cette fonction fait une action de cette partie de l'app.
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 val query = s?.toString()?.trim().orEmpty()
                 toggleCancelButton(query.isNotEmpty())
                 if (query.isEmpty()) {
-                    showDefaultState(animated = true)
+                    if (hasActiveFilters()) {
+                        performSearch("")
+                    } else {
+                        showDefaultState(animated = true)
+                    }
                 } else {
                     renderSuggestions(query)
                     showSuggestionsState(animated = true)
                 }
             }
-            // Cette fonction fait une action de cette partie de l'app.
             override fun afterTextChanged(s: Editable?) = Unit
         })
 
@@ -200,7 +265,6 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
-    // Cette fonction fait une action de cette partie de l'app.
     private fun bindSortDropdown() {
         val labels = SortOption.values().map { getString(it.labelRes) }
         sortDropdown.setAdapter(ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, labels))
@@ -209,14 +273,13 @@ class SearchActivity : AppCompatActivity() {
         sortDropdown.setOnClickListener { sortDropdown.showDropDown() }
         sortDropdown.setOnItemClickListener { _, _, position, _ ->
             currentSort = SortOption.values()[position]
-            if (currentQuery.isNotBlank()) {
+            if (resultsState.visibility == View.VISIBLE) {
                 val sorted = applySort(lastResults, currentSort)
                 renderSearchResults(currentQuery, sorted)
             }
         }
     }
 
-    // Cette fonction fait une action de cette partie de l'app.
     private fun bindPopularChips() {
         popularGroup.removeAllViews()
         popularSearches.forEach { term ->
@@ -229,7 +292,7 @@ class SearchActivity : AppCompatActivity() {
                 chipBackgroundColor = ContextCompat.getColorStateList(context, R.color.home_chip_bg)
                 rippleColor = ContextCompat.getColorStateList(context, R.color.home_nav_selected_bg)
                 typeface = resources.getFont(R.font.plus_jakarta_sans_regular)
-                setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
                 setOnClickListener {
                     etSearch.setText(term)
                     etSearch.setSelection(term.length)
@@ -240,14 +303,12 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
-    // Cette fonction fait une action de cette partie de l'app.
     private fun bindBrowseCategories() {
         btnBrowseCategories.setOnClickListener {
-            navigateToMainTab(MainActivity.Tab.EXPLORE)
+            openMainTab(MainActivity.Tab.EXPLORE)
         }
     }
 
-    // Cette fonction fait une action de cette partie de l'app.
     private fun renderRecentSearches() {
         recentList.removeAllViews()
         val items = getRecentSearches().take(5)
@@ -255,7 +316,7 @@ class SearchActivity : AppCompatActivity() {
             val empty = TextView(this).apply {
                 text = getString(R.string.search_recent_empty)
                 setTextColor(ContextCompat.getColor(context, R.color.home_text_secondary))
-                textSize = 13f
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
                 typeface = resources.getFont(R.font.plus_jakarta_sans_regular)
             }
             recentList.addView(empty)
@@ -270,7 +331,6 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
-    // Cette fonction fait une action de cette partie de l'app.
     private fun buildRecentRow(term: String): View {
         val row = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
@@ -291,8 +351,8 @@ class SearchActivity : AppCompatActivity() {
         val text = TextView(this).apply {
             this.text = term
             setTextColor(ContextCompat.getColor(context, R.color.home_text_primary))
-            textSize = 14f
-                typeface = resources.getFont(R.font.plus_jakarta_sans_regular)
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
+            typeface = resources.getFont(R.font.plus_jakarta_sans_regular)
             layoutParams = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f)
                 .apply { marginStart = 10.dp }
             setOnClickListener {
@@ -318,7 +378,6 @@ class SearchActivity : AppCompatActivity() {
         return row
     }
 
-    // Cette fonction fait une action de cette partie de l'app.
     private fun renderSuggestions(query: String) {
         suggestionsList.removeAllViews()
         val normalized = query.lowercase(Locale.getDefault())
@@ -336,7 +395,6 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
-    // Cette fonction fait une action de cette partie de l'app.
     private fun buildSuggestionRow(query: String, suggestion: String): View {
         val row = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
@@ -362,7 +420,7 @@ class SearchActivity : AppCompatActivity() {
         val text = TextView(this).apply {
             layoutParams = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f)
                 .apply { marginStart = 10.dp }
-            textSize = 15f
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
             typeface = resources.getFont(R.font.plus_jakarta_sans_regular)
             this.text = createSuggestionSpan(query, suggestion)
         }
@@ -372,7 +430,6 @@ class SearchActivity : AppCompatActivity() {
         return row
     }
 
-    // Cette fonction fait une action de cette partie de l'app.
     private fun createSuggestionSpan(query: String, suggestion: String): SpannableString {
         val span = SpannableString(suggestion)
         val start = suggestion.lowercase(Locale.getDefault())
@@ -418,114 +475,113 @@ class SearchActivity : AppCompatActivity() {
         return span
     }
 
-    // Cette fonction fait une action de cette partie de l'app.
-    private fun performSearch(query: String) {
-        val requestToken = ++searchRequestToken
-        currentQuery = query
-        if (etSearch.text?.toString() != query) {
-            etSearch.setText(query)
-            etSearch.setSelection(query.length)
+    private fun performSearch(query: String, isLoadMore: Boolean = false) {
+        if (!isLoadMore) {
+            searchRequestToken++
+            searchLastDoc = null
+            hasMoreResults = true
+            currentQuery = query
+            if (etSearch.text?.toString() != query) {
+                etSearch.setText(query)
+                etSearch.setSelection(query.length)
+            }
+            hideKeyboard()
+            saveRecentSearch(query)
+            renderRecentSearches()
+            showResultsState(animated = true)
+            startSkeleton()
+            lastResults = emptyList()
+            resultsAdapter.submitList(emptyList())
         }
-        hideKeyboard()
-        saveRecentSearch(query)
-        renderRecentSearches()
-        showResultsState(animated = true)
-        startSkeleton()
+
+        if (isSearching || !hasMoreResults) return
+        val requestToken = searchRequestToken
+        isSearching = true
 
         val sortAtRequestTime = currentSort
-        val catalogSnapshot = ProductCatalog.all()
         val categoryAtRequestTime = filterCategory
         val locationAtRequestTime = filterLocation
         val minPriceAtRequestTime = filterMinPrice
         val maxPriceAtRequestTime = filterMaxPrice
         val bioAtRequestTime = filterBioNaturel
+        val lastDocAtRequestTime = searchLastDoc
 
-        searchExecutor.execute {
-            val filtered = applyFilters(
-                query = query,
-                source = catalogSnapshot,
-                category = categoryAtRequestTime,
-                location = locationAtRequestTime,
-                minPrice = minPriceAtRequestTime,
-                maxPrice = maxPriceAtRequestTime,
-                bioNaturel = bioAtRequestTime
-            )
-            val sorted = applySort(filtered, sortAtRequestTime)
+        lifecycleScope.launch {
+            val (fetchedProducts, nextDoc) = try {
+                ProductService.fetchProductsPaginated(
+                    pageSize = 50,
+                    lastDoc = lastDocAtRequestTime,
+                    categoryFilter = if (categoryAtRequestTime != "all") categoryAtRequestTime else null
+                )
+            } catch (e: Exception) {
+                Pair(emptyList<Product>(), null)
+            }
 
-            uiHandler.post {
-                if (isFinishing || isDestroyed) return@post
-                if (requestToken != searchRequestToken) return@post
-                if (query != currentQuery) return@post
+            val sorted = withContext(Dispatchers.Default) {
+                val filtered = applyFilters(
+                    query = query,
+                    source = fetchedProducts,
+                    category = categoryAtRequestTime,
+                    location = locationAtRequestTime,
+                    minPrice = minPriceAtRequestTime,
+                    maxPrice = maxPriceAtRequestTime,
+                    bioNaturel = bioAtRequestTime
+                )
+                applySort(filtered, sortAtRequestTime)
+            }
 
-                lastResults = sorted
-                renderSearchResults(query, sorted)
-                stopSkeleton()
+            if (isFinishing || isDestroyed || requestToken != searchRequestToken) {
+                isSearching = false
+                return@launch
+            }
+
+            searchLastDoc = nextDoc
+            hasMoreResults = nextDoc != null
+            val combined = if (isLoadMore) lastResults + sorted else sorted
+            lastResults = combined
+            
+            renderSearchResults(query, combined)
+            if (!isLoadMore) stopSkeleton()
+            isSearching = false
+            
+            if (combined.size < 10 && hasMoreResults) {
+                performSearch(query, isLoadMore = true)
             }
         }
     }
 
-    // Cette fonction fait une action de cette partie de l'app.
     private fun renderSearchResults(query: String, items: List<Product>) {
-        resultsCount.text = getString(R.string.search_results_count, items.size, query)
-        gridResults.removeAllViews()
+        (resultsRecycler.layoutManager as? GridLayoutManager)?.spanCount =
+            marketplaceGridSpanCount(maxSpanCount = 4)
+        val label = if (query.isBlank()) currentFilterDescriptor() else query
+        resultsCount.text = getString(R.string.search_results_count, items.size, label)
+        resultsAdapter.submitList(items)
         if (items.isEmpty()) {
             emptyState.visibility = View.VISIBLE
+            resultsRecycler.visibility = View.GONE
             emptyAnimation.playAnimation()
             return
         }
         emptyState.visibility = View.GONE
+        resultsRecycler.visibility = View.VISIBLE
         emptyAnimation.pauseAnimation()
+    }
 
-        items.forEachIndexed { index, product ->
-            val card = layoutInflater.inflate(R.layout.item_search_product_card, gridResults, false)
-            bindResultCard(card, product)
-            val col = index % 2
-            val row = index / 2
-            val params = GridLayout.LayoutParams(
-                GridLayout.spec(row),
-                GridLayout.spec(col, 1f)
-            ).apply {
-                width = 0
-                setMargins(
-                    if (col == 0) 0 else 8.dp,
-                    0,
-                    if (col == 0) 8.dp else 0,
-                    18.dp
-                )
-            }
-            card.layoutParams = params
-            gridResults.addView(card)
+    private fun handleAddToCart(product: Product) {
+        if (product.stock <= 0) {
+            showSearchToast(getString(R.string.product_state_out_of_stock))
+            return
+        }
+        val beforeCount = CartStore.itemCount(this)
+        CartStore.addOne(this, product.id)
+        val afterCount = CartStore.itemCount(this)
+        if (afterCount == beforeCount) {
+            showSearchToast(getString(R.string.product_stock_limit_reached))
+        } else {
+            showSearchToast(getString(R.string.product_added_to_cart, product.title))
         }
     }
 
-    // Cette fonction fait une action de cette partie de l'app.
-    private fun bindResultCard(view: View, product: Product) {
-        view.findViewById<ImageView>(R.id.ivSearchProductImage).loadCatalogImage(product.imageRes)
-        view.findViewById<TextView>(R.id.tvSearchProductTitle).text = product.title
-        view.findViewById<TextView>(R.id.tvSearchProductSubtitle).text = product.subtitle
-        view.findViewById<TextView>(R.id.tvSearchPriceAmount).text = String.format(Locale.US, "%.3f", product.price)
-
-        val favoriteIcon = view.findViewById<ImageView>(R.id.ivSearchFavoriteIcon)
-        // Cette fonction fait une action de cette partie de l'app.
-        fun refreshFavoriteTint() {
-            val isFavorite = FavoritesStore.isFavorite(this, product.id)
-            val tint = if (isFavorite) R.color.home_heart_active else R.color.home_text_primary
-            favoriteIcon.setColorFilter(ContextCompat.getColor(this, tint))
-        }
-        refreshFavoriteTint()
-
-        view.findViewById<MaterialCardView>(R.id.btnSearchFavorite).setOnClickListener {
-            FavoritesStore.toggleFavorite(this, product.id)
-            refreshFavoriteTint()
-        }
-        view.findViewById<MaterialCardView>(R.id.btnSearchAddCart).setOnClickListener {
-            CartStore.addOne(this, product.id)
-            showToast(getString(R.string.product_added_to_cart, product.title))
-        }
-        view.setOnClickListener { navigateToProductDetails(product.id) }
-    }
-
-    // Cette fonction fait une action de cette partie de l'app.
     private fun applyFilters(
         query: String,
         source: List<Product>,
@@ -542,27 +598,28 @@ class SearchActivity : AppCompatActivity() {
 
             val queryMatch = searchable.contains(normalizedQuery)
             val categoryMatch = when (category) {
-                "craft" -> searchable.contains("artisan") || searchable.contains("tapis") || searchable.contains("poterie")
-                "food" -> searchable.contains("huile") || searchable.contains("harissa") || searchable.contains("safran")
-                "fashion" -> searchable.contains("chechia") || searchable.contains("balgha") || searchable.contains("bijoux")
+                "craft" -> product.category == "craft"
+                "decor" -> product.category == "decor"
+                "food" -> product.category == "food"
+                "fashion" -> product.category == "fashion"
+                "beauty" -> product.category == "beauty"
                 else -> true
             }
             val priceMatch = product.price in minPrice.toDouble()..maxPrice.toDouble()
-            val locationMatch = locationKeyword == null || searchable.contains(locationKeyword)
-            val bioMatch = !bioNaturel || searchable.contains("bio") || searchable.contains("naturel")
-            queryMatch && categoryMatch && priceMatch && locationMatch && bioMatch
+            val locationMatch = locationKeyword == null || product.origin.contains(locationKeyword)
+            val bioMatch = !bioNaturel || product.isBio
+            val visibilityMatch = product.isActive
+            queryMatch && categoryMatch && priceMatch && locationMatch && bioMatch && visibilityMatch
         }
     }
 
-    // Cette fonction fait une action de cette partie de l'app.
     private fun applySort(items: List<Product>, sort: SortOption): List<Product> = when (sort) {
         SortOption.PRICE_LOW -> items.sortedBy { it.price }
         SortOption.PRICE_HIGH -> items.sortedByDescending { it.price }
         SortOption.POPULAR -> items.sortedByDescending { it.reviewsCount }
-        SortOption.NEWEST -> items.sortedByDescending { it.id.hashCode() }
+        SortOption.NEWEST -> items.sortedByDescending { it.updatedAt }
     }
 
-    // Cette fonction fait une action de cette partie de l'app.
     private fun mapLocationToKeyword(value: String): String? = when (value) {
         "medina" -> "medina"
         "djerba" -> "djerba"
@@ -570,10 +627,18 @@ class SearchActivity : AppCompatActivity() {
         else -> null
     }
 
-    // Cette fonction fait une action de cette partie de l'app.
+    private fun currentFilterDescriptor(): String = when (filterCategory) {
+        "craft" -> getString(R.string.search_category_craft)
+        "decor" -> getString(R.string.search_category_decor)
+        "food" -> getString(R.string.search_category_food)
+        "fashion" -> getString(R.string.search_category_fashion)
+        "beauty" -> getString(R.string.search_category_beauty)
+        else -> getString(R.string.search_filter_all)
+    }
+
     private fun showFilterSheet() {
         val dialog = BottomSheetDialog(this)
-        val sheet = layoutInflater.inflate(R.layout.bottom_sheet_search_filters, null)
+        val sheet = layoutInflater.inflate(R.layout.bottom_sheet_search_filters, findViewById(android.R.id.content), false)
         dialog.setContentView(sheet)
 
         val categoryGroup = sheet.findViewById<ChipGroup>(R.id.chipGroupFilterCategory)
@@ -584,7 +649,6 @@ class SearchActivity : AppCompatActivity() {
         val btnReset = sheet.findViewById<MaterialButton>(R.id.btnFilterReset)
         val btnApply = sheet.findViewById<MaterialButton>(R.id.btnFilterApply)
 
-        // Cette fonction fait une action de cette partie de l'app.
         fun syncRangeLabel(values: List<Float>) {
             tvRange.text = getString(
                 R.string.search_filter_price_value,
@@ -600,8 +664,10 @@ class SearchActivity : AppCompatActivity() {
 
         when (filterCategory) {
             "craft" -> categoryGroup.check(R.id.chipCategoryCraft)
+            "decor" -> categoryGroup.check(R.id.chipCategoryDecor)
             "food" -> categoryGroup.check(R.id.chipCategoryFood)
             "fashion" -> categoryGroup.check(R.id.chipCategoryFashion)
+            "beauty" -> categoryGroup.check(R.id.chipCategoryBeauty)
             else -> categoryGroup.check(R.id.chipCategoryAll)
         }
         when (filterLocation) {
@@ -615,17 +681,19 @@ class SearchActivity : AppCompatActivity() {
             filterCategory = "all"
             filterLocation = "all"
             filterMinPrice = 0f
-            filterMaxPrice = 400f
+            filterMaxPrice = MAX_FILTER_PRICE
             filterBioNaturel = false
             dialog.dismiss()
-            if (currentQuery.isNotBlank()) performSearch(currentQuery)
+            performSearch(currentQuery)
         }
 
         btnApply.setOnClickListener {
             filterCategory = when (categoryGroup.checkedChipId) {
                 R.id.chipCategoryCraft -> "craft"
+                R.id.chipCategoryDecor -> "decor"
                 R.id.chipCategoryFood -> "food"
                 R.id.chipCategoryFashion -> "fashion"
+                R.id.chipCategoryBeauty -> "beauty"
                 else -> "all"
             }
             filterLocation = when (locationGroup.checkedChipId) {
@@ -638,19 +706,23 @@ class SearchActivity : AppCompatActivity() {
             filterMaxPrice = slider.values[1]
             filterBioNaturel = swBio.isChecked
             dialog.dismiss()
-            if (currentQuery.isNotBlank()) performSearch(currentQuery)
+            performSearch(currentQuery)
         }
         dialog.show()
     }
 
-    // Cette fonction fait une action de cette partie de l'app.
+    private fun hasActiveFilters(): Boolean {
+        return filterCategory != "all" ||
+            filterLocation != "all" ||
+            filterMinPrice > 0f ||
+            filterMaxPrice < MAX_FILTER_PRICE ||
+            filterBioNaturel
+    }
+
     private fun showDefaultState(animated: Boolean) = fadeTo(defaultState, animated)
-    // Cette fonction fait une action de cette partie de l'app.
     private fun showSuggestionsState(animated: Boolean) = fadeTo(suggestionsState, animated)
-    // Cette fonction fait une action de cette partie de l'app.
     private fun showResultsState(animated: Boolean) = fadeTo(resultsState, animated)
 
-    // Cette fonction fait une action de cette partie de l'app.
     private fun fadeTo(target: View, animated: Boolean) {
         val states = listOf(defaultState, suggestionsState, resultsState)
         states.forEach { view ->
@@ -660,7 +732,7 @@ class SearchActivity : AppCompatActivity() {
                 view.visibility = View.GONE
                 return@forEach
             }
-            view.animate().alpha(0f).setDuration(120L).withEndAction {
+            view.animate().alpha(0f).setDuration(MotionTokens.QUICK).withEndAction {
                 view.visibility = View.GONE
                 view.alpha = 1f
             }.start()
@@ -673,26 +745,24 @@ class SearchActivity : AppCompatActivity() {
         }
         target.alpha = 0f
         target.visibility = View.VISIBLE
-        target.animate().alpha(1f).setDuration(170L)
+        target.animate().alpha(1f).setDuration(MotionTokens.STANDARD)
             .setInterpolator(AccelerateDecelerateInterpolator())
             .start()
     }
 
-    // Cette fonction fait une action de cette partie de l'app.
     private fun toggleCancelButton(show: Boolean) {
         if (show && tvCancel.visibility != View.VISIBLE) {
             tvCancel.visibility = View.VISIBLE
             tvCancel.alpha = 0f
-            tvCancel.animate().alpha(1f).setDuration(150L).start()
+            tvCancel.animate().alpha(1f).setDuration(MotionTokens.QUICK).start()
         } else if (!show && tvCancel.visibility == View.VISIBLE) {
-            tvCancel.animate().alpha(0f).setDuration(120L).withEndAction {
+            tvCancel.animate().alpha(0f).setDuration(MotionTokens.QUICK).withEndAction {
                 tvCancel.visibility = View.GONE
                 tvCancel.alpha = 1f
             }.start()
         }
     }
 
-    // Cette fonction fait une action de cette partie de l'app.
     private fun buildDivider(): View = View(this).apply {
         layoutParams = LinearLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
@@ -701,7 +771,6 @@ class SearchActivity : AppCompatActivity() {
         setBackgroundColor(ContextCompat.getColor(context, R.color.home_divider))
     }
 
-    // Cette fonction fait une action de cette partie de l'app.
     private fun startSkeleton() {
         scrollResults.visibility = View.GONE
         skeleton.visibility = View.VISIBLE
@@ -715,17 +784,15 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
-    // Cette fonction fait une action de cette partie de l'app.
     private fun stopSkeleton() {
         skeletonAnimator?.cancel()
         skeleton.alpha = 1f
         skeleton.visibility = View.GONE
         scrollResults.visibility = View.VISIBLE
         scrollResults.alpha = 0f
-        scrollResults.animate().alpha(1f).setDuration(180L).start()
+        scrollResults.animate().alpha(1f).setDuration(MotionTokens.STANDARD).start()
     }
 
-    // Cette fonction fait une action de cette partie de l'app.
     private fun focusAndOpenKeyboard() {
         etSearch.requestFocus()
         etSearch.post {
@@ -734,13 +801,34 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
-    // Cette fonction fait une action de cette partie de l'app.
     private fun hideKeyboard() {
         val imm = getSystemService(InputMethodManager::class.java)
         imm?.hideSoftInputFromWindow(etSearch.windowToken, 0)
     }
 
-    // Cette fonction fait une action de cette partie de l'app.
+    private fun finishSearchScreen() {
+        finish()
+        overridePendingTransition(R.anim.motion_activity_enter_stay, R.anim.motion_activity_exit_to_top)
+    }
+
+    private fun openMainTab(tab: MainActivity.Tab) {
+        val intent = Intent(this, MainActivity::class.java).apply {
+            addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+            putExtra(MainActivity.EXTRA_OPEN_TAB, tab.name)
+        }
+        startActivity(intent)
+        overridePendingTransition(R.anim.motion_activity_enter_forward, R.anim.motion_activity_exit_forward)
+    }
+
+    private fun openProduct(productId: String) {
+        startActivity(ProductDetailsScreen.createIntent(this, productId))
+        overridePendingTransition(R.anim.motion_activity_enter_forward, R.anim.motion_activity_exit_forward)
+    }
+
+    private fun showSearchToast(message: String) {
+        showMotionSnackbar(message)
+    }
+
     private fun getRecentSearches(): MutableList<String> {
         val raw = getSharedPreferences(PREFS_SEARCH, Context.MODE_PRIVATE)
             .getString(KEY_RECENT_SEARCHES_CSV, "")
@@ -761,7 +849,6 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
-    // Cette fonction fait une action de cette partie de l'app.
     private fun saveRecentListToPrefs(list: List<String>) {
         val array = org.json.JSONArray()
         list.forEach { array.put(it) }
@@ -771,17 +858,15 @@ class SearchActivity : AppCompatActivity() {
             .apply()
     }
 
-    // Cette fonction fait une action de cette partie de l'app.
     private fun saveRecentSearch(query: String) {
         val normalized = query.trim()
         if (normalized.isEmpty()) return
         val recent = getRecentSearches()
         recent.removeAll { it.equals(normalized, ignoreCase = true) }
         recent.add(0, normalized)
-        saveRecentListToPrefs(recent.take(5))
+        saveRecentListToPrefs(recent.take(MAX_RECENT_SEARCHES))
     }
 
-    // Cette fonction fait une action de cette partie de l'app.
     private fun removeRecentSearch(query: String) {
         val filtered = getRecentSearches().filterNot { it.equals(query, ignoreCase = true) }
         saveRecentListToPrefs(filtered)
@@ -790,7 +875,6 @@ class SearchActivity : AppCompatActivity() {
     private val Int.dp: Int
         get() = (this * resources.displayMetrics.density).roundToInt()
 
-    // Cette classe organise cette partie de l'app.
     private enum class SortOption(val labelRes: Int) {
         PRICE_LOW(R.string.search_sort_price_low),
         PRICE_HIGH(R.string.search_sort_price_high),
@@ -798,9 +882,43 @@ class SearchActivity : AppCompatActivity() {
         NEWEST(R.string.search_sort_newest)
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString(KEY_SEARCH_QUERY, currentQuery)
+        outState.putInt(KEY_SORT_ORDINAL, currentSort.ordinal)
+        outState.putString(KEY_FILTER_CATEGORY, filterCategory)
+        outState.putString(KEY_FILTER_LOCATION, filterLocation)
+        outState.putFloat(KEY_FILTER_MIN_PRICE, filterMinPrice)
+        outState.putFloat(KEY_FILTER_MAX_PRICE, filterMaxPrice)
+        outState.putBoolean(KEY_FILTER_BIO, filterBioNaturel)
+    }
+
     companion object {
         private const val PREFS_SEARCH = "search_screen_prefs"
         private const val KEY_RECENT_SEARCHES_CSV = "recent_searches_csv"
         private const val RECENT_SEPARATOR = "|||"
+        private const val MAX_FILTER_PRICE = 400f
+        private const val MAX_RECENT_SEARCHES = 5
+        const val EXTRA_INITIAL_QUERY = "extra_initial_query"
+        const val EXTRA_INITIAL_CATEGORY = "extra_initial_category"
+
+        private const val KEY_SEARCH_QUERY = "search_query"
+        private const val KEY_SORT_ORDINAL = "sort_ordinal"
+        private const val KEY_FILTER_CATEGORY = "filter_category"
+        private const val KEY_FILTER_LOCATION = "filter_location"
+        private const val KEY_FILTER_MIN_PRICE = "filter_min_price"
+        private const val KEY_FILTER_MAX_PRICE = "filter_max_price"
+        private const val KEY_FILTER_BIO = "filter_bio"
+
+        fun createIntent(
+            context: Context,
+            initialQuery: String = "",
+            initialCategory: String = "all"
+        ): Intent {
+            return Intent(context, SearchActivity::class.java).apply {
+                putExtra(EXTRA_INITIAL_QUERY, initialQuery)
+                putExtra(EXTRA_INITIAL_CATEGORY, initialCategory)
+            }
+        }
     }
 }

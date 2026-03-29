@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -6,123 +6,70 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/home_screen_bg"
-    tools:context=".explore">
+    tools:context=".ExploreTabFragment">
 
     <LinearLayout
         android:id="@+id/layoutTopSection"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="@color/home_nav_bg"
+        android:background="@color/colorSurface"
         android:orientation="vertical"
-        android:paddingBottom="@dimen/home_top_section_bottom_padding"
+        android:paddingStart="@dimen/home_horizontal_padding"
+        android:paddingTop="24dp"
+        android:paddingEnd="@dimen/home_horizontal_padding"
+        android:paddingBottom="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/tvBrand"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/home_horizontal_padding"
-            android:layout_marginTop="@dimen/home_top_spacing"
-            android:layout_marginEnd="@dimen/home_horizontal_padding">
+            android:fontFamily="@font/plus_jakarta_sans_bold"
+            android:text="@string/auto_explore_1819"
+            android:textColor="@color/home_text_primary"
+            android:textSize="@dimen/text_size_title_large"
+            android:textStyle="bold" />
 
-            <ImageView
-                android:id="@+id/ivHomeLogo"
-                android:layout_width="@dimen/home_logo_width"
-                android:layout_height="@dimen/home_logo_height"
-                android:contentDescription="@string/auto_text_001"
-                android:scaleType="fitCenter"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@drawable/fatiweblogo" />
-
-            <TextView
-                android:id="@+id/tvBrand"
-                style="@style/HomeText.Brand"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/home_brand_start_margin"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:text="@string/auto_text_002"
-                app:layout_constraintBottom_toBottomOf="@id/ivHomeLogo"
-                app:layout_constraintEnd_toStartOf="@id/layoutTopActions"
-                app:layout_constraintStart_toEndOf="@id/ivHomeLogo"
-                app:layout_constraintTop_toTopOf="@id/ivHomeLogo" />
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/layoutSearchBar"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="16dp"
+            app:cardBackgroundColor="@color/home_surface_raised"
+            app:cardCornerRadius="28dp"
+            app:cardElevation="2dp"
+            app:strokeWidth="0dp">
 
             <LinearLayout
-                android:id="@+id/layoutTopActions"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
-                app:layout_constraintBottom_toBottomOf="@id/ivHomeLogo"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@id/ivHomeLogo">
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp">
 
-                <FrameLayout
-                    android:id="@+id/ivTopCart"
-                    android:layout_width="@dimen/home_action_icon_size"
-                    android:layout_height="@dimen/home_action_icon_size">
+                <ImageView
+                    android:id="@+id/ivSearch"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    app:srcCompat="@drawable/ic_profile_nav_search"
+                    app:tint="@color/home_text_secondary"  android:contentDescription="@string/cd_logo" />
 
-                    <ImageView
-                        android:id="@+id/ivTopCartIcon"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:contentDescription="@string/auto_text_003"
-                        app:srcCompat="@drawable/ic_bottom_nav_cart"
-                        app:tint="@color/home_text_primary" />
-
-                </FrameLayout>
-
-                <FrameLayout
-                    android:id="@+id/notificationContainer"
-                    android:layout_width="wrap_content"
+                <TextView
+                    android:id="@+id/tvSearchPlaceholder"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/home_action_gap">
-
-                    <ImageView
-                        android:id="@+id/ivTopNotifications"
-                        android:layout_width="@dimen/home_action_icon_size"
-                        android:layout_height="@dimen/home_action_icon_size"
-                        android:contentDescription="@string/notifications_title"
-                        app:srcCompat="@drawable/notification"
-                        app:tint="@color/home_text_primary" />
-
-                    <View
-                        android:id="@+id/notificationBadge"
-                        android:layout_width="8dp"
-                        android:layout_height="8dp"
-                        android:layout_gravity="end|top"
-                        android:layout_marginTop="2dp"
-                        android:layout_marginEnd="2dp"
-                        android:background="@drawable/bg_notification_badge"
-                        android:visibility="gone" />
-                </FrameLayout>
+                    android:layout_marginStart="12dp"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/plus_jakarta_sans_regular"
+                    android:text="@string/auto_search_unique_products_3648"
+                    android:textColor="@color/home_text_secondary"
+                    android:textSize="@dimen/text_size_caption" />
             </LinearLayout>
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
+        </com.google.android.material.card.MaterialCardView>
     </LinearLayout>
-
-    <View
-        android:id="@+id/viewBottomDivider"
-        android:layout_width="0dp"
-        android:layout_height="@dimen/divider_height"
-        android:visibility="gone"
-        android:background="@color/profile_divider"
-        app:layout_constraintBottom_toTopOf="@id/layoutBottomNav"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <View
-        android:id="@+id/layoutBottomNav"
-        android:layout_width="0dp"
-        android:layout_height="@dimen/profile_bottom_nav_height_exact"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/scrollExploreContent"
@@ -131,8 +78,7 @@
         android:clipToPadding="false"
         android:fillViewport="true"
         android:overScrollMode="never"
-        android:paddingBottom="@dimen/home_scroll_content_bottom_padding"
-        app:layout_constraintBottom_toTopOf="@id/viewBottomDivider"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/layoutTopSection">
@@ -140,197 +86,330 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:paddingStart="@dimen/home_horizontal_padding"
+            android:paddingTop="20dp"
+            android:paddingEnd="@dimen/home_horizontal_padding"
+            android:paddingBottom="100dp">
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardBackgroundColor="@color/home_surface_raised"
+                app:cardCornerRadius="28dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/colorBorderLight"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="24dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_home_meta_pill"
+                        android:fontFamily="@font/plus_jakarta_sans_medium"
+                        android:paddingStart="12dp"
+                        android:paddingTop="6dp"
+                        android:paddingEnd="12dp"
+                        android:paddingBottom="6dp"
+                        android:text="@string/auto_editorial_56d0"
+                        android:textColor="@color/home_meta_text"
+                        android:textSize="@dimen/text_size_overline"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:fontFamily="@font/plus_jakarta_sans_bold"
+                        android:lineSpacingExtra="2dp"
+                        android:text="@string/auto_the_maker_movement_e7c5"
+                        android:textColor="@color/home_text_primary"
+                        android:textSize="@dimen/text_size_title"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:fontFamily="@font/plus_jakarta_sans_regular"
+                        android:lineSpacingExtra="4dp"
+                        android:text="@string/auto_discover_the_stories_behind_0aa6"
+                        android:textColor="@color/home_text_secondary"
+                        android:textSize="@dimen/text_size_body" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
             <TextView
-                style="@style/HomeText.SectionTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/home_horizontal_padding"
-                android:layout_marginTop="@dimen/home_section_margin_top"
-                android:text="@string/auto_text_011" />
+                android:layout_marginTop="32dp"
+                android:fontFamily="@font/plus_jakarta_sans_bold"
+                android:text="@string/auto_browse_categories_7039"
+                android:textColor="@color/home_text_primary"
+                android:textSize="@dimen/text_size_subtitle"
+                android:textStyle="bold" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardCategoryArtisanat"
+                android:layout_width="match_parent"
+                android:layout_height="220dp"
+                android:layout_marginTop="16dp"
+                app:cardCornerRadius="28dp"
+                app:cardElevation="2dp"
+                app:strokeWidth="0dp">
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:contentDescription="@string/auto_artisanat_6d19"
+                        android:scaleType="centerCrop"
+                        app:srcCompat="@drawable/img_explore_artisanat" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/bg_explore_category_gradient" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="bottom"
+                        android:orientation="vertical"
+                        android:padding="24dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/bg_home_meta_pill"
+                            android:fontFamily="@font/plus_jakarta_sans_medium"
+                            android:paddingStart="12dp"
+                            android:paddingTop="6dp"
+                            android:paddingEnd="12dp"
+                            android:paddingBottom="6dp"
+                            android:text="@string/auto_master_crafts_368b"
+                            android:textColor="@color/home_meta_text"
+                            android:textSize="@dimen/text_size_overline"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            android:fontFamily="@font/plus_jakarta_sans_bold"
+                            android:text="@string/auto_traditional_crafts_501b"
+                            android:textColor="@android:color/white"
+                            android:textSize="@dimen/text_size_title"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:fontFamily="@font/plus_jakarta_sans_regular"
+                            android:text="@string/auto_authentic_tunisian_handmade_goods_99c3"
+                            android:textColor="@color/border_medium"
+                            android:textSize="@dimen/text_size_caption" />
+                    </LinearLayout>
+                </FrameLayout>
+            </com.google.android.material.card.MaterialCardView>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/home_horizontal_padding"
-                android:layout_marginTop="@dimen/home_category_list_margin_top"
-                android:layout_marginEnd="@dimen/home_horizontal_padding"
-                android:gravity="center_horizontal"
-                android:layoutAnimation="@anim/layout_animation_fall_down"
+                android:layout_marginTop="16dp"
+                android:orientation="horizontal">
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardCategoryCosmetiques"
+                    android:layout_width="0dp"
+                    android:layout_height="200dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_weight="1"
+                    app:cardCornerRadius="24dp"
+                    app:cardElevation="2dp"
+                    app:strokeWidth="0dp">
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+                        <ImageView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:contentDescription="@string/auto_cosmetiques_bfba"
+                            android:scaleType="centerCrop"
+                            app:srcCompat="@drawable/img_explore_cosmetiques" />
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/bg_explore_category_gradient" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:gravity="bottom"
+                            android:orientation="vertical"
+                            android:padding="20dp">
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/plus_jakarta_sans_bold"
+                                android:text="@string/auto_beauty_7a7f"
+                                android:textColor="@android:color/white"
+                                android:textSize="@dimen/text_size_subtitle"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:fontFamily="@font/plus_jakarta_sans_regular"
+                                android:text="@string/auto_organic_care_bae4"
+                                android:textColor="@color/border_medium"
+                                android:textSize="@dimen/text_size_overline" />
+                        </LinearLayout>
+                    </FrameLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardCategoryEpices"
+                    android:layout_width="0dp"
+                    android:layout_height="200dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_weight="1"
+                    app:cardCornerRadius="24dp"
+                    app:cardElevation="2dp"
+                    app:strokeWidth="0dp">
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+                        <ImageView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:contentDescription="@string/auto_epices_8354"
+                            android:scaleType="centerCrop"
+                            app:srcCompat="@drawable/img_explore_epices" />
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/bg_explore_category_gradient" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:gravity="bottom"
+                            android:orientation="vertical"
+                            android:padding="20dp">
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/plus_jakarta_sans_bold"
+                                android:text="@string/auto_spices_34c6"
+                                android:textColor="@android:color/white"
+                                android:textSize="@dimen/text_size_subtitle"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:fontFamily="@font/plus_jakarta_sans_regular"
+                                android:text="@string/auto_natural_flavors_7288"
+                                android:textColor="@color/border_medium"
+                                android:textSize="@dimen/text_size_overline" />
+                        </LinearLayout>
+                    </FrameLayout>
+                </com.google.android.material.card.MaterialCardView>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
                 android:orientation="vertical">
 
-                    <!-- Vertical Card List (Stitch V2 Style) -->
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/cardCategoryArtisanat"
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardCategoryVetements"
+                    android:layout_width="match_parent"
+                    android:layout_height="190dp"
+                    app:cardCornerRadius="28dp"
+                    app:cardElevation="2dp"
+                    app:strokeWidth="0dp">
+
+                    <FrameLayout
                         android:layout_width="match_parent"
-                        android:layout_height="@dimen/explore_category_card_height"
-                        android:layout_marginBottom="@dimen/explore_category_card_spacing"
-                        app:cardCornerRadius="@dimen/home_banner_radius"
-                        app:cardElevation="@dimen/space_0"
-                        app:cardUseCompatPadding="false"
-                        app:strokeColor="@android:color/transparent"
-                        app:strokeWidth="@dimen/space_0">
+                        android:layout_height="match_parent">
 
-                        <FrameLayout
+                        <ImageView
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent">
+                            android:layout_height="match_parent"
+                            android:contentDescription="@string/auto_vetements_aee7"
+                            android:scaleType="centerCrop"
+                            app:srcCompat="@drawable/img_explore_vetements" />
 
-                            <ImageView
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:contentDescription="@string/auto_text_012"
-                                android:scaleType="centerCrop"
-                                app:srcCompat="@drawable/img_explore_artisanat" />
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/bg_explore_category_gradient" />
 
-                            <View
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:background="@drawable/bg_explore_category_gradient" />
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:gravity="bottom"
+                            android:orientation="vertical"
+                            android:padding="24dp">
 
                             <TextView
-                                android:layout_width="wrap_content"
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_gravity="start|center_vertical"
-                                android:layout_marginStart="@dimen/explore_category_title_start_margin"
-                                android:textColor="#FFFFFF"
-                                android:textSize="21sp"
-                                android:textStyle="bold"
-                                android:letterSpacing="0.05"
-                                android:text="@string/auto_text_013" />
-                        </FrameLayout>
-                    </com.google.android.material.card.MaterialCardView>
-
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/cardCategoryCosmetiques"
-                        android:layout_width="match_parent"
-                        android:layout_height="@dimen/explore_category_card_height"
-                        android:layout_marginBottom="@dimen/explore_category_card_spacing"
-                        app:cardCornerRadius="@dimen/home_banner_radius"
-                        app:cardElevation="@dimen/space_0"
-                        app:cardUseCompatPadding="false"
-                        app:strokeColor="@android:color/transparent"
-                        app:strokeWidth="@dimen/space_0">
-
-                        <FrameLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent">
-
-                            <ImageView
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:contentDescription="@string/auto_text_014"
-                                android:scaleType="centerCrop"
-                                app:srcCompat="@drawable/img_explore_cosmetiques" />
-
-                            <View
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:background="@drawable/bg_explore_category_gradient" />
+                                android:fontFamily="@font/plus_jakarta_sans_bold"
+                                android:text="@string/auto_apparel_fc43"
+                                android:textColor="@android:color/white"
+                                android:textSize="@dimen/text_size_subtitle"
+                                android:textStyle="bold" />
 
                             <TextView
-                                android:layout_width="wrap_content"
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_gravity="start|center_vertical"
-                                android:layout_marginStart="@dimen/explore_category_title_start_margin"
-                                android:textColor="#FFFFFF"
-                                android:textSize="21sp"
-                                android:textStyle="bold"
-                                android:letterSpacing="0.05"
-                                android:text="@string/auto_text_015" />
-                        </FrameLayout>
-                    </com.google.android.material.card.MaterialCardView>
+                                android:layout_marginTop="4dp"
+                                android:fontFamily="@font/plus_jakarta_sans_regular"
+                                android:text="@string/auto_traditional_wear_71f6"
+                                android:textColor="@color/border_medium"
+                                android:textSize="@dimen/text_size_caption" />
+                        </LinearLayout>
+                    </FrameLayout>
+                </com.google.android.material.card.MaterialCardView>
 
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/cardCategoryEpices"
-                        android:layout_width="match_parent"
-                        android:layout_height="@dimen/explore_category_card_height"
-                        android:layout_marginBottom="@dimen/explore_category_card_spacing"
-                        app:cardCornerRadius="@dimen/home_banner_radius"
-                        app:cardElevation="@dimen/space_0"
-                        app:cardUseCompatPadding="false"
-                        app:strokeColor="@android:color/transparent"
-                        app:strokeWidth="@dimen/space_0">
-
-                        <FrameLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent">
-
-                            <ImageView
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:contentDescription="@string/auto_text_016"
-                                android:scaleType="centerCrop"
-                                app:srcCompat="@drawable/img_explore_epices" />
-
-                            <View
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:background="@drawable/bg_explore_category_gradient" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="start|center_vertical"
-                                android:layout_marginStart="@dimen/explore_category_title_start_margin"
-                                android:textColor="#FFFFFF"
-                                android:textSize="21sp"
-                                android:textStyle="bold"
-                                android:letterSpacing="0.05"
-                                android:text="@string/auto_text_017" />
-                        </FrameLayout>
-                    </com.google.android.material.card.MaterialCardView>
-
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/cardCategoryVetements"
-                        android:layout_width="match_parent"
-                        android:layout_height="@dimen/explore_category_card_height"
-                        android:layout_marginBottom="@dimen/explore_category_card_spacing"
-                        app:cardCornerRadius="@dimen/home_banner_radius"
-                        app:cardElevation="@dimen/space_0"
-                        app:cardUseCompatPadding="false"
-                        app:strokeColor="@android:color/transparent"
-                        app:strokeWidth="@dimen/space_0">
-
-                        <FrameLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent">
-
-                            <ImageView
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:contentDescription="@string/auto_text_018"
-                                android:scaleType="centerCrop"
-                                app:srcCompat="@drawable/img_explore_vetements" />
-
-                            <View
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:background="@drawable/bg_explore_category_gradient" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="start|center_vertical"
-                                android:layout_marginStart="@dimen/explore_category_title_start_margin"
-                                android:textColor="#FFFFFF"
-                                android:textSize="21sp"
-                                android:textStyle="bold"
-                                android:letterSpacing="0.05"
-                                android:text="@string/auto_text_019" />
-                        </FrameLayout>
-                    </com.google.android.material.card.MaterialCardView>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:orientation="horizontal">
 
                     <com.google.android.material.card.MaterialCardView
                         android:id="@+id/cardCategoryDecoration"
-                        android:layout_width="match_parent"
-                        android:layout_height="@dimen/explore_category_card_height"
-                        android:layout_marginBottom="@dimen/explore_category_card_spacing"
-                        app:cardCornerRadius="@dimen/home_banner_radius"
-                        app:cardElevation="@dimen/space_0"
-                        app:cardUseCompatPadding="false"
-                        app:strokeColor="@android:color/transparent"
-                        app:strokeWidth="@dimen/space_0">
+                        android:layout_width="0dp"
+                        android:layout_height="190dp"
+                        android:layout_marginEnd="10dp"
+                        android:layout_weight="1"
+                        app:cardCornerRadius="24dp"
+                        app:cardElevation="2dp"
+                        app:strokeWidth="0dp">
 
                         <FrameLayout
                             android:layout_width="match_parent"
@@ -339,7 +418,7 @@
                             <ImageView
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
-                                android:contentDescription="@string/auto_text_020"
+                                android:contentDescription="@string/auto_decoration_2436"
                                 android:scaleType="centerCrop"
                                 app:srcCompat="@drawable/img_explore_decoration" />
 
@@ -348,29 +427,34 @@
                                 android:layout_height="match_parent"
                                 android:background="@drawable/bg_explore_category_gradient" />
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="start|center_vertical"
-                                android:layout_marginStart="@dimen/explore_category_title_start_margin"
-                                android:textColor="#FFFFFF"
-                                android:textSize="21sp"
-                                android:textStyle="bold"
-                                android:letterSpacing="0.05"
-                                android:text="@string/auto_text_021" />
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:gravity="bottom"
+                                android:orientation="vertical"
+                                android:padding="20dp">
+
+                                <TextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/plus_jakarta_sans_bold"
+                                    android:text="@string/auto_home_decor_a8fa"
+                                    android:textColor="@android:color/white"
+                                    android:textSize="@dimen/text_size_subtitle"
+                                    android:textStyle="bold" />
+                            </LinearLayout>
                         </FrameLayout>
                     </com.google.android.material.card.MaterialCardView>
 
                     <com.google.android.material.card.MaterialCardView
                         android:id="@+id/cardCategoryHuiles"
-                        android:layout_width="match_parent"
-                        android:layout_height="@dimen/explore_category_card_height"
-                        android:layout_marginBottom="@dimen/explore_category_card_spacing"
-                        app:cardCornerRadius="@dimen/home_banner_radius"
-                        app:cardElevation="@dimen/space_0"
-                        app:cardUseCompatPadding="false"
-                        app:strokeColor="@android:color/transparent"
-                        app:strokeWidth="@dimen/space_0">
+                        android:layout_width="0dp"
+                        android:layout_height="190dp"
+                        android:layout_marginStart="10dp"
+                        android:layout_weight="1"
+                        app:cardCornerRadius="24dp"
+                        app:cardElevation="2dp"
+                        app:strokeWidth="0dp">
 
                         <FrameLayout
                             android:layout_width="match_parent"
@@ -379,7 +463,7 @@
                             <ImageView
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
-                                android:contentDescription="@string/auto_text_022"
+                                android:contentDescription="@string/auto_huiles_3b0b"
                                 android:scaleType="centerCrop"
                                 app:srcCompat="@drawable/img_explore_huiles" />
 
@@ -388,28 +472,26 @@
                                 android:layout_height="match_parent"
                                 android:background="@drawable/bg_explore_category_gradient" />
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="start|center_vertical"
-                                android:layout_marginStart="@dimen/explore_category_title_start_margin"
-                                android:textColor="#FFFFFF"
-                                android:textSize="21sp"
-                                android:textStyle="bold"
-                                android:letterSpacing="0.05"
-                                android:text="@string/auto_text_023" />
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:gravity="bottom"
+                                android:orientation="vertical"
+                                android:padding="20dp">
+
+                                <TextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/plus_jakarta_sans_bold"
+                                    android:text="@string/auto_natural_oils_17f4"
+                                    android:textColor="@android:color/white"
+                                    android:textSize="@dimen/text_size_subtitle"
+                                    android:textStyle="bold" />
+                            </LinearLayout>
                         </FrameLayout>
                     </com.google.android.material.card.MaterialCardView>
+                </LinearLayout>
             </LinearLayout>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
-
 </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-
-
-
-
-
-

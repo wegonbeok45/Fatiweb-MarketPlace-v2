@@ -1,120 +1,158 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/cardSearchProduct"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:layout_margin="8dp"
+    app:cardBackgroundColor="@color/colorSurface"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="1dp"
+    app:strokeColor="@color/home_divider"
+    app:strokeWidth="1dp">
 
-    <FrameLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="190dp">
+        android:layout_height="wrap_content"
+        android:padding="8dp">
 
+        <!-- Image Container -->
         <com.google.android.material.card.MaterialCardView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:id="@+id/imageContainer"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
             app:cardBackgroundColor="@color/home_product_surface"
-            app:cardCornerRadius="@dimen/home_product_image_radius"
-            app:cardElevation="@dimen/home_product_card_elevation"
-            app:strokeColor="@color/colorBorderLight"
-            app:strokeWidth="@dimen/stroke_width_default">
+            app:cardCornerRadius="12dp"
+            app:cardElevation="0dp"
+            app:layout_constrainedHeight="true"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintHeight_max="220dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:strokeWidth="0dp">
 
             <ImageView
                 android:id="@+id/ivSearchProductImage"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:contentDescription="@null"
+                android:contentDescription="@string/cd_product_image"
+                android:padding="12dp"
                 android:scaleType="centerInside" />
         </com.google.android.material.card.MaterialCardView>
 
+        <!-- Favorite Button -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/btnSearchFavorite"
-            android:layout_width="@dimen/home_product_heart_size"
-            android:layout_height="@dimen/home_product_heart_size"
-            android:layout_gravity="end|top"
-            android:layout_margin="@dimen/home_product_heart_margin"
-            app:cardBackgroundColor="@color/home_heart_bg"
-            app:cardCornerRadius="@dimen/corner_radius_round"
-            app:cardElevation="@dimen/space_0"
-            app:strokeColor="@color/colorBorderLight"
-            app:strokeWidth="@dimen/stroke_width_default">
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_margin="8dp"
+            app:cardBackgroundColor="@color/overlay_white_80"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="2dp"
+            app:layout_constraintEnd_toEndOf="@id/imageContainer"
+            app:layout_constraintTop_toTopOf="@id/imageContainer"
+            app:strokeWidth="0dp">
 
             <ImageView
                 android:id="@+id/ivSearchFavoriteIcon"
-                android:layout_width="@dimen/home_product_heart_icon_size"
-                android:layout_height="@dimen/home_product_heart_icon_size"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
                 android:layout_gravity="center"
-                android:contentDescription="@null"
-                app:srcCompat="@drawable/ic_home_heart" />
+                android:contentDescription="@string/cd_product_image"
+                app:srcCompat="@drawable/ic_home_heart"
+                app:tint="@color/home_text_primary" />
         </com.google.android.material.card.MaterialCardView>
-    </FrameLayout>
 
-    <TextView
-        android:id="@+id/tvSearchProductTitle"
-        style="@style/HomeText.ProductName"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/home_product_name_margin_top"
-        android:ellipsize="end"
-        android:maxLines="2"
-        android:minLines="2" />
-
-    <TextView
-        android:id="@+id/tvSearchProductSubtitle"
-        style="@style/HomeText.ProductSubtitle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/home_product_subtitle_margin_top"
-        android:ellipsize="end"
-        android:maxLines="1"
-        android:minLines="1" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/home_product_price_row_height"
-        android:layout_marginTop="@dimen/home_product_price_row_margin_top"
-        android:gravity="center_vertical"
-        android:orientation="horizontal">
-
-        <LinearLayout
+        <!-- Product Title -->
+        <TextView
+            android:id="@+id/tvSearchProductTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="bottom"
-            android:orientation="horizontal">
+            android:layout_marginTop="10dp"
+            android:ellipsize="end"
+            android:fontFamily="@font/plus_jakarta_sans_bold"
+            android:maxLines="1"
+            android:textColor="@color/home_text_primary"
+            android:textSize="@dimen/text_size_caption"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/imageContainer"
+            tools:text="Ceramic Vase" />
 
-            <TextView
-                android:id="@+id/tvSearchPriceAmount"
-                style="@style/HomeText.ProductPrice"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+        <!-- Product Subtitle -->
+        <TextView
+            android:id="@+id/tvSearchProductSubtitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:ellipsize="end"
+            android:fontFamily="@font/plus_jakarta_sans_regular"
+            android:maxLines="1"
+            android:textColor="@color/home_text_secondary"
+            android:textSize="@dimen/text_size_overline"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvSearchProductTitle"
+            tools:text="Handcrafted Decor" />
 
-            <TextView
-                android:id="@+id/tvSearchPriceUnit"
-                style="@style/HomeText.ProductPriceUnit"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/home_product_price_unit_margin_start"
-                android:text="@string/currency_dt" />
-        </LinearLayout>
+        <!-- Price Section -->
+        <TextView
+            android:id="@+id/tvSearchPriceAmount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:includeFontPadding="false"
+            android:fontFamily="@font/plus_jakarta_sans_bold"
+            android:textColor="?attr/colorPrimary"
+            android:textSize="@dimen/text_size_body"
+            app:layout_constraintBottom_toBottomOf="@+id/btnSearchAddCart"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/btnSearchAddCart"
+            tools:text="29.900" />
 
-        <com.google.android.material.card.MaterialCardView
+        <TextView
+            android:id="@+id/tvSearchPriceUnit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="2dp"
+            android:includeFontPadding="false"
+            android:fontFamily="@font/plus_jakarta_sans_medium"
+            android:text="@string/currency_dt"
+            android:textColor="?attr/colorPrimary"
+            android:textSize="@dimen/text_size_overline"
+            app:layout_constraintBottom_toBottomOf="@id/tvSearchPriceAmount"
+            app:layout_constraintStart_toEndOf="@id/tvSearchPriceAmount"
+            app:layout_constraintTop_toTopOf="@id/tvSearchPriceAmount"
+            app:layout_constraintVertical_bias="0.8" />
+
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btnSearchAddCart"
-            android:layout_width="@dimen/home_add_cart_button_size"
-            android:layout_height="@dimen/home_add_cart_button_size"
-            app:cardBackgroundColor="@color/home_text_primary"
-            app:cardCornerRadius="@dimen/home_add_cart_button_radius"
-            app:cardElevation="@dimen/space_0"
-            app:strokeWidth="@dimen/space_0">
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="12dp"
+            android:insetLeft="0dp"
+            android:insetTop="0dp"
+            android:insetRight="0dp"
+            android:insetBottom="0dp"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:padding="0dp"
+            android:text=""
+            app:backgroundTint="@android:color/transparent"
+            app:cornerRadius="20dp"
+            app:icon="@drawable/ic_home_add_cart"
+            app:iconGravity="textStart"
+            app:iconPadding="0dp"
+            app:iconSize="18dp"
+            app:iconTint="@color/home_text_primary"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvSearchProductSubtitle"
+            app:rippleColor="@color/colorBorderLight"
+            app:strokeWidth="0dp" />
 
-            <ImageView
-                android:layout_width="@dimen/home_add_cart_icon_size"
-                android:layout_height="@dimen/home_add_cart_icon_size"
-                android:layout_gravity="center"
-                android:contentDescription="@null"
-                app:srcCompat="@drawable/ic_home_add_cart"
-                app:tint="@color/colorSurface" />
-        </com.google.android.material.card.MaterialCardView>
-    </LinearLayout>
-</LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
+</com.google.android.material.card.MaterialCardView>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="screen_padding_horizontal">32dp</dimen>
+    <dimen name="screen_padding_vertical">24dp</dimen>
+    <dimen name="text_size_title_large">32sp</dimen>
+    <dimen name="text_size_title">28sp</dimen>
+    <dimen name="text_size_subtitle">20sp</dimen>
+    <dimen name="text_size_body">18sp</dimen>
+    <dimen name="text_size_caption">16sp</dimen>
+    <dimen name="text_size_overline">14sp</dimen>
+    <dimen name="home_horizontal_padding">32dp</dimen>
+    <dimen name="details_horizontal_padding">32dp</dimen>
+</resources>
