@@ -53,10 +53,28 @@ class ProfileTabFragment : Fragment() {
         ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         if (uri == null) return@registerForActivityResult
-        val savedPath = copyUriToInternalStorage(uri)
-        if (savedPath != null) {
-            saveAvatarPath(savedPath)
-            loadAvatarFromPath(savedPath)
+        
+        val uid = FirebaseAuthManager.currentUser?.uid ?: return@registerForActivityResult
+        
+        lifecycleScope.launch {
+            val progress = (activity as? AppCompatActivity)?.showMotionSnackbar(getString(R.string.profile_avatar_uploading))
+            runCatching { UserAvatarStorage.uploadAvatar(requireContext(), uid, uri) }
+                .onSuccess { remoteUrl ->
+                    FirestoreService.updateUserAvatarUrl(uid, remoteUrl)
+                    loadAvatarFromPath(remoteUrl)
+                    (activity as? AppCompatActivity)?.showMotionSnackbar(getString(R.string.profile_avatar_updated))
+                }
+                .onFailure { error ->
+                    Log.e(logTag, "Avatar upload failed", error)
+                    (activity as? AppCompatActivity)?.showMotionSnackbar(getString(R.string.profile_avatar_update_failed))
+                    
+                    // Fallback to local
+                    val savedPath = copyUriToInternalStorage(uri)
+                    if (savedPath != null) {
+                        saveAvatarPath(savedPath)
+                        loadAvatarFromPath(savedPath)
+                    }
+                }
         }
     }
 
@@ -205,6 +223,12 @@ class ProfileTabFragment : Fragment() {
 
     private fun loadAvatarFromPath(path: String) {
         val imageView = _binding?.ivAvatar ?: return
+        
+        if (path.startsWith("http")) {
+            imageView.loadCatalogImage(path, null)
+            return
+        }
+
         runCatching {
             val options = android.graphics.BitmapFactory.Options()
             options.inJustDecodeBounds = true
@@ -235,27 +259,32 @@ class ProfileTabFragment : Fragment() {
     }
 
     private fun restoreAvatar() {
-        val context = context ?: return
-        val saved = context.getSharedPreferences(avatarPrefsName, Context.MODE_PRIVATE)
-            .getString(avatarUriKey, null)
-            ?: return
-
-        // Support both legacy file:// URIs and new raw file paths
-        val filePath = if (saved.startsWith("file://")) {
-            Uri.parse(saved).path ?: return
-        } else {
-            saved
+        val uid = FirebaseAuthManager.currentUser?.uid
+        if (uid != null) {
+            lifecycleScope.launch {
+                val profile = FirestoreService.fetchUserProfile(uid)
+                if (profile?.avatarUrl != null) {
+                    loadAvatarFromPath(profile.avatarUrl)
+                    return@launch
+                }
+                
+                // Local fallback
+                val context = context ?: return@launch
+                val saved = context.getSharedPreferences(avatarPrefsName, Context.MODE_PRIVATE)
+                    .getString(avatarUriKey, null)
+                if (saved != null) {
+                    val filePath = if (saved.startsWith("file://")) {
+                        Uri.parse(saved).path ?: return@launch
+                    } else {
+                        saved
+                    }
+                    val file = java.io.File(filePath)
+                    if (file.exists()) {
+                        loadAvatarFromPath(filePath)
+                    }
+                }
+            }
         }
-
-        val file = java.io.File(filePath)
-        if (!file.exists()) {
-            Log.w(logTag, "Avatar file not found, clearing saved path")
-            context.getSharedPreferences(avatarPrefsName, Context.MODE_PRIVATE)
-                .edit().remove(avatarUriKey).apply()
-            return
-        }
-
-        loadAvatarFromPath(filePath)
     }
 
     /** Refresh the displayed user name/email from Firebase Auth. */
@@ -353,6 +382,9 @@ class ProfileTabFragment : Fragment() {
                     result.fold(
                         onSuccess = {
                             _binding?.tvUserName?.text = nextName
+                            lifecycleScope.launch {
+                                runCatching { FirestoreService.updateUserProfileName(currentUser.uid, nextName) }
+                            }
                             dialog.dismiss()
                             host.showToast(getString(R.string.profile_updated))
                         },
@@ -367,10 +399,19 @@ class ProfileTabFragment : Fragment() {
     }
 
     private fun showSupportDialog() {
-        MaterialAlertDialogBuilder(requireContext())
+        val options = arrayOf(
+            getString(R.string.support_whatsapp_label),
+            getString(R.string.support_email_label)
+        )
+        androidx.appcompat.app.AlertDialog.Builder(requireContext())
             .setTitle(getString(R.string.profile_support_title))
-            .setMessage(getString(R.string.profile_support_message))
-            .setPositiveButton(getString(R.string.profile_support_close), null)
+            .setItems(options) { _, which ->
+                when (which) {
+                    0 -> activity?.openWhatsApp(getString(R.string.support_whatsapp_number))
+                    1 -> activity?.openEmail(getString(R.string.support_email), "Question FatiWeb")
+                }
+            }
+            .setNegativeButton(getString(R.string.profile_edit_cancel), null)
             .show()
     }
 

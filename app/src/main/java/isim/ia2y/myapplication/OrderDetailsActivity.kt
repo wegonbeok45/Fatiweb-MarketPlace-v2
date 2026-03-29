@@ -101,14 +101,24 @@ class OrderDetailsActivity : AppCompatActivity() {
         val itemsContainer = findViewById<LinearLayout>(R.id.layoutOrderDetailsItems)
         itemsContainer?.removeAllViews()
         order.items.forEach { (productId, quantity) ->
-            val product = ProductCatalog.byId(productId) ?: return@forEach
+            val snapshot = order.itemSnapshots[productId]
+            val product = ProductCatalog.byId(productId)
+
+            if (product == null && snapshot == null) return@forEach
+
             val itemView = layoutInflater.inflate(R.layout.item_confirmation_product, itemsContainer, false)
+            val title = product?.title ?: snapshot?.title ?: ""
+            val subtitle = product?.subtitle ?: snapshot?.subtitle ?: ""
+            val price = product?.price ?: snapshot?.price ?: 0.0
+            val imageUrl = product?.imageUrl ?: snapshot?.imageUrl ?: ""
+            val imageRes = product?.imageRes ?: snapshot?.imageRes
+
             itemView.findViewById<ImageView>(R.id.ivConfirmItemImage)
-                ?.loadCatalogImage(product.imageUrl, product.imageRes)
-            itemView.findViewById<TextView>(R.id.tvConfirmItemName)?.text = product.title
+                ?.loadCatalogImage(imageUrl, imageRes)
+            itemView.findViewById<TextView>(R.id.tvConfirmItemName)?.text = title
             itemView.findViewById<TextView>(R.id.tvConfirmItemDetails)?.text =
-                getString(R.string.order_details_item_meta, quantity, product.subtitle)
-            itemView.findViewById<TextView>(R.id.tvConfirmItemPrice)?.text = formatDt(product.price * quantity)
+                getString(R.string.order_details_item_meta, quantity, subtitle)
+            itemView.findViewById<TextView>(R.id.tvConfirmItemPrice)?.text = formatDt(price * quantity)
             itemsContainer?.addView(itemView)
         }
 
@@ -124,10 +134,19 @@ class OrderDetailsActivity : AppCompatActivity() {
     }
 
     private fun showSupportDialog() {
+        val options = arrayOf(
+            getString(R.string.support_whatsapp_label),
+            getString(R.string.support_email_label)
+        )
         androidx.appcompat.app.AlertDialog.Builder(this)
             .setTitle(getString(R.string.order_help_title))
-            .setMessage(getString(R.string.order_help_message))
-            .setPositiveButton(getString(R.string.profile_support_close), null)
+            .setItems(options) { _, which ->
+                when (which) {
+                    0 -> openWhatsApp(getString(R.string.support_whatsapp_number))
+                    1 -> openEmail(getString(R.string.support_email), "Question commande " + (findViewById<TextView>(R.id.tvOrderDetailsId)?.text ?: ""))
+                }
+            }
+            .setNegativeButton(getString(R.string.profile_edit_cancel), null)
             .show()
     }
 

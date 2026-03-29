@@ -32,6 +32,16 @@ object UserService {
         userRef(uid).set(data, SetOptions.merge()).await()
     }
 
+    suspend fun updateUserAvatarUrl(uid: String, avatarUrl: String) {
+        userRef(uid).set(
+            mapOf(
+                "avatarUrl" to avatarUrl,
+                "updatedAt" to System.currentTimeMillis()
+            ),
+            SetOptions.merge()
+        ).await()
+    }
+
     suspend fun updateUserProfileName(uid: String, name: String) {
         userRef(uid).set(
             mapOf(

@@ -117,11 +117,36 @@ fun AppCompatActivity.finishWithMotion(isForward: Boolean = false) {
     }
 }
 
-fun AppCompatActivity.navigateToProductDetails(productId: String) {
+fun Activity.navigateToProductDetails(productId: String) {
     startActivity(ProductDetailsScreen.createIntent(this, productId))
-    if (isReducedMotionEnabled()) {
+    if (this is AppCompatActivity && isReducedMotionEnabled()) {
         overridePendingTransition(0, 0)
-    } else {
+    } else if (this is AppCompatActivity) {
         overridePendingTransition(R.anim.motion_activity_enter_forward, R.anim.motion_activity_exit_forward)
+    }
+}
+
+fun Activity.openWhatsApp(number: String, message: String = "") {
+    try {
+        val cleanNumber = number.replace("+", "").replace(" ", "")
+        val uri = android.net.Uri.parse("https://api.whatsapp.com/send?phone=$cleanNumber&text=${android.net.Uri.encode(message)}")
+        val intent = Intent(Intent.ACTION_VIEW, uri)
+        startActivity(intent)
+    } catch (e: Exception) {
+        Log.e("Nav", "Failed to open WhatsApp", e)
+    }
+}
+
+fun Activity.openEmail(email: String, subject: String = "", body: String = "") {
+    try {
+        val intent = Intent(Intent.ACTION_SENDTO).apply {
+            data = android.net.Uri.parse("mailto:")
+            putExtra(Intent.EXTRA_EMAIL, arrayOf(email))
+            putExtra(Intent.EXTRA_SUBJECT, subject)
+            putExtra(Intent.EXTRA_TEXT, body)
+        }
+        startActivity(intent)
+    } catch (e: Exception) {
+        Log.e("Nav", "Failed to open Email", e)
     }
 }

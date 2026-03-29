@@ -69,7 +69,14 @@ object CartStore {
     }
 
     fun getCart(context: Context): Map<String, Int> {
-        return decode(prefs(context).getStringSet(KEY_QTY, emptySet()))
+        val raw = decode(prefs(context).getStringSet(KEY_QTY, emptySet()))
+        if (ProductCatalog.all(includeInactive = true).isEmpty()) return raw
+
+        val filtered = raw.filterKeys { ProductCatalog.byId(it) != null }
+        if (filtered.size != raw.size) {
+            saveLocalCart(context, currentAccountKey(), filtered)
+        }
+        return filtered
     }
 
     fun setQuantity(context: Context, productId: String, qty: Int) {

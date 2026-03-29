@@ -5,6 +5,35 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+data class ProductSnapshot(
+    val title: String = "",
+    val price: Double = 0.0,
+    val imageUrl: String = "",
+    val imageRes: Int? = null,
+    val subtitle: String = ""
+) {
+    fun toMap() = mapOf(
+        "title" to title,
+        "price" to price,
+        "imageUrl" to imageUrl,
+        "imageRes" to (imageRes ?: 0),
+        "subtitle" to subtitle
+    )
+
+    companion object {
+        fun fromAny(any: Any?): ProductSnapshot? {
+            val map = any as? Map<*, *> ?: return null
+            return ProductSnapshot(
+                title = map["title"] as? String ?: "",
+                price = (map["price"] as? Number)?.toDouble() ?: 0.0,
+                imageUrl = map["imageUrl"] as? String ?: "",
+                imageRes = (map["imageRes"] as? Number)?.toInt()?.takeIf { it != 0 },
+                subtitle = map["subtitle"] as? String ?: ""
+            )
+        }
+    }
+}
+
 data class AppOrder(
     val id: String = "",
     val items: Map<String, Int> = emptyMap(),
@@ -15,6 +44,7 @@ data class AppOrder(
     val paymentMethod: String = "cash",
     val status: String = "pending",
     val deliveryAddressSnapshot: DeliveryAddressSnapshot? = null,
+    val itemSnapshots: Map<String, ProductSnapshot> = emptyMap(),
     val customerPhone: String = "",
     val estimatedDeliveryDate: Long = 0L,
     val createdAt: Long = System.currentTimeMillis(),
@@ -49,6 +79,7 @@ data class AppOrder(
         put("updatedAt", updatedAt)
         put("statusTimeline", statusTimeline.map { it.toMap() })
         deliveryAddressSnapshot?.let { put("deliveryAddressSnapshot", it.toMap()) }
+        put("itemSnapshots", itemSnapshots.mapValues { it.value.toMap() })
     }
 
     fun withStatus(newStatus: String, changedAt: Long = System.currentTimeMillis()): AppOrder {
@@ -85,6 +116,11 @@ data class AppOrder(
                 paymentMethod = map["paymentMethod"] as? String ?: "cash",
                 status = status,
                 deliveryAddressSnapshot = DeliveryAddressSnapshot.fromAny(map["deliveryAddressSnapshot"]),
+                itemSnapshots = (map["itemSnapshots"] as? Map<*, *>)?.mapNotNull { (k, v) ->
+                    val productId = k as? String ?: return@mapNotNull null
+                    val snap = ProductSnapshot.fromAny(v) ?: return@mapNotNull null
+                    productId to snap
+                }?.toMap() ?: emptyMap(),
                 customerPhone = map["customerPhone"] as? String ?: "",
                 estimatedDeliveryDate = (map["estimatedDeliveryDate"] as? Number)?.toLong() ?: 0L,
                 createdAt = createdAt,

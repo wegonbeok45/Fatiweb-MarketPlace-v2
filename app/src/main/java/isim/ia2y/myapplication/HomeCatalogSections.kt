@@ -6,7 +6,7 @@ data class HomeCatalogSections(
 )
 
 object HomeCatalogSectionsBuilder {
-    fun build(products: List<Product>, latestLimit: Int = 4, discoverLimit: Int = 6): HomeCatalogSections {
+    fun build(products: List<Product>, latestLimit: Int = 10, discoverLimit: Int = 20): HomeCatalogSections {
         val active = products.filter { it.isActive }
         val latest = active
             .sortedByDescending { it.updatedAt }

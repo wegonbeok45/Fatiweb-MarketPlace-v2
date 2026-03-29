@@ -2,21 +2,18 @@ package isim.ia2y.myapplication
 
 import android.os.Bundle
 import android.view.View
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.launch
 
 class AdminCommandesActivity : AppCompatActivity() {
-
-    private val rowIds = listOf(R.id.adminCommRow1, R.id.adminCommRow2, R.id.adminCommRow3, R.id.adminCommRow4)
-    private val idTvIds = listOf(R.id.adminCommId1, R.id.adminCommId2, R.id.adminCommId3, R.id.adminCommId4)
-    private val nameTvIds = listOf(R.id.adminCommName1, R.id.adminCommName2, R.id.adminCommName3, R.id.adminCommName4)
-    private val badgeIds = listOf(R.id.adminCommBadge1, R.id.adminCommBadge2, R.id.adminCommBadge3, R.id.adminCommBadge4)
 
     private var loadedOrders: List<Pair<String, AppOrder>> = emptyList()
 
@@ -27,6 +24,9 @@ class AdminCommandesActivity : AppCompatActivity() {
         setupAdminWindowInsets(R.id.adminCommandesAppBar)
         setupTopBar()
         setupAdminBottomNav(AdminNavTab.COMMANDES)
+
+        findViewById<RecyclerView>(R.id.adminCommandesList)?.layoutManager =
+            LinearLayoutManager(this)
 
         lifecycleScope.launch {
             if (!requireAdminRole()) return@launch
@@ -41,7 +41,7 @@ class AdminCommandesActivity : AppCompatActivity() {
                     staggerMs = 48L
                 )
             }
-            loadOrders()
+            listenToOrders()
         }
     }
 
@@ -58,53 +58,33 @@ class AdminCommandesActivity : AppCompatActivity() {
         applyPressFeedback(R.id.adminCommandesIvBack, R.id.adminCommandesIvSettings)
     }
 
-    private fun loadOrders() {
-        lifecycleScope.launch {
-            runCatching { FirestoreService.fetchAllOrders() }
-                .onSuccess { orders ->
-                    loadedOrders = orders
-                    renderOrders(orders)
-                }
-                .onFailure {
-                    loadedOrders = emptyList()
-                    renderOrders(emptyList())
-                    showMotionSnackbar(getString(R.string.admin_orders_load_failed))
-                }
+    private var ordersListener: com.google.firebase.firestore.ListenerRegistration? = null
+
+    private fun listenToOrders() {
+        findViewById<ProgressBar>(R.id.adminCommandesProgress)?.visibility = View.VISIBLE
+        findViewById<View>(R.id.adminCommandesEmpty)?.visibility = View.GONE
+        
+        ordersListener?.remove()
+        ordersListener = AdminService.listenToAllOrders { orders ->
+            loadedOrders = orders
+            findViewById<ProgressBar>(R.id.adminCommandesProgress)?.visibility = View.GONE
+            renderOrders(loadedOrders)
         }
     }
 
     private fun renderOrders(orders: List<Pair<String, AppOrder>>) {
-        rowIds.forEach { id -> findViewById<View>(id)?.visibility = View.GONE }
+        val recycler = findViewById<RecyclerView>(R.id.adminCommandesList) ?: return
+        val emptyView = findViewById<TextView>(R.id.adminCommandesEmpty)
 
         if (orders.isEmpty()) {
-            findViewById<View>(rowIds[0])?.visibility = View.VISIBLE
-            findViewById<TextView>(nameTvIds[0])?.text = getString(R.string.admin_orders_empty)
-            findViewById<TextView>(idTvIds[0])?.text = ""
-
-            val badgeCard = findViewById<com.google.android.material.card.MaterialCardView>(badgeIds[0])
-            val badgeTv = badgeCard?.getChildAt(0) as? TextView
-            badgeTv?.text = ""
+            emptyView?.visibility = View.VISIBLE
+            recycler.adapter = AdminOrdersAdapter(emptyList()) { _, _ -> }
             return
         }
 
-        orders.take(rowIds.size).forEachIndexed { i, (uid, order) ->
-            val row = findViewById<View>(rowIds[i]) ?: return@forEachIndexed
-            row.visibility = View.VISIBLE
-
-            val firstProduct = order.items.entries.firstOrNull()?.let { (id, qty) ->
-                val name = ProductCatalog.byId(id)?.title?.split(" ")?.firstOrNull() ?: id
-                "$name x$qty"
-            } ?: getString(R.string.admin_order_fallback_label)
-
-            findViewById<TextView>(idTvIds[i])?.text = order.displayId
-            findViewById<TextView>(nameTvIds[i])?.text = firstProduct
-
-            val badgeCard = findViewById<com.google.android.material.card.MaterialCardView>(badgeIds[i])
-            val badgeTv = badgeCard?.getChildAt(0) as? TextView
-            badgeTv?.text = order.statusLabel(this)
-
-            applyPressFeedback(rowIds[i])
-            row.setOnClickListener { showStatusDialog(uid, order, i) }
+        emptyView?.visibility = View.GONE
+        recycler.adapter = AdminOrdersAdapter(orders) { uid, order ->
+            showStatusDialog(uid, order)
         }
 
         val pendingCount = orders.count { it.second.status == "pending" }
@@ -114,7 +94,7 @@ class AdminCommandesActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.adminCommandesTvDelivered)?.text = deliveredCount.toString()
     }
 
-    private fun showStatusDialog(uid: String, order: AppOrder, rowIndex: Int) {
+    private fun showStatusDialog(uid: String, order: AppOrder) {
         val statuses = arrayOf(
             getString(R.string.order_status_pending),
             getString(R.string.order_status_preparing),
@@ -132,14 +112,6 @@ class AdminCommandesActivity : AppCompatActivity() {
                 lifecycleScope.launch {
                     runCatching { FirestoreService.updateOrderStatus(uid, order.id, newStatus) }
                         .onSuccess {
-                            val updatedOrder = order.withStatus(newStatus)
-                            loadedOrders = loadedOrders.toMutableList().also {
-                                it[rowIndex] = uid to updatedOrder
-                            }
-                            val badgeCard = findViewById<com.google.android.material.card.MaterialCardView>(badgeIds[rowIndex])
-                            val badgeTv = badgeCard?.getChildAt(0) as? TextView
-                            badgeTv?.text = updatedOrder.statusLabel(this@AdminCommandesActivity)
-                            renderOrders(loadedOrders)
                             showToast(getString(R.string.admin_order_status_updated))
                         }
                         .onFailure {
@@ -149,5 +121,10 @@ class AdminCommandesActivity : AppCompatActivity() {
             }
             .setNegativeButton(getString(R.string.admin_dialog_cancel), null)
             .show()
+    }
+
+    override fun onDestroy() {
+        ordersListener?.remove()
+        super.onDestroy()
     }
 }

@@ -136,5 +136,18 @@ object AdminService {
                 createdAt = (data["createdAt"] as? Number)?.toLong() ?: 0L
             )
         }.sortedByDescending { it.createdAt }
+    fun listenToAllOrders(onUpdate: (List<Pair<String, AppOrder>>) -> Unit): com.google.firebase.firestore.ListenerRegistration {
+        return db.collectionGroup("orders")
+            .orderBy("createdAt", com.google.firebase.firestore.Query.Direction.DESCENDING)
+            .limit(100)
+            .addSnapshotListener { snapshot, e ->
+                if (e != null || snapshot == null) return@addSnapshotListener
+                val orders = snapshot.documents.mapNotNull { doc ->
+                    val data = doc.data ?: return@mapNotNull null
+                    val uid = doc.reference.parent.parent?.id ?: return@mapNotNull null
+                    uid to AppOrder.fromMap(data)
+                }
+                onUpdate(orders)
+            }
     }
 }

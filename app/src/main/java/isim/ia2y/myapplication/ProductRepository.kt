@@ -26,9 +26,9 @@ data class Product(
     val unitPrice: Double get() = price
     val tag: String get() = tags.firstOrNull().orEmpty()
     val isDisplayReady: Boolean
-        get() = title.trim().length >= 6 &&
-            subtitle.trim().length >= 6 &&
-            description.trim().length >= 20
+        get() = title.trim().length >= 3 &&
+            subtitle.trim().length >= 3 &&
+            description.trim().length >= 12
 
     val searchableText: String by lazy {
         buildString {
@@ -119,13 +119,17 @@ object ProductCatalog {
     fun legacyImageRes(productId: String): Int? = localVisualMap[productId]?.imageRes
 
     private fun mergeLocalVisuals(product: Product): Product {
-        val key = localVisualMap.keys.firstOrNull { 
-            product.id.contains(it, ignoreCase = true) || product.title.contains(it, ignoreCase = true) 
+        // Only use local fallback if there is no remote image URL
+        if (!product.imageUrl.isNullOrBlank()) return product
+
+        val key = localVisualMap.keys.firstOrNull {
+            product.id.contains(it, ignoreCase = true) || product.title.contains(it, ignoreCase = true)
         }
         val localVisual = if (key != null) localVisualMap[key] else null
+        
         return product.copy(
             imageRes = localVisual?.imageRes ?: if (product.imageRes != 0) product.imageRes else imageForCategory(product.category),
-            imageUrl = if (localVisual != null) localVisual.imageUrl else product.imageUrl
+            imageUrl = localVisual?.imageUrl ?: product.imageUrl
         )
     }
 }

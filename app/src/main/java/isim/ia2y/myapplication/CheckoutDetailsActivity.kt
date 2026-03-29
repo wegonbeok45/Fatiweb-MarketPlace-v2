@@ -52,10 +52,9 @@ class CheckoutDetailsActivity : AppCompatActivity() {
         }
 
         setupActions()
+        observeShippingSelection()
         observeOrderResult()
         bindDynamicData()
-        applyDeliverySelection()
-        applyDeliverySelection()
         applyPaymentSelection()
         updateCheckoutChrome()
         renderStepState()
@@ -87,7 +86,6 @@ class CheckoutDetailsActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         bindDynamicData()
-        applyDeliverySelection()
         applyPaymentSelection()
     }
 
@@ -127,6 +125,10 @@ class CheckoutDetailsActivity : AppCompatActivity() {
                 confirmOrder()
             }
         }
+    }
+
+    private fun observeShippingSelection() {
+        viewModel.isStandardSelected.observe(this) { applyDeliverySelection() }
     }
 
     private fun observeOrderResult() {
@@ -206,6 +208,17 @@ class CheckoutDetailsActivity : AppCompatActivity() {
         }
         val estimatedDeliveryDate = buildEstimatedDeliveryTimestamp()
 
+        val itemSnapshots = cart.mapNotNull { (productId, _) ->
+            val product = ProductCatalog.byId(productId) ?: return@mapNotNull null
+            productId to ProductSnapshot(
+                title = product.title,
+                price = product.price,
+                imageUrl = product.imageUrl,
+                imageRes = product.imageRes,
+                subtitle = product.subtitle
+            )
+        }.toMap()
+
         val order = AppOrder(
             id = "local_${System.currentTimeMillis()}",
             items = cart,
@@ -215,6 +228,7 @@ class CheckoutDetailsActivity : AppCompatActivity() {
             deliveryType = if (isStandard) "standard" else "express",
             paymentMethod = "cash",
             deliveryAddressSnapshot = deliveryAddress.toSnapshot(),
+            itemSnapshots = itemSnapshots,
             customerPhone = deliveryAddress.phone,
             estimatedDeliveryDate = estimatedDeliveryDate,
             updatedAt = System.currentTimeMillis(),

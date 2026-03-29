@@ -126,6 +126,11 @@ class MainActivity : AppCompatActivity() {
     fun selectTab(tab: Tab, animate: Boolean = true) {
         if (isTabLoading) return
 
+        if ((tab == Tab.CART || tab == Tab.PROFILE) && !FirebaseAuthManager.isLoggedIn) {
+            startActivity(LoginActivity.createIntent(this))
+            return
+        }
+
         runCatching {
             if (tab == currentTab && supportFragmentManager.findFragmentByTag(tab.name) != null) {
                 updateBottomNavSelection(tab)

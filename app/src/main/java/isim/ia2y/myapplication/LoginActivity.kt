@@ -36,6 +36,14 @@ class LoginActivity : AppCompatActivity() {
     companion object {
         private const val KEY_EMAIL = "email"
         private const val KEY_PASSWORD_VISIBLE = "password_visible"
+
+        fun createIntent(context: android.content.Context): android.content.Intent {
+            return android.content.Intent(context, LoginActivity::class.java)
+        }
+
+        fun start(context: android.content.Context) {
+            context.startActivity(createIntent(context))
+        }
     }
 
     private val googleSignInLauncher = registerForActivityResult(

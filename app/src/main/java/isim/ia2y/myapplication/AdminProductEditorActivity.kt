@@ -232,7 +232,7 @@ class AdminProductEditorActivity : AppCompatActivity() {
                 getString(R.string.admin_product_editor_error_title)
             valid = false
         }
-        if (subtitle.isBlank()) {
+        if (subtitle.length < 3) {
             findViewById<TextInputLayout>(R.id.tilAdminProductSubtitle)?.error =
                 getString(R.string.admin_product_editor_error_subtitle)
             valid = false

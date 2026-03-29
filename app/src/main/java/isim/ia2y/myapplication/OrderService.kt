@@ -21,15 +21,18 @@ object OrderService {
             statusTimeline = order.statusTimeline.ifEmpty { listOf(OrderStatusEntry(order.status, now)) }
         )
 
+        var orderWithSnapshots = orderWithId
+
         db.runTransaction { transaction ->
             val productRefs = order.items.keys.map { productsRef.document(it) }
-            val productSnapshots = productRefs.associateWith { transaction.get(it) }
+            val productSnapshotsDoc = productRefs.associateWith { transaction.get(it) }
+            val capturedSnapshots = mutableMapOf<String, ProductSnapshot>()
 
             for ((productId, quantity) in order.items) {
                 val ref = productsRef.document(productId)
-                val snapshot = productSnapshots[ref]
-                val currentStock = snapshot?.getLong("stock")?.toInt() ?: 0
-                val title = snapshot?.getString("title") ?: productId
+                val snapshotDoc = productSnapshotsDoc[ref]
+                val currentStock = snapshotDoc?.getLong("stock")?.toInt() ?: 0
+                val title = snapshotDoc?.getString("title") ?: productId
 
                 if (quantity > currentStock) {
                     throw FirebaseFirestoreException(
@@ -37,12 +40,23 @@ object OrderService {
                         FirebaseFirestoreException.Code.ABORTED
                     )
                 }
+                
+                capturedSnapshots[productId] = ProductSnapshot(
+                    title = title,
+                    price = (snapshotDoc?.get("price") as? Number)?.toDouble() ?: 0.0,
+                    imageUrl = snapshotDoc?.getString("imageUrl") ?: "",
+                    imageRes = (snapshotDoc?.get("imageRes") as? Number)?.toInt(),
+                    subtitle = snapshotDoc?.getString("subtitle") ?: ""
+                )
+                
                 transaction.update(ref, "stock", currentStock - quantity)
             }
-            transaction.set(orderRef, orderWithId.toMap())
+            
+            orderWithSnapshots = orderWithSnapshots.copy(itemSnapshots = capturedSnapshots)
+            transaction.set(orderRef, orderWithSnapshots.toMap())
         }.await()
 
-        return orderWithId
+        return orderWithSnapshots
     }
 
     suspend fun fetchOrders(uid: String): List<AppOrder> {

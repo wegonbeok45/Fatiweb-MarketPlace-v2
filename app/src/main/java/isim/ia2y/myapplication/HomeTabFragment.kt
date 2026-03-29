@@ -157,6 +157,12 @@ class HomeTabFragment : Fragment(R.layout.fragment_home_tab) {
         root.findViewById<View?>(R.id.tvCategoriesSeeAll)?.setOnClickListener {
             (activity as? MainActivity)?.selectTab(MainActivity.Tab.EXPLORE)
         }
+        root.findViewById<View?>(R.id.tvLatestProductsSeeAll)?.setOnClickListener {
+            (activity as? MainActivity)?.selectTab(MainActivity.Tab.EXPLORE)
+        }
+        root.findViewById<View?>(R.id.tvDiscoverProductsSeeAll)?.setOnClickListener {
+            (activity as? MainActivity)?.selectTab(MainActivity.Tab.EXPLORE)
+        }
         root.findViewById<View?>(R.id.btnLatestProductsRefresh)?.setOnClickListener {
             CatalogSyncManager.refreshAsync(force = false)
         }
