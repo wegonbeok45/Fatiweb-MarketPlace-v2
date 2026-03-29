@@ -11,3 +11,11 @@ fun ImageView.loadCatalogImage(@DrawableRes imageRes: Int) {
         error(R.drawable.placeholder)
     }
 }
+
+fun ImageView.loadCatalogImage(imageUrl: String?, @DrawableRes fallbackRes: Int) {
+    load(imageUrl?.takeIf { it.isNotBlank() } ?: fallbackRes) {
+        crossfade(180)
+        placeholder(R.drawable.placeholder)
+        error(fallbackRes)
+    }
+}

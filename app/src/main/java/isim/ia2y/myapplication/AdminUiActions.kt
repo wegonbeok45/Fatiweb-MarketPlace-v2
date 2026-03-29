@@ -19,7 +19,6 @@ import androidx.transition.TransitionManager
 /**
  * Tab identifiers for the admin bottom navigation bar.
  */
-// Cette classe organise cette partie de l'app.
 enum class AdminNavTab {
     DASHBOARD,
     COMMANDES,
@@ -213,7 +212,7 @@ private fun AppCompatActivity.animateAdminPillTo(@IdRes targetNavId: Int) {
     constraintSet.connect(R.id.admin_nav_indicator, ConstraintSet.END,   targetNavId, ConstraintSet.END)
 
     val transition = ChangeBounds()
-    transition.duration = 250L
+    transition.duration = MotionTokens.STANDARD
     transition.interpolator = FastOutSlowInInterpolator()
     TransitionManager.beginDelayedTransition(navContainer, transition)
 
@@ -232,13 +231,13 @@ private fun AppCompatActivity.setAdminNavItemColor(@IdRes viewId: Int, color: In
         icon.animate()
             .scaleX(1.15f)
             .scaleY(1.15f)
-            .setDuration(150L)
+            .setDuration(MotionTokens.QUICK)
             .setInterpolator(FastOutSlowInInterpolator())
             .withEndAction {
                 icon.animate()
                     .scaleX(1f)
                     .scaleY(1f)
-                    .setDuration(100L)
+                    .setDuration(MotionTokens.QUICK)
                     .setInterpolator(android.view.animation.OvershootInterpolator())
                     .start()
             }
@@ -247,7 +246,7 @@ private fun AppCompatActivity.setAdminNavItemColor(@IdRes viewId: Int, color: In
         icon.animate()
             .scaleX(1f)
             .scaleY(1f)
-            .setDuration(150L)
+            .setDuration(MotionTokens.QUICK)
             .start()
     }
 
@@ -267,13 +266,13 @@ private fun AppCompatActivity.animateAdminNavItemColor(@IdRes viewId: Int, toCol
         icon.animate()
             .scaleX(1.15f)
             .scaleY(1.15f)
-            .setDuration(150L)
+            .setDuration(MotionTokens.QUICK)
             .setInterpolator(FastOutSlowInInterpolator())
             .withEndAction {
                 icon.animate()
                     .scaleX(1f)
                     .scaleY(1f)
-                    .setDuration(100L)
+                    .setDuration(MotionTokens.QUICK)
                     .setInterpolator(android.view.animation.OvershootInterpolator())
                     .start()
             }
@@ -282,7 +281,7 @@ private fun AppCompatActivity.animateAdminNavItemColor(@IdRes viewId: Int, toCol
         icon.animate()
             .scaleX(1f)
             .scaleY(1f)
-            .setDuration(150L)
+            .setDuration(MotionTokens.QUICK)
             .start()
     }
 
@@ -290,7 +289,7 @@ private fun AppCompatActivity.animateAdminNavItemColor(@IdRes viewId: Int, toCol
     if (fromColor == toColor) return
 
     ValueAnimator.ofObject(ArgbEvaluator(), fromColor, toColor).apply {
-        duration = 140L
+        duration = MotionTokens.QUICK
         addUpdateListener { anim ->
             val c = anim.animatedValue as Int
             icon.setColorFilter(c)
