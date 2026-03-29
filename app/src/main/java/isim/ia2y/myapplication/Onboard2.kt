@@ -5,13 +5,22 @@ import android.os.Bundle
 import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.constraintlayout.motion.widget.MotionLayout
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 
-// Cette classe organise cette partie de l'app.
 class Onboard2 : AppCompatActivity() {
-    // Cette fonction fait une action de cette partie de l'app.
+    private val contentIds = intArrayOf(
+        R.id.ivBack,
+        R.id.tvSkip,
+        R.id.tvHeadline,
+        R.id.tvSubtitle,
+        R.id.cardCategoryFood,
+        R.id.cardCategoryCosmetics,
+        R.id.cardCategoryCrafts,
+        R.id.layoutPagerIndicator,
+        R.id.btnContinue
+    )
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -33,19 +42,10 @@ class Onboard2 : AppCompatActivity() {
             insets
         }
         setupOnboardingActions()
-        val motionLayout = findViewById<MotionLayout?>(R.id.layoutOnboardSlideTwoRoot)
-        motionLayout?.post {
-            if (isReducedMotionEnabled()) {
-                motionLayout.progress = 1f
-            } else {
-                motionLayout.progress = 0f
-                motionLayout.transitionToEnd()
-            }
-        }
+        forceViewsFullyVisible(*contentIds)
         emphasizeCta(R.id.btnContinue)
     }
 
-    // Cette fonction fait une action de cette partie de l'app.
     private fun setupOnboardingActions() {
         findViewById<View>(R.id.ivBack)?.setOnClickListener {
             navigateWithMotion(Onboard1::class.java, isForward = false)

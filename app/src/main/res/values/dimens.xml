@@ -73,8 +73,8 @@
     <dimen name="text_size_body">16sp</dimen>
     <dimen name="text_size_caption">14sp</dimen>
     <dimen name="text_size_overline">12sp</dimen>
-    <dimen name="text_size_input">16sp</dimen>
-    <dimen name="text_size_button">16sp</dimen>
+    <dimen name="text_size_input">@dimen/text_size_body</dimen>
+    <dimen name="text_size_button">@dimen/text_size_body</dimen>
 
     <!-- Home screen -->
     <dimen name="home_horizontal_padding">20dp</dimen>
@@ -138,22 +138,22 @@
     <dimen name="home_nav_label_margin_top">8dp</dimen>
     <dimen name="home_top_section_bottom_padding">12dp</dimen>
     <dimen name="home_scroll_content_bottom_padding">16dp</dimen>
-    <dimen name="home_text_brand">19sp</dimen>
-    <dimen name="home_text_search">14sp</dimen>
-    <dimen name="home_text_banner_chip">12sp</dimen>
-    <dimen name="home_text_banner_title">22sp</dimen>
-    <dimen name="home_text_banner_subtitle">15sp</dimen>
-    <dimen name="home_text_section_title">18sp</dimen>
-    <dimen name="home_text_section_action">13sp</dimen>
-    <dimen name="home_text_category_label">13sp</dimen>
-    <dimen name="home_text_product_name">17sp</dimen>
-    <dimen name="home_text_product_subtitle">13sp</dimen>
-    <dimen name="home_text_product_price">20sp</dimen>
-    <dimen name="home_text_product_price_unit">12sp</dimen>
+    <dimen name="home_text_brand">@dimen/text_size_subtitle</dimen>
+    <dimen name="home_text_search">@dimen/text_size_caption</dimen>
+    <dimen name="home_text_banner_chip">@dimen/text_size_overline</dimen>
+    <dimen name="home_text_banner_title">@dimen/text_size_title</dimen>
+    <dimen name="home_text_banner_subtitle">@dimen/text_size_body</dimen>
+    <dimen name="home_text_section_title">@dimen/text_size_subtitle</dimen>
+    <dimen name="home_text_section_action">@dimen/text_size_caption</dimen>
+    <dimen name="home_text_category_label">@dimen/text_size_caption</dimen>
+    <dimen name="home_text_product_name">@dimen/text_size_subtitle</dimen>
+    <dimen name="home_text_product_subtitle">@dimen/text_size_caption</dimen>
+    <dimen name="home_text_product_price">@dimen/text_size_subtitle</dimen>
+    <dimen name="home_text_product_price_unit">@dimen/text_size_overline</dimen>
     <dimen name="home_product_price_unit_margin_start">4dp</dimen>
-    <dimen name="home_product_card_elevation">0dp</dimen>
-    <dimen name="home_header_elevation">0dp</dimen>
-    <dimen name="home_text_nav_label">12sp</dimen>
+    <dimen name="home_product_card_elevation">6dp</dimen>
+    <dimen name="home_header_elevation">4dp</dimen>
+    <dimen name="home_text_nav_label">@dimen/text_size_overline</dimen>
 
     <!-- Explore screen -->
     <dimen name="explore_category_card_height">140dp</dimen>
@@ -207,15 +207,15 @@
     <dimen name="panier_nav_active_pill_height">34dp</dimen>
     <dimen name="panier_nav_active_pill_radius">17dp</dimen>
     <dimen name="panier_nav_active_icon_size">22dp</dimen>
-    <dimen name="panier_text_size_toolbar_title">21sp</dimen>
-    <dimen name="panier_text_size_product_title">16sp</dimen>
-    <dimen name="panier_text_size_product_subtitle">14sp</dimen>
-    <dimen name="panier_text_size_price">16sp</dimen>
-    <dimen name="panier_text_size_qty">16sp</dimen>
-    <dimen name="panier_text_size_summary">16sp</dimen>
-    <dimen name="panier_text_size_total">18sp</dimen>
-    <dimen name="panier_text_size_checkout">15sp</dimen>
-    <dimen name="panier_text_size_nav">11sp</dimen>
+    <dimen name="panier_text_size_toolbar_title">@dimen/text_size_title</dimen>
+    <dimen name="panier_text_size_product_title">@dimen/text_size_body</dimen>
+    <dimen name="panier_text_size_product_subtitle">@dimen/text_size_caption</dimen>
+    <dimen name="panier_text_size_price">@dimen/text_size_body</dimen>
+    <dimen name="panier_text_size_qty">@dimen/text_size_body</dimen>
+    <dimen name="panier_text_size_summary">@dimen/text_size_body</dimen>
+    <dimen name="panier_text_size_total">@dimen/text_size_subtitle</dimen>
+    <dimen name="panier_text_size_checkout">@dimen/text_size_body</dimen>
+    <dimen name="panier_text_size_nav">@dimen/text_size_overline</dimen>
 
     <!-- Profile screen -->
     <dimen name="profile_horizontal_margin">16dp</dimen>
@@ -262,14 +262,14 @@
     <dimen name="profile_nav_item_padding_top">8dp</dimen>
     <dimen name="profile_nav_item_padding_bottom">6dp</dimen>
     <dimen name="profile_nav_text_margin_top">4dp</dimen>
-    <dimen name="profile_text_size_topbar">18sp</dimen>
-    <dimen name="profile_text_size_name">20sp</dimen>
-    <dimen name="profile_text_size_role">12sp</dimen>
-    <dimen name="profile_text_size_location">12sp</dimen>
-    <dimen name="profile_text_size_menu_title">15sp</dimen>
-    <dimen name="profile_text_size_menu_subtitle">12sp</dimen>
-    <dimen name="profile_text_size_logout">16sp</dimen>
-    <dimen name="profile_text_size_nav">11sp</dimen>
+    <dimen name="profile_text_size_topbar">@dimen/text_size_subtitle</dimen>
+    <dimen name="profile_text_size_name">@dimen/text_size_subtitle</dimen>
+    <dimen name="profile_text_size_role">@dimen/text_size_overline</dimen>
+    <dimen name="profile_text_size_location">@dimen/text_size_overline</dimen>
+    <dimen name="profile_text_size_menu_title">@dimen/text_size_body</dimen>
+    <dimen name="profile_text_size_menu_subtitle">@dimen/text_size_overline</dimen>
+    <dimen name="profile_text_size_logout">@dimen/text_size_body</dimen>
+    <dimen name="profile_text_size_nav">@dimen/text_size_overline</dimen>
 
     <!-- Admin top bar -->
     <dimen name="admin_top_bar_height">58dp</dimen>
@@ -277,7 +277,7 @@
     <dimen name="admin_top_badge_size">28dp</dimen>
     <dimen name="admin_top_badge_icon_size">14dp</dimen>
     <dimen name="admin_top_avatar_size">34dp</dimen>
-    <dimen name="admin_top_title_size">18sp</dimen>
+    <dimen name="admin_top_title_size">@dimen/text_size_subtitle</dimen>
     <dimen name="admin_top_title_margin_start">16dp</dimen>
 
     <!-- Floating Navigation -->
@@ -293,7 +293,7 @@
 
     <dimen name="nav_pill_width">58dp</dimen>
     <dimen name="nav_pill_height">36dp</dimen>
-    <dimen name="nav_item_text_size">12sp</dimen>
+    <dimen name="nav_item_text_size">@dimen/text_size_overline</dimen>
     <dimen name="floating_nav_indicator_margin_top">60dp</dimen>
 
     <!-- Legacy aliases kept to avoid broken references while layouts migrate -->
@@ -311,7 +311,7 @@
     <dimen name="details_horizontal_padding">24dp</dimen>
     <dimen name="details_top_bar_height">68dp</dimen>
     <dimen name="details_top_icon">24dp</dimen>
-    <dimen name="details_top_title_size">18sp</dimen>
+    <dimen name="details_top_title_size">@dimen/text_size_subtitle</dimen>
     <dimen name="details_divider_height">1dp</dimen>
     <dimen name="details_image_height">392dp</dimen>
     <dimen name="details_image_width">280dp</dimen>
@@ -321,44 +321,56 @@
     <dimen name="details_chip_min_width">84dp</dimen>
     <dimen name="details_chip_padding_h">14dp</dimen>
     <dimen name="details_chip_radius">16dp</dimen>
-    <dimen name="details_chip_text_size">11sp</dimen>
+    <dimen name="details_chip_text_size">@dimen/text_size_overline</dimen>
     <dimen name="details_chip_gap">10dp</dimen>
-    <dimen name="details_rating_text">18sp</dimen>
-    <dimen name="details_reviews_text">16sp</dimen>
+    <dimen name="details_rating_text">@dimen/text_size_subtitle</dimen>
+    <dimen name="details_reviews_text">@dimen/text_size_body</dimen>
     <dimen name="details_title_margin_top">18dp</dimen>
-    <dimen name="details_title_size">26sp</dimen>
+    <dimen name="details_title_size">@dimen/text_size_title_large</dimen>
     <dimen name="details_price_margin_top">18dp</dimen>
-    <dimen name="details_price_size">20sp</dimen>
+    <dimen name="details_price_size">@dimen/text_size_subtitle</dimen>
     <dimen name="details_divider_margin_top">18dp</dimen>
     <dimen name="details_description_title_margin">26dp</dimen>
-    <dimen name="details_description_title_size">18sp</dimen>
+    <dimen name="details_description_title_size">@dimen/text_size_subtitle</dimen>
     <dimen name="details_description_margin_top">16dp</dimen>
-    <dimen name="details_description_text_size">14sp</dimen>
+    <dimen name="details_description_text_size">@dimen/text_size_caption</dimen>
     <dimen name="details_bullets_margin_top">24dp</dimen>
     <dimen name="details_bullet_icon_size">20dp</dimen>
-    <dimen name="details_bullet_check_size">11sp</dimen>
+    <dimen name="details_bullet_check_size">@dimen/text_size_overline</dimen>
     <dimen name="details_bullet_text_gap">16dp</dimen>
-    <dimen name="details_bullet_text_size">15sp</dimen>
+    <dimen name="details_bullet_text_size">@dimen/text_size_body</dimen>
     <dimen name="details_bullet_item_gap">18dp</dimen>
     <dimen name="details_quantity_label_margin">34dp</dimen>
-    <dimen name="details_quantity_label_size">11sp</dimen>
+    <dimen name="details_quantity_label_size">@dimen/text_size_overline</dimen>
     <dimen name="details_quantity_margin_top">14dp</dimen>
     <dimen name="details_quantity_width">170dp</dimen>
     <dimen name="details_quantity_height">62dp</dimen>
     <dimen name="details_quantity_radius">8dp</dimen>
     <dimen name="details_quantity_stroke">1dp</dimen>
-    <dimen name="details_quantity_btn_size">26sp</dimen>
-    <dimen name="details_quantity_value_size">22sp</dimen>
+    <dimen name="details_quantity_btn_size">@dimen/text_size_title_large</dimen>
+    <dimen name="details_quantity_value_size">@dimen/text_size_title</dimen>
     <dimen name="details_stock_helper_margin_start">20dp</dimen>
-    <dimen name="details_stock_helper_size">16sp</dimen>
+    <dimen name="details_stock_helper_size">@dimen/text_size_body</dimen>
     <dimen name="details_bottom_bar_height">92dp</dimen>
     <dimen name="details_bottom_bar_padding_vertical">12dp</dimen>
     <dimen name="details_total_end_margin">12dp</dimen>
-    <dimen name="details_total_label_size">12sp</dimen>
-    <dimen name="details_total_value_size">16sp</dimen>
+    <dimen name="details_total_label_size">@dimen/text_size_overline</dimen>
+    <dimen name="details_total_value_size">@dimen/text_size_body</dimen>
     <dimen name="details_add_button_height">58dp</dimen>
     <dimen name="details_add_button_radius">18dp</dimen>
-    <dimen name="details_add_button_text_size">16sp</dimen>
+    <dimen name="details_add_button_text_size">@dimen/text_size_body</dimen>
+
+    <!-- Product details responsive (ProductDetailsScreen.applyResponsiveLayout) -->
+    <dimen name="details_responsive_image_header_height_expanded">480dp</dimen>
+    <dimen name="details_responsive_image_header_height_medium">440dp</dimen>
+    <dimen name="details_responsive_image_header_height_compact">344dp</dimen>
+    <dimen name="details_responsive_product_card_radius_expanded">34dp</dimen>
+    <dimen name="details_responsive_product_card_radius_medium">30dp</dimen>
+    <dimen name="details_responsive_product_card_radius_compact">28dp</dimen>
+    <dimen name="details_responsive_quantity_selector_width_expanded">260dp</dimen>
+    <dimen name="details_responsive_quantity_selector_width_medium">220dp</dimen>
+    <dimen name="details_responsive_quantity_selector_width_compact">156dp</dimen>
+    <dimen name="details_content_entry_translation_y">22dp</dimen>
 
     <!-- Alert dialog -->
     <dimen name="dialog_alert_outer_padding">20dp</dimen>

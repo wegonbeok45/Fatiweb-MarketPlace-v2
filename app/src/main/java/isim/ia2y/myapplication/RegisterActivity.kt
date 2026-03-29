@@ -1,6 +1,7 @@
 package isim.ia2y.myapplication
 
 import android.os.Bundle
+import android.util.Log
 import android.text.method.PasswordTransformationMethod
 import android.view.View
 import android.view.inputmethod.EditorInfo
@@ -23,25 +24,41 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import kotlinx.coroutines.launch
 
-// Cette classe organise cette partie de l'app.
 class RegisterActivity : AppCompatActivity() {
     private var passwordVisible = false
     private lateinit var callbackManager: CallbackManager
     private lateinit var googleSignInClient: GoogleSignInClient
 
+    companion object {
+        private const val KEY_NAME = "name"
+        private const val KEY_EMAIL = "email"
+        private const val KEY_PASSWORD = "password"
+        private const val KEY_PASSWORD_VISIBLE = "password_visible"
+    }
+
     private val googleSignInLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
-        val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+        val data = result.data
+        if (data == null) {
+            showMotionSnackbar(getString(R.string.auth_google_sign_in_failed))
+            return@registerForActivityResult
+        }
         try {
-            val account = task.getResult(ApiException::class.java)!!
-            handleGoogleIdToken(account.idToken!!)
+            val account = GoogleSignIn.getSignedInAccountFromIntent(data)
+                .getResult(ApiException::class.java)
+            val idToken = account?.idToken
+            if (idToken == null) {
+                showMotionSnackbar(getString(R.string.auth_google_sign_in_failed))
+                return@registerForActivityResult
+            }
+            handleGoogleIdToken(idToken)
         } catch (e: ApiException) {
-            showMotionSnackbar("Google error ${e.statusCode}: ${e.message}")
+            Log.w("RegisterActivity", "Google sign-in failed: ${e.statusCode} ${e.message}", e)
+            showMotionSnackbar(getString(R.string.auth_google_sign_in_failed))
         }
     }
 
-    // Cette fonction fait une action de cette partie de l'app.
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -60,9 +77,28 @@ class RegisterActivity : AppCompatActivity() {
             .build()
         googleSignInClient = GoogleSignIn.getClient(this, gso)
         setupRegisterActions()
+
+        if (savedInstanceState != null) {
+            savedInstanceState.getString(KEY_NAME)?.let { name ->
+                findViewById<EditText>(R.id.etFullName)?.setText(name)
+            }
+            savedInstanceState.getString(KEY_EMAIL)?.let { email ->
+                findViewById<EditText>(R.id.etEmail)?.setText(email)
+            }
+            savedInstanceState.getString(KEY_PASSWORD)?.let { password ->
+                findViewById<EditText>(R.id.etPassword)?.setText(password)
+            }
+            passwordVisible = savedInstanceState.getBoolean(KEY_PASSWORD_VISIBLE, false)
+            val etPassword = findViewById<EditText>(R.id.etPassword)
+            etPassword?.transformationMethod =
+                if (passwordVisible) null else PasswordTransformationMethod.getInstance()
+            etPassword?.setSelection(etPassword.text?.length ?: 0)
+        }
+
         revealViewsInOrder(
             R.id.ivBack,
             R.id.ivAppLogo,
+            R.id.cardRegisterPanel,
             R.id.tvHeadline,
             R.id.tvSubtitle,
             R.id.cardFullNameField,
@@ -75,7 +111,6 @@ class RegisterActivity : AppCompatActivity() {
         emphasizeCta(R.id.btnRegister)
     }
 
-    // Cette fonction fait une action de cette partie de l'app.
     private fun setupRegisterActions() {
         findViewById<View>(R.id.ivBack)?.setOnClickListener {
             navigateToMainTab(MainActivity.Tab.PROFILE)
@@ -86,7 +121,7 @@ class RegisterActivity : AppCompatActivity() {
         findViewById<View>(R.id.tvGoToLogin)?.setOnClickListener {
             navigateNoShift(LoginActivity::class.java)
         }
-        setupFacebookLogin()
+        configureFacebookAvailability()
         setupGoogleLogin()
 
 
@@ -123,12 +158,13 @@ class RegisterActivity : AppCompatActivity() {
 
             // Disable button and show loading state
             btnRegister.isEnabled = false
-            btnRegister.text = "Création du compte…"
+            btnRegister.text = getString(R.string.register_submitting)
 
             lifecycleScope.launch {
                 val result = FirebaseAuthManager.register(email, password, name)
                 result.fold(
                     onSuccess = {
+                        GuestSessionMerger.mergeIntoCurrentUser(this@RegisterActivity)
                         markInputState(R.id.cardFullNameField, InputFieldState.SUCCESS)
                         markInputState(R.id.cardEmailField, InputFieldState.SUCCESS)
                         markInputState(R.id.cardPasswordField, InputFieldState.SUCCESS)
@@ -168,7 +204,24 @@ class RegisterActivity : AppCompatActivity() {
         )
     }
 
-    // Cette fonction fait une action de cette partie de l'app.
+    private fun configureFacebookAvailability() {
+        val btnFacebook = findViewById<View>(R.id.btnFacebook) ?: return
+        if (!isFacebookConfigured()) {
+            btnFacebook.visibility = View.GONE
+            val btnGoogle = findViewById<com.google.android.material.button.MaterialButton>(R.id.btnGoogle)
+            (btnGoogle?.layoutParams as? androidx.constraintlayout.widget.ConstraintLayout.LayoutParams)?.apply {
+                endToEnd = androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.PARENT_ID
+                endToStart = androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.UNSET
+                startToStart = androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.PARENT_ID
+                startToEnd = androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.UNSET
+                width = 0
+                btnGoogle.layoutParams = this
+            }
+            return
+        }
+        setupFacebookLogin()
+    }
+
     private fun setupFacebookLogin() {
         val btnFacebook = findViewById<View>(R.id.btnFacebook) ?: return
         
@@ -181,29 +234,26 @@ class RegisterActivity : AppCompatActivity() {
         }
 
         LoginManager.getInstance().registerCallback(callbackManager, object : FacebookCallback<LoginResult> {
-            // Cette fonction fait une action de cette partie de l'app.
             override fun onSuccess(result: LoginResult) {
                 handleFacebookAccessToken(result.accessToken.token)
             }
 
-            // Cette fonction fait une action de cette partie de l'app.
             override fun onCancel() {
-                showMotionSnackbar("Connexion annulée")
+                showMotionSnackbar(getString(R.string.auth_cancelled))
             }
 
-            // Cette fonction fait une action de cette partie de l'app.
             override fun onError(error: FacebookException) {
-                showMotionSnackbar("Erreur Facebook: ${error.message}")
+                showMotionSnackbar(getString(R.string.auth_facebook_error, error.message ?: ""))
             }
         })
     }
 
-    // Cette fonction fait une action de cette partie de l'app.
     private fun handleFacebookAccessToken(token: String) {
         lifecycleScope.launch {
             val result = FirebaseAuthManager.signInWithFacebook(token)
             result.fold(
                 onSuccess = {
+                    GuestSessionMerger.mergeIntoCurrentUser(this@RegisterActivity)
                     navigateToMainTab(MainActivity.Tab.HOME)
                 },
                 onFailure = { e ->
@@ -216,27 +266,44 @@ class RegisterActivity : AppCompatActivity() {
 
     // Forward Facebook activity results to its callback manager
     @Suppress("DEPRECATION")
-    // Cette fonction fait une action de cette partie de l'app.
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: android.content.Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         callbackManager.onActivityResult(requestCode, resultCode, data)
     }
 
-    // Cette fonction fait une action de cette partie de l'app.
     private fun setupGoogleLogin() {
         findViewById<View>(R.id.btnGoogle)?.setOnClickListener {
             googleSignInLauncher.launch(googleSignInClient.signInIntent)
         }
     }
 
-    // Cette fonction fait une action de cette partie de l'app.
     private fun handleGoogleIdToken(idToken: String) {
         lifecycleScope.launch {
             val result = FirebaseAuthManager.signInWithGoogle(idToken)
             result.fold(
-                onSuccess = { navigateToMainTab(MainActivity.Tab.HOME) },
+                onSuccess = {
+                    GuestSessionMerger.mergeIntoCurrentUser(this@RegisterActivity)
+                    navigateToMainTab(MainActivity.Tab.HOME)
+                },
                 onFailure = { e -> showMotionSnackbar(FirebaseAuthManager.friendlyError(e)) }
             )
         }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString(KEY_NAME, findViewById<EditText>(R.id.etFullName)?.text?.toString().orEmpty())
+        outState.putString(KEY_EMAIL, findViewById<EditText>(R.id.etEmail)?.text?.toString().orEmpty())
+        outState.putString(KEY_PASSWORD, findViewById<EditText>(R.id.etPassword)?.text?.toString().orEmpty())
+        outState.putBoolean(KEY_PASSWORD_VISIBLE, passwordVisible)
+    }
+
+    private fun isFacebookConfigured(): Boolean {
+        val appId = getString(R.string.facebook_app_id)
+        val clientToken = getString(R.string.facebook_client_token)
+        return appId.isNotBlank() &&
+            clientToken.isNotBlank() &&
+            !appId.startsWith("YOUR_") &&
+            !clientToken.startsWith("YOUR_")
     }
 }

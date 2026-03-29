@@ -3,8 +3,8 @@
     <item android:gravity="center">
         <bitmap
             android:gravity="center"
-            android:height="180dp"
+            android:height="144dp"
             android:src="@drawable/iconlogo"
-            android:width="180dp" />
+            android:width="144dp" />
     </item>
 </layer-list>

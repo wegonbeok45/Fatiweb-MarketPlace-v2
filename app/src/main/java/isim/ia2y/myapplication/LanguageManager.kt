@@ -5,12 +5,10 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.LocaleListCompat
 import java.util.Locale
 
-// Cette classe organise cette partie de l'app.
 object LanguageManager {
     private const val PREFS_NAME = "app_language_prefs"
     private const val KEY_LANGUAGE = "selected_language"
 
-    // Cette fonction fait une action de cette partie de l'app.
     fun ensureDefaultAndApply(context: Context) {
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         val saved = prefs.getString(KEY_LANGUAGE, null)
@@ -22,7 +20,6 @@ object LanguageManager {
         }
     }
 
-    // Cette fonction fait une action de cette partie de l'app.
     fun getSelectedLanguage(context: Context): String {
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         val saved = prefs.getString(KEY_LANGUAGE, null)
@@ -33,7 +30,6 @@ object LanguageManager {
         return if (deviceLanguage == "en") "en" else "fr"
     }
 
-    // Cette fonction fait une action de cette partie de l'app.
     fun setLanguage(context: Context, languageCode: String) {
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             .edit()

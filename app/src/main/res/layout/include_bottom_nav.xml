@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -22,7 +22,7 @@
         <ImageView
             android:layout_width="@dimen/profile_bottom_nav_icon_size"
             android:layout_height="@dimen/profile_bottom_nav_icon_size"
-            android:contentDescription="@null"
+            android:contentDescription="@string/cd_nav_home"
             app:srcCompat="@drawable/ic_bottom_nav_home"
             app:tint="@color/profile_nav_inactive" />
 
@@ -50,7 +50,7 @@
         <ImageView
             android:layout_width="@dimen/profile_bottom_nav_icon_size"
             android:layout_height="@dimen/profile_bottom_nav_icon_size"
-            android:contentDescription="@null"
+            android:contentDescription="@string/cd_nav_explore"
             app:srcCompat="@drawable/ic_bottom_nav_categories"
             app:tint="@color/profile_nav_inactive" />
 
@@ -79,7 +79,7 @@
         <ImageView
             android:layout_width="@dimen/profile_bottom_nav_icon_size"
             android:layout_height="@dimen/profile_bottom_nav_icon_size"
-            android:contentDescription="@null"
+            android:contentDescription="@string/cd_nav_favorites"
             app:srcCompat="@drawable/ic_bottom_nav_favorites"
             app:tint="@color/profile_nav_inactive" />
 
@@ -112,7 +112,7 @@
                 android:id="@+id/ivBottomCartIcon"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:contentDescription="@null"
+                android:contentDescription="@string/cd_nav_cart"
                 app:srcCompat="@drawable/ic_bottom_nav_cart"
                 app:tint="@color/profile_nav_inactive" />
 
@@ -133,7 +133,7 @@
                     android:layout_height="match_parent"
                     android:gravity="center"
                     android:textColor="@color/colorOnError"
-                    android:textSize="10sp"
+                    android:textSize="@dimen/text_size_overline"
                     android:textStyle="bold" />
             </com.google.android.material.card.MaterialCardView>
         </FrameLayout>
@@ -162,7 +162,7 @@
         <ImageView
             android:layout_width="@dimen/profile_bottom_nav_icon_size"
             android:layout_height="@dimen/profile_bottom_nav_icon_size"
-            android:contentDescription="@null"
+            android:contentDescription="@string/cd_nav_profile"
             app:srcCompat="@drawable/ic_bottom_nav_profile"
             app:tint="@color/profile_nav_inactive" />
 

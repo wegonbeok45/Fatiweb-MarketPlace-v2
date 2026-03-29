@@ -1,10 +1,12 @@
 package isim.ia2y.myapplication
 
 import android.os.Bundle
+import android.util.Log
 import android.text.method.PasswordTransformationMethod
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
+import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
@@ -12,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.facebook.CallbackManager
 import com.facebook.FacebookCallback
 import com.facebook.FacebookException
@@ -22,31 +25,48 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import kotlinx.coroutines.launch
+import isim.ia2y.myapplication.databinding.ActivityLoginBinding
 
-// Cette classe organise cette partie de l'app.
 class LoginActivity : AppCompatActivity() {
     private var passwordVisible = false
     private lateinit var callbackManager: CallbackManager
     private lateinit var googleSignInClient: GoogleSignInClient
+    private lateinit var binding: ActivityLoginBinding
+
+    companion object {
+        private const val KEY_EMAIL = "email"
+        private const val KEY_PASSWORD_VISIBLE = "password_visible"
+    }
 
     private val googleSignInLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
-        val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+        val data = result.data
+        if (data == null) {
+            showMotionSnackbar(getString(R.string.auth_google_sign_in_failed))
+            return@registerForActivityResult
+        }
         try {
-            val account = task.getResult(ApiException::class.java)!!
-            handleGoogleIdToken(account.idToken!!)
+            val account = GoogleSignIn.getSignedInAccountFromIntent(data)
+                .getResult(ApiException::class.java)
+            val idToken = account?.idToken
+            if (idToken == null) {
+                showMotionSnackbar(getString(R.string.auth_google_sign_in_failed))
+                return@registerForActivityResult
+            }
+            handleGoogleIdToken(idToken)
         } catch (e: ApiException) {
-            showMotionSnackbar("Google error ${e.statusCode}: ${e.message}")
+            Log.w("LoginActivity", "Google sign-in failed: ${e.statusCode} ${e.message}", e)
+            showMotionSnackbar(getString(R.string.auth_google_sign_in_failed))
         }
     }
 
-    // Cette fonction fait une action de cette partie de l'app.
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_login)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+        binding = ActivityLoginBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        ViewCompat.setOnApplyWindowInsetsListener(binding.main) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             val hPadding = resources.getDimensionPixelSize(R.dimen.auth_screen_padding)
             val vPadding = resources.getDimensionPixelSize(R.dimen.auth_screen_padding)
@@ -60,9 +80,21 @@ class LoginActivity : AppCompatActivity() {
             .build()
         googleSignInClient = GoogleSignIn.getClient(this, gso)
         setupLoginActions()
+
+        if (savedInstanceState != null) {
+            savedInstanceState.getString(KEY_EMAIL)?.let { email ->
+                binding.etEmail.setText(email)
+            }
+            passwordVisible = savedInstanceState.getBoolean(KEY_PASSWORD_VISIBLE, false)
+            val etPassword = binding.etPassword
+            etPassword.transformationMethod =
+                if (passwordVisible) null else PasswordTransformationMethod.getInstance()
+            etPassword.setSelection(etPassword.text?.length ?: 0)
+        }
         revealViewsInOrder(
             R.id.ivBack,
             R.id.ivAppLogo,
+            R.id.cardWelcomePanel,
             R.id.tvWelcomeTitle,
             R.id.tvWelcomeSubtitle,
             R.id.cardEmailField,
@@ -74,25 +106,26 @@ class LoginActivity : AppCompatActivity() {
         emphasizeCta(R.id.btnLogin)
     }
 
-    // Cette fonction fait une action de cette partie de l'app.
     private fun setupLoginActions() {
-        findViewById<View>(R.id.ivBack)?.setOnClickListener {
+        binding.ivBack.setOnClickListener {
             navigateToMainTab(MainActivity.Tab.PROFILE)
         }
-        findViewById<View>(R.id.ivAppLogo)?.setOnClickListener {
+        binding.ivAppLogo.setOnClickListener {
             navigateToMainTab(MainActivity.Tab.HOME)
         }
-        findViewById<View>(R.id.tvSignUp)?.setOnClickListener {
+        binding.tvSignUp.setOnClickListener {
             navigateNoShift(RegisterActivity::class.java)
         }
-        setupFacebookLogin()
+        configureFacebookAvailability()
         setupGoogleLogin()
 
-        bindComingSoon(R.id.tvForgotPassword)
+        binding.tvForgotPassword.setOnClickListener {
+            showResetPasswordDialog()
+        }
 
-        val etEmail = findViewById<EditText>(R.id.etEmail)
-        val etPassword = findViewById<EditText>(R.id.etPassword)
-        val btnLogin = findViewById<TextView>(R.id.btnLogin)
+        val etEmail = binding.etEmail
+        val etPassword = binding.etPassword
+        val btnLogin = binding.btnLogin
 
         bindInputFieldMotion(R.id.cardEmailField, R.id.etEmail) { value ->
             value.contains("@") && value.contains(".")
@@ -117,12 +150,13 @@ class LoginActivity : AppCompatActivity() {
 
             // Disable button and show loading state
             btnLogin.isEnabled = false
-            btnLogin.text = "Connexion…"
+            btnLogin.text = getString(R.string.login_connecting)
 
             lifecycleScope.launch {
                 val result = FirebaseAuthManager.signIn(email, password)
                 result.fold(
                     onSuccess = {
+                        GuestSessionMerger.mergeIntoCurrentUser(this@LoginActivity)
                         markInputState(R.id.cardEmailField, InputFieldState.SUCCESS)
                         markInputState(R.id.cardPasswordField, InputFieldState.SUCCESS)
                         navigateToMainTab(MainActivity.Tab.HOME)
@@ -138,7 +172,7 @@ class LoginActivity : AppCompatActivity() {
             }
         }
 
-        findViewById<View>(R.id.ivPasswordToggle)?.setOnClickListener {
+        binding.ivPasswordToggle.setOnClickListener {
             passwordVisible = !passwordVisible
             etPassword.transformationMethod =
                 if (passwordVisible) null else PasswordTransformationMethod.getInstance()
@@ -164,9 +198,26 @@ class LoginActivity : AppCompatActivity() {
         )
     }
 
-    // Cette fonction fait une action de cette partie de l'app.
+    private fun configureFacebookAvailability() {
+        val btnFacebook = binding.btnFacebook
+        if (!isFacebookConfigured()) {
+            btnFacebook.visibility = View.GONE
+            val btnGoogle = binding.btnGoogle
+            (btnGoogle.layoutParams as? androidx.constraintlayout.widget.ConstraintLayout.LayoutParams)?.apply {
+                endToEnd = androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.PARENT_ID
+                endToStart = androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.UNSET
+                startToStart = androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.PARENT_ID
+                startToEnd = androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.UNSET
+                width = 0
+                btnGoogle.layoutParams = this
+            }
+            return
+        }
+        setupFacebookLogin()
+    }
+
     private fun setupFacebookLogin() {
-        val btnFacebook = findViewById<View>(R.id.btnFacebook) ?: return
+        val btnFacebook = binding.btnFacebook
         
         btnFacebook.setOnClickListener {
             LoginManager.getInstance().logInWithReadPermissions(
@@ -177,29 +228,26 @@ class LoginActivity : AppCompatActivity() {
         }
 
         LoginManager.getInstance().registerCallback(callbackManager, object : FacebookCallback<LoginResult> {
-            // Cette fonction fait une action de cette partie de l'app.
             override fun onSuccess(result: LoginResult) {
                 handleFacebookAccessToken(result.accessToken.token)
             }
 
-            // Cette fonction fait une action de cette partie de l'app.
             override fun onCancel() {
-                showMotionSnackbar("Connexion annulée")
+                showMotionSnackbar(getString(R.string.auth_cancelled))
             }
 
-            // Cette fonction fait une action de cette partie de l'app.
             override fun onError(error: FacebookException) {
-                showMotionSnackbar("Erreur Facebook: ${error.message}")
+                showMotionSnackbar(getString(R.string.auth_facebook_error, error.message ?: ""))
             }
         })
     }
 
-    // Cette fonction fait une action de cette partie de l'app.
     private fun handleFacebookAccessToken(token: String) {
         lifecycleScope.launch {
             val result = FirebaseAuthManager.signInWithFacebook(token)
             result.fold(
                 onSuccess = {
+                    GuestSessionMerger.mergeIntoCurrentUser(this@LoginActivity)
                     navigateToMainTab(MainActivity.Tab.HOME)
                 },
                 onFailure = { e ->
@@ -211,27 +259,88 @@ class LoginActivity : AppCompatActivity() {
 
     // Forward Facebook activity results to its callback manager
     @Suppress("DEPRECATION")
-    // Cette fonction fait une action de cette partie de l'app.
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: android.content.Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         callbackManager.onActivityResult(requestCode, resultCode, data)
     }
 
-    // Cette fonction fait une action de cette partie de l'app.
     private fun setupGoogleLogin() {
-        findViewById<View>(R.id.btnGoogle)?.setOnClickListener {
+        binding.btnGoogle.setOnClickListener {
             googleSignInLauncher.launch(googleSignInClient.signInIntent)
         }
     }
 
-    // Cette fonction fait une action de cette partie de l'app.
     private fun handleGoogleIdToken(idToken: String) {
         lifecycleScope.launch {
             val result = FirebaseAuthManager.signInWithGoogle(idToken)
             result.fold(
-                onSuccess = { navigateToMainTab(MainActivity.Tab.HOME) },
+                onSuccess = {
+                    GuestSessionMerger.mergeIntoCurrentUser(this@LoginActivity)
+                    navigateToMainTab(MainActivity.Tab.HOME)
+                },
                 onFailure = { e -> showMotionSnackbar(FirebaseAuthManager.friendlyError(e)) }
             )
         }
     }
+
+    private fun isFacebookConfigured(): Boolean {
+        val appId = getString(R.string.facebook_app_id)
+        val clientToken = getString(R.string.facebook_client_token)
+        return appId.isNotBlank() &&
+            clientToken.isNotBlank() &&
+            !appId.startsWith("YOUR_") &&
+            !clientToken.startsWith("YOUR_")
+    }
+
+    private fun showResetPasswordDialog() {
+        val prefill = binding.etEmail.text?.toString().orEmpty()
+        val view = layoutInflater.inflate(R.layout.dialog_single_input, null)
+        val input = view.findViewById<EditText>(R.id.etDialogInput).apply {
+            inputType = android.text.InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS
+            hint = getString(R.string.auto_text_035)
+            if (prefill.isNotBlank()) {
+                setText(prefill)
+                setSelection(prefill.length)
+            }
+        }
+
+        val dialog = MaterialAlertDialogBuilder(this)
+            .setTitle(getString(R.string.auth_reset_title))
+            .setMessage(getString(R.string.auth_reset_message))
+            .setView(view)
+            .setNegativeButton(getString(R.string.profile_edit_cancel), null)
+            .setPositiveButton(getString(R.string.auth_reset_send), null)
+            .create()
+
+        dialog.setOnShowListener {
+            dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE)?.setOnClickListener {
+                val email = input.text?.toString().orEmpty().trim()
+                if (!email.contains("@") || !email.contains(".")) {
+                    showMotionSnackbar(getString(R.string.auth_invalid_email))
+                    return@setOnClickListener
+                }
+                lifecycleScope.launch {
+                    val result = FirebaseAuthManager.sendPasswordReset(email)
+                    result.fold(
+                        onSuccess = {
+                            dialog.dismiss()
+                            showMotionSnackbar(getString(R.string.auth_reset_email_sent))
+                        },
+                        onFailure = { error ->
+                            showMotionSnackbar(FirebaseAuthManager.friendlyError(error))
+                        }
+                    )
+                }
+            }
+        }
+        dialog.show()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString(KEY_EMAIL, binding.etEmail.text?.toString().orEmpty())
+        outState.putBoolean(KEY_PASSWORD_VISIBLE, passwordVisible)
+    }
+
+
 }
