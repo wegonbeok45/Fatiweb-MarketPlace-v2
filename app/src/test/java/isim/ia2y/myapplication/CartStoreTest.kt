@@ -1,11 +1,11 @@
 package isim.ia2y.myapplication
 
 import android.content.Context
+import android.content.ContextWrapper
 import android.content.SharedPreferences
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
-import java.lang.reflect.Proxy
 
 // Cette classe organise cette partie de l'app.
 class CartStoreTest {
@@ -17,25 +17,21 @@ class CartStoreTest {
     // Cette fonction fait une action de cette partie de l'app.
     fun setup() {
         fakePrefs = FakeSharedPreferences()
-        fakeContext = Proxy.newProxyInstance(
-            Context::class.java.classLoader,
-            arrayOf(Context::class.java)
-        ) { _, method, _ ->
-            if (method.name == "getSharedPreferences") {
-                fakePrefs
-            } else {
-                null
+        fakeContext = object : ContextWrapper(null) {
+            override fun getSharedPreferences(name: String?, mode: Int): SharedPreferences {
+                return fakePrefs
             }
-        } as Context
+        }
+        ProductCatalog.replaceAll(ProductCatalog.seededAll())
     }
 
     @Test
     // Cette fonction fait une action de cette partie de l'app.
     fun testAddOne_initialEmpty() {
         CartStore.clear(fakeContext)
-        CartStore.addOne(fakeContext, "prod_1")
+        CartStore.addOne(fakeContext, "chechia")
         val cart = CartStore.getCart(fakeContext)
-        assertEquals(1, cart["prod_1"])
+        assertEquals(1, cart["chechia"])
         assertEquals(1, CartStore.itemCount(fakeContext))
     }
 
@@ -43,29 +39,29 @@ class CartStoreTest {
     // Cette fonction fait une action de cette partie de l'app.
     fun testIncrement_existing() {
         CartStore.clear(fakeContext)
-        CartStore.addOne(fakeContext, "prod_2")
-        val newQty = CartStore.increment(fakeContext, "prod_2")
+        CartStore.addOne(fakeContext, "bijoux")
+        val newQty = CartStore.increment(fakeContext, "bijoux")
         assertEquals(2, newQty)
-        assertEquals(2, CartStore.getCart(fakeContext)["prod_2"])
+        assertEquals(2, CartStore.getCart(fakeContext)["bijoux"])
     }
 
     @Test
     // Cette fonction fait une action de cette partie de l'app.
     fun testDecrement_toZeroRemovesItem() {
         CartStore.clear(fakeContext)
-        CartStore.addOne(fakeContext, "prod_3")
-        val newQty = CartStore.decrement(fakeContext, "prod_3")
+        CartStore.addOne(fakeContext, "balgha")
+        val newQty = CartStore.decrement(fakeContext, "balgha")
         assertEquals(0, newQty)
-        assertFalse(CartStore.getCart(fakeContext).containsKey("prod_3"))
+        assertFalse(CartStore.getCart(fakeContext).containsKey("balgha"))
     }
     
     @Test
     // Cette fonction fait une action de cette partie de l'app.
     fun testRemove_clearsItem() {
         CartStore.clear(fakeContext)
-        CartStore.addOne(fakeContext, "prod_4")
-        CartStore.addOne(fakeContext, "prod_4")
-        CartStore.remove(fakeContext, "prod_4")
+        CartStore.addOne(fakeContext, "harissa_artisanale")
+        CartStore.addOne(fakeContext, "harissa_artisanale")
+        CartStore.remove(fakeContext, "harissa_artisanale")
         assertEquals(0, CartStore.itemCount(fakeContext))
     }
     
@@ -76,14 +72,11 @@ class CartStoreTest {
         // subtotal 0 -> total 0
         assertEquals(0.0, CartStore.total(fakeContext), 0.01)
         
-        // add an arbitrary product (must exist in ProductCatalog for subtotal to > 0)
-        // If ProductCatalog has ID "1", it returns real price. We just map 1.
-        CartStore.addOne(fakeContext, "1")
+        CartStore.addOne(fakeContext, "chechia")
         val sub = CartStore.subtotal(fakeContext)
-        if (sub > 0.0) {
-            val expectedTotal = sub + CartStore.LIVRAISON_FEE
-            assertEquals(expectedTotal, CartStore.total(fakeContext), 0.01)
-        }
+        assertTrue(sub > 0.0)
+        val expectedTotal = sub + CartStore.LIVRAISON_FEE
+        assertEquals(expectedTotal, CartStore.total(fakeContext), 0.01)
     }
 }
 
