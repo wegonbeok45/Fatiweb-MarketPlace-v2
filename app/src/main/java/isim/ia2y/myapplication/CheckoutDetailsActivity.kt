@@ -2,6 +2,7 @@ package isim.ia2y.myapplication
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.ImageView
@@ -12,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.button.MaterialButton
@@ -19,12 +21,13 @@ import com.google.android.material.card.MaterialCardView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import java.util.Locale
 import isim.ia2y.myapplication.databinding.ActivityCheckoutDetailsBinding
 
 class CheckoutDetailsActivity : AppCompatActivity() {
+    private companion object {
+        const val TAG = "CheckoutDetails"
+    }
 
     private val viewModel: CheckoutViewModel by viewModels()
     private lateinit var binding: ActivityCheckoutDetailsBinding
@@ -44,10 +47,19 @@ class CheckoutDetailsActivity : AppCompatActivity() {
         enableEdgeToEdge()
         binding = ActivityCheckoutDetailsBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        val scrollBaseBottomPadding = binding.scrollCheckoutContent.paddingBottom
+        val bottomBarBaseBottomPadding = binding.layoutCheckoutBottomBar.paddingBottom
+        val extraBottomSpacing = resources.getDimensionPixelSize(R.dimen.space_24)
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.layoutCheckoutRoot) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0)
+            binding.scrollCheckoutContent.updatePadding(
+                bottom = scrollBaseBottomPadding + systemBars.bottom + extraBottomSpacing
+            )
+            binding.layoutCheckoutBottomBar.updatePadding(
+                bottom = bottomBarBaseBottomPadding + systemBars.bottom
+            )
             insets
         }
 
@@ -87,6 +99,7 @@ class CheckoutDetailsActivity : AppCompatActivity() {
         super.onResume()
         bindDynamicData()
         applyPaymentSelection()
+        updateCheckoutActionCard()
     }
 
     private fun setupActions() {
@@ -119,6 +132,7 @@ class CheckoutDetailsActivity : AppCompatActivity() {
 
         binding.btnCheckoutContinue.setOnClickListener {
             it.performLightHapticFeedback()
+            Log.d(TAG, "Continue tapped on step=${viewModel.currentStep.value ?: 1}")
             if ((viewModel.currentStep.value ?: 1) == 1) {
                 transitionToStep2()
             } else {
@@ -137,13 +151,17 @@ class CheckoutDetailsActivity : AppCompatActivity() {
             result.fold(
                 onSuccess = { order ->
                     lastSavedOrder = order
+                    LocalOrderStore.upsert(this, order)
                     btnContinue.isEnabled = true
+                    binding.layoutLottieLoading.visibility = View.GONE
                     transitionToStep3()
                     viewModel.resetOrderResult()
                 },
                 onFailure = { e ->
+                    Log.e(TAG, "Order confirmation failed", e)
                     btnContinue.isEnabled = true
                     btnContinue.text = getString(R.string.checkout_confirm_order)
+                    binding.layoutLottieLoading.visibility = View.GONE
                     showMotionSnackbar(getString(R.string.checkout_order_failed))
                     viewModel.resetOrderResult()
                 }
@@ -154,6 +172,13 @@ class CheckoutDetailsActivity : AppCompatActivity() {
             if (processing) {
                 btnContinue.isEnabled = false
                 btnContinue.text = getString(R.string.checkout_processing)
+                binding.layoutLottieLoading.visibility = View.VISIBLE
+            } else {
+                binding.layoutLottieLoading.visibility = View.GONE
+                if ((viewModel.currentStep.value ?: 1) < 3) {
+                    btnContinue.isEnabled = true
+                    updateCheckoutChrome()
+                }
             }
         }
     }
@@ -174,27 +199,28 @@ class CheckoutDetailsActivity : AppCompatActivity() {
 
     private fun confirmOrder() {
         if (FirebaseAuthManager.currentUser == null) {
-            showAuthChoiceDialog(
-                onCreateAccount = { navigateNoShift(RegisterActivity::class.java) },
-                onExistingClient = { navigateNoShift(LoginActivity::class.java) }
-            )
+            Log.w(TAG, "Order confirmation blocked: no authenticated user")
+            updateCheckoutActionCard(requestFocus = true)
             return
         }
         if (AddressBookStore.getCurrent(this) == null) {
-            showMotionSnackbar(getString(R.string.checkout_add_address_first))
-            navigateNoShift(AddressesActivity::class.java)
+            Log.w(TAG, "Order confirmation blocked: no active address")
+            updateCheckoutActionCard(requestFocus = true)
             return
         }
         if (selectedPaymentMethod != PaymentMethod.CASH) {
+            Log.w(TAG, "Order confirmation blocked: unsupported payment=$selectedPaymentMethod")
             showMotionSnackbar(getString(R.string.checkout_cod_only))
             return
         }
+        Log.d(TAG, "Order confirmation passed guards, preparing submit")
         saveOrderAndProceed()
     }
 
     private fun saveOrderAndProceed() {
         val cart = CartStore.getCart(this)
         if (cart.isEmpty()) {
+            Log.w(TAG, "Order confirmation blocked: cart is empty")
             showMotionSnackbar(getString(R.string.checkout_cart_empty))
             return
         }
@@ -203,44 +229,50 @@ class CheckoutDetailsActivity : AppCompatActivity() {
         val isStandard = viewModel.isStandardSelected.value ?: true
         val shippingFee = if (isStandard) standardShippingFee else expressShippingFee
         val deliveryAddress = AddressBookStore.getCurrent(this) ?: run {
+            Log.w(TAG, "Order confirmation blocked during save: address missing")
             showMotionSnackbar(getString(R.string.checkout_add_address_first))
             return
         }
         val estimatedDeliveryDate = buildEstimatedDeliveryTimestamp()
 
-        val itemSnapshots = cart.mapNotNull { (productId, _) ->
-            val product = ProductCatalog.byId(productId) ?: return@mapNotNull null
-            productId to ProductSnapshot(
-                title = product.title,
-                price = product.price,
-                imageUrl = product.imageUrl,
-                imageRes = product.imageRes,
-                subtitle = product.subtitle
+        val orderItems = cart.map { (productId, quantity) ->
+            val product = ProductCatalog.byId(productId)
+            OrderItem(
+                productId = productId,
+                name = product?.title ?: productId.toString(),
+                priceAtPurchase = product?.price ?: 0.0,
+                quantity = quantity,
+                thumbnailUrl = product?.imageUrls?.firstOrNull() ?: product?.imageUrl ?: ""
             )
-        }.toMap()
-
-        val order = AppOrder(
-            id = "local_${System.currentTimeMillis()}",
-            items = cart,
-            subtotal = subtotal,
-            shippingFee = shippingFee,
-            total = subtotal + shippingFee,
-            deliveryType = if (isStandard) "standard" else "express",
-            paymentMethod = "cash",
-            deliveryAddressSnapshot = deliveryAddress.toSnapshot(),
-            itemSnapshots = itemSnapshots,
-            customerPhone = deliveryAddress.phone,
-            estimatedDeliveryDate = estimatedDeliveryDate,
-            updatedAt = System.currentTimeMillis(),
-            statusTimeline = listOf(OrderStatusEntry("pending", System.currentTimeMillis()))
-        )
+        }
 
         val uid = FirebaseAuthManager.currentUser?.uid ?: return
-        viewModel.submitOrder(uid, order)
+        
+        val order = AppOrder(
+            id = "local_${System.currentTimeMillis()}",
+            uid = uid,
+            items = orderItems,
+            subtotal = subtotal,
+            deliveryFee = shippingFee,
+            total = subtotal + shippingFee,
+            paymentMethod = "COD",
+            shippingAddress = deliveryAddress.toSnapshot(),
+            createdAt = com.google.firebase.Timestamp.now()
+        )
+
+        Log.d(
+            TAG,
+            "Submitting order with ${orderItems.size} items, subtotal=$subtotal, shippingFee=$shippingFee"
+        )
+        viewModel.submitOrder(uid, order, if (isStandard) "standard" else "express")
     }
 
     private fun transitionToStep2() {
         if (viewModel.currentStep.value == 2) return
+        if (FirebaseAuthManager.currentUser == null || AddressBookStore.getCurrent(this) == null) {
+            updateCheckoutActionCard(requestFocus = true)
+            return
+        }
         viewModel.setStep(2)
 
         val layoutStep1 = binding.layoutStep1Content
@@ -271,25 +303,26 @@ class CheckoutDetailsActivity : AppCompatActivity() {
 
         val container = binding.layoutStep3Items
         container.removeAllViews()
-        val cart = CartStore.getCart(this)
         val inflater = LayoutInflater.from(this)
+        
+        val savedOrder = lastSavedOrder
+        if (savedOrder != null) {
+            savedOrder.items.forEach { item ->
+                val itemView = inflater.inflate(R.layout.item_confirmation_product, container, false)
 
-        cart.forEach { (id, qty) ->
-            val product = ProductCatalog.byId(id) ?: return@forEach
-            val itemView = inflater.inflate(R.layout.item_confirmation_product, container, false)
+                itemView.findViewById<ImageView>(R.id.ivConfirmItemImage)
+                    ?.loadCatalogImage(item.thumbnailUrl, R.drawable.placeholder)
+                itemView.findViewById<TextView>(R.id.tvConfirmItemName)?.text = item.name
+                itemView.findViewById<TextView>(R.id.tvConfirmItemDetails)?.text =
+                    getString(R.string.order_details_item_qty, item.quantity)
+                itemView.findViewById<TextView>(R.id.tvConfirmItemPrice)?.text = formatDt(item.priceAtPurchase * item.quantity)
 
-            itemView.findViewById<ImageView>(R.id.ivConfirmItemImage)
-                ?.loadCatalogImage(product.imageUrl, product.imageRes)
-            itemView.findViewById<TextView>(R.id.tvConfirmItemName)?.text = product.title
-            itemView.findViewById<TextView>(R.id.tvConfirmItemDetails)?.text =
-                getString(R.string.order_details_item_meta, qty, product.subtitle)
-            itemView.findViewById<TextView>(R.id.tvConfirmItemPrice)?.text = formatDt(product.price * qty)
-
-            container.addView(itemView)
+                container.addView(itemView)
+            }
+            binding.tvConfirmationTotal.text = formatDt(savedOrder.total)
+        } else {
+            binding.tvConfirmationTotal.text = formatDt(0.0)
         }
-
-        binding.tvConfirmationTotal.text =
-            formatDt(lastSavedOrder?.total ?: (CartStore.subtotal(this) + if (viewModel.isStandardSelected.value == true) standardShippingFee else expressShippingFee))
         ensureConfirmationMetadata()
         binding.tvConfirmationOrderNumber.text = confirmationOrderNumber
         binding.tvConfirmationEta.text = confirmationDeliveryEstimate
@@ -320,7 +353,9 @@ class CheckoutDetailsActivity : AppCompatActivity() {
 
         layoutStep2.animate().alpha(0f).setDuration(MotionTokens.EMPHASIS).withEndAction {
             layoutStep2.visibility = View.GONE
-            layoutStep3.animate().alpha(1f).setDuration(MotionTokens.EMPHASIS).start()
+            layoutStep3.animate().alpha(1f).setDuration(MotionTokens.EMPHASIS).withStartAction {
+                playConfirmationAnimation()
+            }.start()
         }.start()
     }
 
@@ -340,6 +375,7 @@ class CheckoutDetailsActivity : AppCompatActivity() {
         tvLine2.visibility = if (address?.detailsLine.isNullOrBlank()) View.GONE else View.VISIBLE
         tvPhone.text = address?.phone.orEmpty()
         tvPhone.visibility = if (address?.phone.isNullOrBlank()) View.GONE else View.VISIBLE
+        binding.cardCheckoutAddress.alpha = if (address == null) 0.72f else 1f
 
         firebaseUser?.uid?.let { uid ->
             lifecycleScope.launch {
@@ -359,9 +395,10 @@ class CheckoutDetailsActivity : AppCompatActivity() {
         tray.removeAllViews()
         val cart = CartStore.getCart(this)
         val items = ProductCatalog.orderedFavorites(cart.keys)
+        tray.visibility = if (items.isEmpty()) View.GONE else View.VISIBLE
 
         val inflater = LayoutInflater.from(this)
-        items.forEach { product ->
+        items.take(4).forEach { product ->
             val card = inflater.inflate(R.layout.item_checkout_thumbnail, tray, false) as MaterialCardView
             card.findViewById<ImageView>(R.id.ivThumbnail)
                 ?.loadCatalogImage(product.imageUrl, product.imageRes)
@@ -369,6 +406,7 @@ class CheckoutDetailsActivity : AppCompatActivity() {
         }
 
         updateSummary()
+        updateCheckoutActionCard()
     }
 
     private fun updateSummary() {
@@ -427,6 +465,55 @@ class CheckoutDetailsActivity : AppCompatActivity() {
         }
 
         updateSummary()
+    }
+
+    private fun updateCheckoutActionCard(requestFocus: Boolean = false) {
+        val needsLogin = FirebaseAuthManager.currentUser == null
+        val needsAddress = AddressBookStore.getCurrent(this) == null
+        val shouldShow = needsLogin || needsAddress
+
+        binding.cardCheckoutActionNeeded.visibility = if (shouldShow) View.VISIBLE else View.GONE
+        if (!shouldShow) return
+
+        if (needsLogin) {
+            binding.tvCheckoutActionTitle.text = getString(R.string.checkout_login_required_title)
+            binding.tvCheckoutActionMessage.text = getString(R.string.checkout_login_required_message)
+            binding.btnCheckoutAction.text = getString(R.string.checkout_login_action)
+            binding.btnCheckoutAction.setOnClickListener {
+                showAuthChoiceDialog(
+                    onCreateAccount = {
+                        startActivity(
+                            RegisterActivity.createIntent(
+                                this,
+                                returnToRoute = AUTH_RETURN_ROUTE_CHECKOUT
+                            )
+                        )
+                    },
+                    onExistingClient = {
+                        startActivity(
+                            LoginActivity.createIntent(
+                                this,
+                                returnToRoute = AUTH_RETURN_ROUTE_CHECKOUT
+                            )
+                        )
+                    }
+                )
+            }
+        } else {
+            binding.tvCheckoutActionTitle.text = getString(R.string.checkout_address_required_title)
+            binding.tvCheckoutActionMessage.text = getString(R.string.checkout_add_address_first)
+            binding.btnCheckoutAction.text = getString(R.string.checkout_address_action)
+            binding.btnCheckoutAction.setOnClickListener {
+                navigateNoShift(AddressesActivity::class.java)
+            }
+        }
+
+        if (requestFocus) {
+            binding.scrollCheckoutContent.post {
+                binding.scrollCheckoutContent.smoothScrollTo(0, binding.cardCheckoutActionNeeded.top)
+            }
+            showMotionSnackbar(binding.tvCheckoutActionMessage.text.toString())
+        }
     }
 
     private fun applyPaymentSelection() {
@@ -494,7 +581,23 @@ class CheckoutDetailsActivity : AppCompatActivity() {
             layoutStep2.animate().alpha(1f).setDuration(MotionTokens.EMPHASIS).start()
         }.start()
 
+        resetConfirmationAnimation()
         applyPaymentSelection()
+    }
+
+    private fun playConfirmationAnimation() {
+        binding.ivCheckoutSuccessAnimation.apply {
+            cancelAnimation()
+            progress = 0f
+            playAnimation()
+        }
+    }
+
+    private fun resetConfirmationAnimation() {
+        binding.ivCheckoutSuccessAnimation.apply {
+            cancelAnimation()
+            progress = 0f
+        }
     }
 
     private fun updateCheckoutChrome() {
@@ -544,7 +647,11 @@ class CheckoutDetailsActivity : AppCompatActivity() {
             if (isActive || isComplete) R.drawable.bg_checkout_step_active else R.drawable.bg_checkout_step_inactive
         )
         textView.apply {
-            text = stepNumber.toString()
+            text = if (isComplete) {
+                context.getString(R.string.details_check_symbol)
+            } else {
+                stepNumber.toString()
+            }
             setTextColor(
                 ContextCompat.getColor(
                     this@CheckoutDetailsActivity,
@@ -555,7 +662,10 @@ class CheckoutDetailsActivity : AppCompatActivity() {
                     }
                 )
             )
-            setTypeface(null, if (isActive) android.graphics.Typeface.BOLD else android.graphics.Typeface.NORMAL)
+            setTypeface(
+                null,
+                if (isActive || isComplete) android.graphics.Typeface.BOLD else android.graphics.Typeface.NORMAL
+            )
         }
     }
 
@@ -564,7 +674,7 @@ class CheckoutDetailsActivity : AppCompatActivity() {
         if (confirmationOrderNumber.isBlank()) {
             confirmationOrderNumber = order?.displayId ?: buildOrderNumber()
         }
-        confirmationDeliveryEstimate = order?.estimatedDeliveryLabel.ifNullOrBlank { buildDeliveryEstimate() }
+        confirmationDeliveryEstimate = buildDeliveryEstimate()
     }
 
     private fun buildOrderNumber(): String {
@@ -573,16 +683,8 @@ class CheckoutDetailsActivity : AppCompatActivity() {
     }
 
     private fun buildDeliveryEstimate(): String {
-        val today = LocalDate.now()
-        val isStandard = viewModel.isStandardSelected.value ?: true
-        val start = if (isStandard) today.plusDays(3) else today.plusDays(1)
-        val end = if (isStandard) today.plusDays(5) else today.plusDays(2)
-        val formatter = DateTimeFormatter.ofPattern("d MMM", Locale.FRENCH)
-        return if (start.month == end.month) {
-            "${start.dayOfMonth} - ${end.format(formatter)}"
-        } else {
-            "${start.format(formatter)} - ${end.format(formatter)}"
-        }
+        val estimate = java.util.Date(buildEstimatedDeliveryTimestamp())
+        return java.text.SimpleDateFormat("dd MMM", Locale.FRENCH).format(estimate)
     }
 
     private fun buildEstimatedDeliveryTimestamp(): Long {

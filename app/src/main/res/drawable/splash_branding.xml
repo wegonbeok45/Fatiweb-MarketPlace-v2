@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:gravity="center">
+    <item
+        android:gravity="center"
+        android:height="108dp"
+        android:width="108dp">
         <bitmap
             android:gravity="center"
-            android:height="144dp"
-            android:src="@drawable/iconlogo"
-            android:width="144dp" />
+            android:src="@mipmap/ic_launcher" />
     </item>
 </layer-list>

@@ -19,8 +19,8 @@ object FirestoreService {
         val email: String = "",
         val role: String = "client",
         val avatarUrl: String? = null,
-        val createdAt: Long = 0L,
-        val updatedAt: Long = 0L
+        val createdAt: Any? = null,
+        val updatedAt: Any? = null
     )
 
     data class ClientInfo(
@@ -69,15 +69,22 @@ object FirestoreService {
     suspend fun saveProduct(product: Product) = ProductService.saveProduct(product)
     suspend fun deleteProduct(productId: String) = ProductService.deleteProduct(productId)
 
-    suspend fun saveOrder(uid: String, order: AppOrder) = OrderService.saveOrder(uid, order)
+    suspend fun saveOrder(uid: String, order: AppOrder, deliveryType: String = "standard") =
+        OrderService.saveOrder(uid, order, deliveryType)
     suspend fun fetchOrders(uid: String) = OrderService.fetchOrders(uid)
     suspend fun fetchOrder(uid: String, orderId: String) = OrderService.fetchOrder(uid, orderId)
     suspend fun fetchAllOrders() = AdminService.fetchAllOrders()
     suspend fun fetchAllClients() = AdminService.fetchAllClients()
     suspend fun updateOrderStatus(uid: String, orderId: String, newStatus: String) = OrderService.updateOrderStatus(uid, orderId, newStatus)
 
-    suspend fun saveUserProfile(uid: String, name: String, email: String, avatarUrl: String? = null) = 
-        UserService.saveUserProfile(uid, name, email, avatarUrl)
+    suspend fun saveUserProfile(
+        uid: String,
+        name: String,
+        email: String,
+        avatarUrl: String? = null,
+        roleOverride: String? = null
+    ) =
+        UserService.saveUserProfile(uid, name, email, avatarUrl, roleOverride)
     suspend fun updateUserProfileName(uid: String, name: String) = UserService.updateUserProfileName(uid, name)
     suspend fun fetchUserProfile(uid: String) = UserService.fetchUserProfile(uid)
     suspend fun fetchUserRole(uid: String) = UserService.fetchUserRole(uid)
@@ -98,12 +105,23 @@ object FirestoreService {
     suspend fun saveCommerceConfig(config: CommerceConfig) = ConfigService.saveCommerceConfig(config)
 
     suspend fun fetchNotifications() = NotificationService.fetchNotifications()
+    suspend fun fetchUserInboxNotifications(uid: String) = NotificationService.fetchUserInboxNotifications(uid)
     suspend fun fetchInAppNotifications() = NotificationService.fetchInAppNotifications()
-    suspend fun createInAppNotification(title: String, message: String, createdBy: String) =
-        NotificationService.createInAppNotification(title, message, createdBy)
+    suspend fun createInAppNotification(
+        title: String,
+        message: String,
+        createdBy: String,
+        audience: String = "all"
+    ) = NotificationService.createInAppNotification(title, message, createdBy, audience)
+    suspend fun markNotificationsRead(uid: String, notificationIds: Set<String>) =
+        NotificationService.markNotificationsRead(uid, notificationIds)
     suspend fun fetchNotificationReadIds(uid: String) = NotificationService.fetchNotificationReadIds(uid)
     suspend fun replaceNotificationReadIds(uid: String, readIds: Set<String>) =
         NotificationService.replaceNotificationReadIds(uid, readIds)
     suspend fun markNotificationRead(uid: String, notificationId: String) = NotificationService.markNotificationRead(uid, notificationId)
     suspend fun isNotificationRead(uid: String, notificationId: String) = NotificationService.isNotificationRead(uid, notificationId)
+
+    // Reviews
+    suspend fun fetchReviews(productId: String) = ReviewService.fetchReviews(productId)
+    suspend fun addReview(productId: String, review: ProductReview) = ReviewService.addReview(productId, review)
 }

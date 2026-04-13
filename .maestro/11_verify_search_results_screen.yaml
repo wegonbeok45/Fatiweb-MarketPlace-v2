@@ -1,0 +1,12 @@
+appId: isim.ia2y.myapplication
+tags:
+  - shopper
+  - sync
+  - search
+---
+- extendedWaitUntil:
+    visible:
+      id: "tvResultsCount"
+    timeout: 30000
+- takeScreenshot: "11-search-results-romarin"
+- assertVisible: "Huile capillaire au romarin"

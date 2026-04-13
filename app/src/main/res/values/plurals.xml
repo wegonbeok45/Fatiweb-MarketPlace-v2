@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="search_results_count">
+        <item quantity="one">%1$d résultat pour « %2$s »</item>
+        <item quantity="other">%1$d résultats pour « %2$s »</item>
+    </plurals>
+
+    <plurals name="cart_count_chip">
+        <item quantity="one">%d article</item>
+        <item quantity="other">%d articles</item>
+    </plurals>
+
+    <plurals name="admin_order_count">
+        <item quantity="one">%d commande</item>
+        <item quantity="other">%d commandes</item>
+    </plurals>
+</resources>

@@ -6,6 +6,12 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 
 object AdminService {
+    data class OrderStatusSummary(
+        val total: Int = 0,
+        val pending: Int = 0,
+        val delivered: Int = 0
+    )
+
     private val db: FirebaseFirestore get() = FirebaseFirestore.getInstance()
     private val productsRef = db.collection("products")
 
@@ -15,7 +21,7 @@ object AdminService {
     }
 
     private suspend fun fetchAdminStatsAggregated(): FirestoreService.AdminStats {
-        val ordersAgg = db.collectionGroup("orders")
+        val ordersAgg = db.collection(FirestoreCollections.ORDERS)
             .aggregate(AggregateField.count(), AggregateField.sum("total"))
             .get(AggregateSource.SERVER)
             .await()
@@ -59,7 +65,7 @@ object AdminService {
     }
 
     private suspend fun fetchAdminStatsFromDocuments(): FirestoreService.AdminStats {
-        val ordersSnapshot = db.collectionGroup(FirestoreCollections.ORDERS)
+        val ordersSnapshot = db.collection(FirestoreCollections.ORDERS)
             .get()
             .await()
         val orders = ordersSnapshot.documents.mapNotNull { doc ->
@@ -97,15 +103,15 @@ object AdminService {
     }
 
     suspend fun fetchAllOrders(): List<Pair<String, AppOrder>> {
-        val ordersSnapshot = db.collectionGroup("orders")
+        val ordersSnapshot = db.collection(FirestoreCollections.ORDERS)
             .limit(200)
             .get()
             .await()
         return ordersSnapshot.documents.mapNotNull { doc ->
             val data = doc.data ?: return@mapNotNull null
-            val uid = doc.reference.parent.parent?.id ?: return@mapNotNull null
+            val uid = data["uid"] as? String ?: return@mapNotNull null
             uid to AppOrder.fromMap(data)
-        }.sortedByDescending { it.second.createdAt }
+        }.sortedByDescending { it.second.createdAtMillis }
     }
 
     suspend fun fetchAllClients(): List<FirestoreService.ClientInfo> {
@@ -113,14 +119,14 @@ object AdminService {
             .limit(100)
             .get()
             .await()
-        val ordersSnapshot = db.collectionGroup("orders")
+        val ordersSnapshot = db.collection(FirestoreCollections.ORDERS)
             .limit(500)
             .get()
             .await()
 
         val orderCounts = mutableMapOf<String, Int>()
         ordersSnapshot.documents.forEach { doc ->
-            val uid = doc.reference.parent.parent?.id ?: return@forEach
+            val uid = doc.getString("uid") ?: return@forEach
             orderCounts[uid] = (orderCounts[uid] ?: 0) + 1
         }
 
@@ -136,18 +142,70 @@ object AdminService {
                 createdAt = (data["createdAt"] as? Number)?.toLong() ?: 0L
             )
         }.sortedByDescending { it.createdAt }
-    fun listenToAllOrders(onUpdate: (List<Pair<String, AppOrder>>) -> Unit): com.google.firebase.firestore.ListenerRegistration {
-        return db.collectionGroup("orders")
+    }
+
+    suspend fun fetchOrdersPage(
+        pageSize: Int,
+        lastDoc: com.google.firebase.firestore.DocumentSnapshot? = null
+    ): com.google.firebase.firestore.QuerySnapshot {
+        val query = db.collection(FirestoreCollections.ORDERS)
             .orderBy("createdAt", com.google.firebase.firestore.Query.Direction.DESCENDING)
-            .limit(100)
-            .addSnapshotListener { snapshot, e ->
-                if (e != null || snapshot == null) return@addSnapshotListener
-                val orders = snapshot.documents.mapNotNull { doc ->
-                    val data = doc.data ?: return@mapNotNull null
-                    val uid = doc.reference.parent.parent?.id ?: return@mapNotNull null
-                    uid to AppOrder.fromMap(data)
-                }
-                onUpdate(orders)
-            }
+            .limit(pageSize.toLong())
+        
+        return if (lastDoc != null) {
+            query.startAfter(lastDoc).get().await()!!
+        } else {
+            query.get().await()!!
+        }
+    }
+
+    suspend fun fetchOrderStatusSummary(): OrderStatusSummary {
+        return runCatching {
+            val totalAgg = db.collection(FirestoreCollections.ORDERS)
+                .aggregate(AggregateField.count())
+                .get(AggregateSource.SERVER)
+                .await()
+            val pendingAgg = db.collection(FirestoreCollections.ORDERS)
+                .whereEqualTo("status", "pending")
+                .aggregate(AggregateField.count())
+                .get(AggregateSource.SERVER)
+                .await()
+            val deliveredAgg = db.collection(FirestoreCollections.ORDERS)
+                .whereEqualTo("status", "delivered")
+                .aggregate(AggregateField.count())
+                .get(AggregateSource.SERVER)
+                .await()
+
+            OrderStatusSummary(
+                total = totalAgg.count.toInt(),
+                pending = pendingAgg.count.toInt(),
+                delivered = deliveredAgg.count.toInt()
+            )
+        }.getOrElse {
+            val snapshot = db.collection(FirestoreCollections.ORDERS)
+                .get()
+                .await()
+            OrderStatusSummary(
+                total = snapshot.size(),
+                pending = snapshot.documents.count { it.getString("status") == "pending" },
+                delivered = snapshot.documents.count { it.getString("status") == "delivered" }
+            )
+        }
+    }
+
+    suspend fun fetchClientsPage(
+        pageSize: Int,
+        lastDoc: com.google.firebase.firestore.DocumentSnapshot? = null
+    ): com.google.firebase.firestore.QuerySnapshot {
+        val query = db.collection(FirestoreCollections.USERS)
+            .whereEqualTo("role", "client")
+            .orderBy("createdAt", com.google.firebase.firestore.Query.Direction.DESCENDING)
+            .limit(pageSize.toLong())
+            
+        return if (lastDoc != null) {
+            query.startAfter(lastDoc).get().await()!!
+        } else {
+            query.get().await()!!
+        }
     }
 }

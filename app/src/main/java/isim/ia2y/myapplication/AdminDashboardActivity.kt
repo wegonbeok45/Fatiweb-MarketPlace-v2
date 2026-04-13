@@ -58,7 +58,7 @@ class AdminDashboardActivity : AppCompatActivity() {
             setupBottomNav()
             setupQuickActions()
             setupObservers()
-            renderAdminStats(FirestoreService.AdminStats())
+            renderAdminStats(FirestoreService.AdminStats(), emptyList())
 
             if (viewModel.isVerified.value != true) {
                 viewModel.verifyAdmin(uid)
@@ -99,10 +99,8 @@ class AdminDashboardActivity : AppCompatActivity() {
 
     private fun setupObservers() {
         viewModel.isVerified.observe(this) { verified ->
-            if (!verified && !AdminSession.isVerified(FirebaseAuthManager.currentUser?.uid ?: "")) {
-                // If verification failed and session not marked, we finish
-                // Note: verifyAdmin will set this to true upon success
-            }
+            // Access denial is handled asynchronously by the viewModel.error observer.
+            // Do not call finish() here to avoid premature immediate exit on initial false state.
         }
 
         viewModel.activeTab.observe(this) { tab ->
@@ -111,11 +109,13 @@ class AdminDashboardActivity : AppCompatActivity() {
         }
 
         viewModel.stats.observe(this) { stats ->
-            renderAdminStats(stats)
+            renderAdminStats(stats, viewModel.orders.value.orEmpty())
         }
 
         viewModel.orders.observe(this) { orders ->
             renderInlineOrders(orders)
+            renderDashboardOrdersPreview(orders)
+            renderAdminStats(viewModel.stats.value ?: FirestoreService.AdminStats(), orders)
         }
 
         viewModel.clients.observe(this) { clients ->
@@ -125,6 +125,9 @@ class AdminDashboardActivity : AppCompatActivity() {
         viewModel.error.observe(this) { error ->
             error?.let {
                 showMotionSnackbar(it)
+                if (it == getString(R.string.admin_access_denied)) {
+                    finish()
+                }
                 viewModel.clearError()
             }
         }
@@ -371,23 +374,67 @@ class AdminDashboardActivity : AppCompatActivity() {
             .start()
     }
 
-    private fun renderAdminStats(stats: FirestoreService.AdminStats) {
+    private fun renderAdminStats(
+        stats: FirestoreService.AdminStats,
+        orders: List<Pair<String, AppOrder>>
+    ) {
+        val pendingOrders = orders.count { it.second.status == "pending" }
+        val averageBasket = if (stats.totalOrders > 0) stats.totalRevenue / stats.totalOrders else 0.0
+        val inactiveProducts = (stats.totalProducts - stats.activeProducts).coerceAtLeast(0)
+
         findViewById<TextView>(R.id.adminTvCommandesVal)?.text = stats.totalOrders.toString()
         findViewById<TextView>(R.id.adminTvRevenueVal)?.text =
             formatDt(stats.totalRevenue)
         findViewById<TextView>(R.id.adminTvClientsVal)?.text = stats.totalClients.toString()
         findViewById<TextView>(R.id.adminTvStockVal)?.text = stats.lowStockProducts.toString()
-        findViewById<TextView>(R.id.adminTvRevenueDelta)?.apply {
-            text = getString(R.string.admin_dashboard_products_count, stats.totalProducts)
-            visibility = View.VISIBLE
+        findViewById<TextView>(R.id.adminTvWelcomeChipSync)?.text =
+            getString(R.string.admin_dashboard_chip_sync)
+        findViewById<TextView>(R.id.adminTvWelcomeChipInventory)?.text =
+            getString(R.string.admin_dashboard_chip_inventory, stats.activeProducts)
+        findViewById<TextView>(R.id.adminTvRevenueDelta)?.visibility = View.GONE
+        findViewById<TextView>(R.id.adminTvCommandesDelta)?.apply {
+            text = getString(R.string.admin_dashboard_chip_attention, pendingOrders)
+            visibility = if (pendingOrders > 0) View.VISIBLE else View.GONE
         }
-        findViewById<TextView>(R.id.adminTvClientsDelta)?.apply {
-            text = getString(R.string.admin_dashboard_active_products_count, stats.activeProducts)
-            visibility = View.VISIBLE
-        }
-        findViewById<TextView>(R.id.adminTvStockDelta)?.apply {
-            text = getString(R.string.admin_dashboard_low_stock_caption)
-            visibility = View.VISIBLE
+        findViewById<TextView>(R.id.adminTvClientsDelta)?.visibility = View.GONE
+        findViewById<TextView>(R.id.adminTvStockDelta)?.visibility = View.GONE
+        findViewById<TextView>(R.id.adminTvCommandesMeta)?.text =
+            getString(R.string.admin_dashboard_orders_meta, pendingOrders)
+        findViewById<TextView>(R.id.adminTvRevenueMeta)?.text =
+            getString(R.string.admin_dashboard_revenue_meta, formatDt(averageBasket))
+        findViewById<TextView>(R.id.adminTvClientsMeta)?.text =
+            getString(R.string.admin_dashboard_clients_meta, stats.totalClients)
+        findViewById<TextView>(R.id.adminTvStockMeta)?.text =
+            getString(R.string.admin_dashboard_stock_meta, inactiveProducts)
+    }
+
+    private fun renderDashboardOrdersPreview(orders: List<Pair<String, AppOrder>>) {
+        val rows = listOf(
+            intArrayOf(R.id.adminOrderRow1, R.id.adminOrderId1, R.id.adminOrderName1, R.id.adminOrderPrice1),
+            intArrayOf(R.id.adminOrderRow2, R.id.adminOrderId2, R.id.adminOrderName2, R.id.adminOrderPrice2),
+            intArrayOf(R.id.adminOrderRow3, R.id.adminOrderId3, R.id.adminOrderName3, R.id.adminOrderPrice3)
+        )
+
+        rows.forEachIndexed { index, ids ->
+            val row = findViewById<View>(ids[0]) ?: return@forEachIndexed
+            val item = orders.getOrNull(index)
+            if (item == null) {
+                row.visibility = View.GONE
+                row.setOnClickListener(null)
+                return@forEachIndexed
+            }
+
+            val (uid, order) = item
+            findViewById<TextView>(ids[1])?.text = order.displayId
+            findViewById<TextView>(ids[2])?.text = getString(
+                R.string.admin_dashboard_recent_order_subtitle,
+                order.shippingAddress?.recipientName?.takeIf { it.isNotBlank() }
+                    ?: getString(R.string.admin_client_fallback_name),
+                order.statusLabel(this)
+            )
+            findViewById<TextView>(ids[3])?.text = formatDt(order.total)
+            row.visibility = View.VISIBLE
+            row.setOnClickListener { showStatusDialogInline(uid, order) }
         }
     }
 
@@ -399,11 +446,14 @@ class AdminDashboardActivity : AppCompatActivity() {
             getString(R.string.admin_status_delivered)
         )
         val keys = arrayOf("pending", "preparing", "shipped", "delivered")
+        val currentIndex = keys.indexOf(order.status).coerceAtLeast(0)
 
-        android.app.AlertDialog.Builder(this)
+        androidx.appcompat.app.AlertDialog.Builder(this)
             .setTitle(getString(R.string.admin_change_status_title, order.displayId))
-            .setItems(statuses) { _, which ->
+            .setMessage(order.statusLabel(this))
+            .setSingleChoiceItems(statuses, currentIndex) { dialog, which ->
                 val newStatus = keys[which]
+                dialog.dismiss()
                 viewModel.updateOrderStatus(uid, order.id, newStatus)
             }
             .setNegativeButton(getString(R.string.admin_delete_cancel), null)

@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.firebase.firestore.FirebaseFirestoreException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -20,8 +19,8 @@ class CheckoutViewModel : ViewModel() {
     private val _isProcessing = MutableLiveData(false)
     val isProcessing: LiveData<Boolean> = _isProcessing
 
-    private val _orderResult = MutableLiveData<Result<AppOrder>>()
-    val orderResult: LiveData<Result<AppOrder>> = _orderResult
+    private val _orderResult = MutableLiveData<Result<AppOrder>?>(null)
+    val orderResult: LiveData<Result<AppOrder>?> = _orderResult
 
     fun setStep(step: Int) {
         _currentStep.value = step
@@ -31,11 +30,11 @@ class CheckoutViewModel : ViewModel() {
         _isStandardSelected.value = standard
     }
 
-    fun submitOrder(uid: String, order: AppOrder) {
+    fun submitOrder(uid: String, order: AppOrder, deliveryType: String) {
         _isProcessing.value = true
         viewModelScope.launch {
             val result = withContext(Dispatchers.IO) {
-                runCatching { OrderService.saveOrder(uid, order) }
+                runCatching { OrderService.saveOrder(uid, order, deliveryType) }
             }
             _orderResult.value = result
             _isProcessing.value = false

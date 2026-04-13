@@ -1,0 +1,133 @@
+appId: isim.ia2y.myapplication
+tags:
+  - admin
+  - capture
+  - live
+---
+- launchApp:
+    stopApp: true
+- extendedWaitUntil:
+    visible:
+      id: "layoutSearchBar"
+    timeout: 45000
+- tapOn:
+    id: "hostNavProfile"
+    waitToSettleTimeoutMs: 1000
+- extendedWaitUntil:
+    visible:
+      id: "tvUserName"
+    timeout: 45000
+- extendedWaitUntil:
+    visible:
+      id: "cardLogout"
+    timeout: 45000
+- tapOn:
+    id: "cardLogout"
+    waitToSettleTimeoutMs: 1000
+- extendedWaitUntil:
+    visible:
+      id: "btnLogin"
+    timeout: 15000
+- tapOn:
+    id: "etEmail"
+    waitToSettleTimeoutMs: 1000
+- inputText: "speedyjj08@gmail.com"
+- hideKeyboard
+- tapOn:
+    id: "etPassword"
+    waitToSettleTimeoutMs: 1000
+- inputText: "mahamedtaher2004"
+- hideKeyboard
+- tapOn:
+    id: "btnLogin"
+    waitToSettleTimeoutMs: 1000
+- extendedWaitUntil:
+    visible:
+      id: "hostNavProfile"
+    timeout: 30000
+- tapOn:
+    id: "hostNavProfile"
+    waitToSettleTimeoutMs: 1000
+- extendedWaitUntil:
+    visible:
+      id: "tvUserName"
+    timeout: 45000
+- extendedWaitUntil:
+    visible:
+      id: "cardAdmin"
+    timeout: 45000
+- takeScreenshot: "90-profile-admin"
+- tapOn:
+    id: "cardAdmin"
+    waitToSettleTimeoutMs: 1000
+- extendedWaitUntil:
+    visible:
+      id: "adminNavDashboard"
+    timeout: 20000
+- takeScreenshot: "91-admin-dashboard"
+- tapOn:
+    id: "adminNavCommandes"
+    waitToSettleTimeoutMs: 1000
+- extendedWaitUntil:
+    visible:
+      id: "adminInlineCommandesTvTotal"
+    timeout: 15000
+- takeScreenshot: "92-orders"
+- tapOn:
+    id: "adminNavClients"
+    waitToSettleTimeoutMs: 1000
+- extendedWaitUntil:
+    visible:
+      id: "adminInlineClientsTvTotal"
+    timeout: 15000
+- takeScreenshot: "92b-clients-inline"
+- tapOn:
+    id: "adminNavProduits"
+    waitToSettleTimeoutMs: 1000
+- extendedWaitUntil:
+    visible:
+      id: "adminProduitsBtnAdd"
+    timeout: 15000
+- takeScreenshot: "93-products"
+- tapOn:
+    id: "adminProduitsBtnAdd"
+    waitToSettleTimeoutMs: 1000
+- extendedWaitUntil:
+    visible:
+      id: "adminProductEditorBtnSave"
+    timeout: 15000
+- takeScreenshot: "94-product-editor"
+- tapOn:
+    id: "adminProductEditorIvBack"
+    waitToSettleTimeoutMs: 1000
+- extendedWaitUntil:
+    visible:
+      id: "adminProduitsBtnAdd"
+    timeout: 15000
+- tapOn:
+    id: "adminNavNotifications"
+    waitToSettleTimeoutMs: 1000
+- extendedWaitUntil:
+    visible:
+      id: "adminNotifBtnSend"
+    timeout: 15000
+- takeScreenshot: "96-notifications"
+- tapOn:
+    id: "adminNotifIvSettings"
+    waitToSettleTimeoutMs: 1000
+- extendedWaitUntil:
+    visible:
+      id: "adminParamCardLivraison"
+    timeout: 15000
+- takeScreenshot: "97-settings"
+- tapOn:
+    id: "adminParamLivrStandardEditGroup"
+    waitToSettleTimeoutMs: 1000
+- extendedWaitUntil:
+    visible:
+      id: "etEditPrice"
+    timeout: 15000
+- takeScreenshot: "98-settings-dialog"
+- tapOn:
+    id: "btnEditPriceCancel"
+    waitToSettleTimeoutMs: 1000

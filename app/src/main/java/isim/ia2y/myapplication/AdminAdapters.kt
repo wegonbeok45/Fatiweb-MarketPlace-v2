@@ -28,9 +28,9 @@ class AdminOrdersAdapter(
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         fun bind(uid: String, order: AppOrder) {
             itemView.findViewById<TextView>(R.id.adminInlineOrderId).text = order.displayId
-            itemView.findViewById<TextView>(R.id.adminInlineOrderName).text = order.items.keys.firstOrNull()?.let { id ->
-                val name = ProductCatalog.byId(id)?.title?.split(" ")?.firstOrNull() ?: id
-                "$name x${order.items[id]}"
+            itemView.findViewById<TextView>(R.id.adminInlineOrderName).text = order.items.firstOrNull()?.let { item ->
+                val name = item.name.split(" ").firstOrNull() ?: item.productId
+                "$name x${item.quantity}"
             } ?: itemView.context.getString(R.string.admin_order_fallback_label)
             
             val badge = itemView.findViewById<MaterialCardView>(R.id.adminInlineOrderBadge)
@@ -51,6 +51,10 @@ class AdminOrdersAdapter(
                 "preparing" -> {
                     badge.setCardBackgroundColor(ContextCompat.getColor(ctx, R.color.status_chip_bg_preparing))
                     badgeText.setTextColor(ContextCompat.getColor(ctx, R.color.status_chip_text_preparing))
+                }
+                "shipped" -> {
+                    badge.setCardBackgroundColor(ContextCompat.getColor(ctx, R.color.status_chip_bg_shipped))
+                    badgeText.setTextColor(ContextCompat.getColor(ctx, R.color.status_chip_text_shipped))
                 }
                 else -> {
                     badge.setCardBackgroundColor(ContextCompat.getColor(ctx, R.color.status_chip_bg_cancelled))
@@ -88,9 +92,15 @@ class AdminClientsAdapter(
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         fun bind(client: FirestoreService.ClientInfo) {
+            val resources = itemView.context.resources
             itemView.findViewById<TextView>(R.id.adminClientName).text = client.name
             itemView.findViewById<TextView>(R.id.adminClientEmail).text = client.email
-            itemView.findViewById<TextView>(R.id.adminClientId).text = if (client.orderCount == 1) "1 commande" else "${client.orderCount} commandes"
+            itemView.findViewById<TextView>(R.id.adminClientId).text =
+                resources.getQuantityString(
+                    R.plurals.admin_order_count,
+                    client.orderCount,
+                    client.orderCount
+                )
             itemView.findViewById<TextView>(R.id.adminClientAvatarInitial).text = if (client.name.isNotBlank()) client.name.take(1).uppercase() else "?"
             itemView.setOnClickListener { onClick(client) }
         }

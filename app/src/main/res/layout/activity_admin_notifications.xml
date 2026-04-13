@@ -204,6 +204,38 @@
                             android:imeOptions="actionDone" />
                     </com.google.android.material.card.MaterialCardView>
 
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="@string/admin_announcements_audience_label"
+                        android:textColor="@color/home_text_secondary"
+                        android:textSize="@dimen/text_size_overline" />
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="match_parent"
+                        android:layout_height="52dp"
+                        android:layout_marginBottom="14dp"
+                        app:cardBackgroundColor="@color/overlay_white_8"
+                        app:cardCornerRadius="16dp"
+                        app:cardElevation="0dp"
+                        app:strokeWidth="0dp">
+
+                        <AutoCompleteTextView
+                            android:id="@+id/adminNotifAudienceInput"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@android:color/transparent"
+                            android:paddingStart="14dp"
+                            android:paddingEnd="14dp"
+                            android:textColor="@android:color/white"
+                            android:textColorHint="@color/home_text_secondary"
+                            android:textSize="@dimen/text_size_caption"
+                            android:fontFamily="@font/plus_jakarta_sans_regular"
+                            android:inputType="none"
+                            tools:text="Tous les utilisateurs" />
+                    </com.google.android.material.card.MaterialCardView>
+
                     <!-- Send Button -->
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/adminNotifBtnSend"
@@ -216,6 +248,15 @@
                         android:textColor="@color/home_text_primary"
                         app:cornerRadius="16dp"
                         app:strokeWidth="0dp" />
+
+                    <TextView
+                        android:id="@+id/adminNotifComposerStatus"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="@string/admin_announcements_status_idle"
+                        android:textColor="@color/surface_warm_border"
+                        android:textSize="@dimen/text_size_overline" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -283,4 +324,3 @@
         android:layout_gravity="bottom" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
-

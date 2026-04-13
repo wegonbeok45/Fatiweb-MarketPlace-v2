@@ -7,15 +7,15 @@ import org.junit.Test
 class AppOrderTest {
 
     @Test
-    fun withStatus_updatesStatusTimestampAndTimeline() {
+    fun withStatus_updatesStatusTimestampAndTrackingEvents() {
         val createdAt = 1_710_000_000_000L
         val order = AppOrder(
             id = "order-1",
-            items = mapOf("chechia" to 1),
+            items = listOf(OrderItem(productId = "chechia", quantity = 1)),
             status = "pending",
             createdAt = createdAt,
             updatedAt = createdAt,
-            statusTimeline = listOf(OrderStatusEntry("pending", createdAt))
+            trackingEvents = listOf(OrderStatusEntry("pending", createdAt))
         )
 
         val changedAt = createdAt + 3_600_000L
@@ -23,25 +23,31 @@ class AppOrderTest {
 
         assertEquals("shipped", updated.status)
         assertEquals(changedAt, updated.updatedAt)
-        assertEquals(2, updated.statusTimeline.size)
-        assertTrue(updated.statusTimeline.any { it.status == "pending" && it.changedAt == createdAt })
-        assertTrue(updated.statusTimeline.any { it.status == "shipped" && it.changedAt == changedAt })
+        assertEquals(2, updated.trackingEvents.size)
+        assertTrue(updated.trackingEvents.any { it.status == "pending" && it.changedAt == createdAt })
+        assertTrue(updated.trackingEvents.any { it.status == "shipped" && it.changedAt == changedAt })
     }
 
     @Test
-    fun fromMap_restoresAddressSnapshotAndTimeline() {
+    fun fromMap_restoresShippingAddressAndLegacyTimeline() {
         val createdAt = 1_710_000_000_000L
         val map = mapOf(
             "id" to "order-2",
-            "items" to mapOf("balgha" to 2),
+            "uid" to "user-1",
+            "items" to listOf(
+                mapOf(
+                    "productId" to "balgha",
+                    "name" to "Balgha cuir",
+                    "priceAtPurchase" to 65.0,
+                    "quantity" to 2,
+                    "thumbnailUrl" to "https://example.com/balgha.jpg"
+                )
+            ),
             "subtotal" to 130.0,
             "shippingFee" to 7.0,
             "total" to 137.0,
-            "deliveryType" to "standard",
             "paymentMethod" to "cash",
             "status" to "preparing",
-            "customerPhone" to "+21612345678",
-            "estimatedDeliveryDate" to createdAt + 86_400_000L,
             "createdAt" to createdAt,
             "updatedAt" to createdAt + 1_000L,
             "deliveryAddressSnapshot" to mapOf(
@@ -64,9 +70,11 @@ class AppOrderTest {
         val order = AppOrder.fromMap(map)
 
         assertEquals("order-2", order.id)
-        assertEquals("Ahmed Ben Salem", order.deliveryAddressSnapshot?.recipientName)
-        assertEquals("+21612345678", order.customerPhone)
-        assertEquals(2, order.statusTimeline.size)
+        assertEquals("user-1", order.uid)
+        assertEquals("Ahmed Ben Salem", order.shippingAddress?.recipientName)
+        assertEquals(1, order.items.size)
+        assertEquals("balgha", order.items.first().productId)
+        assertEquals(2, order.trackingEvents.size)
         assertEquals("preparing", order.status)
     }
 }

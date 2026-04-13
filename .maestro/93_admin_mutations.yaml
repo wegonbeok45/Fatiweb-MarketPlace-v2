@@ -1,0 +1,102 @@
+appId: isim.ia2y.myapplication
+tags:
+  - admin
+  - mutations
+---
+- launchApp
+- extendedWaitUntil:
+    visible:
+      id: "hostNavProfile"
+    timeout: 15000
+- tapOn:
+    id: "hostNavProfile"
+- extendedWaitUntil:
+    visible:
+      id: "cardLogout"
+    timeout: 10000
+- tapOn:
+    id: "cardLogout"
+- extendedWaitUntil:
+    visible:
+      id: "btnLogin"
+    timeout: 10000
+- tapOn:
+    id: "etEmail"
+- inputText: "${QA_ADMIN_EMAIL}"
+- hideKeyboard
+- tapOn:
+    id: "etPassword"
+- inputText: "${QA_ADMIN_PASSWORD}"
+- hideKeyboard
+- tapOn:
+    id: "btnLogin"
+- extendedWaitUntil:
+    visible:
+      id: "hostNavProfile"
+    timeout: 20000
+- tapOn:
+    id: "hostNavProfile"
+- extendedWaitUntil:
+    visible:
+      id: "cardAdmin"
+    timeout: 10000
+- tapOn:
+    id: "cardAdmin"
+- extendedWaitUntil:
+    visible:
+      id: "adminNavDashboard"
+    timeout: 15000
+- tapOn:
+    id: "adminNavProduits"
+- extendedWaitUntil:
+    visible:
+      id: "adminProduitsBtnAdd"
+    timeout: 15000
+- tapOn:
+    id: "adminProduitsBtnAdd"
+- extendedWaitUntil:
+    visible:
+      id: "adminProductEditorBtnAutofill"
+    timeout: 15000
+- tapOn:
+    id: "adminProductEditorBtnAutofill"
+- tapOn:
+    id: "adminProductEditorBtnSave"
+- extendedWaitUntil:
+    visible:
+      id: "adminProduitsBtnAdd"
+    timeout: 30000
+- extendedWaitUntil:
+    visible:
+      id: "adminProductBtnEdit"
+    timeout: 15000
+- tapOn:
+    id: "adminProductBtnEdit"
+- extendedWaitUntil:
+    visible:
+      id: "adminProductEditorBtnSave"
+    timeout: 15000
+- tapOn:
+    id: "adminProductEditorBtnSave"
+- extendedWaitUntil:
+    visible:
+      id: "adminProduitsBtnAdd"
+    timeout: 30000
+- tapOn:
+    id: "adminNavNotifications"
+- extendedWaitUntil:
+    visible:
+      id: "adminNotifEtTitle"
+    timeout: 15000
+- tapOn:
+    id: "adminNotifEtTitle"
+- inputText: "Codex QA Announcement"
+- tapOn:
+    id: "adminNotifEtMessage"
+- inputText: "This is a QA announcement from the admin flow."
+- hideKeyboard
+- tapOn:
+    id: "adminNotifBtnSend"
+- extendedWaitUntil:
+    visible: "Codex QA Announcement"
+    timeout: 30000

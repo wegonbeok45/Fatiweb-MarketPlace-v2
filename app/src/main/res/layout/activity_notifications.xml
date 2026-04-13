@@ -11,19 +11,20 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layoutTopBar"
         android:layout_width="0dp"
-        android:layout_height="@dimen/panier_toolbar_height"
-        android:layout_marginStart="@dimen/home_horizontal_padding"
-        android:layout_marginTop="@dimen/home_top_spacing"
-        android:layout_marginEnd="@dimen/home_horizontal_padding"
+        android:layout_height="@dimen/app_top_bar_height"
+        android:background="@color/home_nav_bg"
+        android:paddingStart="@dimen/app_top_bar_horizontal_padding"
+        android:paddingEnd="@dimen/app_top_bar_horizontal_padding"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
             android:id="@+id/ivBack"
-            android:layout_width="@dimen/panier_toolbar_icon_size"
-            android:layout_height="@dimen/panier_toolbar_icon_size"
+            android:layout_width="@dimen/app_top_bar_side_slot_size"
+            android:layout_height="@dimen/app_top_bar_side_slot_size"
             android:contentDescription="@string/notifications_back"
+            android:padding="@dimen/surface_button_inner_padding"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -32,10 +33,9 @@
 
         <TextView
             android:id="@+id/tvTitle"
-            style="@style/HomeText.SectionTitle"
-            android:layout_width="0dp"
+            style="@style/AppTopBar.Title"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center"
             android:text="@string/notifications_title"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -44,10 +44,12 @@
 
         <TextView
             android:id="@+id/tvClearAll"
-            style="@style/HomeText.SectionAction"
+            style="@style/AppTopBar.Action"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="@dimen/app_top_bar_side_slot_size"
+            android:minWidth="@dimen/app_top_bar_side_slot_size"
             android:text="@string/notifications_clear_all"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -67,7 +69,10 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:clipToPadding="false"
-        android:padding="16dp"
+        android:paddingStart="@dimen/space_16"
+        android:paddingTop="@dimen/space_12"
+        android:paddingEnd="@dimen/space_16"
+        android:paddingBottom="@dimen/space_24"
         android:overScrollMode="never"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -114,8 +119,19 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:gravity="center"
+            android:text="@string/notifications_empty_title"
+            android:textColor="@color/home_text_primary"
+            android:textSize="@dimen/text_size_subtitle"
+            android:fontFamily="@font/plus_jakarta_sans_bold" />
+
+        <TextView
+            android:id="@+id/tvNotificationsEmptySubtitle"
+            style="@style/HomeText.SearchHint"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_8"
+            android:gravity="center"
             android:text="@string/notifications_empty_state" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
-

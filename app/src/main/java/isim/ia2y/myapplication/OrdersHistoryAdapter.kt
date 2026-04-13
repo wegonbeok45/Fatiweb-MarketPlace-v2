@@ -29,9 +29,9 @@ class OrdersHistoryAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val order = getItem(position)
-        val itemsSummary = order.items.entries.take(2).joinToString(", ") { (id, qty) ->
-            val name = ProductCatalog.byId(id)?.title?.split(" ")?.firstOrNull() ?: id
-            "$name x$qty"
+        val itemsSummary = order.items.take(2).joinToString(", ") { item ->
+            val name = item.name.split(" ").firstOrNull() ?: item.productId
+            "$name x${item.quantity}"
         }.let { if (order.items.size > 2) "$it..." else it }
 
         holder.orderId.text = order.displayId
@@ -42,16 +42,18 @@ class OrdersHistoryAdapter(
         
         holder.thumbnailsLayout.removeAllViews()
         val inflater = LayoutInflater.from(holder.itemView.context)
-        order.items.keys.take(5).forEach { productId ->
-            val product = ProductCatalog.byId(productId)
+        order.items.take(4).forEach { item ->
             val thumbView = inflater.inflate(R.layout.item_checkout_thumbnail, holder.thumbnailsLayout, false)
             val image = thumbView.findViewById<android.widget.ImageView>(R.id.ivThumbnail)
-            image.setImageResource(product?.imageRes ?: R.drawable.placeholder)
+            val fallbackProduct = ProductCatalog.byId(item.productId)
+            image.loadCatalogImage(
+                item.thumbnailUrl.ifBlank { fallbackProduct?.imageUrl },
+                fallbackProduct?.imageRes ?: R.drawable.placeholder
+            )
             
-            // Re-use dimen for consistent small thumbnails
             val lp = thumbView.layoutParams
-            lp.width = (48 * holder.itemView.context.resources.displayMetrics.density).toInt()
-            lp.height = (48 * holder.itemView.context.resources.displayMetrics.density).toInt()
+            lp.width = (44 * holder.itemView.context.resources.displayMetrics.density).toInt()
+            lp.height = (44 * holder.itemView.context.resources.displayMetrics.density).toInt()
             thumbView.layoutParams = lp
             
             holder.thumbnailsLayout.addView(thumbView)

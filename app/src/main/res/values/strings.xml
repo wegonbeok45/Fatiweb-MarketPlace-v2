@@ -1,4 +1,4 @@
-<resources xmlns:tools="http://schemas.android.com/tools"
+﻿<resources xmlns:tools="http://schemas.android.com/tools"
     tools:ignore="MissingTranslation">
     <string name="app_name">FatiWeb Market</string>
     <string name="coming_soon">Bient&#244;t disponible</string>
@@ -31,14 +31,18 @@
     <string name="alert_dialog_confirmed">Alertes activ&#233;es</string>
     <string name="notifications_title">Notifications</string>
     <string name="notifications_back">Retour</string>
+    <string name="notifications_empty_title">Boite de notifications vide</string>
     <string name="notifications_empty_state">Aucune notification pour le moment.</string>
-    <string name="notifications_permission_denied_hint">Activez les notifications dans les param&#232;tres de l\'application.</string>
+    <string name="notifications_fallback_title">Notification FatiWeb</string>
+    <string name="notifications_fallback_message">Ouvrez l&#8217;application pour voir les derniers details.</string>
+    <string name="notifications_permission_denied_hint">Activez les notifications dans les param&#232;tres de l&#8217;application.</string>
     <string name="auth_dialog_title">S inscrire</string>
     <string name="auth_dialog_message">Choisissez une option pour continuer.</string>
     <string name="auth_dialog_create_account">Creer compte</string>
     <string name="auth_dialog_existing_client">Deja un client</string>
-    <string name="profile_signup_chip">S\'inscrire</string>
-    <string name="search_hint_products">Rechercher des cr&#233;ations et sp&#233;cialit&#233;s tunisiennes</string>
+    <string name="auth_verification_sent">Un e-mail de v&#233;rification a &#233;t&#233; envoy&#233; &#224; votre adresse.</string>
+    <string name="profile_signup_chip">S&#8217;inscrire</string>
+    <string name="search_hint_products">Rechercher des produits</string>
     <string name="product_added_to_favorites">%1$s ajoute aux favoris</string>
     <string name="product_removed_from_favorites">%1$s retire des favoris</string>
     <string name="product_added_to_cart">%1$s ajoute au panier</string>
@@ -54,7 +58,14 @@
     <string name="settings_title">Parametres</string>
     <string name="settings_back">Retour</string>
     <string name="settings_language_title">Langue</string>
-    <string name="settings_language_subtitle">Fran&#231;ais ou English</string>
+    <string name="settings_language_subtitle">Fran&#231;ais ou anglais</string>
+    <string name="settings_notifications_title">Notifications</string>
+    <string name="settings_notifications_subtitle">Consultez vos annonces et le suivi de vos commandes</string>
+    <string name="settings_support_title">Support</string>
+    <string name="settings_support_subtitle">WhatsApp et e-mail pour vous aider rapidement</string>
+    <string name="settings_about_title">&#192; propos</string>
+    <string name="settings_about_subtitle">Version de l application et informations FatiWeb</string>
+    <string name="settings_about_message">FatiWeb Market\nVersion %1$s\n\nMarketplace mobile d&#233;di&#233;e aux cr&#233;ations et produits tunisiens.</string>
     <string name="admin_title_dashboard">Tableau de bord</string>
     <string name="admin_title_orders">Commandes</string>
     <string name="admin_title_clients">Clients</string>
@@ -62,6 +73,7 @@
     <string name="admin_title_notifications">Notifications</string>
     <string name="admin_title_settings">Param&#232;tres</string>
     <string name="home_add_to_cart_short">Ajouter</string>
+    <string name="product_action_add_short">Ajouter</string>
     <string name="language_settings_title">Langue</string>
     <string name="language_option_french">Fran&#231;ais</string>
     <string name="language_option_english">English</string>
@@ -74,7 +86,7 @@
     <string name="auto_text_005">Rechercher des produits tunisiens</string>
     <string name="auto_text_006">Filtres</string>
     <string name="auto_text_007">Accueil</string>
-    <string name="auto_text_008">Explore</string>
+    <string name="auto_text_008">Explorer</string>
     <string name="auto_text_009">Panier</string>
     <string name="auto_text_010">Profil</string>
     <string name="auto_text_011">Nos Cat&#233;gories</string>
@@ -107,7 +119,7 @@
     <string name="auto_text_030">SECURE TUNISIAN GATEWAY</string>
     <string name="auto_text_031">Connexion</string>
     <string name="auto_text_032">Bienvenue sur FatiWeb</string>
-    <string name="auto_text_033">Le meilleur de l\'artisanat tunisien &#224; port&#233;e de main.</string>
+    <string name="auto_text_033">Le meilleur de l&#8217;artisanat tunisien &#224; port&#233;e de main.</string>
     <string name="auto_text_034">E-mail</string>
     <string name="auto_text_035">votre@email.com</string>
     <string name="auto_text_036">Mot de passe</string>
@@ -117,7 +129,7 @@
     <string name="auto_text_040">Google</string>
     <string name="auto_text_041">Facebook</string>
     <string name="auto_text_042">Pas encore de compte ?</string>
-    <string name="auto_text_043">S\'inscrire</string>
+    <string name="auto_text_043">S&#8217;inscrire</string>
     <string name="auto_text_044">Banni&#232;re promotion locale</string>
     <string name="auto_text_045">&#201;DITION LOCALE</string>
     <string name="auto_text_046">Atelier de Nabeul</string>
@@ -137,12 +149,12 @@
     <string name="auto_text_060">Laine pure, Artisanale</string>
     <string name="auto_text_061">45.000 DT</string>
     <string name="auto_text_062">Ajouter Ch&#233;chia Traditionnelle au panier</string>
-    <string name="auto_text_063">Produit Bijoux de l\'Argent</string>
-    <string name="auto_text_064">Favori Bijoux de l\'Argent</string>
-    <string name="auto_text_065">Bijoux de l\'Argent</string>
-    <string name="auto_text_066">Main d\'oeuvre Djerba</string>
+    <string name="auto_text_063">Produit Bijoux de l&#8217;Argent</string>
+    <string name="auto_text_064">Favori Bijoux de l&#8217;Argent</string>
+    <string name="auto_text_065">Bijoux de l&#8217;Argent</string>
+    <string name="auto_text_066">Main d&#8217;oeuvre Djerba</string>
     <string name="auto_text_067">120.000 DT</string>
-    <string name="auto_text_068">Ajouter Bijoux de l\'Argent au panier</string>
+    <string name="auto_text_068">Ajouter Bijoux de l&#8217;Argent au panier</string>
     <string name="auto_text_069">Produit Marqoum Kairouan</string>
     <string name="auto_text_070">Favori Marqoum Kairouan</string>
     <string name="auto_text_071">Marqoum Kairouan</string>
@@ -157,7 +169,7 @@
     <string name="auto_text_080">Ajouter Balgha Cuir au panier</string>
     <string name="auto_text_081">Passer</string>
     <string name="auto_text_082">Le meilleur de la Tunisie, s&#233;lectionn&#233; avec soin</string>
-    <string name="auto_text_083">Objets artisanaux, produits du terroir et pi&#232;ces de caract&#232;re r&#233;unis dans une exp&#233;rience d\'achat plus &#233;l&#233;gante et plus simple.</string>
+    <string name="auto_text_083">Objets artisanaux, produits du terroir et pi&#232;ces de caract&#232;re r&#233;unis dans une exp&#233;rience d&#8217;achat plus &#233;l&#233;gante et plus simple.</string>
     <string name="auto_text_084">Suivant &gt;</string>
     <string name="auto_text_085">Des collections pens&#233;es pour chaque envie</string>
     <string name="auto_text_086">Parcourez des univers inspir&#233;s par les r&#233;gions, les mati&#232;res et les savoir-faire tunisiens.</string>
@@ -166,7 +178,7 @@
     <string name="auto_text_089">Saveurs du terroir</string>
     <string name="auto_text_090">Cosmetiques</string>
     <string name="auto_text_091">Soin naturel et bio</string>
-    <string name="auto_text_092">L\'h&#233;ritage de nos artisans</string>
+    <string name="auto_text_092">L&#8217;h&#233;ritage de nos artisans</string>
     <string name="auto_text_093">Livraison suivie, paiement en confiance</string>
     <string name="auto_text_094">Recevez vos pi&#232;ces pr&#233;f&#233;r&#233;es chez vous avec un suivi clair, un paiement s&#233;curis&#233; et une confirmation imm&#233;diate.</string>
     <string name="auto_text_095">Commencer &gt;</string>
@@ -188,18 +200,18 @@
     <string name="auto_text_102">-</string>
     <string name="auto_text_103">+</string>
     <string name="auto_text_104">Creer un compte</string>
-    <string name="auto_text_105">Rejoignez la communaut&#233; de l\'artisanat.</string>
+    <string name="auto_text_105">Rejoignez la communaut&#233; de l&#8217;artisanat.</string>
     <string name="auto_text_106">Nom complet</string>
     <string name="auto_text_107">Ex: Ahmed Ben Salem</string>
     <string name="auto_text_108">********</string>
-    <string name="auto_text_109">Ou s\'inscrire avec</string>
+    <string name="auto_text_109">Ou s&#8217;inscrire avec</string>
     <string name="auto_text_110">Deja un compte ?</string>
     <string name="auto_text_111">Utilisateur invit&#233;</string>
     <string name="auto_text_112">Tunis, Tunisie</string>
     <string name="auto_text_113">Mes Commandes</string>
     <string name="auto_text_114">Historique et suivi en direct</string>
     <string name="auto_text_115">Adresses de livraison</string>
-    <string name="auto_text_116">G&#233;rer vos adresses d\'exp&#233;dition</string>
+    <string name="auto_text_116">G&#233;rer vos adresses d&#8217;exp&#233;dition</string>
     <string name="auto_text_117">Param&#232;tres</string>
     <string name="auto_text_118">Confidentialit&#233;, langue et alertes</string>
     <string name="auto_text_119">Aide &amp; Support</string>
@@ -212,7 +224,6 @@
     <string name="price_amount_bijoux">120.000</string>
     <string name="price_amount_marqoum">350.000</string>
     <string name="price_amount_balgha">65.000</string>
-    <string name="home_banner_secondary_title">Huile d\'olive</string>
     <string name="home_banner_secondary_subtitle">S&#233;lection premium du moulin</string>
     <string name="search_cancel">Annuler</string>
     <string name="tab_loading">Chargement...</string>
@@ -246,8 +257,15 @@
     <string name="search_category_fashion">Mode</string>
     <string name="search_category_beauty">Beaut&#233;</string>
     <string name="search_category_decor">D&#233;coration</string>
+    <string name="search_collection_eyebrow">Collection</string>
+    <string name="search_collection_title">%1$s FatiWeb</string>
+    <string name="search_collection_subtitle">Tous les produits de cette categorie, regroupes dans une vue claire et rapide a parcourir.</string>
+    <string name="search_hint_category_products">Rechercher dans %1$s</string>
     <string name="search_empty_title">Aucun produit trouv&#233;</string>
     <string name="search_empty_subtitle">Essayez un autre mot-cl&#233; ou affinez vos filtres.</string>
+    <string name="search_backend_error_title">Le catalogue est momentanement indisponible</string>
+    <string name="search_backend_error_subtitle">La recuperation des produits a echoue. Reessayez dans un instant.</string>
+    <string name="search_backend_error_toast">Impossible de charger plus de produits pour le moment.</string>
     <string name="search_browse_categories">Explorer les collections</string>
     <string name="explore_header_title">Collections</string>
     <string name="explore_header_subtitle">Des univers plus nets, plus inspires, plus premium</string>
@@ -263,18 +281,21 @@
     <string name="orders_history_empty">Aucune commande pour le moment.</string>
     <string name="orders_history_empty_subtitle">Vos prochaines commandes confirmees apparaitront ici avec leur suivi et leur etat de livraison.</string>
     <string name="orders_history_empty_action">Retourner a l accueil</string>
+    <string name="orders_history_guest_title">Suivez vos commandes apr&#232;s connexion</string>
+    <string name="orders_history_guest_subtitle">Connectez-vous pour retrouver votre historique, vos statuts et vos futures livraisons au m&#234;me endroit.</string>
+    <string name="orders_history_guest_action">Se connecter</string>
     <string name="addresses_title">Adresses de livraison</string>
-    <string name="address_current_label">Current address</string>
-    <string name="address_add_button">Add new address</string>
-    <string name="address_current_badge">Current</string>
-    <string name="address_set_current">Set as current</string>
-    <string name="address_add_title">Add address</string>
-    <string name="address_add_hint">Enter your new delivery address.</string>
-    <string name="address_add_input_hint">Example: Medina, Tunis</string>
-    <string name="address_add_confirm">Add</string>
-    <string name="address_add_validation">Please enter an address.</string>
+    <string name="address_current_label">Adresse actuelle</string>
+    <string name="address_add_button">Ajouter une adresse</string>
+    <string name="address_current_badge">Actuelle</string>
+    <string name="address_set_current">D&#233;finir par d&#233;faut</string>
+    <string name="address_add_title">Ajouter une adresse</string>
+    <string name="address_add_hint">Saisissez une nouvelle adresse de livraison.</string>
+    <string name="address_add_input_hint">Exemple : M&#233;dina, Tunis</string>
+    <string name="address_add_confirm">Ajouter</string>
+    <string name="address_add_validation">Veuillez saisir une adresse.</string>
     <string name="notification_welcome_title">Bienvenue sur FatiWeb !</string>
-    <string name="notification_welcome_msg">Merci d\'avoir rejoint notre communaut&#233;. D&#233;couvrez le meilleur de l\'artisanat tunisien authentique.</string>
+    <string name="notification_welcome_msg">Merci d&#8217;avoir rejoint notre communaut&#233;. D&#233;couvrez le meilleur de l&#8217;artisanat tunisien authentique.</string>
 
     <!-- 
       ========================================================================
@@ -295,8 +316,13 @@
     <string name="facebook_client_token">YOUR_FACEBOOK_CLIENT_TOKEN</string>
 
     <string name="google_web_client_id">1036840816071-nhcuumju7knmgufhnqu3fgv8lkqks96m.apps.googleusercontent.com</string>
+    <string name="common_see_all">Tout voir</string>
+    <string name="home_refresh_catalog">Rafraichir le catalogue</string>
+    <string name="home_section_categories">Nos categories</string>
+    <string name="home_section_featured">A la une</string>
     <string name="home_section_latest">Nouveautes</string>
     <string name="home_section_discover">A decouvrir</string>
+    <string name="home_shipping_standard">Livraison standard : 7 DT</string>
     <string name="home_section_empty">Aucun produit a afficher pour le moment.</string>
     <string name="favorites_empty_subtitle">Enregistrez vos coups de coeur pour les retrouver plus vite et les ajouter au panier au bon moment.</string>
     <string name="favorites_empty_action">Decouvrir des produits</string>
@@ -317,7 +343,7 @@
     <string name="admin_dashboard_low_stock_caption">A reapprovisionner</string>
     <string name="admin_dashboard_load_failed">Impossible de charger le tableau de bord pour le moment.</string>
     <string name="admin_product_editor_title_add">Ajouter un produit</string>
-    <string name="admin_product_editor_title_edit">Modifier le produit</string>
+    <string name="admin_product_editor_title_edit">Modifier %1$s</string>
     <string name="admin_product_editor_action_add">Ajouter le produit</string>
     <string name="admin_product_editor_action_save">Enregistrer</string>
     <string name="admin_product_editor_action_saving">Enregistrement...</string>
@@ -342,13 +368,23 @@
     <string name="admin_product_editor_error_subtitle">Ajoutez un sous-titre.</string>
     <string name="admin_product_editor_error_price">Entrez un prix valide.</string>
     <string name="admin_product_editor_error_stock">Entrez un stock valide.</string>
+    <string name="admin_product_editor_error_category">Choisissez une categorie.</string>
     <string name="admin_product_editor_error_origin">Precisez l origine.</string>
     <string name="admin_product_editor_error_description">Ajoutez une description plus complete.</string>
     <string name="admin_product_editor_error_highlights">Ajoutez au moins un point fort.</string>
     <string name="admin_product_editor_error_image">Ajoutez une photo avant de publier ce produit.</string>
+    <string name="admin_product_editor_fix_errors">Completez les champs signales pour continuer.</string>
     <string name="admin_product_editor_saved_new">Produit ajoute au catalogue.</string>
     <string name="admin_product_editor_saved_edit">Produit mis a jour.</string>
     <string name="admin_product_editor_save_failed">Impossible d enregistrer ce produit. %1$s</string>
+    <string name="admin_product_editor_save_failed_generic">Impossible d enregistrer ce produit pour le moment.</string>
+    <string name="admin_product_editor_save_failed_network">La connexion a &#233;chou&#233; pendant l enregistrement du produit.</string>
+    <string name="admin_product_editor_save_failed_permissions">Votre compte ne peut pas modifier ce produit.</string>
+    <string name="admin_product_editor_save_failed_image">L image n a pas pu &#234;tre envoy&#233;e. R&#233;essayez avec une autre connexion ou une autre image.</string>
+    <string name="admin_product_editor_discard_title">Quitter sans enregistrer ?</string>
+    <string name="admin_product_editor_discard_message">Vos modifications non enregistr&#233;es seront perdues.</string>
+    <string name="admin_product_editor_discard_keep">Continuer la modification</string>
+    <string name="admin_product_editor_discard_confirm">Quitter</string>
     <string name="admin_product_editor_image_upload_failed_fallback">Le produit sera enregistre sans la photo selectionnee. Vous pourrez la reessayer ensuite.</string>
     <string name="admin_announcements_title">Annonces</string>
     <string name="admin_announcements_compose_title">Publier une annonce</string>
@@ -362,20 +398,33 @@
     <string name="admin_announcements_publish_success">Annonce publiee dans l application.</string>
     <string name="admin_announcements_publish_error">Impossible d envoyer cette annonce.</string>
     <string name="admin_announcements_history_error">Impossible de charger l historique.</string>
+    <string name="admin_announcements_audience_label">Audience</string>
+    <string name="admin_announcements_audience_all">Tous les utilisateurs</string>
+    <string name="admin_announcements_audience_clients">Clients</string>
+    <string name="admin_announcements_audience_admins">Admins</string>
 
     <!-- Main navigation (labels + accessibility) -->
     <string name="nav_tab_home">Accueil</string>
-    <string name="nav_tab_explore">Catégories</string>
+    <string name="nav_tab_explore">Explorer</string>
     <string name="nav_tab_cart">Panier</string>
     <string name="nav_tab_profile">Profil</string>
     <string name="main_tab_load_failed">Impossible d ouvrir cet onglet. Reessayez.</string>
 
     <!-- Checkout -->
     <string name="checkout_add_address_first">Ajoutez une adresse de livraison avant de confirmer votre commande.</string>
+    <string name="checkout_login_required_title">Connectez-vous pour continuer</string>
+    <string name="checkout_login_required_message">Votre compte permet de sauvegarder l adresse, le suivi et l historique de commande.</string>
+    <string name="checkout_login_action">Se connecter</string>
+    <string name="checkout_address_required_title">Ajoutez une adresse de livraison</string>
+    <string name="checkout_address_action">Ajouter une adresse</string>
     <string name="checkout_address_placeholder">Ajoutez une adresse de livraison</string>
     <string name="checkout_cod_only">Le paiement a la livraison est actuellement le seul mode disponible.</string>
     <string name="checkout_cart_empty">Votre panier est vide.</string>
     <string name="profile_load_failed">Impossible de charger votre profil.</string>
+    <string name="profile_guest_hint">Connectez-vous pour synchroniser vos commandes, adresses et notifications.</string>
+    <string name="profile_email_verified">E-mail v&#233;rifi&#233;</string>
+    <string name="profile_email_unverified">V&#233;rification en attente</string>
+    <string name="profile_settings_title">Param&#232;tres du compte</string>
 
     <!-- Profile -->
     <string name="profile_edit_title">Modifier le profil</string>
@@ -395,19 +444,28 @@
     <string name="admin_order_update_failed">Erreur lors de la mise a jour.</string>
     <string name="admin_orders_load_failed">Impossible de charger les commandes.</string>
     <string name="admin_orders_empty">Aucune commande</string>
+    <string name="admin_orders_empty_filtered">Aucune commande ne correspond &#224; ce filtre.</string>
     <string name="admin_order_status_updated">Statut mis a jour</string>
     <string name="admin_order_status_update_failed">Impossible de mettre a jour le statut.</string>
     <string name="admin_dialog_cancel">Annuler</string>
+    <string name="admin_dialog_close">Fermer</string>
     <string name="admin_order_change_status_title">Changer le statut - %1$s</string>
+    <string name="admin_order_change_status_cta">Mettre &#224; jour le statut</string>
+    <string name="admin_order_detail_message">Statut : %1$s\nPaiement : %2$s\nArticles : %3$d\nTotal : %4$s\nClient : %5$s</string>
     <string name="admin_products_load_failed">Impossible de charger les produits.</string>
     <string name="admin_product_deleted">Produit supprime.</string>
     <string name="admin_product_delete_failed">Impossible de supprimer ce produit.</string>
-    <string name="admin_payments_online_hint">Les paiements en ligne seront actives avec le gateway final.</string>
+    <string name="admin_payments_online_hint">Les paiements en ligne seront activ&#233;s avec la passerelle finale.</string>
     <string name="admin_shipping_load_failed">Impossible de charger les frais de livraison.</string>
     <string name="admin_shipping_updated">Tarifs de livraison mis a jour.</string>
     <string name="admin_shipping_save_failed">Impossible d enregistrer les tarifs.</string>
     <string name="admin_invalid_price">Veuillez entrer un prix valide</string>
     <string name="admin_client_selected">Client : %1$s</string>
+    <string name="admin_client_unknown_date">Date inconnue</string>
+    <string name="admin_client_fallback_name">Client sans nom</string>
+    <string name="admin_client_fallback_email">Adresse e-mail indisponible</string>
+    <string name="admin_client_detail_message">E-mail : %1$s\nUID : %2$s\nCommandes : %3$d\nInscrit le : %4$s</string>
+    <string name="admin_client_contact">Contacter</string>
     <string name="admin_order_fallback_label">Commande</string>
 
     <!-- Order details -->
@@ -422,7 +480,18 @@
     <string name="order_help_title">Aide commande</string>
     <string name="order_help_message">Pour toute question sur votre commande :\n\nEmail: support@fatiweb.tn\nTelephone: +216 70 000 000\nDisponibilite : 09:00 - 18:00</string>
     <string name="order_details_total">Total : %1$s</string>
-    <string name="order_details_item_meta">Qt&#233; : %1$d &#8226; %2$s</string>
+    
+    <string name="order_details_item_qty">Qt&#233; : %1$d</string>
+    <string name="order_details_state_login_title">Connectez-vous pour voir cette commande</string>
+    <string name="order_details_state_login_action">Se connecter</string>
+    <string name="order_details_state_missing_title">Commande introuvable</string>
+    <string name="order_details_state_missing_action">Retour</string>
+    <string name="order_details_state_error_title">Chargement impossible</string>
+    <string name="order_details_state_error_action">Reessayer</string>
+    
+    <string name="order_details_support_cta">Aide pour cette commande</string>
+    <string name="order_details_eta_delivered">Commande livr&#233;e</string>
+    <string name="order_details_eta_cancelled">Commande annul&#233;e</string>
 
     <!-- Order status (short labels) -->
     <string name="order_status_pending">En attente</string>
@@ -446,27 +515,35 @@
     <string name="checkout_confirm_order">Confirmer la commande</string>
     <string name="checkout_processing">Traitement en cours...</string>
     <string name="checkout_order_failed">Impossible de passer la commande. Reessayez.</string>
-    <string name="checkout_step1_title">Details de la commande</string>
+    <string name="checkout_step1_title">Livraison</string>
     <string name="checkout_step1_continue">Continuer vers le paiement</string>
-    <string name="checkout_step2_title">Confirmation du paiement</string>
+    <string name="checkout_step2_title">Paiement</string>
     <string name="checkout_step3_title">Confirmation</string>
     <string name="checkout_pay_cod_title">Paiement a la livraison</string>
-    <string name="checkout_pay_cod_subtitle">Reglement en especes ou par cheque a la reception. Aucun paiement en ligne n\'est propose.</string>
+    <string name="checkout_pay_cod_subtitle">Reglement en especes ou par cheque a la reception. Aucun paiement en ligne n&#8217;est propose.</string>
     <string name="checkout_shipping_standard">Livraison standard</string>
     <string name="checkout_shipping_express">Livraison express</string>
     <string name="checkout_shipping_free">Gratuite</string>
 
     <!-- Admin hardcoded strings -->
     <string name="admin_products_load_error">Impossible de charger les produits.</string>
+    <string name="admin_products_empty_filtered">Aucun produit ne correspond &#224; cette recherche.</string>
+    <string name="admin_products_search_hint">Recherche catalogue</string>
+    <string name="admin_clients_search_hint">Rechercher un client par nom ou e-mail</string>
+    <string name="admin_orders_search_hint">Rechercher une commande ou un produit</string>
+    <string name="admin_filter_all">Tous</string>
+    <string name="admin_filter_low_stock">Stock faible</string>
+    <string name="admin_filter_inactive">Inactifs</string>
+    <string name="admin_filter_active">Actifs</string>
     <string name="admin_delete_product_title">Supprimer %1$s ?</string>
     <string name="admin_delete_product_message">Cette action retirera le produit du catalogue Firebase.</string>
     <string name="admin_delete_cancel">Annuler</string>
     <string name="admin_delete_confirm">Supprimer</string>
     <string name="admin_change_status_title">Changer le statut - %1$s</string>
     <string name="admin_status_pending">En attente</string>
-    <string name="admin_status_preparing">En preparation</string>
+    <string name="admin_status_preparing">En pr&#233;paration</string>
     <string name="admin_status_shipped">En livraison</string>
-    <string name="admin_status_delivered">Livre</string>
+    <string name="admin_status_delivered">Livr&#233;e</string>
     <string name="admin_no_clients">Aucun client inscrit</string>
     <string name="admin_clients_load_error">Impossible de charger les clients.</string>
     <string name="admin_delivery_price_title">Prix de livraison %1$s</string>
@@ -474,16 +551,20 @@
     <string name="admin_order_count">%1$d commandes</string>
 
     <!-- Address hardcoded strings -->
-    <string name="address_none_registered">Aucune adresse enregistree</string>
+    <string name="address_none_registered">Aucune adresse enregistr&#233;e</string>
     <string name="address_none">Aucune adresse</string>
     <string name="address_delete_title">Supprimer cette adresse ?</string>
     <string name="address_delete_cancel">Annuler</string>
     <string name="address_delete_confirm">Supprimer</string>
     <string name="address_dialog_add_title">Ajouter une adresse</string>
-    <string name="address_dialog_edit_title">Modifier l\'adresse</string>
+    <string name="address_dialog_edit_title">Modifier l&#8217;adresse</string>
     <string name="address_dialog_cancel">Annuler</string>
     <string name="address_dialog_add_action">Ajouter</string>
     <string name="address_dialog_save_action">Enregistrer</string>
+    <string name="address_title_fallback">Adresse</string>
+    <string name="address_details_missing">Aucun d&#233;tail suppl&#233;mentaire</string>
+    <string name="address_state_default">Par d&#233;faut</string>
+    <string name="address_state_secondary">Secondaire</string>
     <string name="address_no_details">Aucun detail supplementaire</string>
 
     <!-- Delivery validation strings -->
@@ -501,6 +582,7 @@
     <string name="auth_error_recent_login">Reconnectez-vous avant de modifier ce profil.</string>
     <string name="auth_error_too_many_requests">Trop de tentatives. Reessayez dans quelques instants.</string>
     <string name="auth_error_network">Erreur reseau. Verifiez votre connexion.</string>
+    <string name="auth_error_timeout">La connexion prend trop de temps. Reessayez dans un instant.</string>
     <string name="auth_error_wrong_password">Mot de passe incorrect.</string>
     <string name="auth_error_invalid_email">Adresse e-mail invalide.</string>
     <string name="auth_error_weak_password">Le mot de passe doit contenir au moins 6 caracteres.</string>
@@ -527,17 +609,17 @@
     <string name="auto_en_cours_7202">En cours</string>
     <string name="auto_fw8820_8c8f">#FW-8820</string>
     <string name="auto_sara_mansour_781c">Sara Mansour</string>
-    <string name="auto_livre_8f9d">LivrÃ©e</string>
+    <string name="auto_livre_8f9d">Livr&#233;e</string>
     <string name="auto_fw8819_072c">#FW-8819</string>
     <string name="auto_mohamed_aziz_e11a">Mohamed Aziz</string>
     <string name="auto_fw8818_8f31">#FW-8818</string>
     <string name="auto_linda_gharbi_de2a">Linda Gharbi</string>
-    <string name="auto_annule_07b6">AnnulÃ©e</string>
+    <string name="auto_annule_07b6">Annul&#233;e</string>
     <string name="auto_tableau_de_bord_6985">Tableau de Bord</string>
     <string name="auto_bienvenue_b961">Bienvenue,</string>
     <string name="auto_administrateur_a67d">Administrateur</string>
-    <string name="auto_fatiweb_market_panneau_admin_07bf">FatiWeb Market · Panneau Admin</string>
-    <string name="auto_vue_densemble_2aad">Vue d\'ensemble</string>
+    <string name="auto_fatiweb_market_panneau_admin_07bf">FatiWeb Market Â· Panneau Admin</string>
+    <string name="auto_vue_densemble_2aad">Vue d&#8217;ensemble</string>
     <string name="auto_commandes_66c3">Commandes</string>
     <string name="auto_ca_dt_4d00">CA (DT)</string>
     <string name="auto_nv_clients_bdbc">Nv. clients</string>
@@ -568,7 +650,7 @@
     <string name="auto_edinar_92ac">E-Dinar</string>
     <string name="auto_cash_a_la_livraison_2636">Cash a la livraison</string>
     <string name="auto_gestion_des_produits_551d">Gestion des produits</string>
-    <string name="auto_catalog_control_a428">Catalog control</string>
+    <string name="auto_catalog_control_a428">Gestion du catalogue</string>
     <string name="auto_catalogue_connecte_a_firebase_137f">Catalogue connecte a Firebase</string>
     <string name="auto_ajoutez_modifiez_desactivez_ou_855e">Ajoutez, modifiez, desactivez ou supprimez des produits dans une surface admin plus nette et plus credible.</string>
     <string name="auto_produits_actifs_4560">Produits actifs</string>
@@ -615,7 +697,7 @@
     <string name="auto_total_pay233_0e5e">Total pay&#233;</string>
     <string name="auto_0000_dt_e668">0.000 DT</string>
     <string name="auto_suivre_ma_commande_7473">Suivre ma commande</string>
-    <string name="auto_retour_224_laccueil_f63e">Retour &#224; l\'accueil</string>
+    <string name="auto_retour_224_laccueil_f63e">Retour &#224; l&#8217;accueil</string>
     <string name="auto_continuer_vers_le_paiement_361d">Continuer vers le paiement</string>
     <string name="auto_livraison_standard_c598">Livraison standard</string>
     <string name="auto_total_192_payer_2c61">Total &#224; payer</string>
@@ -633,7 +715,7 @@
     <string name="auto_dtail_de_la_commande_d45e">D&#233;tail de la commande</string>
     <string name="auto_articles_7978">Articles</string>
     <string name="auto_suivi_c749">Suivi</string>
-    <string name="auto_besoin_daide_pour_cette_058e">Besoin d\'aide pour cette commande ?</string>
+    <string name="auto_besoin_daide_pour_cette_058e">Besoin d&#8217;aide pour cette commande ?</string>
     <string name="auto_start_shopping_d5ce">Start Shopping</string>
     <string name="auto_back_0557">Back</string>
     <string name="auto_details_3ec3">Details</string>
@@ -682,14 +764,14 @@
     <string name="auto_gouvernorat_9478">Gouvernorat</string>
     <string name="auto_ville_92e2">Ville</string>
     <string name="auto_adresse_principale_896f">Adresse principale</string>
-    <string name="auto_complment_dadresse_optionnel_9ca7">Compl&#233;ment d\'adresse (optionnel)</string>
+    <string name="auto_complment_dadresse_optionnel_9ca7">Compl&#233;ment d&#8217;adresse (optionnel)</string>
     <string name="auto_code_postal_optionnel_7e3a">Code postal (optionnel)</string>
     <string name="auto_instructions_de_livraison_optionnel_009f">Instructions de livraison (optionnel)</string>
     <string name="auto_dfinir_comme_adresse_par_8e8d">D&#233;finir comme adresse par d&#233;faut</string>
     <string name="auto_search_unique_products_3648">Search unique products...</string>
     <string name="auto_editorial_56d0">&#201;ditorial</string>
     <string name="auto_the_maker_movement_e7c5">The Maker Movement</string>
-    <string name="auto_discover_the_stories_behind_0aa6">Discover the stories behind Tunisia\'s most talented artisans and their timeless creations.</string>
+    <string name="auto_discover_the_stories_behind_0aa6">Discover the stories behind Tunisia&#8217;s most talented artisans and their timeless creations.</string>
     <string name="auto_browse_categories_7039">Browse Categories</string>
     <string name="auto_artisanat_6d19">Artisanat</string>
     <string name="auto_master_crafts_368b">Master crafts</string>
@@ -709,13 +791,13 @@
     <string name="auto_huiles_3b0b">Huiles</string>
     <string name="auto_natural_oils_17f4">Natural Oils</string>
     <string name="auto_fatiweb_a4a8">FatiWeb</string>
-    <string name="auto_search_products_makers_or_3406">Search products, makers, or categories</string>
-    <string name="auto_editors_pick_caf1">Editor\'s pick</string>
+    <string name="auto_search_products_makers_or_3406">Search in FatiWeb</string>
+    <string name="auto_editors_pick_caf1">Editor&#8217;s pick</string>
     <string name="auto_a_more_premium_way_75b9">A more premium way to shop Tunisian craft.</string>
     <string name="auto_better_discovery_cleaner_checkout_4083">Better discovery, cleaner checkout, and curated products.</string>
     <string name="auto_premium_browsing_6dc6">Premium browsing.</string>
     <string name="auto_350_curated_items_87fa">350+ curated items</string>
-    <string name="auto_from_tunisias_finest_makers_352e">From Tunisia\'s finest makers.</string>
+    <string name="auto_from_tunisias_finest_makers_352e">From Tunisia&#8217;s finest makers.</string>
     <string name="auto_trusted_c040">Trusted</string>
     <string name="auto_categories_af1b">Categories</string>
     <string name="auto_see_all_453d">See all</string>
@@ -745,16 +827,17 @@
     <string name="auto_000_dt_6f0d">0,00 DT</string>
     <string name="auto_welcome_to_fatiweb_b4d1">Welcome to FatiWeb!</string>
     <string name="auto_discover_the_best_of_887b">Discover the best of Tunisian artisanat...</string>
-    <string name="auto_just_now_5803">Just now</string>
+    <string name="auto_just_now_5803">A l instant</string>
     <string name="auto_livrees_e8f0">Livr&#233;es</string>
     <string name="auto_commandes_recentes_5821">Commandes r&#233;centes</string>
 
     <!-- Accessibility content descriptions -->
-    <string name="cd_back">Back</string>
+    <string name="cd_back">Retour</string>
     <string name="cd_close">Fermer</string>
     <string name="cd_settings">Param&#232;tres</string>
     <string name="cd_notifications">Notifications</string>
     <string name="cd_search">Rechercher</string>
+    <string name="cd_language">Langue</string>
     <string name="cd_filter">Filtrer</string>
     <string name="cd_sort">Trier</string>
     <string name="cd_favorite">Ajouter aux favoris</string>
@@ -771,6 +854,47 @@
     <string name="cd_nav_cart">Panier</string>
     <string name="cd_nav_profile">Profil</string>
     <string name="cd_nav_favorites">Favoris</string>
+    <string name="home_banner_primary_chip">Selection de la semaine</string>
+    <string name="home_banner_primary_title">Une vitrine plus soignee pour vos plus belles trouvailles</string>
+    <string name="home_banner_primary_subtitle">Collections mieux agencees, recherche plus nette et passage en caisse plus rassurant.</string>
+    <string name="home_banner_secondary_title">Livraison suivie et achats sereins</string>
+    <string name="home_feature_count">350 articles choisis avec soin</string>
+    <string name="home_feature_subtitle">Des createurs tunisiens presentes avec plus de clarte, de contexte et de confiance.</string>
+    <string name="home_trusted_label">Fiable</string>
+    <string name="chat_title">FatiBot</string>
+    <string name="chat_status_online">Assistant FatiWeb &#8226; En ligne</string>
+    <string name="chat_status_typing">FatiBot ecrit...</string>
+    <string name="chat_disclaimer_title">Conseils rapides, pas support officiel</string>
+    <string name="chat_disclaimer_body">FatiBot peut aider pour le catalogue, les commandes et la livraison, mais il ne remplace pas le support client pour les cas sensibles.</string>
+    <string name="chat_empty_title">Posez votre premiere question</string>
+    <string name="chat_empty_subtitle">Produits, commandes, livraison : FatiBot peut vous orienter rapidement.</string>
+    <string name="chat_hint">Ecrivez un message...</string>
+    <string name="chat_retry">Reessayer</string>
+    <string name="chat_send">Envoyer</string>
+    <string name="chat_suggestion_products">Produits</string>
+    <string name="chat_suggestion_orders">Commandes</string>
+    <string name="chat_suggestion_delivery">Livraison</string>
+    <string name="chat_prompt_products">Quels produits sont les plus populaires en ce moment ?</string>
+    <string name="chat_prompt_orders">Comment suivre ma commande ?</string>
+    <string name="chat_prompt_delivery">Quels sont les delais de livraison ?</string>
+    <string name="chat_error_rate_limit">Vous envoyez des messages trop rapidement. Attendez quelques secondes.</string>
+    <string name="chat_error_safety">Votre message ne peut pas etre traite tel quel. Reformulez-le s il vous plait.</string>
+    <string name="chat_error_bad_request">La demande n a pas pu etre comprise. Essayez avec une formulation plus simple.</string>
+    <string name="chat_error_auth">Le service de chat n est pas disponible pour le moment.</string>
+    <string name="chat_error_quota">Le service de chat est momentanement sature. Reessayez un peu plus tard.</string>
+    <string name="chat_error_network">Connexion instable. Verifiez votre reseau puis reessayez.</string>
+    <string name="chat_welcome_message">Bonjour. Je suis FatiBot, votre assistant FatiWeb Market.\n\nJe peux vous aider a trouver un produit, comprendre une commande ou repondre a vos questions sur la livraison.</string>
+    <string name="admin_dashboard_chip_sync">Donnees en direct</string>
+    <string name="admin_dashboard_chip_inventory">%1$d produits actifs</string>
+    <string name="admin_dashboard_chip_attention">%1$d a surveiller</string>
+    <string name="admin_dashboard_orders_meta">%1$d commandes en attente</string>
+    <string name="admin_dashboard_revenue_meta">Panier moyen %1$s</string>
+    <string name="admin_dashboard_clients_meta">%1$d comptes clients</string>
+    <string name="admin_dashboard_stock_meta">%1$d references inactives</string>
+    <string name="admin_dashboard_recent_order_subtitle">%1$s &#8226; %2$s</string>
+    <string name="admin_dashboard_quick_add_subtitle">Catalogue</string>
+    <string name="admin_dashboard_quick_orders_subtitle">Suivi</string>
+    <string name="admin_dashboard_quick_settings_subtitle">Configuration</string>
     <string name="cd_checkout_step">&#201;tape de commande</string>
     <string name="cd_logo">Logo</string>
     <string name="cd_location">Localisation</string>
@@ -791,18 +915,109 @@
     <string name="cd_admin_notifications">Notifications admin</string>
     <string name="cd_stat_icon">Ic&#244;ne statistique</string>
     <string name="cd_chevron">Voir plus</string>
-    <string name="cd_onboarding_image">Image d\'introduction</string>
-    <string name="address_empty_title">No Addresses Found</string>
-    <string name="address_empty_subtitle">Add a new delivery address below</string>
-    <string name="notifications_clear_all">Clear All</string>
+    <string name="cd_onboarding_image">Image d&#8217;introduction</string>
+    <string name="address_empty_title">Aucune adresse enregistr&#233;e</string>
+    <string name="address_empty_subtitle">Ajoutez une adresse de livraison pour acc&#233;l&#233;rer vos prochaines commandes.</string>
+    <string name="support_whatsapp_number">21620000000</string>
+    <string name="support_email">support@fatiweb.tn</string>
+    <string name="support_whatsapp_label">Support WhatsApp</string>
+    <string name="support_email_label">Support e-mail</string>
+    <string name="profile_avatar_uploading">Mise a jour de la photo...</string>
+    <string name="profile_avatar_updated">Photo de profil mise a jour.</string>
+    <string name="profile_avatar_update_failed">Impossible de mettre a jour la photo de profil.</string>
+    
+    <string name="notifications_clear_all">Tout lire</string>
+    <string name="notifications_load_error">Impossible de charger vos notifications.</string>
+    <string name="home_catalog_error">Le catalogue ne peut pas etre charge pour le moment. Reessayez.</string>
+    <string name="admin_product_editor_action_autofill">Pr&#233;remplir</string>
+    <string name="admin_product_editor_autofill_done">Champs remplis automatiquement.</string>
+    <string name="generated_product_art_caption">Visuel de secours genere automatiquement</string>
+    <string name="notification_preferences_title">Preferences de notification</string>
+    <string name="notification_preferences_badge">Controle</string>
+    <string name="notification_preferences_heading">Choisissez les alertes qui comptent vraiment</string>
+    <string name="notification_preferences_summary_muted">Les notifications sont coupees sur cet appareil.</string>
+    <string name="notification_preferences_summary_active">%1$d categories actives sur cet appareil.</string>
+    <string name="notification_preferences_push_title">Notifications sur cet appareil</string>
+    <string name="notification_preferences_push_subtitle">Coupez tout si vous voulez une experience plus silencieuse.</string>
+    <string name="notification_preferences_orders_title">Suivi de commandes</string>
+    <string name="notification_preferences_orders_subtitle">Confirmation, preparation, expedition et livraison.</string>
+    <string name="notification_preferences_promotions_title">Promotions et nouveautes</string>
+    <string name="notification_preferences_promotions_subtitle">Offres, collections saisonnieres et coups de coeur.</string>
+    <string name="notification_preferences_announcements_title">Annonces FatiWeb</string>
+    <string name="notification_preferences_announcements_subtitle">Infos importantes sur le service et le catalogue.</string>
+    <string name="notification_preferences_open_inbox">Ouvrir ma boite de notifications</string>
+    <string name="search_saved_title">Recherches enregistrees</string>
+    <string name="search_saved_empty">Enregistrez une recherche utile pour la relancer en un geste.</string>
+    <string name="search_loading_results">Chargement des r&#233;sultats...</string>
+    <string name="search_save_action">Enregistrer</string>
+    <string name="search_save_dialog_title">Enregistrer cette recherche</string>
+    <string name="search_save_dialog_hint">Nom de la recherche</string>
+    <string name="search_save_confirm">Sauvegarder</string>
+    <string name="search_saved_added">Recherche enregistree.</string>
+    <string name="search_saved_removed">Recherche supprimee.</string>
+    <string name="search_saved_title_template">%1$s personnalise</string>
+    <string name="profile_account_center_title">Centre de compte</string>
+    <string name="profile_account_center_message">Email : %1$s\nStatut : %2$s\nRole : %3$s\nTelephone principal : %4$s\nMembre depuis : %5$s</string>
+    <string name="profile_account_verify_action">Renvoyer le mail</string>
+    <string name="profile_account_verify_sent">Email de verification renvoye.</string>
+    <string name="profile_account_addresses_action">Voir mes adresses</string>
+    <string name="profile_account_phone_missing">Aucun numero principal</string>
+    <string name="profile_account_email_missing">Email indisponible</string>
+    <string name="profile_account_member_unknown">Date inconnue</string>
+    <string name="profile_privacy_title">Confidentialite</string>
+    <string name="profile_privacy_message">Vos informations de compte restent liees a votre profil Firebase. Vous pouvez gerer vos notifications, consulter vos adresses et demander de l aide sans exposer publiquement vos donnees.</string>
+    <string name="profile_privacy_settings_action">Ouvrir les reglages</string>
+    <string name="profile_account_hint_format">%1$s &#8226; %2$s</string>
+    
+    <string name="orders_history_load_error">Impossible de charger vos commandes.</string>
+    <string name="admin_announcements_status_idle">Publiez une annonce pour informer vos utilisateurs.</string>
+    <string name="admin_announcements_status_progress">Publication en cours...</string>
+    <string name="admin_announcements_status_success">Annonce publi&#233;e et historique actualis&#233;.</string>
+    <string name="admin_announcements_status_error">&#201;chec de publication. R&#233;essayez dans un instant.</string>
+    <string name="profile_location_fallback">Tunis, Tunisie</string>
+    <string name="profile_admin_dashboard_action">Ouvrir l espace admin</string>
+    <string name="admin_product_editor_save_failed_security">La verification de securite Firebase a refuse cette action. Enregistrez le jeton App Check de debogage ou testez sur un build de production.</string>
+    <string name="admin_products_title">Gestion des produits</string>
+    <string name="admin_products_chip">Pilotage catalogue</string>
+    <string name="admin_products_hero_title">Catalogue synchronise et pret pour les clients.</string>
+    <string name="admin_products_hero_subtitle">Ajoutez, modifiez, masquez ou reapprovisionnez les fiches produit avec une mise a jour directe du catalogue utilisateur.</string>
+    <string name="admin_products_active_label">Produits actifs</string>
+    <string name="admin_products_low_stock_label">Stock faible</string>
+    <string name="admin_products_add_action">Ajouter un produit</string>
+    <string name="admin_dashboard_welcome">Bienvenue</string>
+    <string name="admin_dashboard_admin_label">Administrateur</string>
+    <string name="admin_dashboard_subtitle">Supervisez le catalogue, les commandes et les clients depuis un seul espace.</string>
+    <string name="admin_dashboard_overview_title">Vue d ensemble</string>
+    <string name="admin_dashboard_orders_label">Commandes</string>
+    <string name="admin_dashboard_revenue_label">Chiffre d affaires</string>
+    <string name="admin_dashboard_customers_label">Clients</string>
+    <string name="admin_dashboard_low_stock_label">Stock faible</string>
+    <string name="admin_dashboard_quick_actions_title">Actions rapides</string>
+    <string name="admin_dashboard_add_product_action">Ajouter produit</string>
+    <string name="admin_dashboard_view_orders_action">Voir commandes</string>
+    <string name="admin_dashboard_settings_action">Parametres</string>
+    <string name="admin_dashboard_recent_orders_title">Dernieres commandes</string>
+    <string name="admin_clients_total_label">Total clients</string>
+    <string name="admin_clients_new_label">Nouveaux</string>
+    <string name="admin_clients_list_title">Liste des clients</string>
+    <string name="admin_orders_total_label">Total</string>
+    <string name="admin_orders_pending_label">En attente</string>
+    <string name="admin_orders_delivered_label">Livrees</string>
+    <string name="admin_orders_recent_title">Commandes recentes</string>
+    <string name="admin_settings_hero_subtitle">Configuration de la boutique, livraison et outils d exploitation.</string>
+    <string name="admin_settings_delivery_title">Methodes de livraison</string>
+    <string name="admin_settings_shipping_standard">Standard</string>
+    <string name="admin_settings_shipping_express">Express</string>
+    <string name="admin_settings_payments_title">Modes de paiement</string>
+    <string name="admin_settings_payment_card">Carte bancaire</string>
+    <string name="admin_settings_payment_edinar">e-Dinar</string>
+    <string name="admin_settings_payment_cod">Paiement a la livraison</string>
+    <string name="admin_settings_debug_seed">Synchroniser le catalogue test</string>
+    <string name="admin_settings_debug_seed_running">Synchronisation en cours...</string>
+    <string name="admin_settings_debug_seed_progress">Synchronisation : %1$d / %2$d</string>
+    <string name="admin_settings_debug_seed_done">Catalogue test synchronise</string>
+    <string name="admin_settings_debug_seed_success">Le catalogue test a ete mis a jour.</string>
+    <string name="admin_settings_debug_seed_failed">Echec de synchronisation : %1$s</string>
+    <string name="admin_settings_debug_seed_helper">Disponible uniquement dans les builds de debogage.</string>
 </resources>
-
-
-
-
-
-
-
-
-
 

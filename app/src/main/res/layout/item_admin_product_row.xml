@@ -3,20 +3,19 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:minHeight="108dp"
-    android:paddingStart="18dp"
-    android:paddingTop="16dp"
-    android:paddingEnd="18dp"
-    android:paddingBottom="16dp">
+    android:minHeight="104dp"
+    android:paddingStart="14dp"
+    android:paddingTop="14dp"
+    android:paddingEnd="14dp"
+    android:paddingBottom="14dp">
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/adminProductThumb"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
         app:cardBackgroundColor="@color/profile_card_icon_bg"
-        app:cardCornerRadius="18dp"
+        app:cardCornerRadius="@dimen/corner_radius_medium"
         app:cardElevation="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:strokeWidth="0dp">
@@ -29,51 +28,6 @@
             android:scaleType="centerCrop" />
     </com.google.android.material.card.MaterialCardView>
 
-    <TextView
-        android:id="@+id/adminProductTitle"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:ellipsize="end"
-        android:maxLines="2"
-        android:textColor="@color/profile_text_primary"
-        android:fontFamily="@font/plus_jakarta_sans_bold"
-        android:textSize="@dimen/text_size_body"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toStartOf="@id/adminProductActions"
-        app:layout_constraintStart_toEndOf="@id/adminProductThumb"
-        app:layout_constraintTop_toTopOf="@id/adminProductThumb" />
-
-    <TextView
-        android:id="@+id/adminProductPrice"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:layout_marginTop="4dp"
-        android:ellipsize="end"
-        android:maxLines="1"
-        android:textColor="?attr/colorPrimary"
-        android:fontFamily="@font/plus_jakarta_sans_bold"
-        android:textSize="@dimen/text_size_body"
-        app:layout_constraintEnd_toStartOf="@id/adminProductActions"
-        app:layout_constraintStart_toEndOf="@id/adminProductThumb"
-        app:layout_constraintTop_toBottomOf="@id/adminProductTitle" />
-
-    <TextView
-        android:id="@+id/adminProductSubtitle"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:layout_marginTop="6dp"
-        android:ellipsize="end"
-        android:maxLines="2"
-        android:textColor="@color/profile_text_secondary"
-        android:fontFamily="@font/plus_jakarta_sans_regular"
-        android:textSize="@dimen/text_size_overline"
-        app:layout_constraintEnd_toStartOf="@id/adminProductActions"
-        app:layout_constraintStart_toEndOf="@id/adminProductThumb"
-        app:layout_constraintTop_toBottomOf="@id/adminProductPrice" />
-
     <LinearLayout
         android:id="@+id/adminProductActions"
         android:layout_width="wrap_content"
@@ -81,25 +35,25 @@
         android:layout_marginStart="12dp"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        app:layout_constraintTop_toTopOf="@id/adminProductThumb"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="@id/adminProductThumb">
+        app:layout_constraintTop_toTopOf="parent">
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/adminProductBtnEdit"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
+            android:layout_width="@dimen/surface_button_size"
+            android:layout_height="@dimen/surface_button_size"
             android:clickable="true"
+            android:contentDescription="@string/cd_edit"
             android:focusable="true"
             android:foreground="?attr/selectableItemBackgroundBorderless"
             app:cardBackgroundColor="@color/profile_card_icon_bg"
-            app:cardCornerRadius="18dp"
+            app:cardCornerRadius="@dimen/surface_button_corner_radius"
             app:cardElevation="0dp">
 
             <ImageView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:contentDescription="@string/cd_product_image"
+                android:contentDescription="@string/cd_edit"
                 android:padding="10dp"
                 app:srcCompat="@drawable/ic_admin_edit"
                 app:tint="@color/profile_text_primary" />
@@ -107,47 +61,92 @@
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/adminProductBtnDelete"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
+            android:layout_width="@dimen/surface_button_size"
+            android:layout_height="@dimen/surface_button_size"
             android:layout_marginStart="10dp"
             android:clickable="true"
+            android:contentDescription="@string/cd_delete"
             android:focusable="true"
             android:foreground="?attr/selectableItemBackgroundBorderless"
             app:cardBackgroundColor="@color/profile_logout_bg"
-            app:cardCornerRadius="18dp"
+            app:cardCornerRadius="@dimen/surface_button_corner_radius"
             app:cardElevation="0dp">
 
             <ImageView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:contentDescription="@string/cd_product_image"
+                android:contentDescription="@string/cd_delete"
                 android:padding="10dp"
                 app:srcCompat="@drawable/ic_panier_delete"
                 app:tint="?attr/colorError" />
         </com.google.android.material.card.MaterialCardView>
     </LinearLayout>
 
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/adminProductStateChip"
-        android:layout_width="wrap_content"
-        android:layout_height="30dp"
+    <LinearLayout
+        android:id="@+id/adminProductContent"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
-        app:cardCornerRadius="15dp"
-        app:cardElevation="0dp"
-        app:layout_constraintBottom_toBottomOf="@id/adminProductThumb"
+        android:layout_marginEnd="12dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/adminProductActions"
         app:layout_constraintStart_toEndOf="@id/adminProductThumb"
-        app:strokeWidth="0dp">
+        app:layout_constraintTop_toTopOf="parent">
 
         <TextView
-            android:id="@+id/adminProductStateText"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:paddingStart="10dp"
-            android:paddingEnd="10dp"
-            android:textColor="@android:color/white"
+            android:id="@+id/adminProductTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:textColor="@color/profile_text_primary"
             android:fontFamily="@font/plus_jakarta_sans_bold"
+            android:textSize="@dimen/text_size_caption"
+            android:textStyle="bold" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/adminProductStateChip"
+            android:layout_width="wrap_content"
+            android:layout_height="24dp"
+            android:layout_marginTop="6dp"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="0dp">
+
+            <TextView
+                android:id="@+id/adminProductStateText"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:textColor="@android:color/white"
+                android:fontFamily="@font/plus_jakarta_sans_bold"
+                android:textSize="@dimen/text_size_overline" />
+        </com.google.android.material.card.MaterialCardView>
+
+        <TextView
+            android:id="@+id/adminProductPrice"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="?attr/colorPrimary"
+            android:fontFamily="@font/plus_jakarta_sans_bold"
+            android:textSize="@dimen/text_size_caption" />
+
+        <TextView
+            android:id="@+id/adminProductSubtitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="@color/profile_text_secondary"
+            android:fontFamily="@font/plus_jakarta_sans_regular"
             android:textSize="@dimen/text_size_overline" />
-    </com.google.android.material.card.MaterialCardView>
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -2,7 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/profile_bottom_nav_height_exact"
+    android:layout_height="@dimen/main_bottom_nav_height"
     android:background="@color/profile_nav_bg">
 
     <LinearLayout
@@ -175,4 +175,3 @@
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
-

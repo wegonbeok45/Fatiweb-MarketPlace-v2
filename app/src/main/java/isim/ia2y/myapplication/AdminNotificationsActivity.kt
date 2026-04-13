@@ -2,17 +2,19 @@ package isim.ia2y.myapplication
 
 import android.os.Bundle
 import android.view.View
+import android.widget.AutoCompleteTextView
 import android.widget.EditText
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.launch
 
 class AdminNotificationsActivity : AppCompatActivity() {
+    private data class AudienceOption(val key: String, val label: String)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,20 +49,40 @@ class AdminNotificationsActivity : AppCompatActivity() {
     private fun setupComposer() {
         val titleInput = findViewById<EditText?>(R.id.adminNotifEtTitle) ?: return
         val messageInput = findViewById<EditText?>(R.id.adminNotifEtMessage) ?: return
+        val audienceInput = findViewById<AutoCompleteTextView?>(R.id.adminNotifAudienceInput) ?: return
         val sendButton =
             findViewById<com.google.android.material.button.MaterialButton?>(R.id.adminNotifBtnSend)
                 ?: return
+        val statusText = findViewById<android.widget.TextView?>(R.id.adminNotifComposerStatus)
+        val audienceOptions = listOf(
+            AudienceOption("all", getString(R.string.admin_announcements_audience_all)),
+            AudienceOption("clients", getString(R.string.admin_announcements_audience_clients)),
+            AudienceOption("admins", getString(R.string.admin_announcements_audience_admins))
+        )
+        audienceInput.setAdapter(
+            android.widget.ArrayAdapter(
+                this,
+                android.R.layout.simple_list_item_1,
+                audienceOptions.map { it.label }
+            )
+        )
+        audienceInput.setText(audienceOptions.first().label, false)
+        audienceInput.setOnClickListener { audienceInput.showDropDown() }
 
         titleInput.isEnabled = true
         messageInput.isEnabled = true
         sendButton.isEnabled = true
         sendButton.alpha = 1f
         sendButton.text = getString(R.string.admin_announcements_publish)
+        statusText?.text = getString(R.string.admin_announcements_status_idle)
 
         sendButton.setOnClickListener {
             val uid = FirebaseAuthManager.currentUser?.uid ?: return@setOnClickListener
             val title = titleInput.text?.toString().orEmpty().trim()
             val message = messageInput.text?.toString().orEmpty().trim()
+            val audience = audienceOptions.firstOrNull {
+                it.label == audienceInput.text?.toString().orEmpty().trim()
+            }?.key ?: "all"
             if (title.length < 3 || message.length < 5) {
                 showMotionSnackbar(getString(R.string.admin_announcements_validation))
                 return@setOnClickListener
@@ -68,20 +90,30 @@ class AdminNotificationsActivity : AppCompatActivity() {
 
             sendButton.isEnabled = false
             sendButton.text = getString(R.string.admin_announcements_publishing)
+            titleInput.isEnabled = false
+            messageInput.isEnabled = false
+            audienceInput.isEnabled = false
+            statusText?.text = getString(R.string.admin_announcements_status_progress)
             lifecycleScope.launch {
                 runCatching {
-                    FirestoreService.createInAppNotification(title, message, uid)
+                    FirestoreService.createInAppNotification(title, message, uid, audience)
                 }.onSuccess {
                     titleInput.text?.clear()
                     messageInput.text?.clear()
+                    audienceInput.setText(audienceOptions.first().label, false)
                     NotificationStore.refreshFromCloud(this@AdminNotificationsActivity)
                     loadHistory()
-                    showToast(getString(R.string.admin_announcements_publish_success))
+                    statusText?.text = getString(R.string.admin_announcements_status_success)
+                    showMotionSnackbar(getString(R.string.admin_announcements_publish_success))
                 }.onFailure {
+                    statusText?.text = getString(R.string.admin_announcements_status_error)
                     showMotionSnackbar(getString(R.string.admin_announcements_publish_error))
                 }
                 sendButton.isEnabled = true
                 sendButton.text = getString(R.string.admin_announcements_publish)
+                titleInput.isEnabled = true
+                messageInput.isEnabled = true
+                audienceInput.isEnabled = true
             }
         }
     }
@@ -115,12 +147,12 @@ class AdminNotificationsActivity : AppCompatActivity() {
                 val adapter = (recycler?.adapter as? NotificationsAdapter) ?: NotificationsAdapter().also {
                     recycler?.adapter = it
                 }
-                adapter.submitList(state.data.map {
+                adapter.submitList(state.data.map { notification ->
                     AppNotification(
-                        id = it.id,
-                        title = it.title,
-                        message = it.message,
-                        timestamp = it.createdAt,
+                        id = notification.id,
+                        title = notification.title,
+                        message = formatHistoryMessage(notification),
+                        timestamp = notification.createdAt,
                         isRead = true
                     )
                 })
@@ -152,5 +184,19 @@ class AdminNotificationsActivity : AppCompatActivity() {
             navigateNoShift(AdminParametresActivity::class.java)
         }
         applyPressFeedback(R.id.adminNotifIvBack, R.id.adminNotifIvSettings)
+    }
+
+    private fun audienceLabel(audience: String): String = when (audience) {
+        "clients" -> getString(R.string.admin_announcements_audience_clients)
+        "admins" -> getString(R.string.admin_announcements_audience_admins)
+        else -> getString(R.string.admin_announcements_audience_all)
+    }
+
+    private fun formatHistoryMessage(notification: FirestoreService.InAppNotification): String {
+        return buildString {
+            append(audienceLabel(notification.audience))
+            append(" \u2022 ")
+            append(notification.message)
+        }
     }
 }

@@ -24,7 +24,7 @@ object LocalOrderStore {
                     val item = array.optJSONObject(index) ?: continue
                     add(AppOrder.fromMap(item.toMap().filterValues { it != null } as Map<String, Any>))
                 }
-            }.sortedByDescending { it.createdAt }
+            }.sortedByDescending { it.createdAtMillis }
         }.getOrDefault(emptyList())
     }
 
@@ -40,7 +40,7 @@ object LocalOrderStore {
         } else {
             next.add(0, order)
         }
-        saveAll(context, next.sortedByDescending { it.createdAt })
+        saveAll(context, next.sortedByDescending { it.createdAtMillis })
     }
 
     fun replaceTemp(context: Context, tempId: String, savedOrder: AppOrder) {
@@ -48,18 +48,18 @@ object LocalOrderStore {
             .filterNot { it.id == tempId }
             .toMutableList()
         next.add(0, savedOrder)
-        saveAll(context, next.sortedByDescending { it.createdAt })
+        saveAll(context, next.sortedByDescending { it.createdAtMillis })
     }
 
     fun mergeRemote(context: Context, orders: List<AppOrder>) {
         val merged = linkedMapOf<String, AppOrder>()
-        orders.sortedByDescending { it.createdAt }.forEach { merged[it.id] = it }
+        orders.sortedByDescending { it.createdAtMillis }.forEach { merged[it.id] = it }
         getAll(context).forEach { order ->
             if (!merged.containsKey(order.id)) {
                 merged[order.id] = order
             }
         }
-        saveAll(context, merged.values.sortedByDescending { it.createdAt })
+        saveAll(context, merged.values.sortedByDescending { it.createdAtMillis })
     }
 
     private fun saveAll(context: Context, orders: List<AppOrder>) {

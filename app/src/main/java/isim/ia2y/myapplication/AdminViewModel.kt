@@ -14,6 +14,9 @@ enum class DashboardInlineTab(val navTab: AdminNavTab, val titleRes: Int) {
 }
 
 class AdminViewModel(application: Application) : AndroidViewModel(application) {
+    private companion object {
+        const val DASHBOARD_REFRESH_TTL_MS = 30_000L
+    }
 
     private val _activeTab = MutableLiveData(DashboardInlineTab.OVERVIEW)
     val activeTab: LiveData<DashboardInlineTab> = _activeTab
@@ -35,6 +38,8 @@ class AdminViewModel(application: Application) : AndroidViewModel(application) {
 
     private val _error = MutableLiveData<String?>()
     val error: LiveData<String?> = _error
+
+    private var lastDashboardLoadAt: Long = 0L
 
     private fun appStr(resId: Int): String = getApplication<Application>().getString(resId)
 
@@ -61,7 +66,20 @@ class AdminViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun loadDashboardData() {
+    fun loadDashboardData(force: Boolean = false) {
+        val now = System.currentTimeMillis()
+        if (!force && _isLoading.value == true) return
+        if (
+            !force &&
+            lastDashboardLoadAt > 0L &&
+            now - lastDashboardLoadAt < DASHBOARD_REFRESH_TTL_MS &&
+            _stats.value != null &&
+            _orders.value != null &&
+            _clients.value != null
+        ) {
+            return
+        }
+
         viewModelScope.launch {
             _isLoading.value = true
             var hadFailure = false
@@ -89,6 +107,8 @@ class AdminViewModel(application: Application) : AndroidViewModel(application) {
 
             if (hadFailure) {
                 _error.postValue(appStr(R.string.admin_dashboard_data_error))
+            } else {
+                lastDashboardLoadAt = System.currentTimeMillis()
             }
             _isLoading.value = false
         }
@@ -98,8 +118,7 @@ class AdminViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             runCatching {
                 OrderService.updateOrderStatus(uid, orderId, newStatus)
-                val updatedOrders = AdminService.fetchAllOrders()
-                _orders.postValue(updatedOrders)
+                loadDashboardData(force = true)
             }.onFailure {
                 _error.postValue(appStr(R.string.admin_order_update_failed))
             }

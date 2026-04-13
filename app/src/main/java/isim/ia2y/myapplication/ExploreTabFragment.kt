@@ -3,6 +3,7 @@ package isim.ia2y.myapplication
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isGone
 import androidx.fragment.app.Fragment
@@ -15,6 +16,7 @@ class ExploreTabFragment : Fragment(R.layout.fragment_explore_tab) {
         view.findViewById<View?>(R.id.viewBottomDivider)?.isGone = true
         setupHeaderAndExploreActions(view)
         polishExploreUi()
+        setStaticSearchHint(view)
         CatalogSyncManager.refreshAsync(force = false)
     }
 
@@ -78,6 +80,11 @@ class ExploreTabFragment : Fragment(R.layout.fragment_explore_tab) {
                 )
             )
         }
+    }
+
+    private fun setStaticSearchHint(root: View) {
+        val searchHint = root.findViewById<TextView>(R.id.tvSearchPlaceholder) ?: return
+        searchHint.text = getString(R.string.auto_search_products_makers_or_3406)
     }
 
     private fun bindCategorySearch(root: View, viewId: Int, category: String) {

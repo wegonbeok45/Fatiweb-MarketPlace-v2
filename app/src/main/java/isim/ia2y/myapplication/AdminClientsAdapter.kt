@@ -26,8 +26,13 @@ class AdminClientsStaticAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val client = items[position]
+        val resources = holder.itemView.context.resources
         holder.avatarInitial.text = client.name.take(1).ifBlank { "?" }.uppercase()
-        holder.clientId.text = if (client.orderCount == 1) "1 commande" else "${client.orderCount} commandes"
+        holder.clientId.text = resources.getQuantityString(
+            R.plurals.admin_order_count,
+            client.orderCount,
+            client.orderCount
+        )
         holder.name.text = client.name
         holder.email.text = client.email
         holder.itemView.setOnClickListener { onClick(client) }

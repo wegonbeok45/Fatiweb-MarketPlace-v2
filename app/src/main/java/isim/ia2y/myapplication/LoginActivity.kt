@@ -6,7 +6,6 @@ import android.text.method.PasswordTransformationMethod
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
-import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
@@ -24,11 +23,13 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import isim.ia2y.myapplication.databinding.ActivityLoginBinding
 
 class LoginActivity : AppCompatActivity() {
     private var passwordVisible = false
+    private var isEmailLoginSubmitting = false
     private lateinit var callbackManager: CallbackManager
     private lateinit var googleSignInClient: GoogleSignInClient
     private lateinit var binding: ActivityLoginBinding
@@ -37,8 +38,13 @@ class LoginActivity : AppCompatActivity() {
         private const val KEY_EMAIL = "email"
         private const val KEY_PASSWORD_VISIBLE = "password_visible"
 
-        fun createIntent(context: android.content.Context): android.content.Intent {
+        fun createIntent(
+            context: android.content.Context,
+            returnToTab: MainActivity.Tab? = null,
+            returnToRoute: String? = null
+        ): android.content.Intent {
             return android.content.Intent(context, LoginActivity::class.java)
+                .withAuthReturn(returnToTab, returnToRoute)
         }
 
         fun start(context: android.content.Context) {
@@ -76,8 +82,8 @@ class LoginActivity : AppCompatActivity() {
         setContentView(binding.root)
         ViewCompat.setOnApplyWindowInsetsListener(binding.main) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            val hPadding = resources.getDimensionPixelSize(R.dimen.auth_screen_padding)
-            val vPadding = resources.getDimensionPixelSize(R.dimen.auth_screen_padding)
+            val hPadding = resources.getDimensionPixelSize(R.dimen.auth_screen_padding_compact)
+            val vPadding = resources.getDimensionPixelSize(R.dimen.auth_screen_vertical_inset_padding)
             v.setPadding(hPadding, systemBars.top + vPadding, hPadding, systemBars.bottom + vPadding)
             insets
         }
@@ -116,13 +122,13 @@ class LoginActivity : AppCompatActivity() {
 
     private fun setupLoginActions() {
         binding.ivBack.setOnClickListener {
-            navigateToMainTab(MainActivity.Tab.PROFILE)
+            finishAuthEntry()
         }
         binding.ivAppLogo.setOnClickListener {
             navigateToMainTab(MainActivity.Tab.HOME)
         }
         binding.tvSignUp.setOnClickListener {
-            navigateNoShift(RegisterActivity::class.java)
+            startActivity(RegisterActivity.createIntent(this).copyAuthReturnFrom(intent))
         }
         configureFacebookAvailability()
         setupGoogleLogin()
@@ -143,6 +149,8 @@ class LoginActivity : AppCompatActivity() {
         }
 
         btnLogin?.setOnClickListener {
+            if (isEmailLoginSubmitting) return@setOnClickListener
+
             val email = etEmail.text?.toString().orEmpty().trim()
             val password = etPassword.text?.toString().orEmpty()
 
@@ -156,27 +164,30 @@ class LoginActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            // Disable button and show loading state
-            btnLogin.isEnabled = false
-            btnLogin.text = getString(R.string.login_connecting)
-
             lifecycleScope.launch {
-                val result = FirebaseAuthManager.signIn(email, password)
-                result.fold(
-                    onSuccess = {
-                        GuestSessionMerger.mergeIntoCurrentUser(this@LoginActivity)
-                        markInputState(R.id.cardEmailField, InputFieldState.SUCCESS)
-                        markInputState(R.id.cardPasswordField, InputFieldState.SUCCESS)
-                        navigateToMainTab(MainActivity.Tab.HOME)
-                    },
-                    onFailure = { e ->
-                        btnLogin.isEnabled = true
-                        btnLogin.text = getString(R.string.login_btn_label)
-                        markInputState(R.id.cardEmailField, InputFieldState.ERROR)
-                        markInputState(R.id.cardPasswordField, InputFieldState.ERROR)
-                        showMotionSnackbar(FirebaseAuthManager.friendlyError(e))
+                setEmailLoginLoading(true)
+                try {
+                    val result = FirebaseAuthManager.signIn(email, password)
+                    result.fold(
+                        onSuccess = {
+                            lifecycleScope.launch(Dispatchers.IO) {
+                                GuestSessionMerger.mergeIntoCurrentUser(this@LoginActivity)
+                            }
+                            markInputState(R.id.cardEmailField, InputFieldState.SUCCESS)
+                            markInputState(R.id.cardPasswordField, InputFieldState.SUCCESS)
+                            completeAuthFlow()
+                        },
+                        onFailure = { e ->
+                            markInputState(R.id.cardEmailField, InputFieldState.ERROR)
+                            markInputState(R.id.cardPasswordField, InputFieldState.ERROR)
+                            showMotionSnackbar(FirebaseAuthManager.friendlyError(this@LoginActivity, e))
+                        }
+                    )
+                } finally {
+                    if (!isFinishing && !isDestroyed) {
+                        setEmailLoginLoading(false)
                     }
-                )
+                }
             }
         }
 
@@ -255,11 +266,13 @@ class LoginActivity : AppCompatActivity() {
             val result = FirebaseAuthManager.signInWithFacebook(token)
             result.fold(
                 onSuccess = {
-                    GuestSessionMerger.mergeIntoCurrentUser(this@LoginActivity)
-                    navigateToMainTab(MainActivity.Tab.HOME)
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        GuestSessionMerger.mergeIntoCurrentUser(this@LoginActivity)
+                    }
+                    completeAuthFlow()
                 },
                 onFailure = { e ->
-                    showMotionSnackbar(FirebaseAuthManager.friendlyError(e))
+                    showMotionSnackbar(FirebaseAuthManager.friendlyError(this@LoginActivity, e))
                 }
             )
         }
@@ -283,10 +296,12 @@ class LoginActivity : AppCompatActivity() {
             val result = FirebaseAuthManager.signInWithGoogle(idToken)
             result.fold(
                 onSuccess = {
-                    GuestSessionMerger.mergeIntoCurrentUser(this@LoginActivity)
-                    navigateToMainTab(MainActivity.Tab.HOME)
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        GuestSessionMerger.mergeIntoCurrentUser(this@LoginActivity)
+                    }
+                    completeAuthFlow()
                 },
-                onFailure = { e -> showMotionSnackbar(FirebaseAuthManager.friendlyError(e)) }
+                onFailure = { e -> showMotionSnackbar(FirebaseAuthManager.friendlyError(this@LoginActivity, e)) }
             )
         }
     }
@@ -304,6 +319,7 @@ class LoginActivity : AppCompatActivity() {
         val prefill = binding.etEmail.text?.toString().orEmpty()
         val view = layoutInflater.inflate(R.layout.dialog_single_input, null)
         val input = view.findViewById<EditText>(R.id.etDialogInput).apply {
+            id = R.id.etResetPasswordEmail
             inputType = android.text.InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS
             hint = getString(R.string.auto_text_035)
             if (prefill.isNotBlank()) {
@@ -335,7 +351,7 @@ class LoginActivity : AppCompatActivity() {
                             showMotionSnackbar(getString(R.string.auth_reset_email_sent))
                         },
                         onFailure = { error ->
-                            showMotionSnackbar(FirebaseAuthManager.friendlyError(error))
+                            showMotionSnackbar(FirebaseAuthManager.friendlyError(this@LoginActivity, error))
                         }
                     )
                 }
@@ -348,6 +364,35 @@ class LoginActivity : AppCompatActivity() {
         super.onSaveInstanceState(outState)
         outState.putString(KEY_EMAIL, binding.etEmail.text?.toString().orEmpty())
         outState.putBoolean(KEY_PASSWORD_VISIBLE, passwordVisible)
+    }
+
+    private fun finishAuthEntry() {
+        intent.authReturnTab()?.let {
+            navigateToMainTab(it)
+            return
+        }
+        finishWithMotion(isForward = false)
+    }
+
+    private fun setEmailLoginLoading(isLoading: Boolean) {
+        isEmailLoginSubmitting = isLoading
+        binding.btnLogin.isEnabled = !isLoading
+        binding.btnLogin.text =
+            getString(if (isLoading) R.string.login_connecting else R.string.login_btn_label)
+    }
+
+    private fun completeAuthFlow() {
+        when (intent.authReturnRoute()) {
+            AUTH_RETURN_ROUTE_CHECKOUT -> {
+                startActivity(android.content.Intent(this, CheckoutDetailsActivity::class.java))
+                finishWithMotion(isForward = true)
+            }
+            AUTH_RETURN_ROUTE_ORDERS -> {
+                startActivity(android.content.Intent(this, OrdersHistoryActivity::class.java))
+                finishWithMotion(isForward = true)
+            }
+            else -> navigateToMainTab(intent.authReturnTab() ?: MainActivity.Tab.HOME)
+        }
     }
 
 

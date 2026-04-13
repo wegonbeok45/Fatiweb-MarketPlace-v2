@@ -60,17 +60,16 @@ fun AppCompatActivity.resolveAdminTab(): AdminNavTab {
 
 fun AppCompatActivity.setupAdminTopBar(title: String) {
     findViewById<TextView?>(R.id.adminTvTitle)?.text = title
+    val currentTab = resolveAdminTab()
 
     findViewById<View?>(R.id.adminIvBack)?.setOnClickListener {
         navigateBackToMain()
     }
-    findViewById<View?>(R.id.adminIvSettings)?.setOnClickListener {
-        if (resolveAdminTab() != AdminNavTab.SETTINGS) {
+    findViewById<View?>(R.id.adminIvSettings)?.apply {
+        visibility = if (currentTab == AdminNavTab.SETTINGS) View.GONE else View.VISIBLE
+        setOnClickListener {
             navigateToAdminTab(AdminNavTab.SETTINGS)
         }
-    }
-    findViewById<View?>(R.id.adminIvAvatar)?.setOnClickListener {
-        showToast(getString(R.string.coming_soon))
     }
     findViewById<View?>(R.id.adminShieldBadge)?.setOnClickListener {
         showToast(getString(R.string.coming_soon))
@@ -79,7 +78,6 @@ fun AppCompatActivity.setupAdminTopBar(title: String) {
     applyPressFeedback(
         R.id.adminIvBack,
         R.id.adminIvSettings,
-        R.id.adminIvAvatar,
         R.id.adminShieldBadge
     )
 }

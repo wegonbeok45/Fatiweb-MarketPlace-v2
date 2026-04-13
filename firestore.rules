@@ -1,70 +1,203 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
 
-    // --- User Profiles ---
+    function isOwner(userId) {
+      return signedIn() && request.auth.uid == userId;
+    }
+
+    function adminClaim() {
+      return signedIn() &&
+        (request.auth.token.admin == true || request.auth.token.role == 'admin');
+    }
+
+    function adminDocument() {
+      return signedIn() &&
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    function isAdmin() {
+      return adminClaim() || adminDocument();
+    }
+
+    function allowedUserProfileKeys() {
+      return [
+        'uid',
+        'name',
+        'displayName',
+        'email',
+        'role',
+        'status',
+        'avatarUrl',
+        'avatar',
+        'schemaVersion',
+        'createdAt',
+        'updatedAt'
+      ];
+    }
+
+    function ownerProfileCreateIsSafe(userId) {
+      return request.resource.data.keys().hasOnly(allowedUserProfileKeys()) &&
+        request.resource.data.uid == userId &&
+        request.resource.data.role == 'client' &&
+        (
+          !('status' in request.resource.data) ||
+          request.resource.data.status == 'active'
+        );
+    }
+
+    function ownerProfileUpdateIsSafe(userId) {
+      return request.resource.data.keys().hasOnly(allowedUserProfileKeys()) &&
+        request.resource.data.uid == userId &&
+        request.resource.data.role == resource.data.role &&
+        request.resource.data.createdAt == resource.data.createdAt &&
+        request.resource.data.status == resource.data.status;
+    }
+
+    function onlyReadStateChanged() {
+      return request.resource.data.diff(resource.data).changedKeys().hasOnly(['readAt', 'updatedAt']);
+    }
+
+    function allowedOrderKeys() {
+      return [
+        'id',
+        'uid',
+        'userId',
+        'status',
+        'paymentMethod',
+        'deliveryType',
+        'subtotal',
+        'subtotalMinor',
+        'deliveryFee',
+        'shippingFee',
+        'deliveryFeeMinor',
+        'total',
+        'totalMinor',
+        'currency',
+        'shippingAddress',
+        'items',
+        'trackingEvents',
+        'statusTimeline',
+        'serverVerified',
+        'schemaVersion',
+        'createdAt',
+        'updatedAt'
+      ];
+    }
+
+    function validOrderStatus(status) {
+      return ['pending', 'preparing', 'shipped', 'delivered'].hasAny([status]);
+    }
+
+    function ownerOrderCreateIsSafe(userId, orderId) {
+      return request.resource.data.keys().hasOnly(allowedOrderKeys()) &&
+        request.resource.data.id == orderId &&
+        request.resource.data.uid == userId &&
+        request.resource.data.userId == userId &&
+        request.resource.data.status == 'pending' &&
+        request.resource.data.paymentMethod == 'COD' &&
+        request.resource.data.serverVerified == false;
+    }
+
+    function adminOrderUpdateIsSafe() {
+      return request.resource.data.diff(resource.data).changedKeys()
+          .hasOnly(['status', 'trackingEvents', 'statusTimeline', 'updatedAt', 'schemaVersion']) &&
+        validOrderStatus(request.resource.data.status);
+    }
+
     match /users/{userId} {
-      allow read: if request.auth != null;
-      // Users can only write their own profile
-      allow write: if request.auth != null && request.auth.uid == userId;
+      allow read: if isOwner(userId) || isAdmin();
+      allow create: if isAdmin() || (isOwner(userId) && ownerProfileCreateIsSafe(userId));
+      allow update: if isAdmin() || (isOwner(userId) && ownerProfileUpdateIsSafe(userId));
+      allow delete: if isAdmin();
+
+      match /addresses/{addressId} {
+        allow read, write: if isOwner(userId) || isAdmin();
+      }
+
+      match /favorites/{favoriteId} {
+        allow read, write: if isOwner(userId) || isAdmin();
+      }
+
+      match /cart/{cartId} {
+        allow read, write: if isOwner(userId) || isAdmin();
+      }
+
+      match /notification_reads/{notificationId} {
+        allow read, write: if isOwner(userId) || isAdmin();
+      }
+
+      match /inbox/{notificationId} {
+        allow read: if isOwner(userId) || isAdmin();
+        allow create, delete: if isAdmin();
+        allow update: if isOwner(userId) && onlyReadStateChanged();
+      }
+
+      match /orders/{orderId} {
+        allow read: if isOwner(userId) || isAdmin();
+        allow create: if isOwner(userId) && ownerOrderCreateIsSafe(userId, orderId);
+        allow update: if isAdmin() && adminOrderUpdateIsSafe();
+        allow delete: if false;
+      }
+
+      match /assistant_threads/{threadId} {
+        allow read: if isOwner(userId) || isAdmin();
+        allow write: if false;
+
+        match /messages/{messageId} {
+          allow read: if isOwner(userId) || isAdmin();
+          allow write: if false;
+        }
+      }
     }
 
-    // Orders are stored under each user (see OrderService); collectionGroup("orders") uses this path.
-    match /users/{userId}/orders/{orderId} {
-      allow read: if request.auth != null && (request.auth.uid == userId || isAdmin());
-      allow create: if request.auth != null
-                    && request.auth.uid == userId
-                    && request.resource.data.status == 'pending';
-      allow update: if isAdmin()
-                    || (request.auth != null && request.auth.uid == userId
-                        && request.resource.data.status == resource.data.status);
-    }
-
-    // --- Products ---
-    match /products/{productId} {
-      // Everyone can read products
-      allow read: if true;
-      // Only admins can write products
-      allow write: if isAdmin();
-    }
-
-    // --- Orders ---
     match /orders/{orderId} {
-      // Users can read their own orders; Admins can read all
-      allow read: if request.auth != null && (resource.data.userId == request.auth.uid || isAdmin());
-      
-      // Order creation rules
-      allow create: if request.auth != null 
-                    && request.resource.data.userId == request.auth.uid
-                    && request.resource.data.status == 'pending'; // New orders must start as pending
-
-      // Critical: Only admins can update order status
-      allow update: if isAdmin() 
-                    || (request.auth != null && resource.data.userId == request.auth.uid 
-                        && request.resource.data.status == resource.data.status); // Users can update order but NOT status
+      allow read: if isAdmin() || (signedIn() && resource.data.uid == request.auth.uid);
+      allow create: if signedIn() && ownerOrderCreateIsSafe(request.auth.uid, orderId);
+      allow update: if isAdmin() && adminOrderUpdateIsSafe();
+      allow delete: if false;
     }
 
-    // --- Cart Snapshots ---
-    match /carts/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+    match /products/{productId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+
+      match /reviews/{reviewId} {
+        allow read: if true;
+        allow write: if false;
+      }
     }
 
-    // --- Notifications ---
-    match /notifications/{userId} {
-      allow read: if request.auth != null && request.auth.uid == userId;
-      allow write: if isAdmin(); // Only system/admin sends notifications
-    }
-
-    // --- Config ---
     match /config/{configId} {
       allow read: if true;
       allow write: if isAdmin();
     }
 
-    // --- Helper Functions ---
-    function isAdmin() {
-      return request.auth != null && 
-             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    match /admin_stats/{statId} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+
+    match /in_app_notifications/{notificationId} {
+      allow read: if isAdmin();
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /carts/{userId} {
+      allow read, write: if isOwner(userId) || isAdmin();
+    }
+
+    match /notifications/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow write: if false;
+    }
+
+    match /assistant_rate_limits/{docId} {
+      allow read, write: if false;
     }
   }
 }

@@ -51,7 +51,7 @@ class LanguageSettingsActivity : AppCompatActivity() {
         val selectedText = ContextCompat.getColor(this, R.color.profile_language_selected_text)
         val unselectedBg = ContextCompat.getColor(this, R.color.profile_language_unselected_bg)
         val unselectedText = ContextCompat.getColor(this, R.color.profile_language_unselected_text)
-        val unselectedStroke = ContextCompat.getColor(this, R.color.colorBorderLight)
+        val unselectedStroke = ContextCompat.getColor(this, R.color.color_grey_mid)
         val noStroke = resources.getDimensionPixelSize(R.dimen.space_0)
         val regularStroke = resources.getDimensionPixelSize(R.dimen.stroke_width_default)
 

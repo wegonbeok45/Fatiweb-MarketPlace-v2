@@ -19,10 +19,11 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/adminBottomNav"
         android:layout_width="match_parent"
-        android:layout_height="82dp"
+        android:layout_height="@dimen/admin_bottom_nav_height"
         android:background="@color/profile_nav_bg"
         android:elevation="0dp"
-        android:paddingTop="4dp">
+        android:paddingTop="@dimen/admin_bottom_nav_padding_top"
+        android:paddingBottom="@dimen/admin_bottom_nav_padding_bottom">
 
         <!-- Animated Pill Indicator -->
         <View
@@ -30,7 +31,7 @@
             android:layout_width="@dimen/nav_pill_width"
             android:layout_height="@dimen/nav_pill_height"
             android:background="@drawable/bg_home_meta_pill"
-            android:layout_marginTop="6dp"
+            android:layout_marginTop="@dimen/space_4"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toTopOf="@id/admin_guide_pill_bottom"
             app:layout_constraintStart_toStartOf="@id/adminNavDashboard"
@@ -41,7 +42,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            app:layout_constraintGuide_begin="42dp" />
+            app:layout_constraintGuide_begin="@dimen/main_bottom_nav_guideline" />
 
         <!-- Dashboard -->
         <LinearLayout
@@ -49,7 +50,8 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:gravity="center_horizontal"
-            android:paddingTop="10dp"
+            android:paddingTop="@dimen/space_4"
+            android:paddingBottom="@dimen/space_4"
             android:orientation="vertical"
             android:clickable="true"
             android:focusable="true"
@@ -61,8 +63,8 @@
 
             <ImageView
                 android:id="@+id/adminNavDashboardIcon"
-                android:layout_width="22dp"
-                android:layout_height="22dp"
+                android:layout_width="@dimen/main_bottom_nav_icon_size"
+                android:layout_height="@dimen/main_bottom_nav_icon_size"
                 android:minWidth="48dp"
                 android:minHeight="48dp"
                 android:contentDescription="@string/cd_admin_dashboard"
@@ -76,7 +78,7 @@
                 android:text="@string/auto_dashboard_2938"
                 android:textSize="@dimen/text_size_overline"
                 android:textColor="@color/home_nav_inactive"
-                android:layout_marginTop="5dp"
+                android:layout_marginTop="@dimen/admin_bottom_nav_label_margin_top"
                 android:fontFamily="@font/plus_jakarta_sans_regular"
                 android:maxLines="1"
                 android:ellipsize="end" />
@@ -88,7 +90,8 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:gravity="center_horizontal"
-            android:paddingTop="10dp"
+            android:paddingTop="@dimen/space_4"
+            android:paddingBottom="@dimen/space_4"
             android:orientation="vertical"
             android:clickable="true"
             android:focusable="true"
@@ -99,8 +102,8 @@
 
             <ImageView
                 android:id="@+id/adminNavCommandesIcon"
-                android:layout_width="22dp"
-                android:layout_height="22dp"
+                android:layout_width="@dimen/main_bottom_nav_icon_size"
+                android:layout_height="@dimen/main_bottom_nav_icon_size"
                 android:contentDescription="@string/cd_admin_orders"
                 app:srcCompat="@drawable/ic_admin_nav_commandes"
                 app:tint="@color/home_nav_inactive" />
@@ -112,7 +115,7 @@
                 android:text="@string/auto_commandes_66c3"
                 android:textSize="@dimen/text_size_overline"
                 android:textColor="@color/home_nav_inactive"
-                android:layout_marginTop="5dp"
+                android:layout_marginTop="@dimen/admin_bottom_nav_label_margin_top"
                 android:fontFamily="@font/plus_jakarta_sans_regular"
                 android:maxLines="1"
                 android:ellipsize="end" />
@@ -124,7 +127,8 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:gravity="center_horizontal"
-            android:paddingTop="10dp"
+            android:paddingTop="@dimen/space_4"
+            android:paddingBottom="@dimen/space_4"
             android:orientation="vertical"
             android:clickable="true"
             android:focusable="true"
@@ -135,8 +139,8 @@
 
             <ImageView
                 android:id="@+id/adminNavProduitsIcon"
-                android:layout_width="22dp"
-                android:layout_height="22dp"
+                android:layout_width="@dimen/main_bottom_nav_icon_size"
+                android:layout_height="@dimen/main_bottom_nav_icon_size"
                 android:minWidth="48dp"
                 android:minHeight="48dp"
                 android:contentDescription="@string/cd_admin_products"
@@ -150,7 +154,7 @@
                 android:text="@string/auto_produits_88c6"
                 android:textSize="@dimen/text_size_overline"
                 android:textColor="@color/home_nav_inactive"
-                android:layout_marginTop="5dp"
+                android:layout_marginTop="@dimen/admin_bottom_nav_label_margin_top"
                 android:fontFamily="@font/plus_jakarta_sans_regular"
                 android:maxLines="1"
                 android:ellipsize="end" />
@@ -162,7 +166,8 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:gravity="center_horizontal"
-            android:paddingTop="10dp"
+            android:paddingTop="@dimen/space_4"
+            android:paddingBottom="@dimen/space_4"
             android:orientation="vertical"
             android:clickable="true"
             android:focusable="true"
@@ -173,8 +178,8 @@
 
             <ImageView
                 android:id="@+id/adminNavClientsIcon"
-                android:layout_width="22dp"
-                android:layout_height="22dp"
+                android:layout_width="@dimen/main_bottom_nav_icon_size"
+                android:layout_height="@dimen/main_bottom_nav_icon_size"
                 android:minWidth="48dp"
                 android:minHeight="48dp"
                 android:contentDescription="@string/cd_admin_clients"
@@ -188,7 +193,7 @@
                 android:text="@string/auto_clients_0f55"
                 android:textSize="@dimen/text_size_overline"
                 android:textColor="@color/home_nav_inactive"
-                android:layout_marginTop="5dp"
+                android:layout_marginTop="@dimen/admin_bottom_nav_label_margin_top"
                 android:fontFamily="@font/plus_jakarta_sans_regular"
                 android:maxLines="1"
                 android:ellipsize="end" />
@@ -200,7 +205,8 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:gravity="center_horizontal"
-            android:paddingTop="10dp"
+            android:paddingTop="@dimen/space_4"
+            android:paddingBottom="@dimen/space_4"
             android:orientation="vertical"
             android:clickable="true"
             android:focusable="true"
@@ -211,8 +217,8 @@
 
             <ImageView
                 android:id="@+id/adminNavNotificationsIcon"
-                android:layout_width="22dp"
-                android:layout_height="22dp"
+                android:layout_width="@dimen/main_bottom_nav_icon_size"
+                android:layout_height="@dimen/main_bottom_nav_icon_size"
                 android:contentDescription="@string/cd_admin_notifications"
                 app:srcCompat="@drawable/ic_admin_nav_notifications"
                 app:tint="@color/home_nav_inactive" />
@@ -224,7 +230,7 @@
                 android:text="@string/auto_notifs_b962"
                 android:textSize="@dimen/text_size_overline"
                 android:textColor="@color/home_nav_inactive"
-                android:layout_marginTop="5dp"
+                android:layout_marginTop="@dimen/admin_bottom_nav_label_margin_top"
                 android:fontFamily="@font/plus_jakarta_sans_regular"
                 android:maxLines="1"
                 android:ellipsize="end" />
@@ -271,4 +277,3 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </LinearLayout>
-

@@ -11,10 +11,15 @@ import com.google.android.material.card.MaterialCardView
 import java.util.Locale
 
 class AdminProductsAdapter(
-    private val items: List<Product>,
+    private var items: MutableList<Product>,
     private val onEdit: (Product) -> Unit,
     private val onDelete: (Product) -> Unit
 ) : RecyclerView.Adapter<AdminProductsAdapter.ViewHolder>() {
+
+    fun updateItems(newItems: List<Product>) {
+        items = newItems.toMutableList()
+        notifyDataSetChanged()
+    }
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val image: ImageView = view.findViewById(R.id.adminProductImage)

@@ -21,14 +21,20 @@ fun Context.screenWidthClass(): ScreenWidthClass {
 
 fun Context.marketplaceGridSpanCount(
     minCardWidthDp: Int = 184,
-    compactMinCardWidthDp: Int = 220,
+    compactMinCardWidthDp: Int = 156,
     maxSpanCount: Int = 4
 ): Int {
     val availableWidth = resources.configuration.screenWidthDp - 32
-    val targetWidth = if (screenWidthClass() == ScreenWidthClass.COMPACT && availableWidth < 360) {
+    val isCompact = screenWidthClass() == ScreenWidthClass.COMPACT
+    val targetWidth = if (isCompact && availableWidth < 360) {
         compactMinCardWidthDp
     } else {
         minCardWidthDp
     }
-    return min(max(1, availableWidth / targetWidth), maxSpanCount)
+    val computed = min(max(1, availableWidth / targetWidth), maxSpanCount)
+    return if (isCompact && availableWidth >= compactMinCardWidthDp * 2) {
+        max(2, computed)
+    } else {
+        computed
+    }
 }

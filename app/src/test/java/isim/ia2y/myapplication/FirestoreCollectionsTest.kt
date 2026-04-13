@@ -15,7 +15,7 @@ class FirestoreCollectionsTest {
         assertEquals("notification_reads", FirestoreCollections.NOTIFICATION_READS)
         assertEquals("addresses", FirestoreCollections.ADDRESSES)
         assertEquals("favorites", FirestoreCollections.FAVORITES)
-        assertEquals("app_config", FirestoreCollections.APP_CONFIG)
+        assertEquals("config", FirestoreCollections.APP_CONFIG)
         assertEquals("commerce", FirestoreCollections.COMMERCE)
     }
 }

@@ -3,16 +3,16 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="76dp"
-    android:paddingStart="16dp"
-    android:paddingEnd="16dp"
+    android:paddingStart="14dp"
+    android:paddingEnd="14dp"
     android:background="?selectableItemBackground"
     android:clickable="true"
     android:focusable="true">
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/adminClientAvatar"
-        android:layout_width="42dp"
-        android:layout_height="42dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         app:cardBackgroundColor="@color/profile_card_icon_bg"
         app:cardCornerRadius="999dp"
         app:cardElevation="0dp"
@@ -50,6 +50,8 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
+        android:ellipsize="end"
+        android:maxLines="1"
 
         android:text="@string/auto_ahmed_ben_ali_10ae"
         android:textColor="@color/profile_text_primary"
@@ -64,10 +66,12 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
+        android:ellipsize="end"
+        android:maxLines="1"
 
         android:text="@string/auto_ahmedbenaliemailcom_512b"
         android:textColor="@color/profile_text_secondary"
-        android:textSize="@dimen/text_size_overline"
+        android:textSize="@dimen/text_size_caption"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/adminClientAvatar"

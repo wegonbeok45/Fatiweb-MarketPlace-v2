@@ -72,14 +72,25 @@ fun AppCompatActivity.startTypingHintAnimation(
 fun View.applyStatusBarInset() {
     val initialTopPadding = paddingTop
     ViewCompat.setOnApplyWindowInsetsListener(this) { view, insets ->
-        val topInset = insets.getInsets(WindowInsetsCompat.Type.statusBars()).top
+        val breathingRoom = (4 * resources.displayMetrics.density).toInt()
         view.setPadding(
             view.paddingLeft,
-            initialTopPadding + topInset,
+            initialTopPadding + breathingRoom,
             view.paddingRight,
             view.paddingBottom
         )
         insets
     }
     post { ViewCompat.requestApplyInsets(this) }
+}
+
+fun formatDt(price: Double): String {
+    return String.format(java.util.Locale("fr", "TN"), "%.3f DT", price)
+}
+
+fun formatOrigin(origin: String): String {
+    return origin.replace('_', ' ')
+        .replaceFirstChar {
+            if (it.isLowerCase()) it.titlecase(java.util.Locale.getDefault()) else it.toString()
+        }
 }

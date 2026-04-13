@@ -1,0 +1,39 @@
+appId: isim.ia2y.myapplication
+tags:
+  - debug
+  - auth
+---
+- launchApp:
+    stopApp: true
+- extendedWaitUntil:
+    visible:
+      id: "layoutSearchBar"
+    timeout: 20000
+- tapOn:
+    id: "hostNavProfile"
+- extendedWaitUntil:
+    visible:
+      id: "cardLogout"
+    timeout: 10000
+- tapOn:
+    id: "cardLogout"
+- extendedWaitUntil:
+    visible:
+      id: "btnLogin"
+    timeout: 10000
+- tapOn:
+    id: "etEmail"
+- inputText: "${QA_LOGIN_EMAIL}"
+- hideKeyboard
+- tapOn:
+    id: "etPassword"
+- inputText: "${QA_LOGIN_PASSWORD}"
+- hideKeyboard
+- tapOn:
+    id: "btnLogin"
+- waitForAnimationToEnd
+- extendedWaitUntil:
+    visible:
+      id: "ivAppLogo"
+    timeout: 5000
+- takeScreenshot: "96-login-probe"

@@ -11,19 +11,20 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layoutTopBar"
         android:layout_width="0dp"
-        android:layout_height="@dimen/profile_top_bar_height"
+        android:layout_height="@dimen/app_top_bar_height"
         android:background="@color/profile_header_bg"
-        android:paddingStart="@dimen/profile_horizontal_margin"
-        android:paddingEnd="@dimen/profile_horizontal_margin"
+        android:paddingStart="@dimen/app_top_bar_horizontal_padding"
+        android:paddingEnd="@dimen/app_top_bar_horizontal_padding"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
             android:id="@+id/ivBack"
-            android:layout_width="@dimen/profile_top_bar_icon_size"
-            android:layout_height="@dimen/profile_top_bar_icon_size"
+            android:layout_width="@dimen/app_top_bar_side_slot_size"
+            android:layout_height="@dimen/app_top_bar_side_slot_size"
             android:contentDescription="@string/settings_back"
+            android:padding="@dimen/surface_button_inner_padding"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -31,13 +32,20 @@
             app:tint="@color/profile_text_primary" />
 
         <TextView
-            style="@style/ProfileText.TopBarTitle"
+            style="@style/AppTopBar.Title.Profile"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/language_settings_title"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Space
+            android:layout_width="@dimen/app_top_bar_side_slot_size"
+            android:layout_height="@dimen/app_top_bar_side_slot_size"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -48,11 +56,11 @@
         android:layout_marginStart="@dimen/profile_horizontal_margin"
         android:layout_marginTop="@dimen/profile_menu_top_padding"
         android:layout_marginEnd="@dimen/profile_horizontal_margin"
-        app:cardBackgroundColor="@color/profile_card_bg"
-        app:cardCornerRadius="@dimen/profile_menu_card_radius"
-        app:cardElevation="@dimen/profile_menu_card_elevation"
+        app:cardBackgroundColor="@color/profile_section_bg"
+        app:cardCornerRadius="@dimen/profile_menu_group_radius"
+        app:cardElevation="0dp"
         app:cardUseCompatPadding="false"
-        app:strokeColor="@color/colorBorderLight"
+        app:strokeColor="@color/profile_section_stroke"
         app:strokeWidth="@dimen/stroke_width_default"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -87,29 +95,31 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tvLanguageHeadline" />
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnFrench"
-                style="@style/LanguageButton.Base"
+            <LinearLayout
+                android:id="@+id/layoutLanguageButtons"
                 android:layout_width="0dp"
-                android:layout_height="@dimen/button_height"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_16"
-                android:text="@string/language_option_french"
-                app:layout_constraintEnd_toStartOf="@id/btnEnglish"
-                app:layout_constraintHorizontal_chainStyle="spread_inside"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tvLanguageSubtitle" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnEnglish"
-                style="@style/LanguageButton.Base"
-                android:layout_width="0dp"
-                android:layout_height="@dimen/button_height"
-                android:layout_marginStart="@dimen/space_12"
-                android:layout_marginTop="@dimen/space_16"
-                android:text="@string/language_option_english"
+                android:orientation="vertical"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/btnFrench"
-                app:layout_constraintTop_toBottomOf="@id/tvLanguageSubtitle" />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvLanguageSubtitle">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnFrench"
+                    style="@style/LanguageButton.Base"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/profile_language_option_height"
+                    android:text="@string/language_option_french" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnEnglish"
+                    style="@style/LanguageButton.Base"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/profile_language_option_height"
+                    android:layout_marginTop="@dimen/space_12"
+                    android:text="@string/language_option_english" />
+            </LinearLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.card.MaterialCardView>
 

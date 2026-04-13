@@ -5,19 +5,19 @@
     android:layout_width="match_parent"
     android:layout_height="@dimen/admin_top_bar_height"
     android:paddingStart="@dimen/home_horizontal_padding"
-    android:paddingTop="8dp"
+    android:paddingTop="@dimen/space_8"
     android:paddingEnd="@dimen/home_horizontal_padding"
-    android:paddingBottom="8dp">
+    android:paddingBottom="@dimen/space_8">
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/adminIvBack"
-        android:layout_width="44dp"
-        android:layout_height="44dp"
+        android:layout_width="@dimen/surface_button_size"
+        android:layout_height="@dimen/surface_button_size"
         android:clickable="true"
         android:focusable="true"
         android:foreground="?attr/selectableItemBackgroundBorderless"
         app:cardBackgroundColor="@color/profile_card_bg"
-        app:cardCornerRadius="22dp"
+        app:cardCornerRadius="@dimen/surface_button_corner_radius"
         app:cardElevation="0dp"
         app:strokeColor="@color/colorBorderLight"
         app:strokeWidth="1dp"
@@ -29,7 +29,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:contentDescription="@string/cd_back"
-            android:padding="12dp"
+            android:padding="@dimen/surface_button_inner_padding"
             app:srcCompat="@drawable/back"
             app:tint="@color/profile_text_primary" />
     </com.google.android.material.card.MaterialCardView>
@@ -46,13 +46,13 @@
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/adminIvSettings"
-            android:layout_width="44dp"
-            android:layout_height="44dp"
+            android:layout_width="@dimen/surface_button_size"
+            android:layout_height="@dimen/surface_button_size"
             android:clickable="true"
             android:focusable="true"
             android:foreground="?attr/selectableItemBackgroundBorderless"
             app:cardBackgroundColor="@color/profile_card_bg"
-            app:cardCornerRadius="22dp"
+            app:cardCornerRadius="@dimen/surface_button_corner_radius"
             app:cardElevation="0dp"
             app:strokeColor="@color/colorBorderLight"
             app:strokeWidth="1dp">
@@ -61,18 +61,18 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:contentDescription="@string/cd_settings"
-                android:padding="12dp"
+                android:padding="@dimen/surface_button_inner_padding"
                 app:srcCompat="@drawable/settings"
                 app:tint="@color/profile_text_primary" />
         </com.google.android.material.card.MaterialCardView>
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/adminShieldBadge"
-            android:layout_width="44dp"
-            android:layout_height="44dp"
+            android:layout_width="@dimen/surface_button_size"
+            android:layout_height="@dimen/surface_button_size"
             android:layout_marginStart="@dimen/space_8"
             app:cardBackgroundColor="@color/profile_card_bg"
-            app:cardCornerRadius="22dp"
+            app:cardCornerRadius="@dimen/surface_button_corner_radius"
             app:cardElevation="@dimen/space_0"
             app:strokeColor="@color/colorBorderLight"
             app:strokeWidth="1dp">
@@ -84,25 +84,6 @@
                 android:contentDescription="@string/cd_admin_dashboard"
                 app:srcCompat="@drawable/ic_admin_shield"
                 app:tint="?attr/colorPrimary" />
-        </com.google.android.material.card.MaterialCardView>
-
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/adminIvAvatar"
-            android:layout_width="@dimen/admin_top_avatar_size"
-            android:layout_height="@dimen/admin_top_avatar_size"
-            android:layout_marginStart="@dimen/space_8"
-            app:cardCornerRadius="@dimen/corner_radius_round"
-            app:cardElevation="@dimen/space_0"
-            app:strokeColor="@color/profile_avatar_ring"
-            app:strokeWidth="@dimen/stroke_width_medium">
-
-            <ImageView
-                android:id="@+id/adminIvAvatarImg"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:contentDescription="@string/cd_user_avatar"
-                android:scaleType="centerCrop"
-                app:srcCompat="@drawable/profile_avatar_art" />
         </com.google.android.material.card.MaterialCardView>
     </LinearLayout>
 
@@ -123,4 +104,3 @@
         app:layout_constraintTop_toTopOf="@id/adminIvBack" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
-

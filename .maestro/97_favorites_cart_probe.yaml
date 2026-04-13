@@ -1,0 +1,64 @@
+appId: isim.ia2y.myapplication
+tags:
+  - shopper
+  - probe
+  - favorites
+---
+- launchApp
+- extendedWaitUntil:
+    visible:
+      id: "layoutSearchBar"
+    timeout: 15000
+- tapOn:
+    id: "ivTopFavorites"
+- extendedWaitUntil:
+    visible:
+      id: "btnFavoritesBrowseHome"
+    timeout: 10000
+- tapOn:
+    id: "btnFavoritesBrowseHome"
+- extendedWaitUntil:
+    visible:
+      id: "layoutSearchBar"
+    timeout: 10000
+- swipe:
+    start: 50%, 82%
+    end: 50%, 30%
+    duration: 500
+- swipe:
+    start: 50%, 82%
+    end: 50%, 34%
+    duration: 500
+- extendedWaitUntil:
+    visible:
+      id: "homeDynamicFavoriteButton"
+    timeout: 10000
+- tapOn:
+    id: "homeDynamicFavoriteButton"
+- tapOn:
+    id: "hostNavHome"
+- swipe:
+    start: 50%, 35%
+    end: 50%, 82%
+    duration: 400
+- swipe:
+    start: 50%, 35%
+    end: 50%, 82%
+    duration: 400
+- extendedWaitUntil:
+    visible:
+      id: "ivTopFavorites"
+    timeout: 10000
+- tapOn:
+    id: "ivTopFavorites"
+- extendedWaitUntil:
+    visible:
+      id: "btnFavoriteAddCart"
+    timeout: 10000
+- tapOn:
+    id: "btnFavoriteAddCart"
+- extendedWaitUntil:
+    visible:
+      id: "tvBottomCartBadge"
+    timeout: 5000
+- takeScreenshot: "42-favorites-cart-badge"

@@ -4,103 +4,126 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     app:cardBackgroundColor="@color/colorSurface"
-    app:cardCornerRadius="@dimen/home_product_image_radius"
-    app:cardElevation="@dimen/panier_product_card_elevation"
-    app:strokeWidth="@dimen/space_0">
+    app:cardCornerRadius="@dimen/corner_radius_large"
+    app:cardElevation="0dp"
+    app:strokeColor="@color/colorBorderLight"
+    app:strokeWidth="1dp">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="@dimen/space_12">
+        android:paddingStart="@dimen/space_14"
+        android:paddingTop="@dimen/space_14"
+        android:paddingEnd="@dimen/space_14"
+        android:paddingBottom="@dimen/space_14">
 
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:maxHeight="220dp">
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardFavoriteImage"
+            android:layout_width="88dp"
+            android:layout_height="88dp"
+            app:cardBackgroundColor="@color/home_surface_soft"
+            app:cardCornerRadius="@dimen/corner_radius_medium"
+            app:cardElevation="0dp"
+            app:strokeColor="@color/colorBorderLight"
+            app:strokeWidth="1dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-            <com.google.android.material.card.MaterialCardView
+            <ImageView
+                android:id="@+id/ivFavoriteProductImage"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:contentDescription="@string/cd_product_image"
+                android:scaleType="centerCrop" />
+        </com.google.android.material.card.MaterialCardView>
+
+        <LinearLayout
+            android:id="@+id/layoutFavoriteContent"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="@dimen/space_14"
+            android:layout_marginEnd="@dimen/space_12"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="@id/cardFavoriteImage"
+            app:layout_constraintEnd_toStartOf="@id/layoutFavoriteActions"
+            app:layout_constraintStart_toEndOf="@id/cardFavoriteImage"
+            app:layout_constraintTop_toTopOf="@id/cardFavoriteImage">
+
+            <TextView
+                android:id="@+id/tvFavoriteTag"
+                style="@style/AppText.Overline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_home_meta_pill"
+                android:paddingStart="@dimen/space_8"
+                android:paddingTop="@dimen/space_4"
+                android:paddingEnd="@dimen/space_8"
+                android:paddingBottom="@dimen/space_4"
+                android:textColor="@color/home_meta_text" />
+
+            <TextView
+                android:id="@+id/tvFavoriteTitle"
+                style="@style/HomeText.ProductName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardBackgroundColor="@color/home_product_surface"
-                app:cardCornerRadius="@dimen/home_product_image_radius"
-                app:cardElevation="@dimen/space_0"
-                app:strokeWidth="@dimen/space_0">
+                android:layout_marginTop="@dimen/space_8"
+                android:ellipsize="end"
+                android:maxLines="2" />
 
-                <ImageView
-                    android:id="@+id/ivFavoriteProductImage"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:adjustViewBounds="true"
-                    android:contentDescription="@string/cd_product_image"
-                    android:maxHeight="220dp"
-                    android:scaleType="fitCenter" />
-            </com.google.android.material.card.MaterialCardView>
+            <TextView
+                android:id="@+id/tvFavoritePrice"
+                style="@style/HomeText.ProductPriceCompact"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_8" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layoutFavoriteActions"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="@id/cardFavoriteImage"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/cardFavoriteImage">
 
             <FrameLayout
                 android:id="@+id/btnFavoriteToggle"
-                android:layout_width="@dimen/home_product_heart_size"
-                android:layout_height="@dimen/home_product_heart_size"
-                android:layout_gravity="top|end"
-                android:layout_marginTop="@dimen/home_product_heart_margin"
-                android:layout_marginEnd="@dimen/home_product_heart_margin"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
                 android:background="@drawable/bg_home_product_heart">
 
                 <ImageView
                     android:id="@+id/ivFavoriteToggleIcon"
-                    android:layout_width="@dimen/home_product_heart_icon_size"
-                    android:layout_height="@dimen/home_product_heart_icon_size"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
                     android:layout_gravity="center"
                     android:contentDescription="@string/cd_product_image"
                     app:srcCompat="@drawable/ic_home_heart"
                     app:tint="@color/home_heart_active" />
             </FrameLayout>
-        </FrameLayout>
 
-        <TextView
-            android:id="@+id/tvFavoriteTag"
-            style="@style/AppText.Overline"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/space_12"
-            android:textColor="@color/home_chip_bg" />
-
-        <TextView
-            android:id="@+id/tvFavoriteTitle"
-            style="@style/HomeText.ProductName"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/space_4"
-            android:maxLines="2"
-            android:ellipsize="end" />
-
-        <TextView
-            android:id="@+id/tvFavoritePrice"
-            style="@style/HomeText.ProductPrice"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/space_2" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnFavoriteAddCart"
-            android:layout_width="42dp"
-            android:layout_height="42dp"
-            android:layout_marginTop="@dimen/space_12"
-            android:layout_gravity="end"
-            android:minWidth="0dp"
-            android:minHeight="0dp"
-            android:text=""
-            app:backgroundTint="@android:color/transparent"
-            app:cornerRadius="21dp"
-            app:icon="@drawable/ic_home_add_cart"
-            app:iconGravity="textStart"
-            app:iconPadding="0dp"
-            app:iconSize="18dp"
-            app:iconTint="@color/home_text_primary"
-            app:rippleColor="@color/colorBorderLight"
-            app:strokeWidth="0dp" />
-    </LinearLayout>
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnFavoriteAddCart"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:layout_marginTop="@dimen/space_12"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
+                android:text=""
+                app:backgroundTint="@color/colorSurfaceVariant"
+                app:cornerRadius="@dimen/corner_radius_medium"
+                app:icon="@drawable/ic_home_add_cart"
+                app:iconGravity="textStart"
+                app:iconPadding="0dp"
+                app:iconSize="18dp"
+                app:iconTint="@color/home_text_primary"
+                app:rippleColor="@color/colorBorderLight"
+                app:strokeColor="@color/colorBorderLight"
+                app:strokeWidth="1dp" />
+        </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </com.google.android.material.card.MaterialCardView>
-
-

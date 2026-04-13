@@ -26,8 +26,10 @@ class NotificationsActivity : AppCompatActivity() {
 
         findViewById<View>(R.id.ivBack)?.setOnClickListener { finishWithMotion() }
         findViewById<View>(R.id.tvClearAll)?.setOnClickListener {
-            NotificationStore.clearAll(this)
-            loadNotifications()
+            lifecycleScope.launch {
+                NotificationStore.markAllAsRead(this@NotificationsActivity)
+                loadNotifications()
+            }
         }
         applyPressFeedback(R.id.ivBack, R.id.tvClearAll)
 
@@ -46,7 +48,7 @@ class NotificationsActivity : AppCompatActivity() {
                 onFailure = {
                     val cached = NotificationStore.getAll(this@NotificationsActivity).filter { !it.title.startsWith("{") && !it.message.startsWith("{") }
                     if (cached.isEmpty()) {
-                        ScreenState.Error("Impossible de charger vos notifications.")
+                        ScreenState.Error(getString(R.string.notifications_load_error))
                     } else {
                         ScreenState.Content(cached)
                     }
@@ -61,12 +63,14 @@ class NotificationsActivity : AppCompatActivity() {
         val emptyState = findViewById<View>(R.id.layoutEmptyState)
         val emptyAnimation = findViewById<com.airbnb.lottie.LottieAnimationView>(R.id.ivNotificationsEmptyAnimation)
         val loading = findViewById<ProgressBar>(R.id.loadingIndicator)
+        val clearAll = findViewById<View>(R.id.tvClearAll)
         when (state) {
             is ScreenState.Content -> {
                 loading?.visibility = View.GONE
                 rv.visibility = View.VISIBLE
                 emptyState.visibility = View.GONE
                 emptyAnimation?.pauseAnimation()
+                clearAll?.visibility = if (state.data.any { !it.isRead }) View.VISIBLE else View.GONE
                 if (rv.layoutManager == null) {
                     rv.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this)
                 }
@@ -74,25 +78,27 @@ class NotificationsActivity : AppCompatActivity() {
                     rv.adapter = notificationsAdapter
                 }
                 notificationsAdapter.submitList(state.data)
-                NotificationStore.markAllAsRead(this)
             }
             is ScreenState.Empty -> {
                 loading?.visibility = View.GONE
                 rv.visibility = View.GONE
                 emptyState.visibility = View.VISIBLE
                 emptyAnimation?.playAnimation()
+                clearAll?.visibility = View.GONE
             }
             is ScreenState.Error -> {
                 loading?.visibility = View.GONE
                 rv.visibility = View.GONE
                 emptyState.visibility = View.VISIBLE
                 emptyAnimation?.playAnimation()
+                clearAll?.visibility = View.GONE
                 showMotionSnackbar(state.message)
             }
             ScreenState.Loading -> {
                 loading?.visibility = View.VISIBLE
                 rv.visibility = View.GONE
                 emptyState.visibility = View.GONE
+                clearAll?.visibility = View.GONE
             }
         }
     }

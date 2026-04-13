@@ -1,27 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/bg_auth_screen"
-    android:fillViewport="true"
-    android:paddingStart="@dimen/auth_screen_padding"
-    android:paddingEnd="@dimen/auth_screen_padding"
+    android:paddingStart="@dimen/auth_screen_padding_compact"
+    android:paddingEnd="@dimen/auth_screen_padding_compact"
     tools:context=".LoginActivity">
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingTop="8dp"
-        android:paddingBottom="16dp">
 
     <ImageView
         android:id="@+id/ivBack"
         android:layout_width="@dimen/icon_size_large"
         android:layout_height="@dimen/icon_size_large"
-        android:layout_marginTop="0dp"
+        android:layout_marginTop="@dimen/space_4"
         android:importantForAccessibility="no"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -29,19 +22,29 @@
         app:tint="?attr/colorOnSurface" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:paddingTop="@dimen/space_6"
+        android:paddingBottom="@dimen/space_8"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ivBack">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layoutLoginContent"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:layout_marginBottom="@dimen/space_12"
+        android:layout_marginTop="@dimen/space_8"
+        android:layout_marginBottom="@dimen/space_8"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/ivBack">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.45">
 
         <ImageView
             android:id="@+id/ivAppLogo"
-            android:layout_width="120dp"
-            android:layout_height="70dp"
+            android:layout_width="@dimen/auth_logo_width_compact"
+            android:layout_height="@dimen/auth_logo_height_compact"
             android:adjustViewBounds="true"
             android:importantForAccessibility="no"
             android:scaleType="fitCenter"
@@ -54,9 +57,9 @@
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardWelcomePanel"
             android:layout_width="0dp"
-            android:layout_height="190dp"
-            android:layout_marginTop="16dp"
-            app:cardCornerRadius="28dp"
+            android:layout_height="@dimen/auth_hero_height_compact"
+            android:layout_marginTop="@dimen/space_12"
+            app:cardCornerRadius="@dimen/corner_radius_large"
             app:cardElevation="0dp"
             app:strokeColor="@color/overlay_white_8"
             app:strokeWidth="1dp"
@@ -85,7 +88,7 @@
                     android:layout_height="match_parent"
                     android:gravity="bottom"
                     android:orientation="vertical"
-                    android:padding="18dp">
+                    android:padding="@dimen/space_16">
 
                     <com.google.android.material.card.MaterialCardView
                         android:layout_width="wrap_content"
@@ -98,10 +101,10 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:paddingStart="12dp"
-                            android:paddingTop="6dp"
-                            android:paddingEnd="12dp"
-                            android:paddingBottom="6dp"
+                            android:paddingStart="10dp"
+                            android:paddingTop="5dp"
+                            android:paddingEnd="10dp"
+                            android:paddingBottom="5dp"
                             android:text="@string/auto_premium_commerce_9fb5"
                             android:textColor="?attr/colorOnSurface"
                             android:textSize="@dimen/text_size_overline"
@@ -111,17 +114,19 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
+                        android:layout_marginTop="@dimen/space_8"
+                        android:ellipsize="end"
                         android:text="@string/auto_connexion_rapide_commandes_et_f014"
                         android:textColor="@android:color/white"
                         android:textSize="@dimen/text_size_title"
                         android:fontFamily="@font/plus_jakarta_sans_bold"
-                        android:lineSpacingExtra="2dp" />
+                        android:lineSpacingExtra="1dp"
+                        android:maxLines="2" />
 
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
+                        android:layout_marginTop="@dimen/space_10"
                         android:orientation="horizontal">
 
                         <com.google.android.material.card.MaterialCardView
@@ -175,10 +180,10 @@
 
         <TextView
             android:id="@+id/tvWelcomeTitle"
-            style="@style/AppText.Title"
+            style="@style/AppText.Subtitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/space_12"
+            android:layout_marginTop="@dimen/space_10"
             android:gravity="center"
             android:text="@string/auto_text_032"
             app:layout_constraintEnd_toEndOf="parent"
@@ -190,9 +195,11 @@
             style="@style/AppText.Body"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/space_8"
+            android:layout_marginTop="@dimen/space_4"
             android:gravity="center"
+            android:maxLines="2"
             android:text="@string/auto_text_033"
+            android:textSize="@dimen/text_size_caption"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tvWelcomeTitle" />
@@ -202,7 +209,7 @@
             style="@style/AppText.FieldLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="@dimen/space_16"
             android:text="@string/auto_text_034"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tvWelcomeSubtitle" />
@@ -223,9 +230,9 @@
 
                 <ImageView
                     android:id="@+id/ivEmailIcon"
-                    android:layout_width="@dimen/icon_size_medium"
-                    android:layout_height="@dimen/icon_size_medium"
-                    android:layout_marginStart="@dimen/space_16"
+                    android:layout_width="@dimen/auth_icon_slot_size"
+                    android:layout_height="@dimen/auth_icon_slot_size"
+                    android:padding="@dimen/space_12"
                     android:importantForAccessibility="no"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -251,7 +258,7 @@
             style="@style/AppText.FieldLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
+            android:layout_marginTop="@dimen/space_12"
             android:text="@string/auto_text_036"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/cardEmailField" />
@@ -272,9 +279,9 @@
 
                 <ImageView
                     android:id="@+id/ivPasswordIcon"
-                    android:layout_width="@dimen/icon_size_medium"
-                    android:layout_height="@dimen/icon_size_medium"
-                    android:layout_marginStart="@dimen/space_16"
+                    android:layout_width="@dimen/auth_icon_slot_size"
+                    android:layout_height="@dimen/auth_icon_slot_size"
+                    android:padding="@dimen/space_12"
                     android:importantForAccessibility="no"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -283,9 +290,9 @@
 
                 <ImageView
                     android:id="@+id/ivPasswordToggle"
-                    android:layout_width="@dimen/icon_size_medium"
-                    android:layout_height="@dimen/icon_size_medium"
-                    android:layout_marginEnd="@dimen/space_16"
+                    android:layout_width="@dimen/auth_icon_slot_size"
+                    android:layout_height="@dimen/auth_icon_slot_size"
+                    android:padding="@dimen/space_12"
                     android:importantForAccessibility="no"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -312,7 +319,7 @@
             style="@style/AppText.Body"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/space_8"
+            android:layout_marginTop="@dimen/space_6"
             android:text="@string/auto_text_037"
             android:textColor="?attr/colorPrimary"
             android:textStyle="bold"
@@ -323,7 +330,7 @@
             android:id="@+id/btnLogin"
             style="@style/AppButton.Primary"
             android:layout_width="0dp"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="@dimen/space_16"
             android:text="@string/auto_text_038"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -333,7 +340,7 @@
             android:id="@+id/layoutOrDivider"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="@dimen/space_14"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/btnLogin">
@@ -376,7 +383,7 @@
             android:id="@+id/layoutSocialButtons"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="@dimen/space_10"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/layoutOrDivider">
@@ -385,6 +392,9 @@
                 android:id="@+id/btnGoogle"
                 style="@style/AppButton.Secondary"
                 android:layout_width="0dp"
+                android:minHeight="@dimen/auth_social_button_height"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
                 android:text="@string/auto_text_040"
                 app:icon="@drawable/googlelogo"
                 app:iconGravity="textStart"
@@ -400,6 +410,9 @@
                 style="@style/AppButton.Secondary"
                 android:layout_width="0dp"
                 android:layout_marginStart="@dimen/space_12"
+                android:minHeight="@dimen/auth_social_button_height"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
                 android:text="@string/auto_text_041"
                 app:icon="@drawable/facebooklogo"
                 app:iconGravity="textStart"
@@ -411,46 +424,43 @@
                 app:layout_constraintTop_toTopOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/layoutSignUpRow"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:layout_marginBottom="12dp"
-        app:layout_constraintTop_toBottomOf="@id/layoutLoginContent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
-
-        <TextView
-            android:id="@+id/tvNoAccount"
-            style="@style/AppText.Body"
-            android:layout_width="wrap_content"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/layoutSignUpRow"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="@string/auto_text_042"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/tvSignUp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/tvSignUp"
-            style="@style/AppText.Body"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/space_8"
-            android:text="@string/auto_text_043"
-            android:textColor="?attr/colorPrimary"
-            android:textStyle="bold"
-            app:layout_constraintBaseline_toBaselineOf="@id/tvNoAccount"
+            android:layout_marginTop="@dimen/space_10"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/tvNoAccount" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/layoutSocialButtons">
+
+            <TextView
+                android:id="@+id/tvNoAccount"
+                style="@style/AppText.Body"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/auto_text_042"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/tvSignUp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tvSignUp"
+                style="@style/AppText.Body"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/space_8"
+                android:text="@string/auto_text_043"
+                android:textColor="?attr/colorPrimary"
+                android:textStyle="bold"
+                app:layout_constraintBaseline_toBaselineOf="@id/tvNoAccount"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/tvNoAccount" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-</androidx.core.widget.NestedScrollView>
-
-
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,342 @@
+appId: isim.ia2y.myapplication
+tags:
+  - admin
+  - shopper
+  - catalog
+  - roundtrip
+---
+- launchApp:
+    stopApp: true
+- retry:
+    maxRetries: 3
+    commands:
+      - tapOn:
+          id: "android:id/aerr_wait"
+          optional: true
+      - tapOn:
+          text: "Wait"
+          optional: true
+      - extendedWaitUntil:
+          visible:
+            id: "layoutSearchBar"
+          timeout: 10000
+- tapOn:
+    id: "hostNavProfile"
+- extendedWaitUntil:
+    visible:
+      id: "cardLogout"
+    timeout: 15000
+- tapOn:
+    id: "cardLogout"
+- extendedWaitUntil:
+    visible:
+      id: "btnLogin"
+    timeout: 15000
+- tapOn:
+    id: "etEmail"
+- inputText: "${QA_ADMIN_EMAIL}"
+- hideKeyboard
+- tapOn:
+    id: "etPassword"
+- inputText: "${QA_ADMIN_PASSWORD}"
+- hideKeyboard
+- tapOn:
+    id: "btnLogin"
+- extendedWaitUntil:
+    visible:
+      id: "hostNavProfile"
+    timeout: 30000
+- tapOn:
+    id: "hostNavProfile"
+- extendedWaitUntil:
+    visible:
+      id: "cardAdmin"
+    timeout: 15000
+- tapOn:
+    id: "cardAdmin"
+- extendedWaitUntil:
+    visible:
+      id: "adminNavDashboard"
+    timeout: 20000
+- tapOn:
+    id: "adminNavProduits"
+- extendedWaitUntil:
+    visible:
+      id: "adminProduitsBtnAdd"
+    timeout: 15000
+- tapOn:
+    id: "adminProduitsBtnAdd"
+- extendedWaitUntil:
+    visible:
+      id: "etAdminProductTitle"
+    timeout: 15000
+- tapOn:
+    id: "etAdminProductTitle"
+- inputText: "${QA_ADMIN_PRODUCT_TITLE_INITIAL}"
+- hideKeyboard
+- tapOn:
+    id: "etAdminProductSubtitle"
+- inputText: "Codex QA beauty launch"
+- hideKeyboard
+- tapOn:
+    id: "etAdminProductPrice"
+- inputText: "41.5"
+- hideKeyboard
+- tapOn:
+    id: "etAdminProductStock"
+- inputText: "9"
+- hideKeyboard
+- tapOn:
+    id: "actvAdminProductCategory"
+- inputText: "Beauty"
+- hideKeyboard
+- tapOn:
+    id: "etAdminProductOrigin"
+- inputText: "Sousse"
+- hideKeyboard
+- swipe:
+    start: 50%, 78%
+    end: 50%, 28%
+    duration: 500
+- tapOn:
+    id: "etAdminProductDescription"
+- inputText: "Codex QA seeded beauty product for admin and shopper catalog verification."
+- hideKeyboard
+- tapOn:
+    id: "etAdminProductBullets"
+- inputText: "Rounded bottle with a clean QA label"
+- hideKeyboard
+- tapOn:
+    id: "adminProductEditorBtnSave"
+- extendedWaitUntil:
+    visible:
+      id: "adminProduitsBtnAdd"
+    timeout: 30000
+- tapOn:
+    id: "adminProduitsSearchInput"
+- inputText: "${QA_ADMIN_PRODUCT_TITLE_INITIAL}"
+- hideKeyboard
+- extendedWaitUntil:
+    visible: "${QA_ADMIN_PRODUCT_TITLE_INITIAL}"
+    timeout: 15000
+- takeScreenshot: "110-admin-product-added"
+- tapOn:
+    id: "adminProductBtnEdit"
+- extendedWaitUntil:
+    visible:
+      id: "etAdminProductTitle"
+    timeout: 15000
+- tapOn:
+    id: "etAdminProductTitle"
+- eraseText
+- inputText: "${QA_ADMIN_PRODUCT_TITLE_EDITED}"
+- hideKeyboard
+- tapOn:
+    id: "etAdminProductSubtitle"
+- eraseText
+- inputText: "Codex QA pantry relaunch"
+- hideKeyboard
+- tapOn:
+    id: "etAdminProductPrice"
+- eraseText
+- inputText: "59.0"
+- hideKeyboard
+- tapOn:
+    id: "etAdminProductStock"
+- eraseText
+- inputText: "4"
+- hideKeyboard
+- tapOn:
+    id: "actvAdminProductCategory"
+- eraseText
+- inputText: "Food"
+- hideKeyboard
+- tapOn:
+    id: "etAdminProductOrigin"
+- eraseText
+- inputText: "Nabeul"
+- hideKeyboard
+- swipe:
+    start: 50%, 78%
+    end: 50%, 28%
+    duration: 500
+- tapOn:
+    id: "etAdminProductDescription"
+- eraseText
+- inputText: "Codex QA pantry product after the admin edit path changed the name, price, category, and stock."
+- hideKeyboard
+- tapOn:
+    id: "etAdminProductBullets"
+- eraseText
+- inputText: "Updated pantry highlight for shopper verification"
+- hideKeyboard
+- tapOn:
+    id: "adminProductEditorBtnSave"
+- extendedWaitUntil:
+    visible:
+      id: "adminProduitsBtnAdd"
+    timeout: 30000
+- tapOn:
+    id: "adminProduitsSearchInput"
+- eraseText
+- inputText: "${QA_ADMIN_PRODUCT_TITLE_EDITED}"
+- hideKeyboard
+- extendedWaitUntil:
+    visible: "${QA_ADMIN_PRODUCT_TITLE_EDITED}"
+    timeout: 15000
+- takeScreenshot: "111-admin-product-edited"
+- tapOn:
+    id: "adminProduitsIvBack"
+- extendedWaitUntil:
+    visible:
+      id: "hostNavProfile"
+    timeout: 15000
+- tapOn:
+    id: "hostNavProfile"
+- extendedWaitUntil:
+    visible:
+      id: "cardLogout"
+    timeout: 15000
+- tapOn:
+    id: "cardLogout"
+- extendedWaitUntil:
+    visible:
+      id: "btnLogin"
+    timeout: 15000
+- pressKey: back
+- extendedWaitUntil:
+    visible:
+      id: "hostNavHome"
+    timeout: 15000
+- tapOn:
+    id: "hostNavHome"
+- extendedWaitUntil:
+    visible:
+      id: "layoutSearchBar"
+    timeout: 10000
+- tapOn:
+    id: "layoutSearchBar"
+- extendedWaitUntil:
+    visible:
+      id: "etSearch"
+    timeout: 10000
+- tapOn:
+    id: "etSearch"
+- inputText: "${QA_ADMIN_PRODUCT_TITLE_EDITED}"
+- pressKey: enter
+- extendedWaitUntil:
+    visible: "${QA_ADMIN_PRODUCT_TITLE_EDITED}"
+    timeout: 20000
+- takeScreenshot: "112-shopper-sees-edited-product"
+- pressKey: back
+- extendedWaitUntil:
+    visible:
+      id: "hostNavProfile"
+    timeout: 15000
+- tapOn:
+    id: "hostNavProfile"
+- extendedWaitUntil:
+    visible:
+      id: "cardLogout"
+    timeout: 15000
+- tapOn:
+    id: "cardLogout"
+- extendedWaitUntil:
+    visible:
+      id: "btnLogin"
+    timeout: 15000
+- tapOn:
+    id: "etEmail"
+- inputText: "${QA_ADMIN_EMAIL}"
+- hideKeyboard
+- tapOn:
+    id: "etPassword"
+- inputText: "${QA_ADMIN_PASSWORD}"
+- hideKeyboard
+- tapOn:
+    id: "btnLogin"
+- extendedWaitUntil:
+    visible:
+      id: "hostNavProfile"
+    timeout: 30000
+- tapOn:
+    id: "hostNavProfile"
+- extendedWaitUntil:
+    visible:
+      id: "cardAdmin"
+    timeout: 15000
+- tapOn:
+    id: "cardAdmin"
+- extendedWaitUntil:
+    visible:
+      id: "adminNavDashboard"
+    timeout: 20000
+- tapOn:
+    id: "adminNavProduits"
+- extendedWaitUntil:
+    visible:
+      id: "adminProduitsSearchInput"
+    timeout: 15000
+- tapOn:
+    id: "adminProduitsSearchInput"
+- inputText: "${QA_ADMIN_PRODUCT_TITLE_EDITED}"
+- hideKeyboard
+- extendedWaitUntil:
+    visible: "${QA_ADMIN_PRODUCT_TITLE_EDITED}"
+    timeout: 15000
+- tapOn:
+    id: "adminProductBtnDelete"
+- extendedWaitUntil:
+    visible: "Supprimer|Delete"
+    timeout: 10000
+- takeScreenshot: "113-admin-delete-confirmation"
+- tapOn: "Supprimer|Delete"
+- extendedWaitUntil:
+    visible:
+      id: "adminProduitsEmpty"
+    timeout: 15000
+- takeScreenshot: "114-admin-product-deleted"
+- tapOn:
+    id: "adminProduitsIvBack"
+- extendedWaitUntil:
+    visible:
+      id: "hostNavProfile"
+    timeout: 15000
+- tapOn:
+    id: "hostNavProfile"
+- extendedWaitUntil:
+    visible:
+      id: "cardLogout"
+    timeout: 15000
+- tapOn:
+    id: "cardLogout"
+- extendedWaitUntil:
+    visible:
+      id: "btnLogin"
+    timeout: 15000
+- pressKey: back
+- extendedWaitUntil:
+    visible:
+      id: "hostNavHome"
+    timeout: 15000
+- tapOn:
+    id: "hostNavHome"
+- extendedWaitUntil:
+    visible:
+      id: "layoutSearchBar"
+    timeout: 10000
+- tapOn:
+    id: "layoutSearchBar"
+- extendedWaitUntil:
+    visible:
+      id: "etSearch"
+    timeout: 10000
+- tapOn:
+    id: "etSearch"
+- inputText: "${QA_ADMIN_PRODUCT_TITLE_EDITED}"
+- pressKey: enter
+- extendedWaitUntil:
+    visible:
+      id: "layoutEmptyState"
+    timeout: 20000
+- takeScreenshot: "115-shopper-product-removed"

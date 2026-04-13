@@ -12,6 +12,8 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.switchmaterial.SwitchMaterial
 import kotlinx.coroutines.launch
@@ -57,7 +59,30 @@ class AddressesActivity : AppCompatActivity() {
 
     private fun loadAddresses() {
         lifecycleScope.launch {
-            val addresses = AddressBookStore.getAll(this@AddressesActivity)
+            val localAddresses = AddressBookStore.getAll(this@AddressesActivity)
+            val isLoggedIn = FirebaseAuthManager.currentUser != null
+
+            if (isLoggedIn) {
+                state = if (localAddresses.isEmpty()) {
+                    ScreenState.Loading
+                } else {
+                    ScreenState.Content(localAddresses)
+                }
+                renderState()
+            }
+
+            val addresses = if (isLoggedIn) {
+                runCatching { AddressBookStore.refreshFromCloud(this@AddressesActivity) }
+                    .onFailure {
+                        if (localAddresses.isEmpty()) {
+                            showMotionSnackbar(getString(R.string.profile_load_failed))
+                        }
+                    }
+                    .getOrDefault(localAddresses)
+            } else {
+                localAddresses
+            }
+
             state = if (addresses.isEmpty()) {
                 ScreenState.Empty(getString(R.string.address_none))
             } else {
@@ -72,6 +97,7 @@ class AddressesActivity : AppCompatActivity() {
         val emptyLayout = findViewById<View>(R.id.layoutAddressesEmpty)
         val emptyAnimation = findViewById<com.airbnb.lottie.LottieAnimationView>(R.id.ivAddressesEmptyAnimation)
         val currentValue = findViewById<TextView>(R.id.tvCurrentAddressValue)
+        val currentCard = findViewById<View>(R.id.cardCurrentAddress)
         val loading = findViewById<ProgressBar>(R.id.loadingIndicator)
 
         when (val currentState = state) {
@@ -80,6 +106,7 @@ class AddressesActivity : AppCompatActivity() {
                 recycler.visibility = View.VISIBLE
                 emptyLayout?.visibility = View.GONE
                 emptyAnimation?.pauseAnimation()
+                currentCard?.visibility = View.VISIBLE
                 val current = currentState.data.firstOrNull { it.isDefault } ?: currentState.data.first()
                 currentValue?.text = listOf(current.titleLine, current.summaryLine, current.detailsLine)
                     .filter { it.isNotBlank() }
@@ -94,6 +121,7 @@ class AddressesActivity : AppCompatActivity() {
                 recycler.visibility = View.GONE
                 emptyLayout?.visibility = View.VISIBLE
                 emptyAnimation?.playAnimation()
+                currentCard?.visibility = View.GONE
                 currentValue?.text = getString(R.string.address_none_registered)
             }
             is ScreenState.Error -> {
@@ -101,6 +129,7 @@ class AddressesActivity : AppCompatActivity() {
                 recycler.visibility = View.GONE
                 emptyLayout?.visibility = View.VISIBLE
                 emptyAnimation?.playAnimation()
+                currentCard?.visibility = View.GONE
                 currentValue?.text = currentState.message
             }
             ScreenState.Loading -> {
@@ -108,6 +137,7 @@ class AddressesActivity : AppCompatActivity() {
                 recycler.visibility = View.GONE
                 emptyLayout?.visibility = View.GONE
                 emptyAnimation?.pauseAnimation()
+                currentCard?.visibility = View.GONE
             }
         }
     }
@@ -139,6 +169,10 @@ class AddressesActivity : AppCompatActivity() {
         val etPostal = dialogView.findViewById<EditText>(R.id.etAddressPostalCode)
         val etNotes = dialogView.findViewById<EditText>(R.id.etAddressNotes)
         val switchDefault = dialogView.findViewById<SwitchMaterial>(R.id.switchAddressDefault)
+        val btnCancel = dialogView.findViewById<MaterialButton>(R.id.btnAddressSheetCancel)
+        val btnSave = dialogView.findViewById<MaterialButton>(R.id.btnAddressSheetSave)
+        btnSave.text =
+            if (existing == null) getString(R.string.address_dialog_add_action) else getString(R.string.address_dialog_save_action)
 
         val fallbackName = FirebaseAuthManager.currentUser?.displayName.orEmpty()
         existing?.let { address ->
@@ -157,52 +191,50 @@ class AddressesActivity : AppCompatActivity() {
             switchDefault.isChecked = AddressBookStore.getAll(this).isEmpty()
         }
 
-        val dialog = MaterialAlertDialogBuilder(this)
-            .setView(dialogView)
-            .setNegativeButton(getString(R.string.address_dialog_cancel), null)
-            .setPositiveButton(if (existing == null) getString(R.string.address_dialog_add_action) else getString(R.string.address_dialog_save_action), null)
-            .create()
+        val dialog = BottomSheetDialog(this)
+        dialog.setContentView(dialogView)
+        dialog.behavior.state = BottomSheetBehavior.STATE_EXPANDED
+        dialog.behavior.skipCollapsed = true
 
-        dialog.setOnShowListener {
-            dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE)?.setOnClickListener {
-                val input = DeliveryAddressInput(
-                    label = etLabel.text?.toString().orEmpty(),
-                    recipientName = etRecipient.text?.toString().orEmpty(),
-                    phone = etPhone.text?.toString().orEmpty(),
-                    governorate = etGovernorate.text?.toString().orEmpty(),
-                    city = etCity.text?.toString().orEmpty(),
-                    addressLine1 = etLine1.text?.toString().orEmpty(),
-                    addressLine2 = etLine2.text?.toString().orEmpty(),
-                    postalCode = etPostal.text?.toString().orEmpty(),
-                    deliveryNotes = etNotes.text?.toString().orEmpty(),
-                    isDefault = switchDefault.isChecked
-                )
-                val validation = DeliveryAddressValidator.validate(input)
-                if (validation != null) {
-                    showMotionSnackbar(validation)
-                    return@setOnClickListener
-                }
-
-                val address = DeliveryAddress(
-                    id = existing?.id ?: java.util.UUID.randomUUID().toString(),
-                    label = input.label.trim(),
-                    recipientName = input.recipientName.trim(),
-                    phone = DeliveryAddressValidator.normalizedPhone(input.phone),
-                    governorate = input.governorate.trim(),
-                    city = input.city.trim(),
-                    addressLine1 = input.addressLine1.trim(),
-                    addressLine2 = input.addressLine2.trim().ifBlank { null },
-                    postalCode = input.postalCode.trim().ifBlank { null },
-                    deliveryNotes = input.deliveryNotes.trim().ifBlank { null },
-                    isDefault = input.isDefault
-                )
-                AddressBookStore.upsert(this, address)
-                if (address.isDefault) {
-                    AddressBookStore.setCurrent(this, address.id)
-                }
-                dialog.dismiss()
-                loadAddresses()
+        btnCancel.setOnClickListener { dialog.dismiss() }
+        btnSave.setOnClickListener {
+            val input = DeliveryAddressInput(
+                label = etLabel.text?.toString().orEmpty(),
+                recipientName = etRecipient.text?.toString().orEmpty(),
+                phone = etPhone.text?.toString().orEmpty(),
+                governorate = etGovernorate.text?.toString().orEmpty(),
+                city = etCity.text?.toString().orEmpty(),
+                addressLine1 = etLine1.text?.toString().orEmpty(),
+                addressLine2 = etLine2.text?.toString().orEmpty(),
+                postalCode = etPostal.text?.toString().orEmpty(),
+                deliveryNotes = etNotes.text?.toString().orEmpty(),
+                isDefault = switchDefault.isChecked
+            )
+            val validation = DeliveryAddressValidator.validate(input)
+            if (validation != null) {
+                showMotionSnackbar(validation)
+                return@setOnClickListener
             }
+
+            val address = DeliveryAddress(
+                id = existing?.id ?: java.util.UUID.randomUUID().toString(),
+                label = input.label.trim(),
+                recipientName = input.recipientName.trim(),
+                phone = DeliveryAddressValidator.normalizedPhone(input.phone),
+                governorate = input.governorate.trim(),
+                city = input.city.trim(),
+                addressLine1 = input.addressLine1.trim(),
+                addressLine2 = input.addressLine2.trim().ifBlank { null },
+                postalCode = input.postalCode.trim().ifBlank { null },
+                deliveryNotes = input.deliveryNotes.trim().ifBlank { null },
+                isDefault = input.isDefault
+            )
+            AddressBookStore.upsert(this, address)
+            if (address.isDefault) {
+                AddressBookStore.setCurrent(this, address.id)
+            }
+            dialog.dismiss()
+            loadAddresses()
         }
         dialog.show()
     }

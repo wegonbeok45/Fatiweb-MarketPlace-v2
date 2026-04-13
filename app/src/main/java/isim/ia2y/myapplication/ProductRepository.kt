@@ -16,13 +16,31 @@ data class Product(
     val bullets: List<String>,
     @DrawableRes val imageRes: Int,
     val imageUrl: String? = null,
+    val imageUrls: List<String> = emptyList(),
     val category: String = "craft",
+    val categoryIds: List<String> = emptyList(),
     val origin: String = "tunisia",
     val stock: Int = 0,
     val isBio: Boolean = false,
     val isActive: Boolean = true,
-    val updatedAt: Long = 0L
+    val status: String = "published",
+    val searchKeywords: List<String> = emptyList(),
+    val createdAt: Any? = null,
+    val updatedAt: Any? = null
 ) {
+    val updatedAtMillis: Long get() = when (val res = updatedAt) {
+        is Long -> res
+        is com.google.firebase.Timestamp -> res.toDate().time
+        is Map<*, *> -> (res["seconds"] as? Number)?.toLong()?.let { it * 1000 } ?: 0L // handle potential map from local cache
+        else -> 0L
+    }
+
+    val createdAtMillis: Long get() = when (val res = createdAt) {
+        is Long -> res
+        is com.google.firebase.Timestamp -> res.toDate().time
+        is Map<*, *> -> (res["seconds"] as? Number)?.toLong()?.let { it * 1000 } ?: 0L
+        else -> 0L
+    }
     val unitPrice: Double get() = price
     val tag: String get() = tags.firstOrNull().orEmpty()
     val isDisplayReady: Boolean
@@ -59,7 +77,7 @@ object ProductCatalog {
 
     fun all(includeInactive: Boolean = false): List<Product> {
         val snapshot = cachedProducts
-        return if (includeInactive) snapshot else snapshot.filter { it.isActive && it.isDisplayReady }
+        return if (includeInactive) snapshot else snapshot.filter { it.isActive }
     }
 
     fun byId(id: String): Product? {

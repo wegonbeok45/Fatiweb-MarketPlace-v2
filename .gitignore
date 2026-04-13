@@ -23,3 +23,14 @@ build_log.txt
 final_build.log
 gradlew_out.txt
 fatiweb-marketplace-firebase-adminsdk-fbsvc-ee9d682cc5.json
+service_account.json
+*firebase-adminsdk-*.json
+*.hprof
+build_*.txt
+build_*.log
+all_errors_*.txt
+log_*.txt
+out.txt
+firebase_functions_setup/node_modules/
+firebase_functions_setup/lib/
+local.secrets.properties

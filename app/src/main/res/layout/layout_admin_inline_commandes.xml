@@ -141,6 +141,7 @@
             android:textSize="@dimen/text_size_body" />
 
         <com.google.android.material.card.MaterialCardView
+            android:id="@+id/adminInlineOrdersContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:cardBackgroundColor="@color/profile_card_bg"
@@ -158,4 +159,3 @@
         </com.google.android.material.card.MaterialCardView>
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>
-

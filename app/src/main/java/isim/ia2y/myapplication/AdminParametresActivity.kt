@@ -44,6 +44,22 @@ class AdminParametresActivity : AppCompatActivity() {
             configurePaymentSection()
             setupDeliveryEdits()
             loadDeliveryConfig()
+            if (BuildConfig.DEBUG) {
+                findViewById<View>(R.id.btnAdminSeedDB)?.apply {
+                    visibility = View.VISIBLE
+                    isEnabled = true
+                    alpha = 1f
+                }
+                findViewById<View>(R.id.tvAdminSeedDBHelper)?.visibility = View.GONE
+                setupSeederButton()
+            } else {
+                findViewById<View>(R.id.btnAdminSeedDB)?.apply {
+                    visibility = View.VISIBLE
+                    isEnabled = false
+                    alpha = 0.58f
+                }
+                findViewById<View>(R.id.tvAdminSeedDBHelper)?.visibility = View.VISIBLE
+            }
         }
     }
 
@@ -147,6 +163,31 @@ class AdminParametresActivity : AppCompatActivity() {
         }
 
         dialog.show()
+    }
+
+    private fun setupSeederButton() {
+        val btnSeed = findViewById<MaterialButton>(R.id.btnAdminSeedDB)
+        btnSeed?.setOnClickListener {
+            btnSeed.isEnabled = false
+            btnSeed.text = getString(R.string.admin_settings_debug_seed_running)
+            
+            lifecycleScope.launch {
+                runCatching {
+                    AdminSeederUtils.seedDatabase(this@AdminParametresActivity) { curr, total ->
+                        runOnUiThread {
+                            btnSeed.text = getString(R.string.admin_settings_debug_seed_progress, curr, total)
+                        }
+                    }
+                }.onSuccess {
+                    btnSeed.text = getString(R.string.admin_settings_debug_seed_done)
+                    showToast(getString(R.string.admin_settings_debug_seed_success))
+                }.onFailure {
+                    btnSeed.isEnabled = true
+                    btnSeed.text = getString(R.string.admin_settings_debug_seed)
+                    showMotionSnackbar(getString(R.string.admin_settings_debug_seed_failed, it.message ?: "unknown error"))
+                }
+            }
+        }
     }
 
     private fun setupTopBar() {

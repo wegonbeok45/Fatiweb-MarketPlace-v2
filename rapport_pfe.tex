@@ -1,0 +1,400 @@
+\documentclass[12pt,a4paper]{report}
+
+% Paquets de base
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+
+% Paquets pour la mise en page et le style
+\usepackage{geometry}
+\geometry{a4paper, top=2.5cm, bottom=2.5cm, left=3cm, right=2.5cm}
+\usepackage{setspace}
+\onehalfspacing
+
+% Paquets pour les graphiques et figures
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{subcaption}
+
+% Paquets pour les tableaux
+\usepackage{tabularx}
+\usepackage{multirow}
+\usepackage{booktabs}
+\usepackage{array}
+
+% Paquets pour le code source et la coloration syntaxique
+\usepackage{listings}
+\usepackage{xcolor}
+
+% Configuration de listings pour JSON et Kotlin (pseudo)
+\definecolor{eclipseStrings}{RGB}{42,0.0,255}
+\definecolor{eclipseKeywords}{RGB}{127,0,85}
+\colorlet{numb}{magenta!60!black}
+\lstdefinelanguage{json}{
+    basicstyle=\small\ttfamily,
+    stringstyle=\color{eclipseStrings},
+    showstringspaces=false,
+    breaklines=true,
+}
+\lstset{
+    language=json,
+    extendedchars=true,
+    literate={é}{{\'e}}1 {è}{{\`e}}1 {à}{{\`a}}1 {ç}{{\c{c}}}1 {œ}{{\oe}}1 {ù}{{\`u}}1 {É}{{\'E}}1 {È}{{\`E}}1 {À}{{\`A}}1 {Ç}{{\c{C}}}1 {Œ}{{\OE}}1 {Ê}{{\^E}}1 {ê}{{\^e}}1 {î}{{\^i}}1 {ô}{{\^o}}1 {û}{{\^u}}1,
+}
+
+% Paquets pour liens et table des matières cliquable
+\usepackage[hidelinks]{hyperref}
+
+% Définition des en-têtes et pieds de page
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+% Définition des abréviations
+\usepackage{acronym}
+
+\begin{document}
+
+% ==========================================
+% PAGE DE GARDE
+% ==========================================
+\begin{titlepage}
+    \begin{center}
+        \includegraphics[width=0.3\textwidth]{example-image-a} % Placeholder pour logo établissement
+        \hfill
+        \includegraphics[width=0.3\textwidth]{example-image-b} % Placeholder pour logo entreprise
+        
+        \vspace{2cm}
+        
+        {\large \textbf{Rapport de Projet de Fin d'Études}}\\[0.5cm]
+        {\small En vue de l'obtention du diplôme de}\\[0.5cm]
+        {\large \textbf{[Nom du Diplôme]}}\\[0.5cm]
+        {\small Spécialité : [Nom de la Spécialité]}
+        
+        \vspace{1.5cm}
+        
+        \rule{\linewidth}{0.5mm} \\[0.4cm]
+        {\huge \textbf{Refonte et Sécurisation de l'Architecture Backend d'une Place de Marché E-commerce Android}}\\[0.4cm]
+        \rule{\linewidth}{0.5mm}
+        
+        \vspace{1.5cm}
+        
+        \textbf{Réalisé par :}\\
+        Nom : \_\_\_\_\_\_\_\_ \ Prénom : \_\_\_\_\_\_\_\_
+        
+        \vspace{1.5cm}
+        
+        \textbf{Soutenu le : \_\_\_\_\_\_\_\_ devant le jury composé de :}
+        \vspace{0.5cm}
+        
+        \begin{tabular}{lll}
+            M./Mme \_\_\_\_\_\_\_\_ & [Fonction/Établissement] & Président \\
+            M./Mme \_\_\_\_\_\_\_\_ & [Fonction/Établissement] & Rapporteur \\
+            M./Mme \_\_\_\_\_\_\_\_ & Encadrant Académique & \_\_\_\_\_\_\_\_ \\
+            M./Mme \_\_\_\_\_\_\_\_ & Encadrant Professionnel & \_\_\_\_\_\_\_\_ \\
+        \end{tabular}
+        
+        \vfill
+        
+        \textbf{Entreprise d'accueil : \_\_\_\_\_\_\_\_}\\
+        \textbf{Année Universitaire : 2025/2026}
+        
+    \end{center}
+\end{titlepage}
+
+% ==========================================
+% REMERCIEMENTS
+% ==========================================
+\pagenumbering{roman}
+\addcontentsline{toc}{chapter}{Remerciements}
+\chapter*{Remerciements}
+\thispagestyle{empty}
+
+Avant tout développement sur cette expérience professionnelle, il apparaît opportun de commencer ce rapport par des remerciements, à ceux qui m'ont beaucoup appris au cours de ce projet, et à ceux qui ont eu la gentillesse de faire de ce stage un moment très profitable.\\
+
+Je tiens à remercier dans un premier temps \textbf{[Nom de l'entreprise]} de m'avoir accueilli comme stagiaire au sein de son équipe.\\
+
+Mes remerciements vont également à mon encadrant professionnel, \textbf{M./Mme \_\_\_\_\_\_\_\_}, pour son accueil, le temps passé ensemble et le partage de son expertise au quotidien. Grâce à sa confiance, j'ai pu accomplir mes missions dans d'excellentes conditions.\\
+
+Je tiens également à exprimer ma profonde gratitude à mon encadrant académique, \textbf{M./Mme \_\_\_\_\_\_\_\_}, pour son suivi rigoureux, ses précieux conseils et son soutien incontestable tout au long de mon projet.\\
+
+Enfin, je remercie les membres du jury, \textbf{M./Mme \_\_\_\_\_\_\_\_} et \textbf{M./Mme \_\_\_\_\_\_\_\_}, qui me font l'honneur de juger ce travail.
+
+\clearpage
+
+% ==========================================
+% RESUMES
+% ==========================================
+\addcontentsline{toc}{chapter}{Résumé}
+\chapter*{Résumé}
+Ce rapport décrit les travaux réalisés dans le cadre du Projet de Fin d'Études visant à refondre l'architecture backend d'une application mobile e-commerce (FatiWeb Marketplace) développée pour Android. L'objectif principal était d'effectuer une migration d'une architecture client-lourd vulnérable vers un modèle robuste, sécurisé et performant basé sur Firebase Cloud Functions et Firestore. Le travail a impliqué la redéfinition du schéma de base de données pour optimiser les lectures, l'implémentation de processus transactionnels sécurisés (commande, gestion de stock), l'intégration sécurisée de Gemini AI via un backend de confiance, et l'établissement de règles de sécurité strictes (Firestore Rules). Ce projet a permis de stabiliser l'application et de la préparer pour un environnement de production fiable.
+
+\textbf{Mots clés :} Android, Firebase, Cloud Functions, E-commerce, Sécurité, Backend.
+
+\vspace{1cm}
+
+\begin{center}
+\textbf{Abstract}
+\end{center}
+This report details the work carried out during an End-of-Studies Project aimed at redesigning the backend architecture of a mobile e-commerce application (FatiWeb Marketplace) developed for Android. The main objective was to transition from a vulnerable thick-client architecture to a robust, secure, and performant model based on Firebase Cloud Functions and Firestore. The work involved redefining the database schema to optimize reads, implementing secure transactional processes (order management, inventory), securely integrating Gemini AI through a trusted backend, and establishing strict security boundaries (Firestore Rules). This project successfully stabilized the application, preparing it for a reliable production environment.
+
+\textbf{Keywords:} Android, Firebase, Cloud Functions, E-commerce, Security, Backend.
+
+\clearpage
+
+% ==========================================
+% TABLES ET LISTES
+% ==========================================
+\tableofcontents
+\clearpage
+
+\addcontentsline{toc}{chapter}{Liste des figures}
+\listoffigures
+\clearpage
+
+\addcontentsline{toc}{chapter}{Liste des tableaux}
+\listoftables
+\clearpage
+
+\addcontentsline{toc}{chapter}{Liste des abréviations}
+\chapter*{Liste des abréviations}
+\begin{acronym}[Firebase]
+ \acro{API}{Application Programming Interface}
+ \acro{COD}{Cash On Delivery}
+ \acro{JSON}{JavaScript Object Notation}
+ \acro{SDK}{Software Development Kit}
+ \acro{UI}{User Interface}
+ \acro{UX}{User Experience}
+\end{acronym}
+\clearpage
+
+% ==========================================
+% INTRODUCTION GÉNÉRALE
+% ==========================================
+\pagenumbering{arabic}
+\chapter*{Introduction Générale}
+\addcontentsline{toc}{chapter}{Introduction Générale}
+
+Avec l'évolution rapide du commerce électronique et la prédominance croissante des plateformes mobiles, garantir la robustesse, l'évolutivité et la sécurité des applications mobiles est devenu un défi majeur. Ce projet de fin d'études s'inscrit dans ce contexte et concerne l'application « FatiWeb Marketplace », une plateforme de commerce en ligne axée sur le marché tunisien, proposant le paiement à la livraison (Cash on Delivery).
+
+La version initiale de l'application reposait sur un modèle où la majorité de la logique métier, y compris la gestion des commandes, le contrôle des stocks et l'intégration de services d'intelligence artificielle (Gemini AI), était embarquée directement du côté client (l'application Android). Bien que ce modèle ait permis le lancement rapide d'un produit minimum viable (MVP), il présentait de sérieuses failles de sécurité, limitait l'évolutivité et complexifiait la maintenance du système.
+
+L'objectif principal de ce projet a été la réalisation d'un audit technique complet suivi d'une refonte majeure et sécurisée de l'architecture backend, en s'appuyant sur l'écosystème Firebase (Firestore, Cloud Functions, Cloud Storage, Authentication). Il s'agissait de déplacer les processus transactionnels sensibles vers un environnement serveur de confiance, de redéfinir la structure des données pour optimiser les performances, et de corriger des problèmes de stabilité critiques (tels que des erreurs de compilation Android et des dysfonctionnements du chatbot IA).
+
+Le présent rapport s'articule autour de quatre chapitres principaux. Le premier chapitre est consacré au cadre général du projet, exposant l'entreprise d'accueil, le contexte, la problématique et les objectifs visés. Le deuxième chapitre détaille l'étude préalable, incluant l'analyse de l'existant et l'identification des processus à sécuriser. Le troisième chapitre présente la conception architecturale, avec un focus sur les décisions de conception relatives à Firestore et la répartition client/serveur. Le quatrième chapitre expose la réalisation technique, la mise en place des scripts de migration, l'intégration de l'infrastructure backend et les tests de validation, avant de clôturer par une conclusion générale et des perspectives.
+
+% ==========================================
+% CHAPITRE 1
+% ==========================================
+\chapter{Contexte et Présentation du Projet}
+
+\section{Introduction}
+Tout projet informatique nécessite une définition claire de son cadre de réalisation. Ce chapitre présente l'organisme d'accueil, le contexte général de l'application concernée, la problématique soulevée par l'architecture initiale, ainsi que les objectifs définis pour résoudre ces problèmes.
+
+\section{Présentation de l'Organisme d'Accueil}
+\textit{[À compléter : Présentation de l'entreprise, de son secteur d'activité, de son organisation, etc.]}
+
+\section{Contexte de l'Application}
+L'application FatiWeb Marketplace est une application mobile e-commerce développée pour Android, pensée spécifiquement pour le contexte tunisien (focus sur les produits artisanaux, agricoles et vestimentaires, et paiement à la livraison). Le système repose sur Firebase pour l'authentification des utilisateurs et Firestore pour le stockage de la base de données orientée documents. 
+
+Avant l'intervention, l'application souffrait de plusieurs limitations structurelles : interactions non sécurisées avec la base de données, instabilités au niveau de l'interface Android, et une gestion de stock effectuée côté client.
+
+\section{Problématique}
+L'architecture initiale sous forme de \textit{Produit Minimum Viable} (MVP) posait plusieurs défis majeurs qui empêchaient une mise en production viable :
+\begin{enumerate}
+    \item \textbf{La sécurité et l'intégrité des données :} Les commandes et les modifications de stock étaient confiées au client Android. Un utilisateur malveillant pouvait potentiellement forger les prix des articles ou modifier le niveau de stock.
+    \item \textbf{La gestion des clés sensibles :} La clé API du modèle Gemini IA, utilisé pour le chatbot d'assistant d'achat, était intégrée côté client, exposant le service à des risques d'utilisation abusive.
+    \item \textbf{Mauvaise structuration de la donnée (Firestore) :} Les chemins d'accès aux données (notamment pour les paniers, les commandes et les commentaires) entraînaient un nombre élevé de \textit{lectures Firestore}, augmentant ainsi les coûts potentiels d'exploitation.
+    \item \textbf{Erreurs de compilation et dysfonctionnements silencieux :} Des problèmes de typage Kotlin et des erreurs réseau étouffées lors de l'exécution (seeding) altéraient l'expérience de développement et d'administration.
+\end{enumerate}
+
+\section{Objectifs du Projet}
+Pour répondre à la problématique, les objectifs suivants ont été fixés :
+\begin{itemize}
+    \item Effectuer un audit technique complet de la solution existante.
+    \item Concevoir une nouvelle architecture backend robuste basée sur le principe du "Trusted Environment" en utilisant Firebase Cloud Functions.
+    \item Optimiser les schémas Firestore pour minimiser les coûts de lecture et améliorer les temps de réponse.
+    \item Implémenter et déployer les workflows côté serveur (Création de commande, Mise à jour de stock, IA Gemini, Notifications).
+    \item Stabiliser l'application Android en corrigeant les erreurs de compilation et en l'adaptant à la nouvelle infrastructure backend.
+\end{itemize}
+
+\section{Conclusion}
+Au terme de ce chapitre, nous avons mis en évidence le cadre du projet, ses enjeux et ses principaux objectifs. Le chapitre suivant sera consacré à l'étude préalable du système existant et à la spécification détaillée des besoins pour la nouvelle architecture.
+
+% ==========================================
+% CHAPITRE 2
+% ==========================================
+\chapter{Étude Préalable et Spécification des Besoins}
+
+\section{Introduction}
+L'élaboration d'une nouvelle architecture exige une anlayse de la structure existante. Ce chapitre propose une étude détaillée de l'organisation des données avant l'intervention, l'identification des vulnérabilités, et la description formelle des exigences nécessaires pour la mise aux normes de production.
+
+\section{Analyse de l'Existant}
+L'application s'appuie sur le SDK Firebase pour Android, interagissant directement avec Firebase Authentication, Cloud Storage, et Firestore.
+
+\subsection{État initial de la base de données}
+Avant la migration, les collections étaient organisées ainsi :
+\begin{itemize}
+    \item Les commandes étaient localisées dans \texttt{/users/\{uid\}/orders/\{orderId\}}, rendant les requêtes d'affichage sur le panneau d'administration lentes ou complexes via les \textit{Collection Group Queries}.
+    \item Les paniers n'étaient pas gérés en base, reposant uniquement sur les \textit{SharedPreferences} locales, ce qui causait une perte de données si l'utilisateur changeait d'appareil.
+    \item Le stock n'était pas fiable car il n'existait aucun verrou transactionnel appliqué à la création de commande.
+\end{itemize}
+
+\subsection{Critique de l'existant}
+Le principal point de défaillance consistait en une absence de "frontière de confiance" (Trust Boundary). Les opérations d'écriture de la commande ou de manipulation des prix étaient contrôlées par l'application APK, facilement modifiable. L'exposition de la clé d'API Google Generative AI posait également un défaut critique de sécurité.
+
+\section{Spécification des Besoins}
+
+\subsection{Besoins fonctionnels}
+\begin{itemize}
+    \item \textbf{Workflow Sécurisé de Commande :} La vérification du stock, le calcul des montants (sous-total, livraison, total final) et la conversion du panier en commande globale doivent être réalisés côté serveur.
+    \item \textbf{Modération et Rôles Administrateurs :} Le système doit fournir des claims (via Firebase Custom Claims) gérés par le serveur pour octroyer les permissions d'administration (modification de produit, mise à jour des statuts).
+    \item \textbf{Interaction avec l'Intelligence Artificielle :} Le client envoie l'historique du chat, et le serveur transmet la requête à l'API Gemini sans exposer de clé côté client (Rate limiting de 3 secondes nécessaire).
+    \item \textbf{Gestion des Paniers Synchronisés :} Implémentation d'un panier distant hébergé sous \texttt{/users/\{uid\}/cart/active}.
+\end{itemize}
+
+\subsection{Besoins non fonctionnels}
+\begin{itemize}
+    \item \textbf{Efficacité et performance :} Modification de la structure Firestore, notamment en transformant les lignes de commande (Order Items) en simples \textit{Arrays} au lieu de sous-collections, économisant ainsi les accès en lecture et les coûts associés.
+    \item \textbf{Rétrocompatibilité :} Le système doit maintenir la compatibilité pour les lectures des anciennes structures pour garantir un déploiement fluide.
+    \item \textbf{Images et ressources :} Standardisation de l'utilisation d'URLs `https://` publiques au lieu des chemins `gs://` bruts pour réduire la latence d'affichage en supprimant la phase asynchrone de résolution côté client.
+\end{itemize}
+
+\section{Conclusion}
+L'identification des failles de l'architecture et la liste des exigences fonctionnelles et non fonctionnelles ont balisé le terrain de ce projet. Dans le chapitre qui suit, nous procéderons à la conception de la nouvelle architecture et à l'argumentation des choix techniques.
+
+% ==========================================
+% CHAPITRE 3
+% ==========================================
+\chapter{Conception et Choix Technologiques}
+
+\section{Introduction}
+La réussite de la migration repose sur une conception logicielle rigoureuse. Ce chapitre illustre les décisions prises concernant l'architecture Cloud, le redécoupage des collections NoSQL Firestore et le choix d'outils de développement.
+
+\section{Les Choix Technologiques}
+Afin de répondre aux attentes du système cible, le choix des technologies existantes a été conservé tout en redéployant leur utilité :
+\begin{itemize}
+    \item \textbf{Langage Android :} Kotlin a été conservé pour son support moderne et sa sécurité de typage.
+    \item \textbf{Backend Service :} Node.js avec TypeScript a été adopté pour le développement des \textit{Firebase Cloud Functions}.
+    \item \textbf{Base de données :} Firestore a été réorganisé plutôt que remplacé.
+    \item \textbf{Outils d'accompagnement :} Python a été requis pour construire des SDK et scripts d'administration (ex: l'initialisation sûre des données, la correction rétroactive des Custom Claims).
+\end{itemize}
+
+\section{Décisions Architecturales Majeures}
+
+\subsection{1. Structure du panier}
+\textbf{Choix :} Sub-collection \texttt{/users/\{uid\}/cart/active} avec des Arrays.
+ \\
+\textbf{Justification :} Cette approche permet d'associer un règlement de sécurité très strict de type \texttt{match /users/\{uid\}/\{document=**\}}. Héberger tous les items (articles) d'un panier via un tableau dans l'unique document `active` réduit drastiquement les lectures de la base en comparaison d'une collection d'articles.
+
+\subsection{2. Structure des commandes administrables}
+\textbf{Choix :} \texttt{/orders/\{orderId\}} (à la racine) contre une collection imbriquée.
+ \\
+\textbf{Justification :} Le passage en niveau de base pour la collection permet des requêtes de filtrage par l'administrateur sans nécessiter la construction complexe ou lente de requêtes "Collection Group". L'app Android des utilisateurs est mise à jour pour lire leurs propres commandes depuis ce nœud racine (uniquement rendu en lecture autorisée pour leur UID).
+
+\subsection{3. Épinglage Temporel Server-Side}
+\textbf{Choix :} Passage de System.currentTimeMillis() (Long) au Timestamp Firebase coté serveur (\texttt{FieldValue.serverTimestamp()}).
+ \\
+\textbf{Justification :} Un utilisateur mal intentionné peut changer la date de son smartphone, menaçant la cohérence de l'historique des statuts de sa livraison. Les horodatages sont ainsi contrôlés.
+
+\section{Architecture Cible du Backend "Trusted" (De Confiance)}
+Le diagramme global peut s'expliquer ainsi : l'application Android se limite à un usage d'interface (UI) pour observer et proposer une action.
+Dès lors qu'une modification critique s'effectue (Validation du panier), l'application exécute une fonction "Firebase Callable Function" (\texttt{createOrder()}). En interne, c'est ce code serveur Node.JS, disposant des droits administrateur Firestore (Admin SDK Firebase), qui procède à la vérification des stocks, au prélèvement du catalogue officiel, à la décrementation, au transfert vers l'historique des achats \texttt{/orders/}, à l'horodatage et à la transmission éventuelle d'une notification push in-app.
+
+\section{Conclusion}
+À travers ces choix structurels, les composants de l'application sont clairs et disjoints, apportant performance et isolation des responsabilités. Le chapitre suivant aborde les aspects de mise en œuvre et de développement.
+
+% ==========================================
+% CHAPITRE 4
+% ==========================================
+\chapter{Réalisation, Tests et Fixation Logicielle}
+
+\section{Introduction}
+Ce chapitre détaille la phase d'implémentation. Nous présentons les redéfinitions au sein du code Kotlin Android, la création des APIs sur Firebase et la résolution des incidents techniques repérés durant l'audit logiciel.
+
+\section{Implémentation des Cloud Functions Node.js}
+Le remplacement direct du code client s'est déroulé en structurant des modules au sein de l'espace \texttt{firebase\_functions\_setup/src}.
+
+\subsection{Le workflow "Passer commande"}
+Une fonction \texttt{createOrder} a été écrite pour recevoir les informations du client.
+Afin d'empêcher les failles et le "double spend" (validation concurrente du même article), les commandes appliquent un concept nommé Idempotence via un \texttt{clientRequestId} généré localement et injecté.
+Le script vérifie la disponibilité sur l'entité côté serveur, et en cas de succès, génère la facture finale sans prendre le moindre élément de facturation venant de l'appareil mobile.
+
+\subsection{Proxy de l'IA (GeminiChatService)}
+L'ancienne implémentation \texttt{GeminiChatService.kt} contenait :
+\begin{lstlisting}[language=json, caption=Pseudo-code de l'ancien modèle non sécurisé]
+val generativeModel = GenerativeModel(
+    modelName = "gemini-pro",
+    apiKey = BuildConfig.GEMINI_API_KEY
+)
+\end{lstlisting}
+
+La refonte consistait en l'implémentation d'une fonction Cloud \texttt{assistantSendMessage} à laquelle l'historique de tchat du client et son UID sont redirigés :
+\begin{lstlisting}[language=json, caption=Approche sécurisée avec une Callable Function Kotlin]
+suspend fun sendMessage(history: List<ChatMessage>, userId: String? = null): String {
+    val now = System.currentTimeMillis()
+    if (now - lastRequestTime < COOLDOWN_MS) { throw IOException("RATE_LIMIT") }
+    lastRequestTime = now
+    return BackendFunctionsService.assistantSendMessage(history, userId)
+}
+\end{lstlisting}
+L'ajout d'une barrière via le délai de récupération \texttt{COOLDOWN\_MS} (Rate limiting local) a également limité l'inondation de paquets sur le serveur Cloud.
+
+\section{Sécurisation via les Firestore Security Rules}
+Le fichier \texttt{firestore.rules} modélise l'architecture et bloque par défaut. Les opérations d'écriture pour les branches sensibles ont été désactivées pour les clients :
+\begin{lstlisting}[language=json, caption=Exemple d'isolation des commandes]
+match /orders/{orderId} {
+    // Lecture autorisee pour l'admin, et pour l'acheteur respectif
+    allow read: if isAdmin() || (signedIn() && resource.data.uid == request.auth.uid);
+    // AUCUNE écriture cote client. Le seul redacteur possible est le webhook Cloud Functions
+    allow write: if false; 
+}
+\end{lstlisting}
+
+\section{Résolution des erreurs de l'application cliente Android}
+Plusieurs dysfonctionnements bloquaient la compilation de l'application. 
+L'erreur silencieuse du seeding des données de base de l'administrateur, rendant impossible la publication d'un catalogue produit, était causée par des permissions manquantes dans le contexte. Nous avons contourné ces freins Android en écrivant un script Python indépendant, \texttt{admin\_seeder.py}, utilisant la clé de compte de service \texttt{service\_account.json} pour la génération correcte des données d'inventaire sur Firestore.
+Les classes Data telles que \texttt{ProductRepository.kt} et \texttt{AppOrder.kt} ont été profondément restructurées afin d'être conformes aux contraintes des types de retour du langage Firebase et ainsi corriger les erreurs de compilation bloquant la génération des Builds Gradle.
+
+\sectionsection{Vérification Qualité (QA)}
+De nombreuses sessions de simulation ont été exécutées avec succès pour observer le comportement global, la robustesse du typage dynamique des champs, la visibilité conditionnelle des blocs du Backend Server API selon les rôles (claims) de sécurité, et le comportement réactif de l'UI lors du remplissage du panier (Cash On Delivery) avec la vérification des nouveaux serveurs logiques Firebase Functions.
+
+\section{Conclusion}
+Au cours de ce chapitre, l’ensemble des phases majeures de développement, allant du scripting de l'API Node au traitement correctif d’erreurs de compilation Kotlin de pointe ont été détaillées confirmant le succès de la refondation technologique demandée.
+
+% ==========================================
+% CONCLUSION GÉNÉRALE
+% ==========================================
+\chapter*{Conclusion Générale et Perspectives}
+\addcontentsline{toc}{chapter}{Conclusion Générale et Perspectives}
+
+Le projet "FatiWeb Marketplace" initié sous une approche MVP a mis en exergue la complexité inhérente et incontournable de la gestion de la sécurité asynchrone des données sur smartphone. L'évolution d’une plateforme Android-First reposant excessivement sur l'intelligence de son outil client vers une architecture Cloud modulaire performante "Zero Trust" constitue la majeure réussite de ce projet de fin d'études.
+
+En effet, lors des phases d’audit puis de décision et d'implémentation abordées dans ce document, la restructuration du système Firebase (Firestore NoSQL, Identity Automation) pour aboutir à une série de barrières sécurisées via Firebase Rules combinées à des déclencheurs via Cloud Functions, aura offert à l’application une stabilisation décisive garantissant sa mise en exploitation sur le marché réel du e-commerce tunisien localisé de confiance. Ces restructurations englobent notamment un panier local et online synchronisé en subcollection optimisée, un modèle de gestion de passage en ligne de commande par interférence et Rate Limits intégrés dans le Gemini API. De surcroît, le correctif des nombreuses anomalies de compilation de typage et des scripts serveurs Python Admin SDK illustrent parfaitement une méthodologie Software Craftsmanship aboutie.
+
+\textbf{Perspectives futures}
+
+À titre de prospective, après une série d'utilisations en production effective, nous prévoyons :
+\begin{itemize}
+    \item L'adoption systématique de "Firebase App Check" couplé au Play Integrity API afin de prohiber l'exploitation d'APIs par toute forme de requêtes d'ingénierie inversée sur notre plateforme,
+    \item Une modularité additionnelle sur les modèles Data afin de soutenir un futur portage potentiel d’application multilingue plus dense (Arabe local),
+    \item L’exécution continue des flux d’intégration TDD via CI/CD (GitHub Actions) afin de pérenniser la montée en charge.
+\end{itemize}
+
+% ==========================================
+% BIBLIOGRAPHIE
+% ==========================================
+\addcontentsline{toc}{chapter}{Bibliographie et Nétographie}
+\begin{thebibliography}{99}
+    \bibitem{firebase_docs} \textbf{Google Firebase Documentation.} Firestore Limits and Performance. \url{https://firebase.google.com/docs/firestore}
+    \bibitem{functions_docs} \textbf{Firebase Cloud Functions.} Callable Functions Architecture. \url{https://firebase.google.com/docs/functions}
+    \bibitem{kotlin} \textbf{Kotlin Programming Language.} Official Guides and Android Documentation. \url{https://kotlinlang.org/docs/}
+    \bibitem{gemini} \textbf{Google Generative AI.} Documentation \& Best Practices. \url{https://ai.google.dev/docs}
+    \bibitem{android_arch} \textbf{Android Architecture Components.} Model View ViewModel (MVVM) Design Pattern. \url{https://developer.android.com/jetpack/guide}
+    \bibitem{nosql} \textbf{NoSQL Database Design.} Patterns and concepts for document-based databases.
+\end{thebibliography}
+
+\end{document}

@@ -5,10 +5,19 @@ tags:
   - favorites
 ---
 - launchApp
-- extendedWaitUntil:
-    visible:
-      id: "layoutSearchBar"
-    timeout: 15000
+- retry:
+    maxRetries: 3
+    commands:
+      - tapOn:
+          id: "android:id/aerr_wait"
+          optional: true
+      - tapOn:
+          text: "Wait"
+          optional: true
+      - extendedWaitUntil:
+          visible:
+            id: "layoutSearchBar"
+          timeout: 10000
 - tapOn:
     id: "ivTopFavorites"
 - extendedWaitUntil:
@@ -22,20 +31,46 @@ tags:
     visible:
       id: "layoutSearchBar"
     timeout: 10000
-- swipe:
-    start: 50%, 82%
-    end: 50%, 30%
-    duration: 500
-- swipe:
-    start: 50%, 82%
-    end: 50%, 34%
-    duration: 500
+- tapOn:
+    id: "layoutSearchBar"
 - extendedWaitUntil:
     visible:
-      id: "homeDynamicFavoriteButton"
+      id: "etSearch"
     timeout: 10000
 - tapOn:
-    id: "homeDynamicFavoriteButton"
+    id: "etSearch"
+- tapOn:
+    text: "Cancel"
+    optional: true
+- inputText: "Balgha"
+- pressKey: enter
+- extendedWaitUntil:
+    visible:
+      id: "tvResultsCount"
+    timeout: 10000
+- extendedWaitUntil:
+    visible:
+      id: "cardSearchProduct"
+    timeout: 10000
+- tapOn:
+    id: "cardSearchProduct"
+- extendedWaitUntil:
+    visible:
+      id: "btnFavoriteDetails"
+    timeout: 10000
+- tapOn:
+    id: "btnFavoriteDetails"
+- pressKey: back
+- extendedWaitUntil:
+    visible:
+      id: "ivSearchBack"
+    timeout: 10000
+- tapOn:
+    id: "ivSearchBack"
+- extendedWaitUntil:
+    visible:
+      id: "ivTopFavorites"
+    timeout: 10000
 - tapOn:
     id: "ivTopFavorites"
 - extendedWaitUntil:
@@ -45,6 +80,10 @@ tags:
 - takeScreenshot: "41-favorites-filled"
 - tapOn:
     id: "btnFavoriteAddCart"
+- extendedWaitUntil:
+    visible:
+      id: "tvBottomCartBadge"
+    timeout: 5000
 - tapOn:
     id: "navCart"
 - extendedWaitUntil:

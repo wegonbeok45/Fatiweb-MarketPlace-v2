@@ -11,19 +11,20 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layoutTopBar"
         android:layout_width="0dp"
-        android:layout_height="@dimen/profile_top_bar_height"
+        android:layout_height="@dimen/app_top_bar_height"
         android:background="@color/profile_header_bg"
-        android:paddingStart="@dimen/profile_horizontal_margin"
-        android:paddingEnd="@dimen/profile_horizontal_margin"
+        android:paddingStart="@dimen/app_top_bar_horizontal_padding"
+        android:paddingEnd="@dimen/app_top_bar_horizontal_padding"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
             android:id="@+id/ivBack"
-            android:layout_width="@dimen/profile_top_bar_icon_size"
-            android:layout_height="@dimen/profile_top_bar_icon_size"
+            android:layout_width="@dimen/app_top_bar_side_slot_size"
+            android:layout_height="@dimen/app_top_bar_side_slot_size"
             android:contentDescription="@string/settings_back"
+            android:padding="@dimen/surface_button_inner_padding"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -31,7 +32,7 @@
             app:tint="@color/profile_text_primary" />
 
         <TextView
-            style="@style/ProfileText.TopBarTitle"
+            style="@style/AppTopBar.Title.Profile"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/settings_title"
@@ -39,20 +40,43 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <Space
+            android:layout_width="@dimen/app_top_bar_side_slot_size"
+            android:layout_height="@dimen/app_top_bar_side_slot_size"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/scrollSettingsContent"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:paddingStart="@dimen/profile_horizontal_margin"
+        android:paddingTop="@dimen/profile_menu_top_padding"
+        android:paddingEnd="@dimen/profile_horizontal_margin"
+        android:paddingBottom="@dimen/profile_menu_bottom_padding"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/layoutTopBar">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/cardLanguage"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/profile_horizontal_margin"
-        android:layout_marginTop="@dimen/profile_menu_top_padding"
-        android:layout_marginEnd="@dimen/profile_horizontal_margin"
-        app:cardBackgroundColor="@color/profile_card_bg"
-        app:cardCornerRadius="@dimen/profile_menu_card_radius"
-        app:cardElevation="@dimen/profile_menu_card_elevation"
+        app:cardBackgroundColor="@color/profile_section_bg"
+        app:cardCornerRadius="@dimen/profile_menu_group_radius"
+        app:cardElevation="0dp"
         app:cardUseCompatPadding="false"
-        app:strokeColor="@color/colorBorderLight"
+        app:strokeColor="@color/profile_section_stroke"
         app:strokeWidth="@dimen/stroke_width_default"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -61,15 +85,15 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:paddingTop="@dimen/space_8"
-            android:paddingBottom="@dimen/space_8"
+            android:paddingTop="@dimen/space_4"
+            android:paddingBottom="@dimen/space_4"
             android:paddingStart="@dimen/profile_menu_content_horizontal_padding"
             android:paddingEnd="@dimen/profile_menu_content_horizontal_padding">
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardLangIcon"
-                android:layout_width="@dimen/profile_menu_icon_container_size_exact"
-                android:layout_height="@dimen/profile_menu_icon_container_size_exact"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 app:cardBackgroundColor="@color/profile_card_icon_bg"
                 app:cardCornerRadius="@dimen/corner_radius_round"
                 app:cardElevation="@dimen/space_0"
@@ -81,10 +105,10 @@
                 app:layout_constraintTop_toTopOf="parent">
 
                 <ImageView
-                    android:layout_width="@dimen/profile_menu_icon_size"
-                    android:layout_height="@dimen/profile_menu_icon_size"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
                     android:layout_gravity="center"
-                    android:contentDescription="@string/cd_back"
+                    android:contentDescription="@string/cd_language"
                     app:srcCompat="@drawable/ic_language"
                     app:tint="@color/profile_text_primary" />
             </com.google.android.material.card.MaterialCardView>
@@ -121,7 +145,7 @@
                 android:id="@+id/ivChevron"
                 android:layout_width="@dimen/profile_chevron_size"
                 android:layout_height="@dimen/profile_chevron_size"
-                android:contentDescription="@string/cd_back"
+                android:contentDescription="@string/cd_chevron"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -130,5 +154,247 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.card.MaterialCardView>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardNotifications"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_12"
+        app:cardBackgroundColor="@color/profile_section_bg"
+        app:cardCornerRadius="@dimen/profile_menu_group_radius"
+        app:cardElevation="0dp"
+        app:cardUseCompatPadding="false"
+        app:strokeColor="@color/profile_section_stroke"
+        app:strokeWidth="@dimen/stroke_width_default">
 
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingTop="@dimen/space_4"
+            android:paddingBottom="@dimen/space_4"
+            android:paddingStart="@dimen/profile_menu_content_horizontal_padding"
+            android:paddingEnd="@dimen/profile_menu_content_horizontal_padding">
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardNotificationsIcon"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                app:cardBackgroundColor="@color/profile_card_icon_bg"
+                app:cardCornerRadius="@dimen/corner_radius_round"
+                app:cardElevation="@dimen/space_0"
+                app:cardUseCompatPadding="false"
+                app:strokeColor="@android:color/transparent"
+                app:strokeWidth="@dimen/space_0"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_gravity="center"
+                    android:contentDescription="@string/cd_notifications"
+                    app:srcCompat="@drawable/notification"
+                    app:tint="@color/profile_text_primary" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <TextView
+                android:id="@+id/tvNotificationsTitle"
+                style="@style/ProfileText.MenuTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/profile_menu_text_start_margin"
+                android:text="@string/settings_notifications_title"
+                app:layout_constraintBottom_toTopOf="@id/tvNotificationsSubtitle"
+                app:layout_constraintEnd_toStartOf="@id/ivNotificationsChevron"
+                app:layout_constraintStart_toEndOf="@id/cardNotificationsIcon"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tvNotificationsSubtitle"
+                style="@style/ProfileText.MenuSubtitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/profile_menu_text_start_margin"
+                android:text="@string/settings_notifications_subtitle"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/ivNotificationsChevron"
+                app:layout_constraintStart_toEndOf="@id/cardNotificationsIcon"
+                app:layout_constraintTop_toBottomOf="@id/tvNotificationsTitle" />
+
+            <ImageView
+                android:id="@+id/ivNotificationsChevron"
+                android:layout_width="@dimen/profile_chevron_size"
+                android:layout_height="@dimen/profile_chevron_size"
+                android:contentDescription="@string/cd_chevron"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/ic_profile_chevron_right"
+                app:tint="@color/profile_chevron" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardSupport"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_12"
+        app:cardBackgroundColor="@color/profile_section_bg"
+        app:cardCornerRadius="@dimen/profile_menu_group_radius"
+        app:cardElevation="0dp"
+        app:cardUseCompatPadding="false"
+        app:strokeColor="@color/profile_section_stroke"
+        app:strokeWidth="@dimen/stroke_width_default">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingTop="@dimen/space_4"
+            android:paddingBottom="@dimen/space_4"
+            android:paddingStart="@dimen/profile_menu_content_horizontal_padding"
+            android:paddingEnd="@dimen/profile_menu_content_horizontal_padding">
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardSupportIcon"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                app:cardBackgroundColor="@color/profile_card_icon_bg"
+                app:cardCornerRadius="@dimen/corner_radius_round"
+                app:cardElevation="@dimen/space_0"
+                app:cardUseCompatPadding="false"
+                app:strokeColor="@android:color/transparent"
+                app:strokeWidth="@dimen/space_0"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_gravity="center"
+                    android:contentDescription="@string/cd_menu"
+                    app:srcCompat="@drawable/ic_profile_help"
+                    app:tint="@color/profile_text_primary" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <TextView
+                android:id="@+id/tvSupportTitle"
+                style="@style/ProfileText.MenuTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/profile_menu_text_start_margin"
+                android:text="@string/settings_support_title"
+                app:layout_constraintBottom_toTopOf="@id/tvSupportSubtitle"
+                app:layout_constraintEnd_toStartOf="@id/ivSupportChevron"
+                app:layout_constraintStart_toEndOf="@id/cardSupportIcon"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tvSupportSubtitle"
+                style="@style/ProfileText.MenuSubtitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/profile_menu_text_start_margin"
+                android:text="@string/settings_support_subtitle"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/ivSupportChevron"
+                app:layout_constraintStart_toEndOf="@id/cardSupportIcon"
+                app:layout_constraintTop_toBottomOf="@id/tvSupportTitle" />
+
+            <ImageView
+                android:id="@+id/ivSupportChevron"
+                android:layout_width="@dimen/profile_chevron_size"
+                android:layout_height="@dimen/profile_chevron_size"
+                android:contentDescription="@string/cd_chevron"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/ic_profile_chevron_right"
+                app:tint="@color/profile_chevron" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardAbout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_12"
+        app:cardBackgroundColor="@color/profile_section_bg"
+        app:cardCornerRadius="@dimen/profile_menu_group_radius"
+        app:cardElevation="0dp"
+        app:cardUseCompatPadding="false"
+        app:strokeColor="@color/profile_section_stroke"
+        app:strokeWidth="@dimen/stroke_width_default">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingTop="@dimen/space_4"
+            android:paddingBottom="@dimen/space_4"
+            android:paddingStart="@dimen/profile_menu_content_horizontal_padding"
+            android:paddingEnd="@dimen/profile_menu_content_horizontal_padding">
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardAboutIcon"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                app:cardBackgroundColor="@color/profile_card_icon_bg"
+                app:cardCornerRadius="@dimen/corner_radius_round"
+                app:cardElevation="@dimen/space_0"
+                app:cardUseCompatPadding="false"
+                app:strokeColor="@android:color/transparent"
+                app:strokeWidth="@dimen/space_0"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_gravity="center"
+                    android:contentDescription="@string/cd_logo"
+                    app:srcCompat="@drawable/settings"
+                    app:tint="@color/profile_text_primary" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <TextView
+                android:id="@+id/tvAboutTitle"
+                style="@style/ProfileText.MenuTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/profile_menu_text_start_margin"
+                android:text="@string/settings_about_title"
+                app:layout_constraintBottom_toTopOf="@id/tvAboutSubtitle"
+                app:layout_constraintEnd_toStartOf="@id/ivAboutChevron"
+                app:layout_constraintStart_toEndOf="@id/cardAboutIcon"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tvAboutSubtitle"
+                style="@style/ProfileText.MenuSubtitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/profile_menu_text_start_margin"
+                android:text="@string/settings_about_subtitle"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/ivAboutChevron"
+                app:layout_constraintStart_toEndOf="@id/cardAboutIcon"
+                app:layout_constraintTop_toBottomOf="@id/tvAboutTitle" />
+
+            <ImageView
+                android:id="@+id/ivAboutChevron"
+                android:layout_width="@dimen/profile_chevron_size"
+                android:layout_height="@dimen/profile_chevron_size"
+                android:contentDescription="@string/cd_chevron"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/ic_profile_chevron_right"
+                app:tint="@color/profile_chevron" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

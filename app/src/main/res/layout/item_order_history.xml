@@ -3,10 +3,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="10dp"
+    android:layout_marginBottom="@dimen/space_10"
     app:cardBackgroundColor="@color/profile_card_bg"
-    app:cardCornerRadius="@dimen/profile_menu_card_radius"
-    app:cardElevation="1dp"
+    app:cardCornerRadius="@dimen/corner_radius_large"
+    app:cardElevation="0dp"
     app:strokeColor="@color/colorBorderLight"
     app:strokeWidth="@dimen/stroke_width_default">
 
@@ -14,7 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="14dp">
+        android:padding="@dimen/space_14">
 
         <TextView
             android:id="@+id/tvOrderId"
@@ -28,7 +28,7 @@
             android:id="@+id/tvOrderDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
+            android:layout_marginTop="@dimen/space_2"
             android:textColor="@color/home_text_secondary"
             android:textSize="@dimen/text_size_overline"
             android:fontFamily="@font/plus_jakarta_sans_regular" />
@@ -37,7 +37,9 @@
             android:id="@+id/tvOrderItems"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="@dimen/space_8"
+            android:ellipsize="end"
+            android:maxLines="2"
             android:textColor="@color/home_text_primary"
             android:textSize="@dimen/text_size_caption"
             android:fontFamily="@font/plus_jakarta_sans_regular" />
@@ -46,7 +48,7 @@
             android:id="@+id/hsvOrderThumbnails"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="@dimen/space_10"
             android:overScrollMode="never"
             android:scrollbars="none">
 
@@ -60,7 +62,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="@dimen/space_10"
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
@@ -78,10 +80,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/bg_home_banner_chip"
-                android:paddingStart="10dp"
-                android:paddingTop="4dp"
-                android:paddingEnd="10dp"
-                android:paddingBottom="4dp"
+                android:paddingStart="@dimen/space_8"
+                android:paddingTop="@dimen/space_4"
+                android:paddingEnd="@dimen/space_8"
+                android:paddingBottom="@dimen/space_4"
                 android:textColor="@color/home_chip_text"
                 android:textSize="@dimen/text_size_overline"
                 android:fontFamily="@font/plus_jakarta_sans_medium" />

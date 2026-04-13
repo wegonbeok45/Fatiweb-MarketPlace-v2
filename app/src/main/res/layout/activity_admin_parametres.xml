@@ -44,16 +44,16 @@
             android:orientation="vertical"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
-            android:paddingTop="20dp">
+            android:paddingTop="16dp">
 
             <!-- Boutique Card -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/adminParamCardBoutique"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
+                android:layout_marginBottom="12dp"
                 app:cardBackgroundColor="@android:color/transparent"
-                app:cardCornerRadius="28dp"
+                app:cardCornerRadius="@dimen/corner_radius_large"
                 app:cardElevation="0dp"
                 app:strokeWidth="0dp">
 
@@ -62,13 +62,13 @@
                     android:layout_height="wrap_content"
                     android:background="@drawable/bg_admin_hero_card"
                     android:orientation="vertical"
-                    android:padding="20dp">
+                    android:padding="16dp">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
 
-                        android:text="@string/auto_fatiweb_market_9c85"
+                        android:text="@string/app_name"
                         android:fontFamily="@font/plus_jakarta_sans_bold"
                         android:textColor="@android:color/white"
                         android:textSize="@dimen/text_size_title" />
@@ -78,7 +78,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
 
-                        android:text="@string/auto_gestion_de_la_boutique_fde7"
+                        android:text="@string/admin_settings_hero_subtitle"
                         android:textColor="@color/surface_warm_muted"
                         android:textSize="@dimen/text_size_caption" />
                 </LinearLayout>
@@ -89,19 +89,19 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
 
-                android:text="@string/auto_methodes_de_livraison_c439"
+                android:text="@string/admin_settings_delivery_title"
                 android:textColor="@color/profile_text_primary"
                 android:fontFamily="@font/plus_jakarta_sans_bold"
                 android:textSize="@dimen/text_size_subtitle"
-                android:layout_marginBottom="10dp" />
+                android:layout_marginBottom="8dp" />
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/adminParamCardLivraison"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
+                android:layout_marginBottom="16dp"
                 app:cardBackgroundColor="@color/profile_card_bg"
-                app:cardCornerRadius="24dp"
+                app:cardCornerRadius="@dimen/corner_radius_large"
                 app:cardElevation="0dp"
                 app:strokeColor="@color/colorBorderLight"
                 app:strokeWidth="1dp">
@@ -113,7 +113,7 @@
 
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
-                        android:layout_height="60dp"
+                        android:layout_height="56dp"
                         android:paddingStart="16dp"
                         android:paddingEnd="16dp">
 
@@ -122,7 +122,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
 
-                            android:text="@string/auto_standard_eb6d"
+                            android:text="@string/admin_settings_shipping_standard"
                             android:textColor="@color/profile_text_primary"
                             android:textSize="@dimen/text_size_caption"
                             app:layout_constraintBottom_toBottomOf="parent"
@@ -168,7 +168,7 @@
 
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
-                        android:layout_height="60dp"
+                        android:layout_height="56dp"
                         android:paddingStart="16dp"
                         android:paddingEnd="16dp">
 
@@ -177,7 +177,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
 
-                            android:text="@string/auto_express_b144"
+                            android:text="@string/admin_settings_shipping_express"
                             android:textColor="@color/profile_text_primary"
                             android:textSize="@dimen/text_size_caption"
                             app:layout_constraintBottom_toBottomOf="parent"
@@ -224,19 +224,19 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
 
-                android:text="@string/auto_modes_de_paiement_a7ff"
+                android:text="@string/admin_settings_payments_title"
                 android:textColor="@color/profile_text_primary"
                 android:fontFamily="@font/plus_jakarta_sans_bold"
                 android:textSize="@dimen/text_size_subtitle"
-                android:layout_marginBottom="10dp" />
+                android:layout_marginBottom="8dp" />
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/adminParamCardPaiement"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
+                android:layout_marginBottom="12dp"
                 app:cardBackgroundColor="@color/profile_card_bg"
-                app:cardCornerRadius="24dp"
+                app:cardCornerRadius="@dimen/corner_radius_large"
                 app:cardElevation="0dp"
                 app:strokeColor="@color/colorBorderLight"
                 app:strokeWidth="1dp">
@@ -248,14 +248,14 @@
 
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
-                        android:layout_height="56dp"
+                        android:layout_height="52dp"
                         android:paddingStart="16dp"
                         android:paddingEnd="16dp">
                         <TextView
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
 
-                            android:text="@string/auto_carte_bancaire_d999"
+                            android:text="@string/admin_settings_payment_card"
                             android:textColor="@color/profile_text_primary"
                             android:textSize="@dimen/text_size_caption"
                             app:layout_constraintBottom_toBottomOf="parent"
@@ -278,14 +278,14 @@
 
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
-                        android:layout_height="56dp"
+                        android:layout_height="52dp"
                         android:paddingStart="16dp"
                         android:paddingEnd="16dp">
                         <TextView
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
 
-                            android:text="@string/auto_edinar_92ac"
+                            android:text="@string/admin_settings_payment_edinar"
                             android:textColor="@color/profile_text_primary"
                             android:textSize="@dimen/text_size_caption"
                             app:layout_constraintBottom_toBottomOf="parent"
@@ -308,14 +308,14 @@
 
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
-                        android:layout_height="56dp"
+                        android:layout_height="52dp"
                         android:paddingStart="16dp"
                         android:paddingEnd="16dp">
                         <TextView
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
 
-                            android:text="@string/auto_cash_a_la_livraison_2636"
+                            android:text="@string/admin_settings_payment_cod"
                             android:textColor="@color/profile_text_primary"
                             android:textSize="@dimen/text_size_caption"
                             app:layout_constraintBottom_toBottomOf="parent"
@@ -333,6 +333,34 @@
                     </androidx.constraintlayout.widget.ConstraintLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnAdminSeedDB"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_marginBottom="8dp"
+                android:layout_gravity="end"
+                android:text="@string/admin_settings_debug_seed"
+                android:textAllCaps="false"
+                android:visibility="gone"
+                app:backgroundTint="@color/profile_card_bg"
+                app:cornerRadius="@dimen/corner_radius_large"
+                app:icon="@drawable/ic_home_add_cart"
+                app:iconGravity="textStart"
+                app:iconPadding="8dp"
+                app:strokeColor="@color/colorBorderLight"
+                app:strokeWidth="1dp" />
+
+            <TextView
+                android:id="@+id/tvAdminSeedDBHelper"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:text="@string/admin_settings_debug_seed_helper"
+                android:textColor="@color/profile_text_secondary"
+                android:textSize="@dimen/text_size_overline"
+                android:visibility="gone" />
+
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
@@ -344,4 +372,3 @@
         android:layout_gravity="bottom" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
-

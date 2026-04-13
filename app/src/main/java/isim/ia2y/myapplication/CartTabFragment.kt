@@ -138,7 +138,12 @@ class CartTabFragment : Fragment(R.layout.fragment_cart_tab) {
         }
 
         val hasItems = lines.isNotEmpty()
-        cartCountChip?.text = getString(R.string.cart_count_chip, cart.values.sum())
+        val itemCount = cart.values.sum()
+        cartCountChip?.text = resources.getQuantityString(
+            R.plurals.cart_count_chip,
+            itemCount,
+            itemCount
+        )
         emptyState.visibility = if (hasItems) View.GONE else View.VISIBLE
         itemsContainer.visibility = if (hasItems) View.VISIBLE else View.GONE
         summaryGap?.visibility = if (hasItems) View.VISIBLE else View.GONE
@@ -168,7 +173,10 @@ class CartTabFragment : Fragment(R.layout.fragment_cart_tab) {
             row.findViewById<ImageView>(R.id.ivCartItemImage)
                 ?.loadCatalogImage(product.imageUrl, product.imageRes)
             row.findViewById<TextView>(R.id.tvCartItemTitle)?.text = product.title
-            row.findViewById<TextView>(R.id.tvCartItemSubtitle)?.text = product.subtitle
+            row.findViewById<TextView>(R.id.tvCartItemSubtitle)?.apply {
+                text = product.subtitle
+                visibility = if (product.subtitle.isBlank()) View.GONE else View.VISIBLE
+            }
             row.findViewById<TextView>(R.id.tvCartItemPrice)?.text = formatDt(product.unitPrice * qty)
             row.findViewById<TextView>(R.id.tvQtyValue)?.text = qty.toString()
 

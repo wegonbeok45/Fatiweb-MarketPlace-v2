@@ -15,9 +15,9 @@
         android:background="@color/colorSurface"
         android:orientation="vertical"
         android:paddingStart="@dimen/home_horizontal_padding"
-        android:paddingTop="24dp"
+        android:paddingTop="@dimen/home_top_bar_top_margin"
         android:paddingEnd="@dimen/home_horizontal_padding"
-        android:paddingBottom="16dp"
+        android:paddingBottom="@dimen/home_top_section_bottom_padding"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -35,11 +35,11 @@
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/layoutSearchBar"
             android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:layout_marginTop="16dp"
+            android:layout_height="@dimen/home_search_height"
+            android:layout_marginTop="@dimen/home_search_margin_top"
             app:cardBackgroundColor="@color/home_surface_raised"
-            app:cardCornerRadius="28dp"
-            app:cardElevation="2dp"
+            app:cardCornerRadius="@dimen/home_search_radius"
+            app:cardElevation="3dp"
             app:strokeWidth="0dp">
 
             <LinearLayout
@@ -47,26 +47,27 @@
                 android:layout_height="match_parent"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:paddingStart="20dp"
-                android:paddingEnd="20dp">
+                android:paddingStart="@dimen/home_search_padding_horizontal"
+                android:paddingEnd="@dimen/home_search_padding_horizontal">
 
                 <ImageView
                     android:id="@+id/ivSearch"
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
+                    android:layout_width="@dimen/home_action_icon_size"
+                    android:layout_height="@dimen/home_action_icon_size"
+                    android:contentDescription="@string/cd_search"
                     app:srcCompat="@drawable/ic_profile_nav_search"
-                    app:tint="@color/home_text_secondary"  android:contentDescription="@string/cd_logo" />
+                    app:tint="@color/home_text_secondary" />
 
                 <TextView
                     android:id="@+id/tvSearchPlaceholder"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
+                    android:layout_marginStart="@dimen/home_search_text_start"
                     android:layout_weight="1"
                     android:fontFamily="@font/plus_jakarta_sans_regular"
                     android:text="@string/auto_search_unique_products_3648"
                     android:textColor="@color/home_text_secondary"
-                    android:textSize="@dimen/text_size_caption" />
+                    android:textSize="@dimen/home_text_search" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
     </LinearLayout>

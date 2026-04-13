@@ -16,6 +16,12 @@ $env:Path="$env:JAVA_HOME\bin;$env:Path"
 .\gradlew.bat assembleDebug
 ```
 
+Or use the repo helper so Gradle always runs against Android Studio JBR:
+
+```powershell
+.\scripts\gradlew-jbr.ps1 testDebugUnitTest
+```
+
 ## Quality Gates
 
 Run these before shipping a candidate build:
@@ -77,3 +83,4 @@ Notes:
 - Do not expose unsupported payment methods in production copy or UI.
 - Keep Facebook auth hidden unless it is fully configured and tested.
 - Use real product image URLs for newly created admin products.
+- Keep `GEMINI_API_KEY` in Firebase Functions secrets only. Do not commit it in app or Gradle config.

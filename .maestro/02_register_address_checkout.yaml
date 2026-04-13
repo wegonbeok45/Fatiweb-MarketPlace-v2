@@ -4,10 +4,19 @@ tags:
   - liveflow
 ---
 - launchApp
-- extendedWaitUntil:
-    visible:
-      id: "hostNavProfile"
-    timeout: 25000
+- retry:
+    maxRetries: 3
+    commands:
+      - tapOn:
+          id: "android:id/aerr_wait"
+          optional: true
+      - tapOn:
+          text: "Wait"
+          optional: true
+      - extendedWaitUntil:
+          visible:
+            id: "hostNavProfile"
+          timeout: 10000
 - extendedWaitUntil:
     visible:
       id: "hostNavProfile"
@@ -33,9 +42,11 @@ tags:
 - tapOn:
     id: "etFullName"
 - inputText: "${QA_SHOPPER_NAME}"
+- hideKeyboard
 - tapOn:
     id: "etEmail"
 - inputText: "${QA_SHOPPER_EMAIL}"
+- hideKeyboard
 - tapOn:
     id: "etPassword"
 - inputText: "${QA_SHOPPER_PASSWORD}"
@@ -45,10 +56,10 @@ tags:
     id: "btnRegister"
 - extendedWaitUntil:
     visible:
-      id: "hostNavProfile"
+      id: "scrollOrders"
     timeout: 30000
-- tapOn:
-    id: "hostNavProfile"
+- takeScreenshot: "10b-orders-after-register"
+- pressKey: back
 - extendedWaitUntil:
     visible:
       id: "cardAddresses"
@@ -96,7 +107,7 @@ tags:
 - inputText: "${QA_ADDRESS_LINE1}"
 - hideKeyboard
 - takeScreenshot: "12-address-filled"
-- tapOn: "Ajouter"
+- tapOn: "Add|Ajouter"
 - extendedWaitUntil:
     visible:
       id: "rvAddresses"
@@ -115,26 +126,22 @@ tags:
     visible:
       id: "layoutSearchBar"
     timeout: 10000
-- swipe:
-    start: 50%, 82%
-    end: 50%, 30%
-    duration: 500
-- swipe:
-    start: 50%, 82%
-    end: 50%, 34%
-    duration: 500
+- tapOn:
+    id: "layoutSearchBar"
 - extendedWaitUntil:
     visible:
-      id: "homeDynamicProductTitle"
+      id: "etSearch"
     timeout: 10000
 - tapOn:
-    id: "homeDynamicProductTitle"
+    id: "etSearch"
+- inputText: "romarin"
+- pressKey: enter
 - extendedWaitUntil:
     visible:
-      id: "btnAddToCart"
+      id: "btnSearchAddCart"
     timeout: 10000
 - tapOn:
-    id: "btnAddToCart"
+    id: "btnSearchAddCart"
 - takeScreenshot: "13-product-added"
 - pressKey: back
 - extendedWaitUntil:
@@ -187,7 +194,7 @@ tags:
       id: "alertTitle"
     timeout: 10000
 - takeScreenshot: "19-order-support-dialog"
-- tapOn: "Fermer"
+- tapOn: "Close|Fermer"
 - extendedWaitUntil:
     visible:
       id: "tvOrderDetailsId"

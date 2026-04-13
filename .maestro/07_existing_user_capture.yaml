@@ -5,43 +5,45 @@ tags:
   - existing-user
 ---
 - launchApp
-- extendedWaitUntil:
-    visible:
-      id: "hostNavProfile"
-    timeout: 25000
+- retry:
+    maxRetries: 3
+    commands:
+      - tapOn:
+          id: "android:id/aerr_wait"
+          optional: true
+      - tapOn:
+          text: "Wait"
+          optional: true
+      - extendedWaitUntil:
+          visible:
+            id: "hostNavProfile"
+          timeout: 10000
 - tapOn:
     id: "hostNavProfile"
 - extendedWaitUntil:
     visible:
       id: "cardOrders"
     timeout: 10000
+- takeScreenshot: "30-profile-authenticated"
 - tapOn:
     id: "cardOrders"
 - extendedWaitUntil:
     visible:
-      id: "btnAuthCreateAccount"
+      id: "scrollOrders"
     timeout: 10000
-- takeScreenshot: "07-auth-gate"
+- takeScreenshot: "31-orders-history"
 - tapOn:
-    id: "btnAuthExistingClient"
+    id: "ivBack"
 - extendedWaitUntil:
     visible:
-      id: "btnLogin"
+      id: "cardSettings"
     timeout: 10000
-- takeScreenshot: "08-login-screen"
 - tapOn:
-    id: "etEmail"
-- inputText: "${QA_SHOPPER_EMAIL}"
-- tapOn:
-    id: "etPassword"
-- inputText: "${QA_SHOPPER_PASSWORD}"
-- hideKeyboard
-- tapOn:
-    id: "btnLogin"
+    id: "hostNavHome"
 - extendedWaitUntil:
     visible:
-      id: "hostNavHome"
-    timeout: 30000
+      id: "layoutSearchBar"
+    timeout: 10000
 - takeScreenshot: "09-home"
 - tapOn:
     id: "layoutSearchBar"
@@ -68,25 +70,11 @@ tags:
     visible:
       id: "cardAddresses"
     timeout: 10000
-- takeScreenshot: "30-profile-authenticated"
-- tapOn:
-    id: "cardOrders"
-- extendedWaitUntil:
-    visible:
-      id: "contentContainer"
-    timeout: 15000
-- takeScreenshot: "31-orders-history"
-- tapOn:
-    id: "ivBack"
-- extendedWaitUntil:
-    visible:
-      id: "cardSettings"
-    timeout: 10000
 - tapOn:
     id: "ivNotifications"
 - extendedWaitUntil:
     visible:
-      id: "rvNotifications"
+      id: "tvClearAll"
     timeout: 10000
 - takeScreenshot: "33-notifications"
 - tapOn:
@@ -162,8 +150,7 @@ tags:
 - tapOn:
     id: "btnAddToCart"
 - takeScreenshot: "38-product-added"
-- tapOn:
-    id: "ivBack"
+- pressKey: back
 - extendedWaitUntil:
     visible:
       id: "hostNavCart"

@@ -46,7 +46,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="14dp"
-                android:text="@string/auto_tableau_de_bord_6985"
+                android:text="@string/admin_title_dashboard"
                 android:textColor="@color/profile_text_primary"
                 android:textSize="@dimen/text_size_subtitle"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -64,7 +64,7 @@
                 app:cardCornerRadius="999dp"
                 app:cardElevation="0dp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/adminIvAvatar"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:strokeWidth="0dp">
 
@@ -88,32 +88,10 @@
                 android:focusable="true"
                 android:background="?selectableItemBackgroundBorderless"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/adminIvAvatar"
+                app:layout_constraintEnd_toStartOf="@id/adminShieldBadge"
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/settings"
                 app:tint="@color/profile_text_primary" />
-
-            <!-- Admin avatar -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/adminIvAvatar"
-                android:layout_width="38dp"
-                android:layout_height="38dp"
-                app:cardCornerRadius="999dp"
-                app:cardElevation="0dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:strokeColor="@color/profile_avatar_ring"
-                app:strokeWidth="2dp">
-
-                <ImageView
-                    android:id="@+id/adminIvAvatarImg"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:contentDescription="@string/cd_stat_icon"
-                    android:scaleType="centerCrop"
-                    app:srcCompat="@drawable/profile_avatar_art" />
-            </com.google.android.material.card.MaterialCardView>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -140,7 +118,7 @@
             android:orientation="vertical"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
-            android:paddingTop="20dp">
+            android:paddingTop="16dp">
 
             <!-- Welcome banner -->
             <com.google.android.material.card.MaterialCardView
@@ -148,7 +126,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:cardBackgroundColor="@android:color/transparent"
-                app:cardCornerRadius="28dp"
+                app:cardCornerRadius="@dimen/corner_radius_large"
                 app:cardElevation="0dp"
                 app:strokeWidth="0dp">
 
@@ -156,14 +134,14 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@color/colorPrimary"
-                    android:padding="20dp">
+                    android:padding="16dp">
 
                     <TextView
                         android:id="@+id/adminTvWelcomeLabel"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
 
-                        android:text="@string/auto_bienvenue_b961"
+                        android:text="@string/admin_dashboard_welcome"
                         android:textColor="@android:color/white"
                         android:fontFamily="@font/plus_jakarta_sans_medium"
                         android:textSize="@dimen/text_size_overline"
@@ -178,7 +156,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
 
-                        android:text="@string/auto_administrateur_a67d"
+                        android:text="@string/admin_dashboard_admin_label"
                         android:textColor="@android:color/white"
                         android:fontFamily="@font/plus_jakarta_sans_bold"
                         android:textSize="@dimen/text_size_title"
@@ -192,7 +170,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
 
-                        android:text="@string/auto_fatiweb_market_panneau_admin_07bf"
+                        android:text="@string/admin_dashboard_subtitle"
                         android:textColor="@android:color/white"
                         android:fontFamily="@font/plus_jakarta_sans_regular"
                         android:textSize="@dimen/text_size_caption"
@@ -200,6 +178,45 @@
                         app:layout_constraintEnd_toStartOf="@id/adminWelcomeShield"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/adminTvWelcomeName" />
+
+                    <LinearLayout
+                        android:id="@+id/adminWelcomeChipRow"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        app:layout_constraintEnd_toStartOf="@id/adminWelcomeShield"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/adminTvWelcomeSub">
+
+                        <TextView
+                            android:id="@+id/adminTvWelcomeChipSync"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/bg_admin_stat_neutral"
+                            android:paddingStart="10dp"
+                            android:paddingTop="4dp"
+                            android:paddingEnd="10dp"
+                            android:paddingBottom="4dp"
+                            android:text="@string/admin_dashboard_chip_sync"
+                            android:textColor="@color/home_meta_text"
+                            android:textSize="@dimen/text_size_overline" />
+
+                        <TextView
+                            android:id="@+id/adminTvWelcomeChipInventory"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:background="@drawable/bg_admin_stat_positive"
+                            android:paddingStart="10dp"
+                            android:paddingTop="4dp"
+                            android:paddingEnd="10dp"
+                            android:paddingBottom="4dp"
+                            android:textColor="@color/success_green"
+                            android:textSize="@dimen/text_size_overline"
+                            tools:text="18 produits actifs" />
+                    </LinearLayout>
 
                     <ImageView
                         android:id="@+id/adminWelcomeShield"
@@ -221,9 +238,9 @@
                 android:id="@+id/adminTvStatsHeader"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="22dp"
+                android:layout_marginTop="18dp"
 
-                android:text="@string/auto_vue_densemble_2aad"
+                android:text="@string/admin_dashboard_overview_title"
                 android:textColor="@color/profile_text_primary"
                 android:textSize="@dimen/text_size_body" />
 
@@ -232,7 +249,7 @@
                 android:id="@+id/adminStatsRow1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="8dp"
                 android:orientation="horizontal"
                 android:weightSum="2">
 
@@ -244,7 +261,7 @@
                     android:layout_weight="1"
                     android:layout_marginEnd="6dp"
                     app:cardBackgroundColor="@color/profile_card_bg"
-                app:cardCornerRadius="20dp"
+                app:cardCornerRadius="@dimen/corner_radius_large"
                     app:cardElevation="0dp"
                     app:strokeColor="@color/colorBorderLight"
                     app:strokeWidth="1dp">
@@ -253,7 +270,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:padding="14dp">
+                        android:padding="12dp">
 
                         <com.google.android.material.card.MaterialCardView
                             android:layout_width="36dp"
@@ -285,7 +302,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
 
-                            android:text="@string/auto_commandes_66c3"
+                            android:text="@string/admin_dashboard_orders_label"
                             android:textColor="@color/profile_text_secondary"
                             android:textSize="@dimen/text_size_overline" />
 
@@ -304,6 +321,15 @@
                             android:visibility="gone"
                             android:textColor="@color/success_green"
                             android:textSize="@dimen/text_size_overline" />
+
+                        <TextView
+                            android:id="@+id/adminTvCommandesMeta"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:textColor="@color/profile_text_secondary"
+                            android:textSize="@dimen/text_size_overline"
+                            tools:text="3 commandes en attente" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
@@ -315,7 +341,7 @@
                     android:layout_weight="1"
                     android:layout_marginStart="6dp"
                     app:cardBackgroundColor="@color/profile_card_bg"
-                app:cardCornerRadius="20dp"
+                app:cardCornerRadius="@dimen/corner_radius_large"
                     app:cardElevation="0dp"
                     app:strokeColor="@color/colorBorderLight"
                     app:strokeWidth="1dp">
@@ -324,7 +350,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:padding="14dp">
+                        android:padding="12dp">
 
                         <com.google.android.material.card.MaterialCardView
                             android:layout_width="36dp"
@@ -356,7 +382,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
 
-                            android:text="@string/auto_ca_dt_4d00"
+                            android:text="@string/admin_dashboard_revenue_label"
                             android:textColor="@color/profile_text_secondary"
                             android:textSize="@dimen/text_size_overline" />
 
@@ -375,6 +401,15 @@
                             android:visibility="gone"
                             android:textColor="@color/success_green"
                             android:textSize="@dimen/text_size_overline" />
+
+                        <TextView
+                            android:id="@+id/adminTvRevenueMeta"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:textColor="@color/profile_text_secondary"
+                            android:textSize="@dimen/text_size_overline"
+                            tools:text="Panier moyen 84 DT" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
             </LinearLayout>
@@ -437,7 +472,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
 
-                            android:text="@string/auto_nv_clients_bdbc"
+                            android:text="@string/admin_dashboard_customers_label"
                             android:textColor="@color/profile_text_secondary"
                             android:textSize="@dimen/text_size_overline" />
 
@@ -456,6 +491,15 @@
                             android:visibility="gone"
                             android:textColor="@color/text_neutral_gray"
                             android:textSize="@dimen/text_size_overline" />
+
+                        <TextView
+                            android:id="@+id/adminTvClientsMeta"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:textColor="@color/profile_text_secondary"
+                            android:textSize="@dimen/text_size_overline"
+                            tools:text="24 comptes clients" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
@@ -508,7 +552,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
 
-                            android:text="@string/auto_stock_faible_d1e5"
+                            android:text="@string/admin_dashboard_low_stock_label"
                             android:textColor="@color/profile_text_secondary"
                             android:textSize="@dimen/text_size_overline" />
 
@@ -527,6 +571,15 @@
                             android:visibility="gone"
                             android:textColor="@color/status_text_error"
                             android:textSize="@dimen/text_size_overline" />
+
+                        <TextView
+                            android:id="@+id/adminTvStockMeta"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:textColor="@color/profile_text_secondary"
+                            android:textSize="@dimen/text_size_overline"
+                            tools:text="4 references inactives" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
             </LinearLayout>
@@ -538,7 +591,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
 
-                android:text="@string/auto_actions_rapides_0192"
+                android:text="@string/admin_dashboard_quick_actions_title"
                 android:textColor="@color/profile_text_primary"
                 android:textSize="@dimen/text_size_body" />
 
@@ -595,8 +648,17 @@
                             android:layout_marginTop="8dp"
 
                             android:gravity="center"
-                            android:text="@string/auto_ajouternproduit_543b"
+                            android:text="@string/admin_dashboard_add_product_action"
                             android:textColor="@color/profile_text_primary"
+                            android:textSize="@dimen/text_size_overline" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:gravity="center"
+                            android:text="@string/admin_dashboard_quick_add_subtitle"
+                            android:textColor="@color/profile_text_secondary"
                             android:textSize="@dimen/text_size_overline" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
@@ -646,8 +708,17 @@
                             android:layout_marginTop="8dp"
 
                             android:gravity="center"
-                            android:text="@string/auto_voirncommandes_bae2"
+                            android:text="@string/admin_dashboard_view_orders_action"
                             android:textColor="@color/profile_text_primary"
+                            android:textSize="@dimen/text_size_overline" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:gravity="center"
+                            android:text="@string/admin_dashboard_quick_orders_subtitle"
+                            android:textColor="@color/profile_text_secondary"
                             android:textSize="@dimen/text_size_overline" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
@@ -696,8 +767,17 @@
                             android:layout_marginTop="8dp"
 
                             android:gravity="center"
-                            android:text="@string/auto_paramtres_e778"
+                            android:text="@string/admin_dashboard_settings_action"
                             android:textColor="@color/profile_text_primary"
+                            android:textSize="@dimen/text_size_overline" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:gravity="center"
+                            android:text="@string/admin_dashboard_quick_settings_subtitle"
+                            android:textColor="@color/profile_text_secondary"
                             android:textSize="@dimen/text_size_overline" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
@@ -710,7 +790,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
 
-                android:text="@string/auto_dernires_commandes_9950"
+                android:text="@string/admin_dashboard_recent_orders_title"
                 android:textColor="@color/profile_text_primary"
                 android:textSize="@dimen/text_size_body" />
 
@@ -721,7 +801,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 app:cardBackgroundColor="@color/profile_card_bg"
-                app:cardCornerRadius="14dp"
+                app:cardCornerRadius="@dimen/corner_radius_large"
                 app:cardElevation="0dp"
                 app:strokeColor="@color/colorBorderLight"
                 app:strokeWidth="1dp">
@@ -988,5 +1068,3 @@
         android:layout_gravity="bottom" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
-
-

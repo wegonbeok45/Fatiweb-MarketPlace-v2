@@ -94,7 +94,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/hostLayoutBottomNav"
         android:layout_width="match_parent"
-        android:layout_height="80dp"
+        android:layout_height="@dimen/main_bottom_nav_height"
         android:background="@color/colorSurface"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -102,9 +102,9 @@
 
         <View
             android:id="@+id/nav_indicator"
-            android:layout_width="64dp"
-            android:layout_height="32dp"
-            android:layout_marginTop="8dp"
+            android:layout_width="@dimen/main_bottom_nav_indicator_width"
+            android:layout_height="@dimen/main_bottom_nav_indicator_height"
+            android:layout_marginTop="@dimen/main_bottom_nav_indicator_margin_top"
             android:background="@drawable/bg_home_meta_pill"
             android:backgroundTint="#F2F2F2"
             app:layout_constraintBottom_toTopOf="@id/guide_pill_bottom"
@@ -117,7 +117,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            app:layout_constraintGuide_begin="44dp" />
+            app:layout_constraintGuide_begin="@dimen/main_bottom_nav_guideline" />
 
         <LinearLayout
             android:id="@+id/hostNavHome"
@@ -130,7 +130,7 @@
             android:gravity="center_horizontal"
             android:importantForAccessibility="yes"
             android:orientation="vertical"
-            android:paddingTop="12dp"
+            android:paddingTop="@dimen/main_bottom_nav_item_padding_top"
             app:layout_constraintEnd_toStartOf="@id/hostNavExplore"
             app:layout_constraintHorizontal_chainStyle="spread"
             app:layout_constraintStart_toStartOf="parent"
@@ -138,8 +138,8 @@
 
             <ImageView
                 android:id="@+id/hostNavHomeIcon"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
+                android:layout_width="@dimen/main_bottom_nav_icon_size"
+                android:layout_height="@dimen/main_bottom_nav_icon_size"
                 android:importantForAccessibility="no"
                 app:srcCompat="@drawable/ic_bottom_nav_home"
                 app:tint="@color/home_nav_active" />
@@ -148,7 +148,7 @@
                 android:id="@+id/hostNavHomeLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
+                android:layout_marginTop="@dimen/main_bottom_nav_label_margin_top"
                 android:fontFamily="@font/plus_jakarta_sans_bold"
                 android:importantForAccessibility="no"
                 android:text="@string/nav_tab_home"
@@ -167,15 +167,15 @@
             android:gravity="center_horizontal"
             android:importantForAccessibility="yes"
             android:orientation="vertical"
-            android:paddingTop="12dp"
+            android:paddingTop="@dimen/main_bottom_nav_item_padding_top"
             app:layout_constraintEnd_toStartOf="@id/hostNavCart"
             app:layout_constraintStart_toEndOf="@id/hostNavHome"
             app:layout_constraintTop_toTopOf="parent">
 
             <ImageView
                 android:id="@+id/hostNavExploreIcon"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
+                android:layout_width="@dimen/main_bottom_nav_icon_size"
+                android:layout_height="@dimen/main_bottom_nav_icon_size"
                 android:importantForAccessibility="no"
                 app:srcCompat="@drawable/ic_bottom_nav_categories"
                 app:tint="@color/home_nav_inactive" />
@@ -184,7 +184,7 @@
                 android:id="@+id/hostNavExploreLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
+                android:layout_marginTop="@dimen/main_bottom_nav_label_margin_top"
                 android:fontFamily="@font/plus_jakarta_sans_medium"
                 android:importantForAccessibility="no"
                 android:text="@string/nav_tab_explore"
@@ -203,7 +203,7 @@
             android:gravity="center_horizontal"
             android:importantForAccessibility="yes"
             android:orientation="vertical"
-            android:paddingTop="12dp"
+            android:paddingTop="@dimen/main_bottom_nav_item_padding_top"
             app:layout_constraintEnd_toStartOf="@id/hostNavProfile"
             app:layout_constraintStart_toEndOf="@id/hostNavExplore"
             app:layout_constraintTop_toTopOf="parent">
@@ -215,19 +215,19 @@
 
                 <ImageView
                     android:id="@+id/hostIvBottomCartIcon"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
+                    android:layout_width="@dimen/main_bottom_nav_icon_size"
+                    android:layout_height="@dimen/main_bottom_nav_icon_size"
                     android:importantForAccessibility="no"
                     app:srcCompat="@drawable/ic_bottom_nav_cart"
                     app:tint="@color/home_nav_inactive" />
 
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/cardBottomCartBadge"
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
+                    android:layout_width="@dimen/main_bottom_badge_size"
+                    android:layout_height="@dimen/main_bottom_badge_size"
                     android:layout_gravity="end|top"
-                    android:layout_marginTop="-4dp"
-                    android:layout_marginEnd="-4dp"
+                    android:layout_marginTop="@dimen/main_bottom_badge_offset"
+                    android:layout_marginEnd="@dimen/main_bottom_badge_offset"
                     android:visibility="gone"
                     app:cardBackgroundColor="?attr/colorPrimary"
                     app:cardCornerRadius="8dp"
@@ -250,7 +250,7 @@
                 android:id="@+id/hostNavCartLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
+                android:layout_marginTop="@dimen/main_bottom_nav_label_margin_top"
                 android:fontFamily="@font/plus_jakarta_sans_medium"
                 android:importantForAccessibility="no"
                 android:text="@string/nav_tab_cart"
@@ -269,15 +269,15 @@
             android:gravity="center_horizontal"
             android:importantForAccessibility="yes"
             android:orientation="vertical"
-            android:paddingTop="12dp"
+            android:paddingTop="@dimen/main_bottom_nav_item_padding_top"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/hostNavCart"
             app:layout_constraintTop_toTopOf="parent">
 
             <ImageView
                 android:id="@+id/hostNavProfileIcon"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
+                android:layout_width="@dimen/main_bottom_nav_icon_size"
+                android:layout_height="@dimen/main_bottom_nav_icon_size"
                 android:importantForAccessibility="no"
                 app:srcCompat="@drawable/ic_bottom_nav_profile"
                 app:tint="@color/home_nav_inactive" />
@@ -286,7 +286,7 @@
                 android:id="@+id/hostNavProfileLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
+                android:layout_marginTop="@dimen/main_bottom_nav_label_margin_top"
                 android:fontFamily="@font/plus_jakarta_sans_medium"
                 android:importantForAccessibility="no"
                 android:text="@string/nav_tab_profile"
@@ -294,6 +294,47 @@
                 android:textSize="@dimen/text_size_overline" />
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
+    <!-- ═══════════════════════════════════════════════════ -->
+    <!-- Floating Chat Bubble — FatiBot                      -->
+    <!-- ═══════════════════════════════════════════════════ -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/chatFab"
+        android:layout_width="@dimen/screen_fab_size"
+        android:layout_height="@dimen/screen_fab_size"
+        android:layout_marginEnd="@dimen/screen_fab_margin_end"
+        android:layout_marginBottom="@dimen/screen_fab_margin_bottom"
+        android:clickable="true"
+        android:contentDescription="FatiBot — Assistant IA"
+        android:elevation="8dp"
+        android:focusable="true"
+        app:cardBackgroundColor="@color/colorPrimary"
+        app:cardCornerRadius="@dimen/screen_fab_corner_radius"
+        app:cardElevation="8dp"
+        app:layout_constraintBottom_toTopOf="@id/hostLayoutBottomNav"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:importantForAccessibility="no"
+            android:padding="@dimen/screen_fab_icon_padding"
+            android:scaleType="centerInside"
+            app:srcCompat="@drawable/ic_chat_bubble"
+            app:tint="@color/colorOnPrimary" />
+
+    </androidx.cardview.widget.CardView>
+
+    <!-- Notification dot on FAB (optional future use) -->
+    <View
+        android:id="@+id/chatFabDot"
+        android:layout_width="@dimen/screen_fab_dot_size"
+        android:layout_height="@dimen/screen_fab_dot_size"
+        android:layout_marginEnd="@dimen/screen_fab_dot_margin_end"
+        android:layout_marginBottom="@dimen/screen_fab_dot_margin_bottom"
+        android:background="@drawable/bg_chat_dot"
+        android:backgroundTint="@android:color/white"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/hostLayoutBottomNav"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
-

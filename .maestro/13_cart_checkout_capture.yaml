@@ -1,0 +1,100 @@
+appId: isim.ia2y.myapplication
+tags:
+  - shopper
+  - capture
+  - checkout
+---
+- launchApp
+- retry:
+    maxRetries: 3
+    commands:
+      - tapOn:
+          id: "android:id/aerr_wait"
+          optional: true
+      - tapOn:
+          text: "Wait"
+          optional: true
+      - extendedWaitUntil:
+          visible:
+            id: "hostNavHome"
+          timeout: 10000
+- tapOn:
+    id: "hostNavHome"
+    waitToSettleTimeoutMs: 1000
+- extendedWaitUntil:
+    visible:
+      id: "layoutSearchBar"
+    timeout: 10000
+- tapOn:
+    id: "layoutSearchBar"
+    waitToSettleTimeoutMs: 1000
+- extendedWaitUntil:
+    visible:
+      id: "etSearch"
+    timeout: 10000
+- tapOn:
+    id: "etSearch"
+    waitToSettleTimeoutMs: 1000
+- inputText: "romarin"
+- pressKey: enter
+- extendedWaitUntil:
+    visible: "Huile capillaire au romarin"
+    timeout: 45000
+- tapOn:
+    text: "Huile capillaire au romarin"
+    waitToSettleTimeoutMs: 1000
+- extendedWaitUntil:
+    visible:
+      id: "btnAddToCart"
+    timeout: 10000
+- takeScreenshot: "37-product-details-fixed"
+- tapOn:
+    id: "btnAddToCart"
+    waitToSettleTimeoutMs: 1000
+- takeScreenshot: "38-product-added-fixed"
+- pressKey: back
+- pressKey: back
+- extendedWaitUntil:
+    visible:
+      id: "hostNavCart"
+    timeout: 10000
+- tapOn:
+    id: "hostNavCart"
+    waitToSettleTimeoutMs: 1000
+- extendedWaitUntil:
+    visible:
+      id: "btnCheckout"
+    timeout: 10000
+- takeScreenshot: "39-cart"
+- tapOn:
+    id: "btnCheckout"
+    waitToSettleTimeoutMs: 1000
+- extendedWaitUntil:
+    visible:
+      id: "btnCheckoutContinue"
+    timeout: 10000
+- takeScreenshot: "43-checkout-step-1"
+- tapOn:
+    id: "btnCheckoutContinue"
+    waitToSettleTimeoutMs: 1000
+- extendedWaitUntil:
+    visible:
+      id: "cardPayCash"
+    timeout: 10000
+- takeScreenshot: "44-checkout-step-2"
+- tapOn:
+    id: "btnCheckoutContinue"
+    waitToSettleTimeoutMs: 1000
+- extendedWaitUntil:
+    visible:
+      id: "btnTrackOrder"
+    timeout: 20000
+- takeScreenshot: "45-checkout-confirmation"
+- tapOn:
+    id: "btnTrackOrder"
+    waitToSettleTimeoutMs: 1000
+- extendedWaitUntil:
+    visible:
+      id: "tvOrderDetailsId"
+    timeout: 10000
+- takeScreenshot: "46-order-details"

@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:importantForAutofill="noExcludeDescendants"
     android:background="@color/profile_body_bg"
     tools:context=".AdminProductEditorActivity">
 
@@ -63,7 +64,7 @@
         android:layout_height="match_parent"
         android:clipToPadding="false"
         android:overScrollMode="never"
-        android:paddingBottom="108dp"
+        android:paddingBottom="140dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <LinearLayout
@@ -391,9 +392,9 @@
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingStart="16dp"
-        android:paddingTop="12dp"
+        android:paddingTop="8dp"
         android:paddingEnd="16dp"
-        android:paddingBottom="12dp">
+        android:paddingBottom="8dp">
 
         <ProgressBar
             android:id="@+id/adminProductEditorProgress"
@@ -403,9 +404,22 @@
             android:visibility="gone" />
 
         <com.google.android.material.button.MaterialButton
+            android:id="@+id/adminProductEditorBtnAutofill"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:layout_marginEnd="12dp"
+            android:text="@string/admin_product_editor_action_autofill"
+            android:textAllCaps="false"
+            android:textColor="@color/colorPrimary"
+            android:visibility="gone"
+            app:cornerRadius="16dp"
+            app:strokeColor="@color/colorOutline" />
+
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/adminProductEditorBtnSave"
             android:layout_width="0dp"
-            android:layout_height="52dp"
+            android:layout_height="48dp"
             android:layout_weight="1"
             android:textAllCaps="false"
             app:backgroundTint="?attr/colorPrimary"

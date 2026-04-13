@@ -1,0 +1,16 @@
+appId: isim.ia2y.myapplication
+tags:
+  - admin
+  - debug
+---
+- assertVisible:
+    id: "adminProductEditorBtnAutofill"
+- tapOn:
+    id: "adminProductEditorBtnAutofill"
+- tapOn:
+    id: "adminProductEditorBtnSave"
+- waitForAnimationToEnd
+- extendedWaitUntil:
+    visible:
+      id: "adminProductEditorBtnSave"
+    timeout: 3000

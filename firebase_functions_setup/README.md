@@ -1,37 +1,53 @@
-# FatiWeb Marketplace - Server-Side Security
+# FatiWeb Cloud Functions
 
-This directory contains the Firebase Cloud Functions necessary to secure the FatiWeb Marketplace checkout process.
+This directory contains the trusted backend workflows for the app.
 
-## Why is this needed?
-Currently, the mobile app calculates the order total and writes it to Firestore. A malicious user could tamper with the app (or use the REST API) to send an order total of `0.0 DT`. 
+## What lives here
 
-The `verifyOrderTotal` function deployed here intercepts every new order, reads the *actual* product prices from the database, recalculates the subtotal and shipping, and forcefully corrects the order document.
+- Auth triggers
+- admin/product callables
+- checkout/order callables
+- review aggregation
+- announcement fan-out
+- assistant gateway with the Gemini secret kept on the server
+- shared validation and domain helpers
 
-## How to deploy
+## Main exported functions
 
-Since the `firebase` CLI is not installed globally on your machine, follow these steps when you are ready to secure the backend:
+- `onAuthUserCreate`
+- `syncUserRoleClaims`
+- `createOrder`
+- `updateOrderStatus`
+- `adminUpsertProduct`
+- `adminDeleteProduct`
+- `adminSendAnnouncement`
+- `submitReview`
+- `assistantSendMessage`
 
-1. **Install Node.js** (Version 18+ is recommended).
-2. **Install Firebase CLI** globally:
-   ```bash
-   npm install -g firebase-tools
-   ```
-3. **Login to Firebase**:
-   ```bash
-   firebase login
-   ```
-4. **Initialize Project** (if not already done, link this to your Firebase project):
-   ```bash
-   firebase use --add
-   ```
-5. **Install Dependencies**:
-   ```bash
-   cd firebase_functions_setup
-   npm install
-   ```
-6. **Deploy**:
-   ```bash
-   firebase deploy --only functions
-   ```
+## Local commands
 
-*Note: Firebase Cloud Functions requires your Firebase Project to be on the **Blaze (Pay-as-you-go)** billing plan. You will not be charged unless you exceed the massive free tier, but a credit card is required by Google for Node environments.*
+```bash
+cd firebase_functions_setup
+npm install
+npm run build
+npm test
+```
+
+## Deploy
+
+```bash
+firebase deploy --only functions,firestore:rules,firestore:indexes,storage
+```
+
+## Required secret
+
+Set the Gemini secret before deploying the assistant function:
+
+```bash
+firebase functions:secrets:set GEMINI_API_KEY
+```
+
+## Notes
+
+- Deploy target is Firebase Functions on Node 18.
+- The Android client now calls these functions for trusted operations instead of writing sensitive data directly.

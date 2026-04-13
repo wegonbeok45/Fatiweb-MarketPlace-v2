@@ -1,0 +1,87 @@
+appId: isim.ia2y.myapplication
+tags:
+  - admin
+  - notifications
+  - roundtrip
+---
+- launchApp:
+    stopApp: true
+- extendedWaitUntil:
+    visible:
+      id: "layoutSearchBar"
+    timeout: 20000
+- tapOn:
+    id: "hostNavProfile"
+- extendedWaitUntil:
+    visible:
+      id: "cardLogout"
+    timeout: 15000
+- tapOn:
+    id: "cardLogout"
+- extendedWaitUntil:
+    visible:
+      id: "btnLogin"
+    timeout: 15000
+- tapOn:
+    id: "etEmail"
+- inputText: "${QA_ADMIN_EMAIL}"
+- hideKeyboard
+- tapOn:
+    id: "etPassword"
+- inputText: "${QA_ADMIN_PASSWORD}"
+- hideKeyboard
+- tapOn:
+    id: "btnLogin"
+- extendedWaitUntil:
+    visible:
+      id: "hostNavProfile"
+    timeout: 30000
+- tapOn:
+    id: "hostNavProfile"
+- extendedWaitUntil:
+    visible:
+      id: "cardAdmin"
+    timeout: 15000
+- tapOn:
+    id: "cardAdmin"
+- extendedWaitUntil:
+    visible:
+      id: "adminNavNotifications"
+    timeout: 20000
+- tapOn:
+    id: "adminNavNotifications"
+- extendedWaitUntil:
+    visible:
+      id: "adminNotifEtTitle"
+    timeout: 20000
+- tapOn:
+    id: "adminNotifEtTitle"
+- inputText: "Codex Admin Broadcast"
+- tapOn:
+    id: "adminNotifEtMessage"
+- inputText: "Admin roundtrip verification from the QA loop."
+- hideKeyboard
+- tapOn:
+    id: "adminNotifBtnSend"
+- extendedWaitUntil:
+    visible: "Codex Admin Broadcast"
+    timeout: 30000
+- takeScreenshot: "12-admin-notification-history"
+- tapOn:
+    id: "adminNotifIvBack"
+- extendedWaitUntil:
+    visible:
+      id: "hostNavProfile"
+    timeout: 20000
+- tapOn:
+    id: "hostNavProfile"
+- extendedWaitUntil:
+    visible:
+      id: "ivNotifications"
+    timeout: 15000
+- tapOn:
+    id: "ivNotifications"
+- extendedWaitUntil:
+    visible: "Codex Admin Broadcast"
+    timeout: 30000
+- takeScreenshot: "12-shopper-notification-inbox"

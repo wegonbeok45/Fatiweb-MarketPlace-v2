@@ -29,9 +29,7 @@ class OrdersHistoryActivity : AppCompatActivity() {
         }
 
         findViewById<View>(R.id.ivBack)?.setOnClickListener { finishWithMotion(isForward = false) }
-        findViewById<View>(R.id.btnOrdersBrowseHome)?.setOnClickListener {
-            navigateToMainTab(MainActivity.Tab.HOME)
-        }
+        findViewById<View>(R.id.btnOrdersBrowseHome)?.setOnClickListener { handleEmptyStateAction() }
         findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.rvOrders)?.layoutManager =
             LinearLayoutManager(this)
         applyPressFeedback(R.id.ivBack, R.id.btnOrdersBrowseHome)
@@ -41,7 +39,7 @@ class OrdersHistoryActivity : AppCompatActivity() {
     private fun loadOrders() {
         val uid = FirebaseAuthManager.currentUser?.uid
         if (uid == null) {
-            renderState(ScreenState.Empty())
+            renderGuestState()
             return
         }
         val localOrders = LocalOrderStore.getAll(this)
@@ -61,7 +59,7 @@ class OrdersHistoryActivity : AppCompatActivity() {
                 },
                 onFailure = {
                     if (localOrders.isEmpty()) {
-                        ScreenState.Error("Impossible de charger vos commandes.")
+                        ScreenState.Error(getString(R.string.orders_history_load_error))
                     } else {
                         ScreenState.Content(localOrders)
                     }
@@ -84,7 +82,7 @@ class OrdersHistoryActivity : AppCompatActivity() {
                 recycler.visibility = View.VISIBLE
                 emptyState.visibility = View.GONE
                 empty.visibility = View.GONE
-                emptyAnimation?.pauseAnimation()
+                resetEmptyAnimation(emptyAnimation)
                 if (recycler.adapter == null) {
                     recycler.adapter = ordersAdapter
                 }
@@ -95,21 +93,58 @@ class OrdersHistoryActivity : AppCompatActivity() {
                 recycler.visibility = View.GONE
                 emptyState.visibility = View.VISIBLE
                 empty.visibility = View.VISIBLE
-                emptyAnimation?.playAnimation()
+                playEmptyAnimation(emptyAnimation)
             }
             is ScreenState.Error -> {
                 loading?.visibility = View.GONE
                 recycler.visibility = View.GONE
                 emptyState.visibility = View.VISIBLE
                 empty.visibility = View.VISIBLE
-                emptyAnimation?.playAnimation()
+                playEmptyAnimation(emptyAnimation)
                 showMotionSnackbar(state.message)
             }
             ScreenState.Loading -> {
                 loading?.visibility = View.VISIBLE
                 recycler.visibility = View.GONE
                 emptyState.visibility = View.GONE
+                resetEmptyAnimation(emptyAnimation)
             }
+        }
+    }
+
+    private fun renderGuestState() {
+        findViewById<TextView>(R.id.tvEmptyOrders)?.text = getString(R.string.orders_history_guest_title)
+        findViewById<TextView>(R.id.tvEmptyOrdersSubtitle)?.text = getString(R.string.orders_history_guest_subtitle)
+        (findViewById<View>(R.id.btnOrdersBrowseHome) as? com.google.android.material.button.MaterialButton)
+            ?.text = getString(R.string.orders_history_guest_action)
+        renderState(ScreenState.Empty())
+    }
+
+    private fun playEmptyAnimation(animationView: com.airbnb.lottie.LottieAnimationView?) {
+        animationView?.apply {
+            cancelAnimation()
+            progress = 0f
+            playAnimation()
+        }
+    }
+
+    private fun resetEmptyAnimation(animationView: com.airbnb.lottie.LottieAnimationView?) {
+        animationView?.apply {
+            cancelAnimation()
+            progress = 0f
+        }
+    }
+
+    private fun handleEmptyStateAction() {
+        if (FirebaseAuthManager.currentUser == null) {
+            startActivity(
+                LoginActivity.createIntent(
+                    this,
+                    returnToRoute = AUTH_RETURN_ROUTE_ORDERS
+                )
+            )
+        } else {
+            navigateToMainTab(MainActivity.Tab.HOME)
         }
     }
 }

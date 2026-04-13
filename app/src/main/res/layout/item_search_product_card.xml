@@ -7,15 +7,15 @@
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
     app:cardBackgroundColor="@color/colorSurface"
-    app:cardCornerRadius="16dp"
-    app:cardElevation="1dp"
-    app:strokeColor="@color/home_divider"
+    app:cardCornerRadius="@dimen/corner_radius_large"
+    app:cardElevation="0dp"
+    app:strokeColor="@color/colorBorderLight"
     app:strokeWidth="1dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="8dp">
+        android:padding="12dp">
 
         <!-- Image Container -->
         <com.google.android.material.card.MaterialCardView
@@ -23,7 +23,7 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             app:cardBackgroundColor="@color/home_product_surface"
-            app:cardCornerRadius="12dp"
+            app:cardCornerRadius="@dimen/corner_radius_medium"
             app:cardElevation="0dp"
             app:layout_constrainedHeight="true"
             app:layout_constraintDimensionRatio="1:1"
@@ -48,9 +48,10 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_margin="8dp"
+            android:contentDescription="@string/cd_favorite"
             app:cardBackgroundColor="@color/overlay_white_80"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="2dp"
+            app:cardCornerRadius="@dimen/corner_radius_medium"
+            app:cardElevation="0dp"
             app:layout_constraintEnd_toEndOf="@id/imageContainer"
             app:layout_constraintTop_toTopOf="@id/imageContainer"
             app:strokeWidth="0dp">
@@ -60,7 +61,7 @@
                 android:layout_width="16dp"
                 android:layout_height="16dp"
                 android:layout_gravity="center"
-                android:contentDescription="@string/cd_product_image"
+                android:contentDescription="@string/cd_favorite"
                 app:srcCompat="@drawable/ic_home_heart"
                 app:tint="@color/home_text_primary" />
         </com.google.android.material.card.MaterialCardView>
@@ -70,7 +71,7 @@
             android:id="@+id/tvSearchProductTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="8dp"
             android:ellipsize="end"
             android:fontFamily="@font/plus_jakarta_sans_bold"
             android:maxLines="1"
@@ -129,9 +130,10 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnSearchAddCart"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:layout_marginTop="12dp"
+            android:contentDescription="@string/cd_add_to_cart"
             android:insetLeft="0dp"
             android:insetTop="0dp"
             android:insetRight="0dp"
@@ -140,18 +142,19 @@
             android:minHeight="0dp"
             android:padding="0dp"
             android:text=""
-            app:backgroundTint="@android:color/transparent"
-            app:cornerRadius="20dp"
+            app:backgroundTint="@color/colorSurface"
+            app:cornerRadius="@dimen/corner_radius_medium"
             app:icon="@drawable/ic_home_add_cart"
             app:iconGravity="textStart"
             app:iconPadding="0dp"
-            app:iconSize="18dp"
+            app:iconSize="20dp"
             app:iconTint="@color/home_text_primary"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tvSearchProductSubtitle"
             app:rippleColor="@color/colorBorderLight"
-            app:strokeWidth="0dp" />
+            app:strokeColor="@color/colorBorderLight"
+            app:strokeWidth="1dp" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

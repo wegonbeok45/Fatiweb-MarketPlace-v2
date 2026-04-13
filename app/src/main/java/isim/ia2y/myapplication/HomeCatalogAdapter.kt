@@ -10,18 +10,24 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.button.MaterialButton
 import java.util.Locale
 
 class HomeCatalogAdapter(
     private val onToggleFavorite: (Product) -> Unit,
-    private val onAddToCart: (Product) -> Unit,
-    private val onOpenProduct: (Product) -> Unit
+    private val onOpenProduct: (Product) -> Unit,
+    private val fixedItemWidthRes: Int? = null
 ) : ListAdapter<Product, HomeCatalogAdapter.ViewHolder>(ProductDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_home_catalog_product, parent, false)
+        fixedItemWidthRes?.let { widthRes ->
+            val width = parent.resources.getDimensionPixelSize(widthRes)
+            view.layoutParams = RecyclerView.LayoutParams(
+                width,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+        }
         return ViewHolder(view)
     }
 
@@ -32,56 +38,66 @@ class HomeCatalogAdapter(
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val image = itemView.findViewById<ImageView>(R.id.homeDynamicProductImage)
         private val title = itemView.findViewById<TextView>(R.id.homeDynamicProductTitle)
-        private val subtitle = itemView.findViewById<TextView>(R.id.homeDynamicProductSubtitle)
+        private val subtitle = itemView.findViewById<TextView?>(R.id.homeDynamicProductSubtitle)
         private val price = itemView.findViewById<TextView>(R.id.homeDynamicProductPrice)
         private val stockText = itemView.findViewById<TextView>(R.id.homeDynamicProductStockText)
         private val origin = itemView.findViewById<TextView>(R.id.homeDynamicProductOrigin)
         private val rating = itemView.findViewById<TextView>(R.id.homeDynamicProductRating)
         private val favorite = itemView.findViewById<View>(R.id.homeDynamicFavoriteButton)
         private val favoriteIcon = itemView.findViewById<ImageView>(R.id.homeDynamicFavoriteIcon)
-        private val addButton = itemView.findViewById<MaterialButton>(R.id.homeDynamicAddButton)
 
         fun bind(product: Product) {
+            val ctx = itemView.context
+
             image.loadCatalogImage(product.imageUrl, product.imageRes)
             title.text = product.title
-            subtitle.text = product.subtitle
+            subtitle?.text = product.subtitle
             price.text = formatDt(product.price)
             origin.text = formatOrigin(product.origin)
             rating.text = String.format(Locale.US, "%.1f", product.rating)
-            stockText.visibility = View.GONE
 
-            val isFavorite = FavoritesStore.isFavorite(itemView.context, product.id)
+            when {
+                !product.isActive -> {
+                    stockText.visibility = View.VISIBLE
+                    stockText.text = ctx.getString(R.string.product_state_hidden)
+                    stockText.backgroundTintList = ColorStateList.valueOf(
+                        ContextCompat.getColor(ctx, R.color.stock_chip_bg_hidden)
+                    )
+                    stockText.setTextColor(ContextCompat.getColor(ctx, R.color.stock_chip_text_hidden))
+                }
+                product.stock <= 0 -> {
+                    stockText.visibility = View.VISIBLE
+                    stockText.text = ctx.getString(R.string.product_state_out_of_stock_short)
+                    stockText.backgroundTintList = ColorStateList.valueOf(
+                        ContextCompat.getColor(ctx, R.color.stock_chip_bg_oos)
+                    )
+                    stockText.setTextColor(ContextCompat.getColor(ctx, R.color.stock_chip_text_oos))
+                }
+                product.stock in 1..5 -> {
+                    stockText.visibility = View.VISIBLE
+                    stockText.text = ctx.getString(R.string.product_state_low_stock, product.stock)
+                    stockText.backgroundTintList = ColorStateList.valueOf(
+                        ContextCompat.getColor(ctx, R.color.stock_chip_bg_low)
+                    )
+                    stockText.setTextColor(ContextCompat.getColor(ctx, R.color.stock_chip_text_low))
+                }
+                else -> stockText.visibility = View.GONE
+            }
+
+            val isFavorite = FavoritesStore.isFavorite(ctx, product.id)
             favoriteIcon.setColorFilter(
                 ContextCompat.getColor(
-                    itemView.context,
+                    ctx,
                     if (isFavorite) R.color.home_heart_active else R.color.home_text_primary
                 )
             )
-
-            val ctx = itemView.context
-            val (chipBg, chipText, chipTextColor) = when {
-                !product.isActive -> Triple(ContextCompat.getColor(ctx, R.color.stock_chip_bg_hidden), ctx.getString(R.string.product_state_hidden), ContextCompat.getColor(ctx, R.color.stock_chip_text_hidden))
-                product.stock <= 0 -> Triple(ContextCompat.getColor(ctx, R.color.stock_chip_bg_oos), ctx.getString(R.string.product_state_out_of_stock_short), ContextCompat.getColor(ctx, R.color.stock_chip_text_oos))
-                product.stock <= 5 -> Triple(ContextCompat.getColor(ctx, R.color.stock_chip_bg_low), ctx.getString(R.string.product_state_low_stock, product.stock), ContextCompat.getColor(ctx, R.color.stock_chip_text_low))
-                else -> Triple(ContextCompat.getColor(ctx, R.color.stock_chip_bg_available), ctx.getString(R.string.product_state_available), ContextCompat.getColor(ctx, R.color.stock_chip_text_available))
-            }
-            addButton.text = chipText
-            addButton.backgroundTintList = ColorStateList.valueOf(chipBg)
-            addButton.setTextColor(chipTextColor)
-
             favorite.setOnClickListener {
                 onToggleFavorite(product)
-                val adapterPosition = bindingAdapterPosition
-                if (adapterPosition != RecyclerView.NO_POSITION) {
-                    notifyItemChanged(adapterPosition)
-                }
+                val pos = bindingAdapterPosition
+                if (pos != RecyclerView.NO_POSITION) notifyItemChanged(pos)
             }
+
             itemView.setOnClickListener { onOpenProduct(product) }
         }
-    }
-
-    private fun formatOrigin(origin: String): String {
-        return origin.replace('_', ' ')
-            .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
     }
 }

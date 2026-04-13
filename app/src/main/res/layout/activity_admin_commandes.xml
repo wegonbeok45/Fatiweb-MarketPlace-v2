@@ -44,7 +44,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="14dp"
-                android:text="@string/auto_gestion_des_commandes_cc59"
+                android:text="@string/admin_title_orders"
                 android:textColor="@color/profile_text_primary"
                 android:textSize="@dimen/text_size_subtitle"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -91,7 +91,7 @@
             android:orientation="vertical"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
-            android:paddingTop="20dp">
+            android:paddingTop="16dp">
 
             <!-- Stats Row -->
             <LinearLayout
@@ -99,15 +99,15 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginBottom="20dp">
+                android:layout_marginBottom="16dp">
 
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="0dp"
-                    android:layout_height="72dp"
+                    android:layout_height="64dp"
                     android:layout_weight="1"
                     android:layout_marginEnd="8dp"
                     app:cardBackgroundColor="@color/profile_card_bg"
-                    app:cardCornerRadius="14dp"
+                    app:cardCornerRadius="@dimen/corner_radius_large"
                     app:cardElevation="0dp"
                     app:strokeColor="@color/colorBorderLight"
                     app:strokeWidth="1dp">
@@ -136,7 +136,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
 
-                            android:text="@string/auto_total_96b0"
+                            android:text="@string/admin_orders_total_label"
                             android:textColor="@color/profile_text_secondary"
                             android:textSize="@dimen/text_size_overline"
                             app:layout_constraintBottom_toBottomOf="parent"
@@ -147,12 +147,12 @@
 
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="0dp"
-                    android:layout_height="72dp"
+                    android:layout_height="64dp"
                     android:layout_weight="1"
                     android:layout_marginStart="4dp"
                     android:layout_marginEnd="4dp"
                     app:cardBackgroundColor="@color/profile_card_bg"
-                    app:cardCornerRadius="14dp"
+                    app:cardCornerRadius="@dimen/corner_radius_large"
                     app:cardElevation="0dp"
                     app:strokeColor="@color/colorBorderLight"
                     app:strokeWidth="1dp">
@@ -181,7 +181,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
 
-                            android:text="@string/auto_en_attente_4391"
+                            android:text="@string/admin_orders_pending_label"
                             android:textColor="@color/profile_text_secondary"
                             android:textSize="@dimen/text_size_overline"
                             app:layout_constraintBottom_toBottomOf="parent"
@@ -192,11 +192,11 @@
 
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="0dp"
-                    android:layout_height="72dp"
+                    android:layout_height="64dp"
                     android:layout_weight="1"
                     android:layout_marginStart="8dp"
                     app:cardBackgroundColor="@color/profile_card_bg"
-                    app:cardCornerRadius="14dp"
+                    app:cardCornerRadius="@dimen/corner_radius_large"
                     app:cardElevation="0dp"
                     app:strokeColor="@color/colorBorderLight"
                     app:strokeWidth="1dp">
@@ -225,7 +225,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
 
-                            android:text="@string/auto_livres_c581"
+                            android:text="@string/admin_orders_delivered_label"
                             android:textColor="@color/profile_text_secondary"
                             android:textSize="@dimen/text_size_overline"
                             app:layout_constraintBottom_toBottomOf="parent"
@@ -241,10 +241,63 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
 
-                android:text="@string/auto_commandes_rcentes_152b"
+                android:text="@string/admin_orders_recent_title"
                 android:textColor="@color/profile_text_primary"
                 android:textSize="@dimen/text_size_body"
-                android:layout_marginBottom="12dp" />
+                android:layout_marginBottom="10dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:orientation="horizontal">
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    app:cardBackgroundColor="@color/profile_card_bg"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="0dp"
+                    app:strokeColor="@color/colorBorderLight"
+                    app:strokeWidth="1dp">
+
+                    <EditText
+                        android:id="@+id/adminCommandesSearchInput"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@android:color/transparent"
+                        android:hint="@string/admin_orders_search_hint"
+                        android:paddingStart="14dp"
+                        android:paddingEnd="14dp"
+                        android:singleLine="true"
+                        android:textColor="@color/profile_text_primary"
+                        android:textColorHint="@color/profile_text_secondary" />
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="136dp"
+                    android:layout_height="48dp"
+                    android:layout_marginStart="10dp"
+                    app:cardBackgroundColor="@color/profile_card_bg"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="0dp"
+                    app:strokeColor="@color/colorBorderLight"
+                    app:strokeWidth="1dp">
+
+                    <AutoCompleteTextView
+                        android:id="@+id/adminCommandesFilterInput"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@android:color/transparent"
+                        android:inputType="none"
+                        android:paddingStart="14dp"
+                        android:paddingEnd="14dp"
+                        android:textColor="@color/profile_text_primary"
+                        android:textColorHint="@color/profile_text_secondary"
+                        tools:text="Tous" />
+                </com.google.android.material.card.MaterialCardView>
+            </LinearLayout>
 
             <!-- Orders Card -->
             <com.google.android.material.card.MaterialCardView
@@ -252,7 +305,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:cardBackgroundColor="@color/profile_card_bg"
-                app:cardCornerRadius="16dp"
+                app:cardCornerRadius="@dimen/corner_radius_large"
                 app:cardElevation="0dp"
                 app:strokeColor="@color/colorBorderLight"
                 app:strokeWidth="1dp">
@@ -301,4 +354,3 @@
         android:layout_gravity="bottom" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
-

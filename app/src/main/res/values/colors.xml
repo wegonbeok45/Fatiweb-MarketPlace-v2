@@ -1,27 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#1A1A1A</color>
+    <color name="colorPrimary">#111111</color>
     <color name="colorOnPrimary">#FFFFFF</color>
-    <color name="colorSecondary">#4D4D4D</color>
+    <color name="colorSecondary">#5F5F5F</color>
     <color name="colorOnSecondary">#FFFFFF</color>
-    <color name="colorBackground">#FFFFFF</color>
-    <color name="colorOnBackground">#1A1A1A</color>
+    <color name="colorBackground">#F7F7F7</color>
+    <color name="colorOnBackground">#111111</color>
     <color name="colorSurface">#FFFFFF</color>
-    <color name="colorOnSurface">#1A1A1A</color>
-    <color name="colorOutline">#EEEEEE</color>
-    <color name="colorError">#000000</color>
+    <color name="colorOnSurface">#111111</color>
+    <color name="colorOutline">#E3E3E3</color>
+    <color name="colorError">#2A2A2A</color>
     <color name="colorOnError">#FFFFFF</color>
-    <color name="colorAccentDeep">#000000</color>
+    <color name="colorAccentDeep">#111111</color>
     <color name="colorOnAccentDeep">#FFFFFF</color>
 
-    <color name="colorSurfaceVariant">#F9F9F9</color>
+    <!-- Design-system source-of-truth aliases -->
+    <color name="color_primary">#111111</color>
+    <color name="color_accent">#5F5F5F</color>
+    <color name="color_surface">#FFFFFF</color>
+    <color name="color_background">#F7F7F7</color>
+    <color name="color_on_surface">#111111</color>
+    <color name="color_grey_mid">#6F6F6F</color>
+    <color name="color_success">#2A2A2A</color>
+    <color name="color_warning">#5F5F5F</color>
+    <color name="color_error">#2A2A2A</color>
+
+    <color name="colorSurfaceVariant">#F1F1F1</color>
     <color name="colorOnSurfaceVariant">#666666</color>
     <color name="colorScrim">#99000000</color>
     <color name="colorOnScrim">#FFFFFF</color>
     <color name="colorLoadingScrim">#66000000</color>
-    <color name="colorErrorContainer">#F5F5F5</color>
+    <color name="colorErrorContainer">#EFEFEF</color>
     <color name="colorOnErrorContainer">#000000</color>
-    <color name="colorBorderLight">#F0F0F0</color>
+    <color name="colorBorderLight">#E3E3E3</color>
 
     <!-- Legacy aliases kept to avoid broken references -->
     <!-- #1A1A1A — aliases of colorPrimary: brand_primary, text_primary -->
@@ -34,26 +45,26 @@
     <!-- #666666 — aliases of colorOnSurfaceVariant: text_secondary -->
     <color name="text_secondary">#666666</color>
     <!-- #A3A3A3 — aliases: text_tertiary (same as profile_text_muted, panier_delete_tint, home_nav_inactive, panier_nav_inactive, profile_nav_inactive) -->
-    <color name="text_tertiary">#A3A3A3</color>
+    <color name="text_tertiary">#6B7280</color>
     <color name="white">#FFFFFF</color>
     <color name="divider_light">#F0F0F0</color>
 
     <!-- Profile screen -->
     <!-- #FAFAFA — alias of background_loading -->
-    <color name="profile_header_bg">#FAFAFA</color>
+    <color name="profile_header_bg">#F7F7F7</color>
     <!-- #FFFFFF — alias of colorSurface -->
     <color name="profile_body_bg">#FFFFFF</color>
     <color name="profile_divider">#F0F0F0</color>
     <!-- #FFFFFF — alias of colorSurface -->
     <color name="profile_card_bg">#FFFFFF</color>
     <!-- #F5F5F5 — alias of colorSurfaceVariant group (same as home_search_bg, home_category_bg, panier_card_image_bg, etc.) -->
-    <color name="profile_card_icon_bg">#F5F5F5</color>
+    <color name="profile_card_icon_bg">#F1F1F1</color>
     <!-- #1A1A1A — alias of colorPrimary -->
-    <color name="profile_text_primary">#1A1A1A</color>
+    <color name="profile_text_primary">#111111</color>
     <!-- #666666 — alias of colorOnSurfaceVariant -->
     <color name="profile_text_secondary">#666666</color>
     <!-- #A3A3A3 — alias of text_tertiary -->
-    <color name="profile_text_muted">#A3A3A3</color>
+    <color name="profile_text_muted">#6B7280</color>
     <!-- #1A1A1A — alias of colorPrimary -->
     <color name="profile_accent">#1A1A1A</color>
     <color name="profile_accent_text">#FFFFFF</color>
@@ -61,7 +72,7 @@
     <color name="profile_location_bg">#F5F5F5</color>
     <!-- #666666 — alias of colorOnSurfaceVariant -->
     <color name="profile_location_icon">#666666</color>
-    <color name="profile_chevron">#D4D4D4</color>
+    <color name="profile_chevron">#B5B5B5</color>
     <color name="profile_avatar_ring">#FFFFFF</color>
     <!-- Default avatar art (vector); light theme: neutral grays aligned with profile surfaces -->
     <color name="profile_avatar_placeholder_bg">#F5F5F5</color>
@@ -71,21 +82,23 @@
     <color name="profile_avatar_placeholder_body">#EEEEEE</color>
     <color name="profile_avatar_placeholder_accent">#F9F9F9</color>
     <!-- #1A1A1A — alias of colorPrimary -->
-    <color name="profile_edit_bg">#1A1A1A</color>
+    <color name="profile_edit_bg">#111111</color>
     <color name="profile_edit_icon">#FFFFFF</color>
-    <color name="profile_logout_bg">#F5F5F5</color>
-    <color name="profile_logout_text">#000000</color>
-    <color name="profile_logout_border">#EEEEEE</color>
+    <color name="profile_logout_bg">#F3F3F3</color>
+    <color name="profile_logout_text">#111111</color>
+    <color name="profile_logout_border">#E3E3E3</color>
     <!-- #FFFFFF — alias of colorSurface -->
     <color name="profile_nav_bg">#FFFFFF</color>
     <!-- #A3A3A3 — alias of text_tertiary -->
-    <color name="profile_nav_inactive">#A3A3A3</color>
+    <color name="profile_nav_inactive">#6B7280</color>
     <!-- #1A1A1A — alias of colorPrimary -->
     <color name="profile_nav_active">#1A1A1A</color>
-    <color name="profile_language_selected_bg">#1A1A1A</color>
+    <color name="profile_language_selected_bg">#111111</color>
     <color name="profile_language_selected_text">#FFFFFF</color>
     <color name="profile_language_unselected_bg">#FFFFFF</color>
-    <color name="profile_language_unselected_text">#1A1A1A</color>
+    <color name="profile_language_unselected_text">#666666</color>
+    <color name="profile_section_bg">#FFFFFF</color>
+    <color name="profile_section_stroke">#E3E3E3</color>
 
     <!-- Panier screen -->
     <!-- #FAFAFA — alias of background_loading -->
@@ -115,7 +128,7 @@
     <!-- #FFFFFF — alias of colorSurface -->
     <color name="panier_nav_bg">#FFFFFF</color>
     <!-- #A3A3A3 — alias of text_tertiary -->
-    <color name="panier_nav_inactive">#A3A3A3</color>
+    <color name="panier_nav_inactive">#6B7280</color>
     <color name="panier_nav_active">#1A1A1A</color>
     <color name="panier_notification_dot">#000000</color>
 
@@ -139,7 +152,7 @@
     <!-- #FFFFFF — alias of colorSurface -->
     <color name="home_product_surface">#FFFFFF</color>
     <color name="home_heart_bg">#FFFFFF</color>
-    <color name="home_heart_active">#1A1A1A</color>
+    <color name="home_heart_active">#E53935</color>
     <!-- #1A1A1A — alias of colorPrimary -->
     <color name="home_add_cart_bg">#1A1A1A</color>
     <color name="home_add_cart_icon">#FFFFFF</color>
@@ -150,7 +163,7 @@
     <!-- #1A1A1A — alias of colorPrimary -->
     <color name="home_nav_active">#1A1A1A</color>
     <!-- #A3A3A3 — alias of text_tertiary -->
-    <color name="home_nav_inactive">#A3A3A3</color>
+    <color name="home_nav_inactive">#6B7280</color>
     <!-- #EEEEEE — alias of colorOutline -->
     <color name="home_divider">#EEEEEE</color>
     <!-- #FAFAFA — alias of background_loading -->
@@ -160,7 +173,7 @@
     <color name="home_top_gradient_start">#FFFFFF</color>
     <color name="home_top_gradient_end">#FAFAFA</color>
     <color name="home_hero_primary_start">#1A1A1A</color>
-    <color name="home_hero_primary_end">#333333</color>
+    <color name="home_hero_primary_end">#2A2A2A</color>
     <!-- #F5F5F5 — alias of colorSurfaceVariant group -->
     <color name="home_hero_secondary_bg">#F5F5F5</color>
     <!-- #EEEEEE — alias of colorOutline -->
@@ -182,8 +195,8 @@
     <color name="details_quantity_bg">#FFFFFF</color>
     <color name="details_quantity_stroke">#E0E0E0</color>
     <color name="details_text_primary">#1A1A1A</color>
-    <color name="details_text_body">#4A4A4A</color>
-    <color name="details_text_muted">#888888</color>
+    <color name="details_text_body">#4F4F4F</color>
+    <color name="details_text_muted">#7A7A7A</color>
     <color name="details_star">#1A1A1A</color>
 
     <!-- Drawable gradient colors (extracted from hardcoded hex in drawables) -->
@@ -201,10 +214,10 @@
     <color name="notification_badge_bg">#000000</color>
     <color name="notification_badge_stroke">#FFFFFF</color>
     <!-- #FEF2F2 — alias of status_bg_error -->
-    <color name="admin_stat_alert_bg">#FFFFFF</color>
-    <color name="admin_stat_positive_bg">#FFFFFF</color>
+    <color name="admin_stat_alert_bg">#FEF2F2</color>
+    <color name="admin_stat_positive_bg">#F1F1F1</color>
     <!-- #F4F0EC — alias of surface_warm -->
-    <color name="admin_stat_neutral_bg">#FFFFFF</color>
+    <color name="admin_stat_neutral_bg">#F4F0EC</color>
     <color name="warning_box_bg">#F5F5F5</color>
     <color name="warning_box_stroke">#E0E0E0</color>
 
@@ -232,6 +245,9 @@
     <!-- Preparing: medium dark pill, white text -->
     <color name="status_chip_bg_preparing">#4A4A4A</color>
     <color name="status_chip_text_preparing">#FFFFFF</color>
+    <!-- Shipped: neutral dark gray pill, white text -->
+    <color name="status_chip_bg_shipped">#4A4A4A</color>
+    <color name="status_chip_text_shipped">#FFFFFF</color>
     <!-- Cancelled: dark gray pill, white text -->
     <color name="status_chip_bg_cancelled">#E0E0E0</color>
     <color name="status_chip_text_cancelled">#1A1A1A</color>
@@ -257,8 +273,8 @@
     <color name="border_medium">#E0E0E0</color>
 
     <!-- Status / semantic feedback colors -->
-    <color name="google_green">#000000</color>
-    <color name="success_green">#000000</color>
+    <color name="google_green">#111111</color>
+    <color name="success_green">#111111</color>
     <!-- #FFF3E0 — same value as stock_chip_bg_low -->
     <color name="status_bg_warning">#F5F5F5</color>
     <!-- #E65100 — same value as status_chip_text_pending -->

@@ -2,24 +2,28 @@
   "name": "fatiweb-functions",
   "description": "Firebase Cloud Functions for FatiWeb Marketplace",
   "scripts": {
-    "lint": "eslint .",
+    "build": "tsc -p tsconfig.json",
+    "lint": "eslint --ext .ts src",
     "serve": "firebase emulators:start --only functions",
     "shell": "firebase functions:shell",
     "start": "npm run shell",
     "deploy": "firebase deploy --only functions",
-    "logs": "firebase functions:log"
+    "logs": "firebase functions:log",
+    "test": "node --test lib/test/**/*.test.js"
   },
   "engines": {
     "node": "18"
   },
-  "main": "index.js",
+  "main": "lib/index.js",
   "dependencies": {
     "firebase-admin": "^11.8.0",
     "firebase-functions": "^4.3.1"
   },
   "devDependencies": {
+    "@types/node": "^20.17.24",
     "eslint": "^8.9.0",
-    "eslint-config-google": "^0.14.0"
+    "eslint-config-google": "^0.14.0",
+    "typescript": "^5.6.3"
   },
   "private": true
 }

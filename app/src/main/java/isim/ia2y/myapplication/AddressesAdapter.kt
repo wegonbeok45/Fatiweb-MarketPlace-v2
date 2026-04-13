@@ -33,10 +33,19 @@ class AddressesAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = getItem(position)
-        holder.title.text = item.titleLine.ifBlank { item.label.ifBlank { "Adresse" } }
+        val context = holder.itemView.context
+        holder.title.text = item.titleLine.ifBlank {
+            item.label.ifBlank { context.getString(R.string.address_title_fallback) }
+        }
         holder.summary.text = item.summaryLine
-        holder.details.text = item.detailsLine.ifBlank { "Aucun détail supplémentaire" }
-        holder.state.text = if (item.isDefault) "Par défaut" else "Secondaire"
+        holder.details.text = item.detailsLine.ifBlank {
+            context.getString(R.string.address_details_missing)
+        }
+        holder.state.text = if (item.isDefault) {
+            context.getString(R.string.address_state_default)
+        } else {
+            context.getString(R.string.address_state_secondary)
+        }
         holder.setDefault.visibility = if (item.isDefault) View.GONE else View.VISIBLE
 
         holder.itemView.setOnClickListener { onSelect(item) }

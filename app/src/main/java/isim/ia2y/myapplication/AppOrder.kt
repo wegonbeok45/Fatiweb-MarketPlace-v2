@@ -5,127 +5,112 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-data class ProductSnapshot(
-    val title: String = "",
-    val price: Double = 0.0,
-    val imageUrl: String = "",
-    val imageRes: Int? = null,
-    val subtitle: String = ""
+data class OrderItem(
+    val productId: String = "",
+    val name: String = "",
+    val priceAtPurchase: Double = 0.0,
+    val quantity: Int = 0,
+    val thumbnailUrl: String = ""
 ) {
     fun toMap() = mapOf(
-        "title" to title,
-        "price" to price,
-        "imageUrl" to imageUrl,
-        "imageRes" to (imageRes ?: 0),
-        "subtitle" to subtitle
+        "productId" to productId,
+        "name" to name,
+        "priceAtPurchase" to priceAtPurchase,
+        "quantity" to quantity,
+        "thumbnailUrl" to thumbnailUrl
     )
 
     companion object {
-        fun fromAny(any: Any?): ProductSnapshot? {
-            val map = any as? Map<*, *> ?: return null
-            return ProductSnapshot(
-                title = map["title"] as? String ?: "",
-                price = (map["price"] as? Number)?.toDouble() ?: 0.0,
-                imageUrl = map["imageUrl"] as? String ?: "",
-                imageRes = (map["imageRes"] as? Number)?.toInt()?.takeIf { it != 0 },
-                subtitle = map["subtitle"] as? String ?: ""
-            )
-        }
+        fun fromMap(map: Map<String, Any?>): OrderItem = OrderItem(
+            productId = map["productId"] as? String ?: "",
+            name = map["name"] as? String ?: "",
+            priceAtPurchase = (map["priceAtPurchase"] as? Number)?.toDouble() ?: 0.0,
+            quantity = (map["quantity"] as? Number)?.toInt() ?: 0,
+            thumbnailUrl = map["thumbnailUrl"] as? String ?: ""
+        )
     }
 }
 
 data class AppOrder(
     val id: String = "",
-    val items: Map<String, Int> = emptyMap(),
-    val subtotal: Double = 0.0,
-    val shippingFee: Double = 0.0,
-    val total: Double = 0.0,
-    val deliveryType: String = "standard",
-    val paymentMethod: String = "cash",
+    val uid: String = "",
     val status: String = "pending",
-    val deliveryAddressSnapshot: DeliveryAddressSnapshot? = null,
-    val itemSnapshots: Map<String, ProductSnapshot> = emptyMap(),
-    val customerPhone: String = "",
-    val estimatedDeliveryDate: Long = 0L,
-    val createdAt: Long = System.currentTimeMillis(),
-    val updatedAt: Long = createdAt,
-    val statusTimeline: List<OrderStatusEntry> = listOf(OrderStatusEntry(status, createdAt))
+    val paymentMethod: String = "COD",
+    val subtotal: Double = 0.0,
+    val deliveryFee: Double = 0.0,
+    val total: Double = 0.0,
+    val shippingAddress: DeliveryAddressSnapshot? = null,
+    val items: List<OrderItem> = emptyList(),
+    val trackingEvents: List<OrderStatusEntry> = emptyList(),
+    val createdAt: Any? = null,
+    val updatedAt: Any? = null
 ) {
     val formattedDate: String
-        get() = SimpleDateFormat("dd MMM yyyy", Locale.FRANCE).format(Date(createdAt))
+        get() = SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(Date(createdAtMillis))
 
-    val estimatedDeliveryLabel: String
-        get() = if (estimatedDeliveryDate <= 0L) {
-            ""
-        } else {
-            SimpleDateFormat("dd MMM yyyy", Locale.FRANCE).format(Date(estimatedDeliveryDate))
-        }
+    val createdAtMillis: Long get() = when (val res = createdAt) {
+        is Long -> res
+        is com.google.firebase.Timestamp -> res.toDate().time
+        else -> System.currentTimeMillis()
+    }
 
     val displayId: String
         get() = if (id.isNotEmpty()) "#FW-${id.takeLast(6).uppercase()}" else "#FW-??????"
 
-    fun toMap(): Map<String, Any> = buildMap {
+    fun toMap(): Map<String, Any?> = buildMap {
         put("id", id)
-        put("items", items)
-        put("subtotal", subtotal)
-        put("shippingFee", shippingFee)
-        put("total", total)
-        put("deliveryType", deliveryType)
-        put("paymentMethod", paymentMethod)
+        put("uid", uid)
         put("status", status)
-        put("customerPhone", customerPhone)
-        put("estimatedDeliveryDate", estimatedDeliveryDate)
-        put("createdAt", createdAt)
-        put("updatedAt", updatedAt)
-        put("statusTimeline", statusTimeline.map { it.toMap() })
-        deliveryAddressSnapshot?.let { put("deliveryAddressSnapshot", it.toMap()) }
-        put("itemSnapshots", itemSnapshots.mapValues { it.value.toMap() })
+        put("paymentMethod", paymentMethod)
+        put("subtotal", subtotal)
+        put("deliveryFee", deliveryFee)
+        put("total", total)
+        put("items", items.map { it.toMap() })
+        put("trackingEvents", trackingEvents.map { it.toMap() })
+        put("createdAt", createdAt ?: com.google.firebase.firestore.FieldValue.serverTimestamp())
+        put("updatedAt", com.google.firebase.firestore.FieldValue.serverTimestamp())
+        shippingAddress?.let { put("shippingAddress", it.toMap()) }
     }
 
-    fun withStatus(newStatus: String, changedAt: Long = System.currentTimeMillis()): AppOrder {
-        val nextTimeline = statusTimeline
+    fun withStatus(newStatus: String, changedAt: Any = com.google.firebase.Timestamp.now()): AppOrder {
+        val nextTimeline = trackingEvents
             .filterNot { it.status == newStatus }
-            .plus(OrderStatusEntry(newStatus, changedAt))
+            .plus(OrderStatusEntry(newStatus, when(changedAt) {
+                is Long -> changedAt
+                is com.google.firebase.Timestamp -> changedAt.toDate().time
+                else -> System.currentTimeMillis()
+            }))
             .sortedBy { it.changedAt }
         return copy(
             status = newStatus,
             updatedAt = changedAt,
-            statusTimeline = nextTimeline
+            trackingEvents = nextTimeline
         )
     }
 
     companion object {
         @Suppress("UNCHECKED_CAST")
         fun fromMap(map: Map<String, Any>): AppOrder {
-            val createdAt = (map["createdAt"] as? Number)?.toLong() ?: System.currentTimeMillis()
             val status = map["status"] as? String ?: "pending"
-            val timeline = (map["statusTimeline"] as? List<*>)
+            val createdAt = map["createdAt"]
+            val timeline = (map["trackingEvents"] as? List<*>)
                 ?.mapNotNull { OrderStatusEntry.fromAny(it) }
-                ?.ifEmpty { listOf(OrderStatusEntry(status, createdAt)) }
-                ?: listOf(OrderStatusEntry(status, createdAt))
+                ?: (map["statusTimeline"] as? List<*>)?.mapNotNull { OrderStatusEntry.fromAny(it) } // Compat
+                ?: emptyList()
 
             return AppOrder(
                 id = map["id"] as? String ?: "",
-                items = (map["items"] as? Map<String, Any>)?.mapValues {
-                    (it.value as? Number)?.toInt() ?: 1
-                } ?: emptyMap(),
-                subtotal = (map["subtotal"] as? Number)?.toDouble() ?: 0.0,
-                shippingFee = (map["shippingFee"] as? Number)?.toDouble() ?: 0.0,
-                total = (map["total"] as? Number)?.toDouble() ?: 0.0,
-                deliveryType = map["deliveryType"] as? String ?: "standard",
-                paymentMethod = map["paymentMethod"] as? String ?: "cash",
+                uid = map["uid"] as? String ?: map["userId"] as? String ?: "",
                 status = status,
-                deliveryAddressSnapshot = DeliveryAddressSnapshot.fromAny(map["deliveryAddressSnapshot"]),
-                itemSnapshots = (map["itemSnapshots"] as? Map<*, *>)?.mapNotNull { (k, v) ->
-                    val productId = k as? String ?: return@mapNotNull null
-                    val snap = ProductSnapshot.fromAny(v) ?: return@mapNotNull null
-                    productId to snap
-                }?.toMap() ?: emptyMap(),
-                customerPhone = map["customerPhone"] as? String ?: "",
-                estimatedDeliveryDate = (map["estimatedDeliveryDate"] as? Number)?.toLong() ?: 0L,
+                paymentMethod = map["paymentMethod"] as? String ?: "COD",
+                subtotal = (map["subtotal"] as? Number)?.toDouble() ?: 0.0,
+                deliveryFee = (map["deliveryFee"] as? Number)?.toDouble() ?: (map["shippingFee"] as? Number)?.toDouble() ?: 0.0,
+                total = (map["total"] as? Number)?.toDouble() ?: 0.0,
+                shippingAddress = DeliveryAddressSnapshot.fromAny(map["shippingAddress"] ?: map["deliveryAddressSnapshot"]),
+                items = (map["items"] as? List<Map<String, Any>>)?.map { OrderItem.fromMap(it) } ?: emptyList(),
+                trackingEvents = timeline,
                 createdAt = createdAt,
-                updatedAt = (map["updatedAt"] as? Number)?.toLong() ?: createdAt,
-                statusTimeline = timeline
+                updatedAt = map["updatedAt"] ?: createdAt
             )
         }
     }

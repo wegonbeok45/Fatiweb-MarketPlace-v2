@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/orderDetailsRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -9,19 +10,20 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layoutTopBar"
         android:layout_width="0dp"
-        android:layout_height="@dimen/profile_top_bar_height"
+        android:layout_height="@dimen/app_top_bar_height"
         android:background="@color/home_nav_bg"
-        android:paddingStart="@dimen/profile_horizontal_margin"
-        android:paddingEnd="@dimen/profile_horizontal_margin"
+        android:paddingStart="@dimen/app_top_bar_horizontal_padding"
+        android:paddingEnd="@dimen/app_top_bar_horizontal_padding"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
             android:id="@+id/ivBack"
-            android:layout_width="@dimen/profile_top_bar_icon_size"
-            android:layout_height="@dimen/profile_top_bar_icon_size"
+            android:layout_width="@dimen/app_top_bar_side_slot_size"
+            android:layout_height="@dimen/app_top_bar_side_slot_size"
             android:contentDescription="@string/details_back"
+            android:padding="@dimen/surface_button_inner_padding"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -29,19 +31,78 @@
             app:tint="@color/home_text_primary" />
 
         <TextView
+            style="@style/AppTopBar.Title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/auto_dtail_de_la_commande_d45e"
-            android:textColor="@color/home_text_primary"
-            android:textSize="@dimen/text_size_subtitle"
-            android:fontFamily="@font/plus_jakarta_sans_bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <Space
+            android:layout_width="@dimen/app_top_bar_side_slot_size"
+            android:layout_height="@dimen/app_top_bar_side_slot_size"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <ProgressBar
+        android:id="@+id/orderDetailsLoading"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/layoutTopBar" />
+
+    <LinearLayout
+        android:id="@+id/layoutOrderState"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/layoutTopBar">
+
+        <TextView
+            android:id="@+id/tvOrderStateTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textColor="@color/home_text_primary"
+            android:textSize="@dimen/text_size_subtitle"
+            android:textStyle="bold"
+            tools:text="Connectez-vous pour voir cette commande" />
+
+        <TextView
+            android:id="@+id/tvOrderStateMessage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="center"
+            android:textColor="@color/home_text_secondary"
+            android:textSize="@dimen/text_size_caption"
+            tools:text="Votre historique reste disponible dès que vous vous reconnectez." />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnOrderStateAction"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:textAllCaps="false"
+            app:cornerRadius="24dp"
+            tools:text="Se connecter" />
+    </LinearLayout>
+
     <androidx.core.widget.NestedScrollView
+        android:id="@+id/scrollOrderDetails"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:clipToPadding="false"
@@ -163,9 +224,14 @@
                 android:id="@+id/btnOrderSupport"
                 style="@style/AppButton.Secondary"
                 android:layout_width="match_parent"
-                android:layout_height="48dp"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                android:text="@string/auto_besoin_daide_pour_cette_058e" />
+                android:gravity="center"
+                android:maxLines="2"
+                android:minHeight="56dp"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:text="@string/order_details_support_cta" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

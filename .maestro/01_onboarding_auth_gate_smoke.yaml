@@ -5,10 +5,19 @@ tags:
 ---
 - launchApp:
     clearState: true
-- extendedWaitUntil:
-    visible:
-      id: "btnNext"
-    timeout: 15000
+- retry:
+    maxRetries: 3
+    commands:
+      - tapOn:
+          id: "android:id/aerr_wait"
+          optional: true
+      - tapOn:
+          text: "Wait"
+          optional: true
+      - extendedWaitUntil:
+          visible:
+            id: "btnNext"
+          timeout: 10000
 - takeScreenshot: "01-onboarding-1"
 - tapOn:
     id: "btnNext"
@@ -32,12 +41,8 @@ tags:
     timeout: 15000
 - assertVisible:
     id: "layoutSearchBar"
-- swipe:
-    start: 50%, 82%
-    end: 50%, 30%
-    duration: 500
 - assertVisible:
-    id: "rvLatestProducts"
+    id: "rvFeaturedProducts"
 - tapOn:
     id: "hostNavProfile"
 - extendedWaitUntil:

@@ -34,10 +34,11 @@ class TabDataPrefetcher(context: Context) {
                         ProductCatalog.orderedFavorites(cart.keys)
                     }
                     MainActivity.Tab.PROFILE -> {
-                        appContext.getSharedPreferences("profile_prefs", Context.MODE_PRIVATE)
-                            .getString("avatar_uri", null)
                         FirebaseAuthManager.currentUser?.uid?.let { uid ->
+                            appContext.getSharedPreferences("profile_prefs", Context.MODE_PRIVATE)
+                                .getString("avatar_uri_$uid", null)
                             FirestoreService.fetchUserProfile(uid)
+                            FirestoreService.fetchUserRole(uid)
                         }
                     }
                 }

@@ -38,3 +38,12 @@
     **[] $VALUES;
     public *;
 }
+
+# OkHttp (used by GeminiChatService)
+-dontwarn okhttp3.**
+-dontwarn okio.**
+-keep class okhttp3.** { *; }
+-keep interface okhttp3.** { *; }
+
+# org.json (used for Gemini API response parsing)
+-keep class org.json.** { *; }

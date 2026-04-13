@@ -16,18 +16,22 @@ object UserService {
         uid: String,
         name: String,
         email: String,
-        avatarUrl: String? = null
+        avatarUrl: String? = null,
+        roleOverride: String? = null
     ) {
         val existing = userRef(uid).get().await()
-        val now = System.currentTimeMillis()
         val data = mapOf(
             "uid" to uid,
             "name" to name,
+            "displayName" to name,
             "email" to email,
-            "role" to (existing.getString("role") ?: "client"),
+            "role" to (roleOverride ?: existing.getString("role") ?: "client"),
+            "status" to (existing.getString("status") ?: "active"),
             "avatarUrl" to (avatarUrl ?: existing.getString("avatarUrl")),
-            "createdAt" to (existing.getLong("createdAt") ?: now),
-            "updatedAt" to now
+            "avatar" to (avatarUrl ?: existing.getString("avatar")),
+            "createdAt" to (existing.get("createdAt") ?: com.google.firebase.firestore.FieldValue.serverTimestamp()),
+            "updatedAt" to com.google.firebase.firestore.FieldValue.serverTimestamp(),
+            "schemaVersion" to 2
         )
         userRef(uid).set(data, SetOptions.merge()).await()
     }
@@ -36,7 +40,8 @@ object UserService {
         userRef(uid).set(
             mapOf(
                 "avatarUrl" to avatarUrl,
-                "updatedAt" to System.currentTimeMillis()
+                "avatar" to avatarUrl,
+                "updatedAt" to com.google.firebase.firestore.FieldValue.serverTimestamp()
             ),
             SetOptions.merge()
         ).await()
@@ -46,7 +51,8 @@ object UserService {
         userRef(uid).set(
             mapOf(
                 "name" to name,
-                "updatedAt" to System.currentTimeMillis()
+                "displayName" to name,
+                "updatedAt" to com.google.firebase.firestore.FieldValue.serverTimestamp()
             ),
             SetOptions.merge()
         ).await()
@@ -61,8 +67,8 @@ object UserService {
             email = data["email"] as? String ?: "",
             role = data["role"] as? String ?: "client",
             avatarUrl = data["avatarUrl"] as? String,
-            createdAt = (data["createdAt"] as? Number)?.toLong() ?: 0L,
-            updatedAt = (data["updatedAt"] as? Number)?.toLong() ?: 0L
+            createdAt = data["createdAt"],
+            updatedAt = data["updatedAt"]
         )
     }
 
@@ -71,7 +77,18 @@ object UserService {
             if (cachedUid == uid) return role
         }
 
+        currentUserRoleFromClaims(uid)?.let { claimedRole ->
+            cachedUserRole = uid to claimedRole
+            return claimedRole
+        }
+
         val role = userRef(uid).get().await().getString("role") ?: "client"
+        if (role != "admin") {
+            currentUserRoleFromClaims(uid, forceRefresh = true)?.let { claimedRole ->
+                cachedUserRole = uid to claimedRole
+                return claimedRole
+            }
+        }
         cachedUserRole = uid to role
         return role
     }
@@ -84,6 +101,19 @@ object UserService {
         }
 
         return fetchUserRole(uid) == "admin"
+    }
+
+    private suspend fun currentUserRoleFromClaims(uid: String, forceRefresh: Boolean = false): String? {
+        val currentUser = FirebaseAuthManager.currentUser ?: return null
+        if (currentUser.uid != uid) return null
+
+        val tokenResult = currentUser.getIdToken(forceRefresh).await()
+        val claims = tokenResult.claims
+        return when {
+            claims["admin"] == true -> "admin"
+            claims["role"] is String -> claims["role"] as String
+            else -> null
+        }
     }
 
     fun clearCache() {

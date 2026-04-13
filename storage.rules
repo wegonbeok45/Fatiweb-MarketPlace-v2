@@ -5,15 +5,39 @@ service firebase.storage {
       return request.auth != null;
     }
 
+    function isOwner(userId) {
+      return signedIn() && request.auth.uid == userId;
+    }
+
     function isAdmin() {
-      return signedIn()
-        && firestore.exists(/databases/(default)/documents/users/$(request.auth.uid))
-        && firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role == "admin";
+      return signedIn() &&
+        (
+          request.auth.token.admin == true ||
+          request.auth.token.role == 'admin' ||
+          (
+            firestore.exists(/databases/(default)/documents/users/$(request.auth.uid)) &&
+            firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role == 'admin'
+          )
+        );
+    }
+
+    function isImageUpload() {
+      return request.resource != null &&
+        request.resource.contentType.matches('image/.*');
     }
 
     match /product_images/{productId}/{fileName} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow write: if isAdmin() &&
+        isImageUpload() &&
+        request.resource.size < 10 * 1024 * 1024;
+    }
+
+    match /user_avatars/{userId}/{fileName} {
+      allow read: if true;
+      allow write: if isOwner(userId) &&
+        isImageUpload() &&
+        request.resource.size < 5 * 1024 * 1024;
     }
 
     match /{allPaths=**} {

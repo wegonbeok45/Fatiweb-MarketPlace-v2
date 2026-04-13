@@ -57,7 +57,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="14dp"
-                android:text="@string/auto_clients_0f55"
+                android:text="@string/admin_title_clients"
                 android:textColor="@color/profile_text_primary"
                 android:fontFamily="@font/plus_jakarta_sans_bold"
                 android:textSize="@dimen/text_size_subtitle"
@@ -114,15 +114,15 @@
             android:orientation="vertical"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
-            android:paddingTop="20dp">
+            android:paddingTop="16dp">
 
             <!-- Stats Row -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
+                android:layout_marginBottom="16dp"
                 app:cardBackgroundColor="@android:color/transparent"
-                app:cardCornerRadius="28dp"
+                app:cardCornerRadius="@dimen/corner_radius_large"
                 app:cardElevation="0dp"
                 app:strokeWidth="0dp">
 
@@ -132,15 +132,15 @@
                     android:layout_height="wrap_content"
                     android:background="@drawable/bg_admin_hero_card"
                     android:orientation="horizontal"
-                    android:padding="18dp">
+                    android:padding="16dp">
 
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="0dp"
-                    android:layout_height="80dp"
+                    android:layout_height="72dp"
                     android:layout_weight="1"
                     android:layout_marginEnd="8dp"
                     app:cardBackgroundColor="@color/overlay_white_12"
-                    app:cardCornerRadius="20dp"
+                    app:cardCornerRadius="@dimen/corner_radius_large"
                     app:cardElevation="0dp"
                     app:strokeWidth="0dp">
 
@@ -149,7 +149,7 @@
                         android:layout_height="match_parent"
                         android:orientation="vertical"
                         android:gravity="center"
-                        android:padding="12dp">
+                        android:padding="10dp">
 
                         <TextView
                             android:id="@+id/adminClientsTvTotal"
@@ -165,7 +165,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
 
-                            android:text="@string/auto_total_clients_ba58"
+                            android:text="@string/admin_clients_total_label"
                             android:textColor="@color/surface_warm_muted"
                             android:textSize="@dimen/text_size_overline" />
                     </LinearLayout>
@@ -173,11 +173,11 @@
 
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="0dp"
-                    android:layout_height="80dp"
+                    android:layout_height="72dp"
                     android:layout_weight="1"
                     android:layout_marginStart="8dp"
                     app:cardBackgroundColor="@color/overlay_white_8"
-                    app:cardCornerRadius="20dp"
+                    app:cardCornerRadius="@dimen/corner_radius_large"
                     app:cardElevation="0dp"
                     app:strokeWidth="0dp">
 
@@ -186,7 +186,7 @@
                         android:layout_height="match_parent"
                         android:orientation="vertical"
                         android:gravity="center"
-                        android:padding="12dp">
+                        android:padding="10dp">
 
                         <TextView
                             android:id="@+id/adminClientsTvNew"
@@ -203,7 +203,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
 
-                            android:text="@string/auto_nouveaux_e8b5"
+                            android:text="@string/admin_clients_new_label"
                             android:textColor="@color/surface_warm_muted"
                             android:textSize="@dimen/text_size_overline" />
                     </LinearLayout>
@@ -217,11 +217,34 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
 
-                android:text="@string/auto_liste_des_clients_b230"
+                android:text="@string/admin_clients_list_title"
                 android:textColor="@color/profile_text_primary"
                 android:fontFamily="@font/plus_jakarta_sans_bold"
                 android:textSize="@dimen/text_size_subtitle"
-                android:layout_marginBottom="12dp" />
+                android:layout_marginBottom="10dp" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginBottom="10dp"
+                app:cardBackgroundColor="@color/profile_card_bg"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/colorBorderLight"
+                app:strokeWidth="1dp">
+
+                <EditText
+                    android:id="@+id/adminClientsSearchInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@android:color/transparent"
+                    android:hint="@string/admin_clients_search_hint"
+                    android:paddingStart="14dp"
+                    android:paddingEnd="14dp"
+                    android:singleLine="true"
+                    android:textColor="@color/profile_text_primary"
+                    android:textColorHint="@color/profile_text_secondary" />
+            </com.google.android.material.card.MaterialCardView>
 
             <!-- Clients Card -->
             <com.google.android.material.card.MaterialCardView
@@ -229,7 +252,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:cardBackgroundColor="@color/profile_card_bg"
-                app:cardCornerRadius="24dp"
+                app:cardCornerRadius="@dimen/corner_radius_large"
                 app:cardElevation="0dp"
                 app:strokeColor="@color/colorBorderLight"
                 app:strokeWidth="1dp">
@@ -259,4 +282,3 @@
         android:layout_gravity="bottom" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
-

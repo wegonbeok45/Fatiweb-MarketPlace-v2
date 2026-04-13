@@ -3,17 +3,30 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/adminInlineOrderRow"
     android:layout_width="match_parent"
-    android:layout_height="70dp"
+    android:layout_height="62dp"
     android:background="?selectableItemBackground"
     android:clickable="true"
     android:focusable="true"
-    android:paddingStart="16dp"
-    android:paddingEnd="16dp">
+    android:paddingStart="14dp"
+    android:paddingEnd="14dp">
+
+    <View
+        android:id="@+id/adminCommRow1"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@android:color/transparent"
+        android:clickable="false"
+        android:focusable="false"
+        android:importantForAccessibility="no"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/adminInlineOrderIcon"
-        android:layout_width="38dp"
-        android:layout_height="38dp"
+        android:layout_width="34dp"
+        android:layout_height="34dp"
         app:cardBackgroundColor="@color/profile_card_icon_bg"
         app:cardCornerRadius="999dp"
         app:cardElevation="0dp"
@@ -50,6 +63,8 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
+        android:ellipsize="end"
+        android:maxLines="1"
         android:text="@string/auto_commande_87ef"
         android:textColor="@color/profile_text_secondary"
         android:textSize="@dimen/text_size_overline"
@@ -61,7 +76,7 @@
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/adminInlineOrderBadge"
         android:layout_width="wrap_content"
-        android:layout_height="26dp"
+        android:layout_height="24dp"
         app:cardBackgroundColor="@color/status_bg_warning"
         app:cardCornerRadius="999dp"
         app:cardElevation="0dp"
@@ -75,11 +90,10 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:gravity="center"
-            android:paddingStart="10dp"
-            android:paddingEnd="10dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
             android:text="@string/auto_en_attente_4391"
             android:textColor="@color/status_text_warning"
             android:textSize="@dimen/text_size_overline" />
     </com.google.android.material.card.MaterialCardView>
 </androidx.constraintlayout.widget.ConstraintLayout>
-

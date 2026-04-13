@@ -62,24 +62,14 @@ object NotificationStore {
     }
 
     suspend fun refreshFromCloud(context: Context): List<AppNotification> {
-        val existingById = getAll(context).associateBy { it.id }
-        val remote = FirestoreService.fetchInAppNotifications()
-        val readIds = currentUidOrNull()?.let { uid ->
-            runCatching { FirestoreService.fetchNotificationReadIds(uid) }.getOrDefault(
-                existingById.values.filter { it.isRead }.map { it.id }.toSet()
-            )
-        } ?: existingById.values.filter { it.isRead }.map { it.id }.toSet()
-        val merged = remote.map { notification ->
-            AppNotification(
-                id = notification.id,
-                title = notification.title,
-                message = notification.message,
-                timestamp = notification.createdAt,
-                isRead = notification.id in readIds
-            )
+        val uid = currentUidOrNull()
+        val remote = if (uid != null) {
+            FirestoreService.fetchUserInboxNotifications(uid)
+        } else {
+            emptyList()
         }
-        saveAll(context, merged)
-        return merged
+        saveAll(context, remote)
+        return remote
     }
 
     fun hasUnread(context: Context): Boolean {
@@ -88,9 +78,10 @@ object NotificationStore {
 
     fun markAllAsRead(context: Context) {
         val notifications = getAll(context)
+        val unreadIds = notifications.filter { !it.isRead }.map { it.id }.toSet()
         notifications.forEach { it.isRead = true }
         saveAll(context, notifications)
-        syncCurrentReadStateToCloud(context, notifications)
+        syncCurrentReadStateToCloud(unreadIds)
     }
 
     private fun saveAll(context: Context, notifications: List<AppNotification>) {
@@ -117,11 +108,11 @@ object NotificationStore {
             .apply()
     }
 
-    private fun syncCurrentReadStateToCloud(context: Context, notifications: List<AppNotification>) {
+    private fun syncCurrentReadStateToCloud(unreadIds: Set<String>) {
         val uid = currentUidOrNull() ?: return
-        val readIds = notifications.filter { it.isRead }.map { it.id }.toSet()
+        if (unreadIds.isEmpty()) return
         scope.launch {
-            runCatching { FirestoreService.replaceNotificationReadIds(uid, readIds) }
+            runCatching { FirestoreService.markNotificationsRead(uid, unreadIds) }
         }
     }
 

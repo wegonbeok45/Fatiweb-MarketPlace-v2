@@ -1,0 +1,66 @@
+appId: isim.ia2y.myapplication
+tags:
+  - admin
+  - debug
+---
+- launchApp
+- extendedWaitUntil:
+    visible:
+      id: "hostNavProfile"
+    timeout: 15000
+- tapOn:
+    id: "hostNavProfile"
+- extendedWaitUntil:
+    visible:
+      id: "cardLogout"
+    timeout: 10000
+- tapOn:
+    id: "cardLogout"
+- extendedWaitUntil:
+    visible:
+      id: "btnLogin"
+    timeout: 10000
+- tapOn:
+    id: "etEmail"
+- inputText: "${QA_ADMIN_EMAIL}"
+- hideKeyboard
+- tapOn:
+    id: "etPassword"
+- inputText: "${QA_ADMIN_PASSWORD}"
+- hideKeyboard
+- tapOn:
+    id: "btnLogin"
+- extendedWaitUntil:
+    visible:
+      id: "hostNavProfile"
+    timeout: 20000
+- tapOn:
+    id: "hostNavProfile"
+- extendedWaitUntil:
+    visible:
+      id: "cardAdmin"
+    timeout: 10000
+- tapOn:
+    id: "cardAdmin"
+- extendedWaitUntil:
+    visible:
+      id: "adminNavDashboard"
+    timeout: 15000
+- tapOn:
+    id: "adminNavProduits"
+- extendedWaitUntil:
+    visible:
+      id: "adminProduitsBtnAdd"
+    timeout: 15000
+- tapOn:
+    id: "adminProduitsBtnAdd"
+- extendedWaitUntil:
+    visible:
+      id: "adminProductEditorBtnAutofill"
+    timeout: 15000
+- tapOn:
+    id: "adminProductEditorBtnAutofill"
+- tapOn:
+    id: "adminProductEditorBtnSave"
+- waitForAnimationToEnd
+- takeScreenshot: "95-editor-after-save"

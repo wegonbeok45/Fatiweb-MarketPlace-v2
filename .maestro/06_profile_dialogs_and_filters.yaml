@@ -5,10 +5,19 @@ tags:
   - dialogs
 ---
 - launchApp
-- extendedWaitUntil:
-    visible:
-      id: "hostNavProfile"
-    timeout: 25000
+- retry:
+    maxRetries: 3
+    commands:
+      - tapOn:
+          id: "android:id/aerr_wait"
+          optional: true
+      - tapOn:
+          text: "Wait"
+          optional: true
+      - extendedWaitUntil:
+          visible:
+            id: "hostNavProfile"
+          timeout: 10000
 - tapOn:
     id: "hostNavProfile"
 - extendedWaitUntil:
@@ -28,7 +37,7 @@ tags:
       id: "etResetPasswordEmail"
     timeout: 10000
 - takeScreenshot: "50-reset-password-dialog"
-- tapOn: "Annuler"
+- tapOn: "Cancel|Annuler"
 - extendedWaitUntil:
     visible:
       id: "btnLogin"
@@ -36,6 +45,7 @@ tags:
 - tapOn:
     id: "etEmail"
 - inputText: "${QA_SHOPPER_EMAIL}"
+- hideKeyboard
 - tapOn:
     id: "etPassword"
 - inputText: "${QA_SHOPPER_PASSWORD}"
@@ -59,7 +69,7 @@ tags:
       id: "etEditProfileName"
     timeout: 10000
 - takeScreenshot: "51-edit-profile-dialog"
-- tapOn: "Annuler"
+- tapOn: "Cancel|Annuler"
 - extendedWaitUntil:
     visible:
       id: "cardHelp"
@@ -71,7 +81,7 @@ tags:
       id: "alertTitle"
     timeout: 10000
 - takeScreenshot: "52-help-dialog"
-- tapOn: "Fermer"
+- tapOn: "Cancel|Annuler"
 - extendedWaitUntil:
     visible:
       id: "cardAddresses"
@@ -89,10 +99,10 @@ tags:
 - tapOn:
     id: "tvAddressRemove"
 - extendedWaitUntil:
-    visible: "Supprimer cette adresse ?"
+    visible: "Supprimer cette adresse \\?|Delete this address\\?"
     timeout: 10000
 - takeScreenshot: "53-address-delete-dialog"
-- tapOn: "Annuler"
+- tapOn: "Cancel|Annuler"
 - extendedWaitUntil:
     visible:
       id: "tvAddressEdit"
@@ -104,7 +114,7 @@ tags:
       id: "etAddressLabel"
     timeout: 10000
 - takeScreenshot: "54-edit-address-dialog"
-- tapOn: "Annuler"
+- tapOn: "Cancel|Annuler"
 - extendedWaitUntil:
     visible:
       id: "rvAddresses"

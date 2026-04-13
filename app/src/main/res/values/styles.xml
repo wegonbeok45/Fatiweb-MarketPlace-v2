@@ -44,6 +44,13 @@
         <item name="android:letterSpacing">0.2</item>
     </style>
 
+    <style name="AppText.SectionLabel" parent="AppText.Caption">
+        <item name="android:fontFamily">@font/plus_jakarta_sans_bold</item>
+        <item name="android:textColor">@color/colorOnSurface</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:letterSpacing">0</item>
+    </style>
+
     <style name="AppButton.Base" parent="Widget.MaterialComponents.Button">
         <item name="android:layout_height">wrap_content</item>
         <item name="android:minHeight">@dimen/button_height</item>
@@ -54,13 +61,15 @@
         <item name="android:includeFontPadding">true</item>
         <item name="android:textStyle">bold</item>
         <item name="android:fontFamily">@font/plus_jakarta_sans_bold</item>
-        <item name="cornerRadius">18dp</item>
+        <item name="cornerRadius">@dimen/corner_radius_medium</item>
         <item name="android:insetLeft">@dimen/space_0</item>
         <item name="android:insetRight">@dimen/space_0</item>
         <item name="android:insetTop">@dimen/space_0</item>
         <item name="android:insetBottom">@dimen/space_0</item>
-        <item name="android:paddingTop">14dp</item>
-        <item name="android:paddingBottom">14dp</item>
+        <item name="android:paddingStart">16dp</item>
+        <item name="android:paddingEnd">16dp</item>
+        <item name="android:paddingTop">10dp</item>
+        <item name="android:paddingBottom">10dp</item>
     </style>
 
     <style name="AppButton.Primary" parent="AppButton.Base">
@@ -92,7 +101,7 @@
     <style name="AppInput.Layout" parent="Widget.MaterialComponents.CardView">
         <item name="android:layout_height">@dimen/input_height</item>
         <item name="cardBackgroundColor">@color/colorSurface</item>
-        <item name="cardCornerRadius">@dimen/corner_radius_large</item>
+        <item name="cardCornerRadius">@dimen/corner_radius_medium</item>
         <item name="cardElevation">@dimen/space_0</item>
         <item name="strokeColor">@color/colorOutline</item>
         <item name="strokeWidth">@dimen/stroke_width_default</item>
@@ -101,20 +110,21 @@
     <style name="AppInput.EditText" parent="">
         <item name="android:layout_height">match_parent</item>
         <item name="android:background">@null</item>
-        <item name="android:gravity">center_vertical</item>
+        <item name="android:gravity">start|center_vertical</item>
         <item name="android:textColor">@color/colorOnSurface</item>
         <item name="android:textColorHint">@color/colorOnSurfaceVariant</item>
         <item name="android:textSize">@dimen/text_size_input</item>
-        <item name="android:paddingStart">@dimen/space_12</item>
-        <item name="android:paddingEnd">@dimen/space_12</item>
+        <item name="android:paddingStart">@dimen/space_16</item>
+        <item name="android:paddingEnd">@dimen/space_16</item>
     </style>
 
     <style name="AppCard" parent="Widget.MaterialComponents.CardView">
         <item name="cardCornerRadius">@dimen/corner_radius_large</item>
-        <item name="cardElevation">4dp</item>
+        <item name="cardElevation">@dimen/space_0</item>
         <item name="cardBackgroundColor">@color/colorSurface</item>
-        <item name="strokeWidth">0dp</item>
-        <item name="cardUseCompatPadding">true</item>
+        <item name="strokeWidth">@dimen/stroke_width_default</item>
+        <item name="strokeColor">@color/colorBorderLight</item>
+        <item name="cardUseCompatPadding">false</item>
     </style>
 
     <style name="AppCard.ListItem" parent="AppCard">
@@ -200,6 +210,25 @@
         <item name="android:textSize">@dimen/home_text_section_action</item>
         <item name="android:textColor">@color/colorAccentDeep</item>
         <item name="android:letterSpacing">0</item>
+    </style>
+
+    <style name="AppTopBar.Title" parent="AppText.Base">
+        <item name="android:fontFamily">@font/plus_jakarta_sans_bold</item>
+        <item name="android:textSize">@dimen/app_top_bar_title_size</item>
+        <item name="android:textColor">@color/home_text_primary</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="AppTopBar.Title.Profile" parent="AppTopBar.Title">
+        <item name="android:textColor">@color/profile_text_primary</item>
+    </style>
+
+    <style name="AppTopBar.Action" parent="AppText.Base">
+        <item name="android:fontFamily">@font/plus_jakarta_sans_medium</item>
+        <item name="android:textSize">@dimen/app_top_bar_action_text_size</item>
+        <item name="android:textColor">@color/colorAccentDeep</item>
+        <item name="android:gravity">center_vertical|end</item>
     </style>
 
     <style name="HomeText.CategoryLabel" parent="HomeText.Base">
@@ -421,11 +450,11 @@
         <item name="android:insetRight">@dimen/space_0</item>
         <item name="android:insetTop">@dimen/space_0</item>
         <item name="android:insetBottom">@dimen/space_0</item>
-        <item name="cornerRadius">@dimen/profile_menu_card_radius</item>
+        <item name="cornerRadius">@dimen/corner_radius_medium</item>
         <item name="strokeWidth">@dimen/stroke_width_default</item>
-        <item name="strokeColor">@color/colorBorderLight</item>
-        <item name="backgroundTint">@color/profile_card_bg</item>
-        <item name="android:textColor">@color/profile_text_primary</item>
+        <item name="strokeColor">@color/profile_section_stroke</item>
+        <item name="backgroundTint">@color/profile_language_unselected_bg</item>
+        <item name="android:textColor">@color/profile_language_unselected_text</item>
         <item name="android:elevation">@dimen/space_0</item>
     </style>
 
@@ -471,4 +500,3 @@
     </style>
 
 </resources>
-

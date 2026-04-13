@@ -2,6 +2,7 @@ package isim.ia2y.myapplication
 import android.animation.ValueAnimator
 import android.content.Context
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.graphics.Rect
 import android.os.Bundle
 import android.os.Handler
@@ -9,6 +10,7 @@ import android.os.Looper
 import android.text.Editable
 import android.text.SpannableString
 import android.text.Spanned
+import android.text.TextUtils
 import android.text.TextWatcher
 import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
@@ -36,21 +38,31 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.airbnb.lottie.LottieAnimationView
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.slider.RangeSlider
 import com.google.android.material.switchmaterial.SwitchMaterial
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import java.util.Locale
 import isim.ia2y.myapplication.databinding.ActivitySearchBinding
 import kotlin.math.roundToInt
-import com.google.firebase.firestore.DocumentSnapshot
 
 class SearchActivity : AppCompatActivity() {
+    private enum class ScreenState {
+        DEFAULT,
+        SUGGESTIONS,
+        RESULTS
+    }
+
     private lateinit var binding: ActivitySearchBinding
     private val etSearch get() = binding.etSearch
     private val tvCancel get() = binding.tvSearchCancel
@@ -58,16 +70,25 @@ class SearchActivity : AppCompatActivity() {
     private val suggestionsState get() = binding.layoutSuggestionsState
     private val resultsState get() = binding.layoutResultsState
     private val recentList get() = binding.layoutRecentList
+    private val savedList get() = binding.layoutSavedList
     private val popularGroup get() = binding.chipGroupPopular
     private val suggestionsList get() = binding.layoutSuggestionsList
     private val resultsCount get() = binding.tvResultsCount
+    private val resultsContext get() = binding.layoutResultsContext
+    private val resultsContextEyebrow get() = binding.tvResultsContextEyebrow
+    private val resultsContextTitle get() = binding.tvResultsContextTitle
+    private val resultsContextSubtitle get() = binding.tvResultsContextSubtitle
     private val sortDropdown get() = binding.dropdownSort
     private val resultsRecycler get() = binding.rvSearchResults
     private val emptyState get() = binding.layoutEmptyState
+    private val emptyTitle get() = binding.tvEmptyStateTitle
+    private val emptySubtitle get() = binding.tvEmptyStateSubtitle
     private val emptyAnimation get() = binding.ivSearchEmptyAnimation
     private val skeleton get() = binding.layoutSkeleton
+    private val loadingLabel get() = binding.tvSearchLoadingLabel
     private val scrollResults get() = binding.scrollResults
     private val btnBrowseCategories get() = binding.btnBrowseCategories
+    private val btnSaveSearch get() = binding.btnSaveSearch
     private lateinit var resultsAdapter: SearchResultsAdapter
 
     private var currentQuery: String = ""
@@ -75,16 +96,22 @@ class SearchActivity : AppCompatActivity() {
     private val uiHandler = Handler(Looper.getMainLooper())
     private var skeletonAnimator: ValueAnimator? = null
     private var lastResults: List<Product> = emptyList()
+    private var fullSearchResults: List<Product> = emptyList()
+    private var loadedSearchCount: Int = 0
     private var searchRequestToken: Int = 0
-    private var searchLastDoc: DocumentSnapshot? = null
     private var isSearching: Boolean = false
     private var hasMoreResults: Boolean = true
+    private var searchError: Throwable? = null
+    private var lastCatalogSignature: Int = 0
+    private var searchJob: Job? = null
 
     private var filterCategory: String = "all"
     private var filterLocation: String = "all"
     private var filterMinPrice: Float = 0f
     private var filterMaxPrice: Float = MAX_FILTER_PRICE
     private var filterBioNaturel: Boolean = false
+    private var launchedIntoCollection: Boolean = false
+    private var activeScreenState: ScreenState = ScreenState.DEFAULT
 
     private val popularSearches = listOf(
         "Harissa",
@@ -124,6 +151,8 @@ class SearchActivity : AppCompatActivity() {
         bindSortDropdown()
         bindPopularChips()
         bindBrowseCategories()
+        bindSaveSearchAction()
+        renderSavedSearches()
         renderRecentSearches()
         showDefaultState(animated = false)
         focusAndOpenKeyboard()
@@ -145,6 +174,18 @@ class SearchActivity : AppCompatActivity() {
 
         applyInitialSearchState()
         lifecycleScope.launch {
+            CatalogSyncManager.syncState.collect { state ->
+                val signature = state.products
+                    .map { product -> product.id to product.updatedAtMillis }
+                    .hashCode()
+                if (signature == lastCatalogSignature) return@collect
+                lastCatalogSignature = signature
+                if (currentQuery.isNotBlank() || hasActiveFilters()) {
+                    performSearch(currentQuery)
+                }
+            }
+        }
+        lifecycleScope.launch {
             CatalogSyncManager.ensureSynced(force = false)
             if (isFinishing || isDestroyed) return@launch
             if (currentQuery.isNotBlank() || filterCategory != "all") {
@@ -160,17 +201,19 @@ class SearchActivity : AppCompatActivity() {
     private fun applyInitialSearchState() {
         filterCategory = intent.getStringExtra(EXTRA_INITIAL_CATEGORY)?.ifBlank { "all" } ?: filterCategory
         val initialQuery = intent.getStringExtra(EXTRA_INITIAL_QUERY).orEmpty()
+        launchedIntoCollection = initialQuery.isBlank() && filterCategory != "all"
+        refreshSearchChrome()
         if (initialQuery.isNotBlank()) {
             etSearch.setText(initialQuery)
             etSearch.setSelection(initialQuery.length)
             performSearch(initialQuery)
         } else if (filterCategory != "all") {
-            toggleCancelButton(true)
             performSearch("")
         }
     }
 
     override fun onDestroy() {
+        searchJob?.cancel()
         skeletonAnimator?.cancel()
         uiHandler.removeCallbacksAndMessages(null)
         super.onDestroy()
@@ -239,6 +282,7 @@ class SearchActivity : AppCompatActivity() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 val query = s?.toString()?.trim().orEmpty()
                 toggleCancelButton(query.isNotEmpty())
+                refreshSearchChrome(query)
                 if (query.isEmpty()) {
                     if (hasActiveFilters()) {
                         performSearch("")
@@ -288,10 +332,19 @@ class SearchActivity : AppCompatActivity() {
                 isClickable = true
                 isCheckable = false
                 chipCornerRadius = 999f
-                setTextColor(ContextCompat.getColor(context, R.color.home_chip_text))
-                chipBackgroundColor = ContextCompat.getColorStateList(context, R.color.home_chip_bg)
-                rippleColor = ContextCompat.getColorStateList(context, R.color.home_nav_selected_bg)
-                typeface = resources.getFont(R.font.plus_jakarta_sans_regular)
+                setEnsureMinTouchTargetSize(true)
+                minHeight = 44.dp
+                chipMinHeight = 44f
+                chipStrokeWidth = 1.dp.toFloat()
+                chipStrokeColor = ContextCompat.getColorStateList(context, R.color.colorPrimary)
+                setTextColor(ContextCompat.getColor(context, R.color.colorOnSurface))
+                chipBackgroundColor = ContextCompat.getColorStateList(context, R.color.colorSurface)
+                rippleColor = ContextCompat.getColorStateList(context, R.color.colorSurfaceVariant)
+                chipStartPadding = 10f
+                chipEndPadding = 10f
+                textStartPadding = 2f
+                textEndPadding = 2f
+                typeface = resources.getFont(R.font.plus_jakarta_sans_medium)
                 setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
                 setOnClickListener {
                     etSearch.setText(term)
@@ -306,6 +359,34 @@ class SearchActivity : AppCompatActivity() {
     private fun bindBrowseCategories() {
         btnBrowseCategories.setOnClickListener {
             openMainTab(MainActivity.Tab.EXPLORE)
+        }
+    }
+
+    private fun bindSaveSearchAction() {
+        btnSaveSearch.setOnClickListener {
+            promptSaveSearch()
+        }
+    }
+
+    private fun renderSavedSearches() {
+        savedList.removeAllViews()
+        val items = SavedSearchStore.load(this)
+        if (items.isEmpty()) {
+            val empty = TextView(this).apply {
+                text = getString(R.string.search_saved_empty)
+                setTextColor(ContextCompat.getColor(context, R.color.home_text_secondary))
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
+                typeface = resources.getFont(R.font.plus_jakarta_sans_regular)
+            }
+            savedList.addView(empty)
+            return
+        }
+
+        items.forEachIndexed { index, preset ->
+            savedList.addView(buildSavedSearchRow(preset))
+            if (index < items.lastIndex) {
+                savedList.addView(buildDivider())
+            }
         }
     }
 
@@ -338,23 +419,26 @@ class SearchActivity : AppCompatActivity() {
             layoutParams = LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
-            ).apply { topMargin = 6.dp }
-            setPadding(0, 8.dp, 0, 8.dp)
+            ).apply { topMargin = 4.dp }
+            minimumHeight = 48.dp
+            setPadding(0, 10.dp, 0, 10.dp)
         }
 
         val clock = ImageView(this).apply {
             setImageResource(android.R.drawable.ic_menu_recent_history)
             setColorFilter(ContextCompat.getColor(context, R.color.home_text_secondary))
-            layoutParams = LinearLayout.LayoutParams(18.dp, 18.dp)
+            layoutParams = LinearLayout.LayoutParams(20.dp, 20.dp)
         }
 
         val text = TextView(this).apply {
             this.text = term
             setTextColor(ContextCompat.getColor(context, R.color.home_text_primary))
             setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
-            typeface = resources.getFont(R.font.plus_jakarta_sans_regular)
+            typeface = resources.getFont(R.font.plus_jakarta_sans_medium)
+            maxLines = 1
+            ellipsize = TextUtils.TruncateAt.END
             layoutParams = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f)
-                .apply { marginStart = 10.dp }
+                .apply { marginStart = 12.dp }
             setOnClickListener {
                 etSearch.setText(term)
                 etSearch.setSelection(term.length)
@@ -365,7 +449,7 @@ class SearchActivity : AppCompatActivity() {
         val remove = ImageView(this).apply {
             setImageResource(android.R.drawable.ic_menu_close_clear_cancel)
             setColorFilter(ContextCompat.getColor(context, R.color.home_text_secondary))
-            layoutParams = LinearLayout.LayoutParams(18.dp, 18.dp)
+            layoutParams = LinearLayout.LayoutParams(20.dp, 20.dp)
             setOnClickListener {
                 removeRecentSearch(term)
                 renderRecentSearches()
@@ -374,6 +458,70 @@ class SearchActivity : AppCompatActivity() {
 
         row.addView(clock)
         row.addView(text)
+        row.addView(remove)
+        return row
+    }
+
+    private fun buildSavedSearchRow(preset: SavedSearchPreset): View {
+        val row = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = android.view.Gravity.CENTER_VERTICAL
+            layoutParams = LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            ).apply { topMargin = 4.dp }
+            minimumHeight = 52.dp
+            setPadding(0, 10.dp, 0, 10.dp)
+            setOnClickListener {
+                applySavedSearch(preset)
+            }
+        }
+
+        val icon = ImageView(this).apply {
+            setImageResource(R.drawable.ic_profile_nav_search)
+            setColorFilter(ContextCompat.getColor(context, R.color.home_text_secondary))
+            layoutParams = LinearLayout.LayoutParams(20.dp, 20.dp)
+        }
+
+        val textContainer = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            layoutParams = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f)
+                .apply { marginStart = 12.dp }
+        }
+
+        val title = TextView(this).apply {
+            text = preset.title
+            setTextColor(ContextCompat.getColor(context, R.color.home_text_primary))
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
+            typeface = resources.getFont(R.font.plus_jakarta_sans_bold)
+            maxLines = 1
+            ellipsize = TextUtils.TruncateAt.END
+        }
+
+        val subtitle = TextView(this).apply {
+            text = buildSavedSearchSubtitle(preset)
+            setTextColor(ContextCompat.getColor(context, R.color.home_text_secondary))
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
+            typeface = resources.getFont(R.font.plus_jakarta_sans_regular)
+            maxLines = 2
+            ellipsize = TextUtils.TruncateAt.END
+        }
+
+        val remove = ImageView(this).apply {
+            setImageResource(android.R.drawable.ic_menu_close_clear_cancel)
+            setColorFilter(ContextCompat.getColor(context, R.color.home_text_secondary))
+            layoutParams = LinearLayout.LayoutParams(20.dp, 20.dp)
+            setOnClickListener {
+                SavedSearchStore.remove(context, preset.id)
+                renderSavedSearches()
+                showSearchToast(getString(R.string.search_saved_removed))
+            }
+        }
+
+        textContainer.addView(title)
+        textContainer.addView(subtitle)
+        row.addView(icon)
+        row.addView(textContainer)
         row.addView(remove)
         return row
     }
@@ -403,6 +551,7 @@ class SearchActivity : AppCompatActivity() {
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
             )
+            minimumHeight = 48.dp
             setPadding(0, 10.dp, 0, 10.dp)
             setOnClickListener {
                 etSearch.setText(suggestion)
@@ -414,14 +563,16 @@ class SearchActivity : AppCompatActivity() {
         val icon = ImageView(this).apply {
             setImageResource(android.R.drawable.ic_menu_search)
             setColorFilter(ContextCompat.getColor(context, R.color.home_text_secondary))
-            layoutParams = LinearLayout.LayoutParams(18.dp, 18.dp)
+            layoutParams = LinearLayout.LayoutParams(20.dp, 20.dp)
         }
 
         val text = TextView(this).apply {
             layoutParams = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f)
-                .apply { marginStart = 10.dp }
-            setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
-            typeface = resources.getFont(R.font.plus_jakarta_sans_regular)
+                .apply { marginStart = 12.dp }
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, 15f)
+            typeface = resources.getFont(R.font.plus_jakarta_sans_medium)
+            maxLines = 1
+            ellipsize = TextUtils.TruncateAt.END
             this.text = createSuggestionSpan(query, suggestion)
         }
 
@@ -477,10 +628,16 @@ class SearchActivity : AppCompatActivity() {
 
     private fun performSearch(query: String, isLoadMore: Boolean = false) {
         if (!isLoadMore) {
+            searchJob?.cancel()
+            searchJob = null
+            isSearching = false
             searchRequestToken++
-            searchLastDoc = null
             hasMoreResults = true
+            searchError = null
+            fullSearchResults = emptyList()
+            loadedSearchCount = 0
             currentQuery = query
+            refreshSearchChrome(query)
             if (etSearch.text?.toString() != query) {
                 etSearch.setText(query)
                 etSearch.setSelection(query.length)
@@ -504,23 +661,24 @@ class SearchActivity : AppCompatActivity() {
         val minPriceAtRequestTime = filterMinPrice
         val maxPriceAtRequestTime = filterMaxPrice
         val bioAtRequestTime = filterBioNaturel
-        val lastDocAtRequestTime = searchLastDoc
 
-        lifecycleScope.launch {
-            val (fetchedProducts, nextDoc) = try {
-                ProductService.fetchProductsPaginated(
-                    pageSize = 50,
-                    lastDoc = lastDocAtRequestTime,
-                    categoryFilter = if (categoryAtRequestTime != "all") categoryAtRequestTime else null
-                )
-            } catch (e: Exception) {
-                Pair(emptyList<Product>(), null)
+        val launchedJob = lifecycleScope.launch {
+            val sourceResult = runCatching {
+                val cached = ProductCatalog.all(includeInactive = true)
+                if (cached.isNotEmpty() || CatalogSyncManager.isFirstSyncCompleted) {
+                    cached
+                } else {
+                    withTimeoutOrNull(10_000L) {
+                        CatalogSyncManager.ensureSynced(force = false)
+                    } ?: ProductCatalog.all(includeInactive = true)
+                }
             }
+            val sourceProducts = sourceResult.getOrElse { ProductCatalog.all(includeInactive = true) }
 
             val sorted = withContext(Dispatchers.Default) {
                 val filtered = applyFilters(
                     query = query,
-                    source = fetchedProducts,
+                    source = sourceProducts,
                     category = categoryAtRequestTime,
                     location = locationAtRequestTime,
                     minPrice = minPriceAtRequestTime,
@@ -531,22 +689,41 @@ class SearchActivity : AppCompatActivity() {
             }
 
             if (isFinishing || isDestroyed || requestToken != searchRequestToken) {
-                isSearching = false
                 return@launch
             }
 
-            searchLastDoc = nextDoc
-            hasMoreResults = nextDoc != null
-            val combined = if (isLoadMore) lastResults + sorted else sorted
+            fullSearchResults = sorted
+            val startIndex = if (isLoadMore) loadedSearchCount else 0
+            val nextChunk = fullSearchResults.drop(startIndex).take(SEARCH_PAGE_SIZE)
+            val combined = if (isLoadMore) lastResults + nextChunk else nextChunk
+            loadedSearchCount = combined.size
+            hasMoreResults = fullSearchResults.size > loadedSearchCount
+            searchError = sourceResult.exceptionOrNull()?.takeIf { fullSearchResults.isEmpty() }
             lastResults = combined
-            
+
             renderSearchResults(query, combined)
             if (!isLoadMore) stopSkeleton()
-            isSearching = false
-            
+
+            if (sourceResult.exceptionOrNull() != null && combined.isNotEmpty()) {
+                showSearchToast(getString(R.string.search_backend_error_toast))
+            }
+
             if (combined.size < 10 && hasMoreResults) {
                 performSearch(query, isLoadMore = true)
             }
+        }.also { job ->
+            job.invokeOnCompletion {
+                if (requestToken == searchRequestToken) {
+                    isSearching = false
+                }
+                if (!isLoadMore && searchJob === job) {
+                    searchJob = null
+                }
+            }
+        }
+
+        if (!isLoadMore) {
+            searchJob = launchedJob
         }
     }
 
@@ -554,9 +731,34 @@ class SearchActivity : AppCompatActivity() {
         (resultsRecycler.layoutManager as? GridLayoutManager)?.spanCount =
             marketplaceGridSpanCount(maxSpanCount = 4)
         val label = if (query.isBlank()) currentFilterDescriptor() else query
-        resultsCount.text = getString(R.string.search_results_count, items.size, label)
+        resultsCount.text = resources.getQuantityString(
+            R.plurals.search_results_count,
+            items.size,
+            items.size,
+            label
+        )
+        btnSaveSearch.visibility = if (query.isNotBlank()) View.VISIBLE else View.GONE
+        val collectionMode = isCollectionMode(query)
+        resultsContext.visibility = if (collectionMode) View.VISIBLE else View.GONE
+        if (collectionMode) {
+            val categoryLabel = currentFilterDescriptor()
+            resultsContextEyebrow.text = getString(R.string.search_collection_eyebrow)
+            resultsContextTitle.text = getString(R.string.search_collection_title, categoryLabel)
+            resultsContextSubtitle.text = getString(R.string.search_collection_subtitle)
+        }
         resultsAdapter.submitList(items)
         if (items.isEmpty()) {
+            val hasBackendError = searchError != null
+            emptyTitle.text = if (hasBackendError) {
+                getString(R.string.search_backend_error_title)
+            } else {
+                getString(R.string.search_empty_title)
+            }
+            emptySubtitle.text = if (hasBackendError) {
+                getString(R.string.search_backend_error_subtitle)
+            } else {
+                getString(R.string.search_empty_subtitle)
+            }
             emptyState.visibility = View.VISIBLE
             resultsRecycler.visibility = View.GONE
             emptyAnimation.playAnimation()
@@ -606,7 +808,7 @@ class SearchActivity : AppCompatActivity() {
                 else -> true
             }
             val priceMatch = product.price in minPrice.toDouble()..maxPrice.toDouble()
-            val locationMatch = locationKeyword == null || product.origin.contains(locationKeyword)
+            val locationMatch = locationKeyword == null || product.origin.contains(locationKeyword, ignoreCase = true)
             val bioMatch = !bioNaturel || product.isBio
             val visibilityMatch = product.isActive
             queryMatch && categoryMatch && priceMatch && locationMatch && bioMatch && visibilityMatch
@@ -617,7 +819,7 @@ class SearchActivity : AppCompatActivity() {
         SortOption.PRICE_LOW -> items.sortedBy { it.price }
         SortOption.PRICE_HIGH -> items.sortedByDescending { it.price }
         SortOption.POPULAR -> items.sortedByDescending { it.reviewsCount }
-        SortOption.NEWEST -> items.sortedByDescending { it.updatedAt }
+        SortOption.NEWEST -> items.sortedByDescending { it.updatedAtMillis }
     }
 
     private fun mapLocationToKeyword(value: String): String? = when (value) {
@@ -640,6 +842,9 @@ class SearchActivity : AppCompatActivity() {
         val dialog = BottomSheetDialog(this)
         val sheet = layoutInflater.inflate(R.layout.bottom_sheet_search_filters, findViewById(android.R.id.content), false)
         dialog.setContentView(sheet)
+        dialog.behavior.state = BottomSheetBehavior.STATE_EXPANDED
+        dialog.behavior.skipCollapsed = true
+        dialog.behavior.isFitToContents = true
 
         val categoryGroup = sheet.findViewById<ChipGroup>(R.id.chipGroupFilterCategory)
         val locationGroup = sheet.findViewById<ChipGroup>(R.id.chipGroupLocation)
@@ -648,6 +853,10 @@ class SearchActivity : AppCompatActivity() {
         val swBio = sheet.findViewById<SwitchMaterial>(R.id.switchBioNaturel)
         val btnReset = sheet.findViewById<MaterialButton>(R.id.btnFilterReset)
         val btnApply = sheet.findViewById<MaterialButton>(R.id.btnFilterApply)
+
+        styleFilterChipGroup(categoryGroup)
+        styleFilterChipGroup(locationGroup)
+        styleFilterSwitch(swBio)
 
         fun syncRangeLabel(values: List<Float>) {
             tvRange.text = getString(
@@ -711,6 +920,65 @@ class SearchActivity : AppCompatActivity() {
         dialog.show()
     }
 
+    private fun styleFilterChipGroup(group: ChipGroup?) {
+        group ?: return
+        for (index in 0 until group.childCount) {
+            val chip = group.getChildAt(index) as? Chip ?: continue
+            styleFilterChip(chip)
+        }
+    }
+
+    private fun styleFilterChip(chip: Chip) {
+        val checked = ContextCompat.getColor(this, R.color.colorPrimary)
+        val unchecked = ContextCompat.getColor(this, R.color.colorSurface)
+        val stroke = ContextCompat.getColor(this, R.color.colorBorderLight)
+        val bg = ColorStateList(
+            arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()),
+            intArrayOf(
+                ContextCompat.getColor(this, R.color.colorSurfaceVariant),
+                unchecked
+            )
+        )
+        val text = ColorStateList(
+            arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()),
+            intArrayOf(
+                ContextCompat.getColor(this, R.color.colorOnSurface),
+                ContextCompat.getColor(this, R.color.colorOnSurface)
+            )
+        )
+        val strokes = ColorStateList(
+            arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()),
+            intArrayOf(checked, stroke)
+        )
+
+        chip.chipBackgroundColor = bg
+        chip.setTextColor(text)
+        chip.chipStrokeColor = strokes
+        chip.chipStrokeWidth = 1.dp.toFloat()
+        chip.chipCornerRadius = 999f
+        chip.isCheckedIconVisible = false
+        chip.chipMinHeight = 44.dp.toFloat()
+        chip.setEnsureMinTouchTargetSize(true)
+    }
+
+    private fun styleFilterSwitch(toggle: SwitchMaterial?) {
+        toggle ?: return
+        toggle.thumbTintList = ColorStateList(
+            arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()),
+            intArrayOf(
+                ContextCompat.getColor(this, R.color.colorOnPrimary),
+                ContextCompat.getColor(this, R.color.colorSurface)
+            )
+        )
+        toggle.trackTintList = ColorStateList(
+            arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()),
+            intArrayOf(
+                ContextCompat.getColor(this, R.color.colorPrimary),
+                ContextCompat.getColor(this, R.color.colorBorderLight)
+            )
+        )
+    }
+
     private fun hasActiveFilters(): Boolean {
         return filterCategory != "all" ||
             filterLocation != "all" ||
@@ -724,30 +992,48 @@ class SearchActivity : AppCompatActivity() {
     private fun showResultsState(animated: Boolean) = fadeTo(resultsState, animated)
 
     private fun fadeTo(target: View, animated: Boolean) {
+        val targetState = when (target.id) {
+            R.id.layoutDefaultState -> ScreenState.DEFAULT
+            R.id.layoutSuggestionsState -> ScreenState.SUGGESTIONS
+            else -> ScreenState.RESULTS
+        }
+        if (activeScreenState == targetState && target.visibility == View.VISIBLE) return
+
         val states = listOf(defaultState, suggestionsState, resultsState)
         states.forEach { view ->
+            view.animate().cancel()
             if (view == target) return@forEach
-            if (!view.isShown) return@forEach
-            if (!animated) {
-                view.visibility = View.GONE
-                return@forEach
-            }
-            view.animate().alpha(0f).setDuration(MotionTokens.QUICK).withEndAction {
-                view.visibility = View.GONE
-                view.alpha = 1f
-            }.start()
+            view.alpha = 1f
+            view.visibility = View.GONE
         }
-        if (target.isShown) return
+
+        activeScreenState = targetState
         if (!animated) {
-            target.visibility = View.VISIBLE
             target.alpha = 1f
+            target.visibility = View.VISIBLE
             return
         }
+
         target.alpha = 0f
         target.visibility = View.VISIBLE
-        target.animate().alpha(1f).setDuration(MotionTokens.STANDARD)
+        target.animate()
+            .alpha(1f)
+            .setDuration(MotionTokens.STANDARD)
             .setInterpolator(AccelerateDecelerateInterpolator())
             .start()
+    }
+
+    private fun refreshSearchChrome(queryOverride: String = currentQuery) {
+        val categoryLabel = currentFilterDescriptor()
+        etSearch.hint = if (isCollectionMode(queryOverride)) {
+            getString(R.string.search_hint_category_products, categoryLabel)
+        } else {
+            getString(R.string.search_hint_products)
+        }
+    }
+
+    private fun isCollectionMode(queryOverride: String = currentQuery): Boolean {
+        return launchedIntoCollection && queryOverride.isBlank() && filterCategory != "all"
     }
 
     private fun toggleCancelButton(show: Boolean) {
@@ -768,12 +1054,14 @@ class SearchActivity : AppCompatActivity() {
             ViewGroup.LayoutParams.MATCH_PARENT,
             1.dp
         )
+        alpha = 0.6f
         setBackgroundColor(ContextCompat.getColor(context, R.color.home_divider))
     }
 
     private fun startSkeleton() {
         scrollResults.visibility = View.GONE
         skeleton.visibility = View.VISIBLE
+        loadingLabel.visibility = View.VISIBLE
         skeletonAnimator?.cancel()
         skeletonAnimator = ValueAnimator.ofFloat(0.45f, 1f).apply {
             duration = 720L
@@ -788,6 +1076,7 @@ class SearchActivity : AppCompatActivity() {
         skeletonAnimator?.cancel()
         skeleton.alpha = 1f
         skeleton.visibility = View.GONE
+        loadingLabel.visibility = View.GONE
         scrollResults.visibility = View.VISIBLE
         scrollResults.alpha = 0f
         scrollResults.animate().alpha(1f).setDuration(MotionTokens.STANDARD).start()
@@ -827,6 +1116,70 @@ class SearchActivity : AppCompatActivity() {
 
     private fun showSearchToast(message: String) {
         showMotionSnackbar(message)
+    }
+
+    private fun promptSaveSearch() {
+        val suggestion = buildSuggestedSavedSearchTitle()
+        val input = EditText(this).apply {
+            setText(suggestion)
+            setSelection(suggestion.length)
+            hint = getString(R.string.search_save_dialog_hint)
+        }
+
+        MaterialAlertDialogBuilder(this)
+            .setTitle(getString(R.string.search_save_dialog_title))
+            .setView(input)
+            .setNegativeButton(getString(R.string.profile_edit_cancel), null)
+            .setPositiveButton(getString(R.string.search_save_confirm)) { _, _ ->
+                val title = input.text?.toString().orEmpty().trim().ifBlank { suggestion }
+                val preset = SavedSearchPreset(
+                    id = "saved_${System.currentTimeMillis()}",
+                    title = title,
+                    query = currentQuery,
+                    category = filterCategory,
+                    location = filterLocation,
+                    minPrice = filterMinPrice,
+                    maxPrice = filterMaxPrice,
+                    bioNaturel = filterBioNaturel,
+                    sortOrdinal = currentSort.ordinal,
+                    createdAt = System.currentTimeMillis()
+                )
+                SavedSearchStore.save(this, preset)
+                renderSavedSearches()
+                showSearchToast(getString(R.string.search_saved_added))
+            }
+            .show()
+    }
+
+    private fun applySavedSearch(preset: SavedSearchPreset) {
+        currentSort = SortOption.values().getOrElse(preset.sortOrdinal) { SortOption.POPULAR }
+        sortDropdown.setText(getString(currentSort.labelRes), false)
+        filterCategory = preset.category
+        filterLocation = preset.location
+        filterMinPrice = preset.minPrice
+        filterMaxPrice = preset.maxPrice
+        filterBioNaturel = preset.bioNaturel
+        etSearch.setText(preset.query)
+        etSearch.setSelection(preset.query.length)
+        performSearch(preset.query)
+    }
+
+    private fun buildSuggestedSavedSearchTitle(): String {
+        val base = currentQuery.ifBlank { currentFilterDescriptor() }
+        return if (hasActiveFilters()) {
+            getString(R.string.search_saved_title_template, base)
+        } else {
+            base
+        }
+    }
+
+    private fun buildSavedSearchSubtitle(preset: SavedSearchPreset): String {
+        val parts = mutableListOf<String>()
+        if (preset.query.isNotBlank()) parts += preset.query
+        if (preset.category != "all") parts += preset.category.replaceFirstChar { it.uppercase() }
+        if (preset.location != "all") parts += preset.location.replaceFirstChar { it.uppercase() }
+        if (preset.bioNaturel) parts += getString(R.string.search_filter_bio_naturel)
+        return parts.ifEmpty { listOf(getString(R.string.search_filter_all)) }.joinToString(" • ")
     }
 
     private fun getRecentSearches(): MutableList<String> {
@@ -899,6 +1252,7 @@ class SearchActivity : AppCompatActivity() {
         private const val RECENT_SEPARATOR = "|||"
         private const val MAX_FILTER_PRICE = 400f
         private const val MAX_RECENT_SEARCHES = 5
+        private const val SEARCH_PAGE_SIZE = 24
         const val EXTRA_INITIAL_QUERY = "extra_initial_query"
         const val EXTRA_INITIAL_CATEGORY = "extra_initial_category"
 

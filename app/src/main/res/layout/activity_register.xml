@@ -54,9 +54,9 @@
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardRegisterPanel"
             android:layout_width="0dp"
-            android:layout_height="190dp"
+            android:layout_height="@dimen/auth_hero_height_register"
             android:layout_marginTop="16dp"
-            app:cardCornerRadius="28dp"
+            app:cardCornerRadius="@dimen/corner_radius_large"
             app:cardElevation="0dp"
             app:strokeColor="@color/overlay_white_8"
             app:strokeWidth="1dp"
@@ -116,7 +116,8 @@
                         android:textColor="@android:color/white"
                         android:textSize="@dimen/text_size_title"
                         android:fontFamily="@font/plus_jakarta_sans_bold"
-                        android:lineSpacingExtra="2dp" />
+                        android:lineSpacingExtra="2dp"
+                        android:maxLines="2" />
 
                     <LinearLayout
                         android:layout_width="wrap_content"
@@ -223,9 +224,9 @@
 
                 <ImageView
                     android:id="@+id/ivFullNameIcon"
-                    android:layout_width="@dimen/icon_size_medium"
-                    android:layout_height="@dimen/icon_size_medium"
-                    android:layout_marginStart="@dimen/space_16"
+                    android:layout_width="@dimen/auth_icon_slot_size"
+                    android:layout_height="@dimen/auth_icon_slot_size"
+                    android:padding="@dimen/space_12"
                     android:importantForAccessibility="no"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -272,9 +273,9 @@
 
                 <ImageView
                     android:id="@+id/ivEmailIcon"
-                    android:layout_width="@dimen/icon_size_medium"
-                    android:layout_height="@dimen/icon_size_medium"
-                    android:layout_marginStart="@dimen/space_16"
+                    android:layout_width="@dimen/auth_icon_slot_size"
+                    android:layout_height="@dimen/auth_icon_slot_size"
+                    android:padding="@dimen/space_12"
                     android:importantForAccessibility="no"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -285,8 +286,14 @@
                     android:id="@+id/etEmail"
                     style="@style/AppInput.EditText"
                     android:layout_width="0dp"
+                    android:ellipsize="end"
+                    android:gravity="start|center_vertical"
                     android:hint="@string/auto_text_035"
                     android:inputType="textEmailAddress"
+                    android:maxLines="1"
+                    android:scrollHorizontally="false"
+                    android:textAlignment="viewStart"
+                    android:textDirection="ltr"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@id/ivEmailIcon"
@@ -321,9 +328,9 @@
 
                 <ImageView
                     android:id="@+id/ivPasswordIcon"
-                    android:layout_width="@dimen/icon_size_medium"
-                    android:layout_height="@dimen/icon_size_medium"
-                    android:layout_marginStart="@dimen/space_16"
+                    android:layout_width="@dimen/auth_icon_slot_size"
+                    android:layout_height="@dimen/auth_icon_slot_size"
+                    android:padding="@dimen/space_12"
                     android:importantForAccessibility="no"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -332,9 +339,9 @@
 
                 <ImageView
                     android:id="@+id/ivPasswordToggle"
-                    android:layout_width="@dimen/icon_size_medium"
-                    android:layout_height="@dimen/icon_size_medium"
-                    android:layout_marginEnd="@dimen/space_16"
+                    android:layout_width="@dimen/auth_icon_slot_size"
+                    android:layout_height="@dimen/auth_icon_slot_size"
+                    android:padding="@dimen/space_12"
                     android:importantForAccessibility="no"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -489,5 +496,3 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.core.widget.NestedScrollView>
-
-

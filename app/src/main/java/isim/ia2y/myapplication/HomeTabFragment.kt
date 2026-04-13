@@ -6,19 +6,43 @@ import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isGone
+import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.launch
 
-class HomeTabFragment : Fragment(R.layout.fragment_home_tab) {
+class HomeTabFragment : Fragment(R.layout.fragment_home_tab), TabReselectionHandler {
+    private var featuredEmptyMessage: String? = null
     private var hasPlayedEntrance = false
+    private var latestEmptyMessage: String? = null
+    private var discoverEmptyMessage: String? = null
+    private var searchHintRunnable: Runnable? = null
+    private var searchHintTargetView: TextView? = null
+
+    private val categoryItems = listOf(
+        HomeCategoryItem(R.string.auto_text_013, R.drawable.ic_home_cat_artisanat, "craft"),
+        HomeCategoryItem(R.string.auto_text_052, R.drawable.ic_home_cat_epices, "food"),
+        HomeCategoryItem(R.string.auto_text_053, R.drawable.ic_home_cat_vetements, "fashion"),
+        HomeCategoryItem(R.string.auto_text_054, R.drawable.ic_home_cat_deco, "decor"),
+        HomeCategoryItem(R.string.auto_text_023, R.drawable.ic_home_cat_huiles, "food")
+    )
 
     private val latestProductsAdapter by lazy {
         HomeCatalogAdapter(
             onToggleFavorite = ::toggleFavorite,
-            onAddToCart = ::addToCart,
+            onOpenProduct = ::openProduct,
+            fixedItemWidthRes = R.dimen.home_product_carousel_card_width
+        )
+    }
+
+    private val featuredProductsAdapter by lazy {
+        HomeCatalogAdapter(
+            onToggleFavorite = ::toggleFavorite,
             onOpenProduct = ::openProduct
         )
     }
@@ -26,29 +50,51 @@ class HomeTabFragment : Fragment(R.layout.fragment_home_tab) {
     private val discoverProductsAdapter by lazy {
         HomeCatalogAdapter(
             onToggleFavorite = ::toggleFavorite,
-            onAddToCart = ::addToCart,
             onOpenProduct = ::openProduct
         )
     }
 
+    private val categoriesAdapter by lazy {
+        HomeCategoryCarouselAdapter(categoryItems, ::openCuratedSearch)
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        view.applyStatusBarInset()
         view.findViewById<View?>(R.id.layoutBottomNav)?.isGone = true
         view.findViewById<View?>(R.id.viewBottomDivider)?.isGone = true
         setupCatalogSections(view)
+        setupCategoryCarousel(view)
         renderCatalogSections(view)
         setupHeaderAndContentActions(view)
+        setupCollapsingHeader(view)
         setupMotionPolish()
+        startSearchHintTyping(view)
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                CatalogSyncManager.syncState.collect { state ->
+                    val emptyMessage = when {
+                        state.status == CatalogSyncStatus.ERROR && state.products.isEmpty() ->
+                            getString(R.string.home_catalog_error)
+                        else -> getString(R.string.home_section_empty)
+                    }
+                    featuredEmptyMessage = emptyMessage
+                    latestEmptyMessage = emptyMessage
+                    discoverEmptyMessage = emptyMessage
+                    if (isAdded) {
+                        renderCatalogSections(requireView())
+                    }
+                }
+            }
+        }
+
         val hasLocalCatalog = ProductCatalog.all(includeInactive = true).isNotEmpty()
         if (hasLocalCatalog) {
             CatalogSyncManager.refreshAsync(force = false)
         } else {
+            setShimmering(true)
             viewLifecycleOwner.lifecycleScope.launch {
-                CatalogSyncManager.ensureSynced(force = false)
-                if (isAdded) {
-                    renderCatalogSections(requireView())
-                }
+                runCatching { CatalogSyncManager.ensureSynced(force = false) }
             }
         }
     }
@@ -67,42 +113,143 @@ class HomeTabFragment : Fragment(R.layout.fragment_home_tab) {
         }
     }
 
-    private fun setupCatalogSections(root: View) {
-        setupGrid(root.findViewById(R.id.rvLatestProducts), latestProductsAdapter)
-        setupGrid(root.findViewById(R.id.rvDiscoverProducts), discoverProductsAdapter)
+    override fun onDestroyView() {
+        stopSearchHintTyping()
+        super.onDestroyView()
     }
 
-    private fun setupGrid(recycler: RecyclerView?, adapter: HomeCatalogAdapter) {
+    private fun setupCatalogSections(root: View) {
+        setupGrid(root.findViewById(R.id.rvFeaturedProducts), featuredProductsAdapter, spanCount = 2)
+        setupHorizontalRow(root.findViewById(R.id.rvLatestProducts), latestProductsAdapter)
+        setupGrid(root.findViewById(R.id.rvDiscoverProducts), discoverProductsAdapter, spanCount = 2)
+    }
+
+    private fun setupGrid(recycler: RecyclerView?, adapter: HomeCatalogAdapter, spanCount: Int) {
         recycler ?: return
-        recycler.layoutManager = GridLayoutManager(requireContext(), calculateHomeSpanCount())
+        recycler.layoutManager = GridLayoutManager(requireContext(), spanCount)
         recycler.adapter = adapter
         recycler.isNestedScrollingEnabled = false
         if (recycler.itemDecorationCount == 0) {
-            recycler.addItemDecoration(HomeCatalogSpacingDecoration(resources.getDimensionPixelSize(R.dimen.space_12)))
+            recycler.addItemDecoration(
+                HomeCatalogSpacingDecoration(
+                    horizontalSpacing = resources.getDimensionPixelSize(R.dimen.home_products_column_gap),
+                    verticalSpacing = resources.getDimensionPixelSize(R.dimen.home_products_row_gap)
+                )
+            )
         }
     }
 
+    private fun setupHorizontalRow(recycler: RecyclerView?, adapter: HomeCatalogAdapter) {
+        recycler ?: return
+        recycler.layoutManager = LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
+        recycler.adapter = adapter
+        recycler.isNestedScrollingEnabled = false
+        recycler.clipToPadding = false
+        recycler.overScrollMode = View.OVER_SCROLL_NEVER
+        if (recycler.itemDecorationCount == 0) {
+            recycler.addItemDecoration(HomeHorizontalSpacingDecoration(resources.getDimensionPixelSize(R.dimen.home_products_column_gap)))
+        }
+    }
+
+    private fun setupCategoryCarousel(root: View) {
+        val recycler = root.findViewById<RecyclerView>(R.id.rvCategories) ?: return
+        recycler.layoutManager = LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
+        recycler.adapter = categoriesAdapter
+        recycler.isNestedScrollingEnabled = false
+        if (recycler.itemDecorationCount == 0) {
+            recycler.addItemDecoration(HomeCategorySpacingDecoration(resources.getDimensionPixelSize(R.dimen.space_12)))
+        }
+
+        val middleStart = (Int.MAX_VALUE / 2).let { midpoint ->
+            midpoint - (midpoint % categoryItems.size)
+        }
+        recycler.scrollToPosition(middleStart)
+    }
+
     private fun renderCatalogSections(root: View) {
-        val spanCount = calculateHomeSpanCount()
-        (root.findViewById<RecyclerView>(R.id.rvLatestProducts)?.layoutManager as? GridLayoutManager)?.spanCount = spanCount
-        (root.findViewById<RecyclerView>(R.id.rvDiscoverProducts)?.layoutManager as? GridLayoutManager)?.spanCount = spanCount
+        (root.findViewById<RecyclerView>(R.id.rvFeaturedProducts)?.layoutManager as? GridLayoutManager)?.spanCount = 2
+        (root.findViewById<RecyclerView>(R.id.rvDiscoverProducts)?.layoutManager as? GridLayoutManager)?.spanCount = 2
 
         val sections = HomeCatalogSectionsBuilder.build(ProductCatalog.all())
-        latestProductsAdapter.submitList(sections.latest)
-        discoverProductsAdapter.submitList(sections.discover)
+        updateCatalogSection(root, R.id.rvFeaturedProducts, featuredProductsAdapter, sections.featured)
+        updateCatalogSection(root, R.id.rvLatestProducts, latestProductsAdapter, sections.latest)
+        updateCatalogSection(root, R.id.rvDiscoverProducts, discoverProductsAdapter, sections.discover)
 
+        val hasData = sections.featured.isNotEmpty() || sections.latest.isNotEmpty() || sections.discover.isNotEmpty()
+        val syncState = CatalogSyncManager.syncState.value
+        setShimmering(!hasData && syncState.isRefreshing)
+
+        root.findViewById<RecyclerView>(R.id.rvFeaturedProducts)?.visibility =
+            if (sections.featured.isEmpty()) View.GONE else View.VISIBLE
+        root.findViewById<TextView>(R.id.tvFeaturedProductsEmpty)?.apply {
+            text = featuredEmptyMessage ?: context.getString(R.string.home_section_empty)
+            visibility = if (sections.featured.isEmpty()) View.VISIBLE else View.GONE
+        }
         root.findViewById<RecyclerView>(R.id.rvLatestProducts)?.visibility =
             if (sections.latest.isEmpty()) View.GONE else View.VISIBLE
-        root.findViewById<TextView>(R.id.tvLatestProductsEmpty)?.visibility =
-            if (sections.latest.isEmpty()) View.VISIBLE else View.GONE
+        root.findViewById<TextView>(R.id.tvLatestProductsEmpty)?.apply {
+            text = latestEmptyMessage ?: context.getString(R.string.home_section_empty)
+            visibility = if (sections.latest.isEmpty()) View.VISIBLE else View.GONE
+        }
         root.findViewById<RecyclerView>(R.id.rvDiscoverProducts)?.visibility =
             if (sections.discover.isEmpty()) View.GONE else View.VISIBLE
-        root.findViewById<TextView>(R.id.tvDiscoverProductsEmpty)?.visibility =
-            if (sections.discover.isEmpty()) View.VISIBLE else View.GONE
+        root.findViewById<TextView>(R.id.tvDiscoverProductsEmpty)?.apply {
+            text = discoverEmptyMessage ?: context.getString(R.string.home_section_empty)
+            visibility = if (sections.discover.isEmpty()) View.VISIBLE else View.GONE
+        }
         root.findViewById<View>(R.id.btnLatestProductsRefresh)?.visibility =
             if (sections.latest.isEmpty()) View.VISIBLE else View.GONE
         root.findViewById<View>(R.id.btnDiscoverProductsRefresh)?.visibility =
             if (sections.discover.isEmpty()) View.VISIBLE else View.GONE
+        root.findViewById<View>(R.id.btnFeaturedProductsRefresh)?.visibility =
+            if (sections.featured.isEmpty()) View.VISIBLE else View.GONE
+    }
+
+    private fun updateCatalogSection(
+        root: View,
+        recyclerId: Int,
+        adapter: HomeCatalogAdapter,
+        items: List<Product>
+    ) {
+        val recycler = root.findViewById<RecyclerView>(recyclerId) ?: return
+        adapter.submitList(items) {
+            recycler.post {
+                recycler.requestLayout()
+                recycler.invalidateItemDecorations()
+                root.findViewById<NestedScrollView>(R.id.scrollHomeContent)?.requestLayout()
+            }
+        }
+    }
+
+    private fun setShimmering(isShimmering: Boolean) {
+        val root = view ?: return
+        val featuredShimmer = root.findViewById<View>(R.id.layoutFeaturedShimmer)
+        val latestShimmer = root.findViewById<View>(R.id.layoutLatestShimmer)
+        val discoverShimmer = root.findViewById<View>(R.id.layoutDiscoverShimmer)
+
+        featuredShimmer?.visibility = if (isShimmering) View.VISIBLE else View.GONE
+        latestShimmer?.visibility = if (isShimmering) View.VISIBLE else View.GONE
+        discoverShimmer?.visibility = if (isShimmering) View.VISIBLE else View.GONE
+        
+        if (isShimmering) {
+            startPulsingAnimation(featuredShimmer as? android.view.ViewGroup)
+            startPulsingAnimation(latestShimmer as? android.view.ViewGroup)
+            startPulsingAnimation(discoverShimmer as? android.view.ViewGroup)
+        }
+    }
+
+    private fun startPulsingAnimation(group: android.view.ViewGroup?) {
+        group ?: return
+        val pulse = android.view.animation.AnimationUtils.loadAnimation(requireContext(), R.anim.pulse)
+        for (i in 0 until group.childCount) {
+            val child = group.getChildAt(i)
+            child.startAnimation(pulse)
+            if (child is android.view.ViewGroup) {
+                for (j in 0 until child.childCount) {
+                    child.getChildAt(j).startAnimation(pulse)
+                }
+            }
+        }
     }
 
     private fun toggleFavorite(product: Product) {
@@ -137,9 +284,6 @@ class HomeTabFragment : Fragment(R.layout.fragment_home_tab) {
     }
 
     private fun setupHeaderAndContentActions(root: View) {
-        root.findViewById<View>(R.id.ivHomeLogo)?.setOnClickListener {
-            (activity as? MainActivity)?.selectTab(MainActivity.Tab.HOME)
-        }
         root.findViewById<View>(R.id.tvBrand)?.setOnClickListener {
             (activity as? MainActivity)?.selectTab(MainActivity.Tab.HOME)
         }
@@ -149,12 +293,10 @@ class HomeTabFragment : Fragment(R.layout.fragment_home_tab) {
         root.findViewById<View>(R.id.ivTopFavorites)?.setOnClickListener {
             (activity as? AppCompatActivity)?.navigateNoShift(FavoritesActivity::class.java)
         }
-        bindCategorySearch(root, R.id.itemCategoryArtisanat, "craft")
-        bindCategorySearch(root, R.id.itemCategoryEpices, "food")
-        bindCategorySearch(root, R.id.itemCategoryVetements, "fashion")
-        bindCategorySearch(root, R.id.itemCategoryDeco, "decor")
-        bindCategorySearch(root, R.id.itemCategoryHuiles, "food")
         root.findViewById<View?>(R.id.tvCategoriesSeeAll)?.setOnClickListener {
+            (activity as? MainActivity)?.selectTab(MainActivity.Tab.EXPLORE)
+        }
+        root.findViewById<View?>(R.id.tvFeaturedProductsSeeAll)?.setOnClickListener {
             (activity as? MainActivity)?.selectTab(MainActivity.Tab.EXPLORE)
         }
         root.findViewById<View?>(R.id.tvLatestProductsSeeAll)?.setOnClickListener {
@@ -163,11 +305,17 @@ class HomeTabFragment : Fragment(R.layout.fragment_home_tab) {
         root.findViewById<View?>(R.id.tvDiscoverProductsSeeAll)?.setOnClickListener {
             (activity as? MainActivity)?.selectTab(MainActivity.Tab.EXPLORE)
         }
+        root.findViewById<View?>(R.id.btnFeaturedProductsRefresh)?.setOnClickListener {
+            setShimmering(true)
+            CatalogSyncManager.refreshAsync(force = true)
+        }
         root.findViewById<View?>(R.id.btnLatestProductsRefresh)?.setOnClickListener {
-            CatalogSyncManager.refreshAsync(force = false)
+            setShimmering(true)
+            CatalogSyncManager.refreshAsync(force = true)
         }
         root.findViewById<View?>(R.id.btnDiscoverProductsRefresh)?.setOnClickListener {
-            (activity as? MainActivity)?.selectTab(MainActivity.Tab.EXPLORE)
+            setShimmering(true)
+            CatalogSyncManager.refreshAsync(force = true)
         }
 
         (activity as? AppCompatActivity)?.bindNotificationEntry(R.id.ivTopNotifications)
@@ -194,19 +342,6 @@ class HomeTabFragment : Fragment(R.layout.fragment_home_tab) {
                 .start()
         }
 
-        fun openCuratedSearch(category: String) {
-            val host = activity as? AppCompatActivity ?: return
-            startActivity(SearchActivity.createIntent(host, initialCategory = category))
-            if (host.isReducedMotionEnabled()) {
-                host.overridePendingTransition(0, 0)
-            } else {
-                host.overridePendingTransition(
-                    R.anim.motion_activity_enter_from_top,
-                    R.anim.motion_activity_exit_stay
-                )
-            }
-        }
-
         root.findViewById<View>(R.id.cardBannerPrimary)?.setOnClickListener {
             openCuratedSearch("craft")
         }
@@ -219,24 +354,48 @@ class HomeTabFragment : Fragment(R.layout.fragment_home_tab) {
         root.findViewById<View>(R.id.ivFilter)?.setOnClickListener { openSearch(root.findViewById(R.id.layoutSearchBar) ?: it) }
     }
 
-    private fun bindCategorySearch(root: View, viewId: Int, category: String) {
-        root.findViewById<View?>(viewId)?.setOnClickListener {
-            val host = activity as? AppCompatActivity ?: return@setOnClickListener
-            startActivity(SearchActivity.createIntent(host, initialCategory = category))
-            if (host.isReducedMotionEnabled()) {
-                host.overridePendingTransition(0, 0)
-            } else {
-                host.overridePendingTransition(
-                    R.anim.motion_activity_enter_from_top,
-                    R.anim.motion_activity_exit_stay
-                )
+    private fun setupCollapsingHeader(root: View) {
+        val topSection = root.findViewById<View>(R.id.layoutTopSection) ?: return
+        val topBar = root.findViewById<View>(R.id.layoutTopBar) ?: return
+        val searchBar = root.findViewById<View>(R.id.layoutSearchBar) ?: return
+        val scrollView = root.findViewById<NestedScrollView>(R.id.scrollHomeContent) ?: return
+
+        topSection.post {
+            val collapseDistance = searchBar.top.coerceAtLeast(1)
+            scrollView.setPadding(
+                scrollView.paddingLeft,
+                topSection.height,
+                scrollView.paddingRight,
+                scrollView.paddingBottom
+            )
+            topSection.bringToFront()
+            updateCollapsingHeaderState(topSection, topBar, scrollView.scrollY, collapseDistance)
+            scrollView.setOnScrollChangeListener { _, _, scrollY, _, _ ->
+                updateCollapsingHeaderState(topSection, topBar, scrollY, collapseDistance)
             }
+        }
+    }
+
+    private fun updateCollapsingHeaderState(
+        topSection: View,
+        topBar: View,
+        scrollY: Int,
+        collapseDistance: Int
+    ) {
+        val clampedOffset = scrollY.coerceIn(0, collapseDistance)
+        val progress = clampedOffset / collapseDistance.toFloat()
+        topSection.translationY = -clampedOffset.toFloat()
+        topBar.alpha = 1f - progress
+        topBar.translationY = -(clampedOffset * 0.2f)
+        topSection.elevation = if (progress > 0.92f) {
+            resources.getDimension(R.dimen.home_header_elevation) * 1.5f
+        } else {
+            resources.getDimension(R.dimen.home_header_elevation)
         }
     }
 
     private fun setupMotionPolish() {
         (activity as? AppCompatActivity)?.applyPressFeedback(
-            R.id.ivHomeLogo,
             R.id.tvBrand,
             R.id.ivTopCart,
             R.id.ivTopFavorites,
@@ -245,13 +404,40 @@ class HomeTabFragment : Fragment(R.layout.fragment_home_tab) {
             R.id.ivSearch,
             R.id.ivFilter,
             R.id.cardBannerPrimary,
-            R.id.cardBannerSecondary,
-            R.id.itemCategoryArtisanat,
-            R.id.itemCategoryEpices,
-            R.id.itemCategoryVetements,
-            R.id.itemCategoryDeco,
-            R.id.itemCategoryHuiles
+            R.id.cardBannerSecondary
         )
+    }
+
+    private fun startSearchHintTyping(root: View) {
+        val searchHint = root.findViewById<TextView>(R.id.tvSearchHint) ?: return
+        stopSearchHintTyping()
+        searchHint.text = getString(R.string.search_hint_products)
+        searchHint.alpha = 1f
+    }
+
+    private fun stopSearchHintTyping() {
+        searchHintRunnable?.let { runnable ->
+            searchHintTargetView?.removeCallbacks(runnable)
+        }
+        searchHintRunnable = null
+        searchHintTargetView = null
+    }
+
+    private fun openCuratedSearch(item: HomeCategoryItem) {
+        openCuratedSearch(item.categoryKey)
+    }
+
+    private fun openCuratedSearch(category: String) {
+        val host = activity as? AppCompatActivity ?: return
+        startActivity(SearchActivity.createIntent(host, initialCategory = category))
+        if (host.isReducedMotionEnabled()) {
+            host.overridePendingTransition(0, 0)
+        } else {
+            host.overridePendingTransition(
+                R.anim.motion_activity_enter_from_top,
+                R.anim.motion_activity_exit_stay
+            )
+        }
     }
 
     private fun updateNotificationBadge() {
@@ -259,11 +445,16 @@ class HomeTabFragment : Fragment(R.layout.fragment_home_tab) {
         badge.visibility = if (NotificationStore.hasUnread(requireContext())) View.VISIBLE else View.GONE
     }
 
-    private fun calculateHomeSpanCount(): Int = requireContext().marketplaceGridSpanCount()
+    override fun onTabReselected() {
+        view?.findViewById<NestedScrollView>(R.id.scrollHomeContent)?.smoothScrollTo(0, 0)
+    }
 
 
 
-    private class HomeCatalogSpacingDecoration(private val spacing: Int) : RecyclerView.ItemDecoration() {
+    private class HomeCatalogSpacingDecoration(
+        private val horizontalSpacing: Int,
+        private val verticalSpacing: Int
+    ) : RecyclerView.ItemDecoration() {
         override fun getItemOffsets(
             outRect: Rect,
             view: View,
@@ -275,10 +466,36 @@ class HomeTabFragment : Fragment(R.layout.fragment_home_tab) {
 
             val spanCount = (parent.layoutManager as? GridLayoutManager)?.spanCount ?: 1
             val column = position % spanCount
-            outRect.left = if (column == 0) 0 else spacing / 2
-            outRect.right = if (column == spanCount - 1) 0 else spacing / 2
+            outRect.left = if (column == 0) 0 else horizontalSpacing / 2
+            outRect.right = if (column == spanCount - 1) 0 else horizontalSpacing / 2
             if (position >= spanCount) {
-                outRect.top = spacing / 2
+                outRect.top = verticalSpacing
+            }
+        }
+    }
+
+    private class HomeCategorySpacingDecoration(private val spacing: Int) : RecyclerView.ItemDecoration() {
+        override fun getItemOffsets(
+            outRect: Rect,
+            view: View,
+            parent: RecyclerView,
+            state: RecyclerView.State
+        ) {
+            outRect.right = spacing
+        }
+    }
+
+    private class HomeHorizontalSpacingDecoration(private val spacing: Int) : RecyclerView.ItemDecoration() {
+        override fun getItemOffsets(
+            outRect: Rect,
+            view: View,
+            parent: RecyclerView,
+            state: RecyclerView.State
+        ) {
+            val position = parent.getChildAdapterPosition(view)
+            if (position == RecyclerView.NO_POSITION) return
+            if (position > 0) {
+                outRect.left = spacing
             }
         }
     }

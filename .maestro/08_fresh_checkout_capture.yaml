@@ -5,10 +5,19 @@ tags:
   - checkout
 ---
 - launchApp
-- extendedWaitUntil:
-    visible:
-      id: "hostNavProfile"
-    timeout: 25000
+- retry:
+    maxRetries: 3
+    commands:
+      - tapOn:
+          id: "android:id/aerr_wait"
+          optional: true
+      - tapOn:
+          text: "Wait"
+          optional: true
+      - extendedWaitUntil:
+          visible:
+            id: "hostNavProfile"
+          timeout: 10000
 - tapOn:
     id: "hostNavProfile"
 - extendedWaitUntil:
@@ -30,9 +39,11 @@ tags:
 - tapOn:
     id: "etFullName"
 - inputText: "${QA_SHOPPER_NAME}"
+- hideKeyboard
 - tapOn:
     id: "etEmail"
 - inputText: "${QA_SHOPPER_EMAIL}"
+- hideKeyboard
 - tapOn:
     id: "etPassword"
 - inputText: "${QA_SHOPPER_PASSWORD}"

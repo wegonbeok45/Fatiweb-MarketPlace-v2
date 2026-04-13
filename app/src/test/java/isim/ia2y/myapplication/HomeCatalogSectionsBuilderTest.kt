@@ -16,11 +16,19 @@ class HomeCatalogSectionsBuilderTest {
             fakeProduct("inactive", updatedAt = 600L, isActive = false)
         )
 
-        val sections = HomeCatalogSectionsBuilder.build(products, latestLimit = 2, discoverLimit = 3)
+        val sections = HomeCatalogSectionsBuilder.build(
+            products,
+            featuredLimit = 1,
+            latestLimit = 2,
+            discoverLimit = 3
+        )
 
+        assertEquals(listOf("discoverTop"), sections.featured.map { it.id })
         assertEquals(listOf("latestA", "latestB"), sections.latest.map { it.id })
-        assertEquals(listOf("discoverTop", "older"), sections.discover.map { it.id })
+        assertEquals(listOf("older"), sections.discover.map { it.id })
+        assertFalse(sections.latest.any { latest -> sections.featured.any { it.id == latest.id } })
         assertFalse(sections.discover.any { discover -> sections.latest.any { it.id == discover.id } })
+        assertFalse(sections.discover.any { discover -> sections.featured.any { it.id == discover.id } })
     }
 
     private fun fakeProduct(

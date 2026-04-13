@@ -13,9 +13,10 @@ suspend fun AppCompatActivity.requireAdminRole(): Boolean {
     val uid = FirebaseAuthManager.currentUser?.uid
     val role = uid?.let { runCatching { FirestoreService.fetchUserRole(it) }.getOrNull() }
     if (uid == null || role != "admin") {
-        if (uid != null && role == null) {
-            showMotionSnackbar(getString(R.string.admin_verify_failed))
-        }
+        showMotionSnackbar(
+            if (uid != null && role == null) getString(R.string.admin_verify_failed)
+            else getString(R.string.admin_access_denied)
+        )
         finish()
         return false
     }
@@ -30,7 +31,9 @@ fun AppCompatActivity.setupAdminWindowInsets(appBarId: Int, bottomNavId: Int = R
     }
     ViewCompat.setOnApplyWindowInsetsListener(findViewById(bottomNavId)) { view, insets ->
         val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-        view.updatePadding(bottom = bars.bottom)
+        val baseBottomPadding = (view.getTag(R.id.adminBottomNav) as? Int)
+            ?: view.paddingBottom.also { view.setTag(R.id.adminBottomNav, it) }
+        view.updatePadding(bottom = baseBottomPadding + bars.bottom + view.resources.getDimensionPixelSize(R.dimen.admin_bottom_nav_inset_extra))
         insets
     }
 }

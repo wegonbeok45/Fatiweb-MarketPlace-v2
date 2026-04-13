@@ -69,7 +69,7 @@ class FavoritesActivity : AppCompatActivity() {
     }
 
     private fun setupFavorisActions() {
-        findViewById<View>(R.id.ivBack)?.setOnClickListener { finishWithMotion() }
+        findViewById<View>(R.id.ivBack)?.setOnClickListener { navigateBackToMain() }
         findViewById<View>(R.id.btnFavoritesBrowseHome)?.setOnClickListener {
             navigateToMainTab(MainActivity.Tab.HOME)
         }
@@ -99,7 +99,10 @@ class FavoritesActivity : AppCompatActivity() {
 
             card.findViewById<ImageView>(R.id.ivFavoriteProductImage)
                 ?.loadCatalogImage(product.imageUrl, product.imageRes)
-            card.findViewById<TextView>(R.id.tvFavoriteTag)?.text = product.tag
+            card.findViewById<TextView>(R.id.tvFavoriteTag)?.apply {
+                text = product.tag
+                visibility = if (product.tag.isBlank()) View.GONE else View.VISIBLE
+            }
             card.findViewById<TextView>(R.id.tvFavoriteTitle)?.text = product.title
             card.findViewById<TextView>(R.id.tvFavoritePrice)?.text = formatDt(product.unitPrice)
 

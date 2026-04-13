@@ -22,10 +22,12 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class RegisterActivity : AppCompatActivity() {
     private var passwordVisible = false
+    private var isRegisterSubmitting = false
     private lateinit var callbackManager: CallbackManager
     private lateinit var googleSignInClient: GoogleSignInClient
 
@@ -34,6 +36,15 @@ class RegisterActivity : AppCompatActivity() {
         private const val KEY_EMAIL = "email"
         private const val KEY_PASSWORD = "password"
         private const val KEY_PASSWORD_VISIBLE = "password_visible"
+
+        fun createIntent(
+            context: android.content.Context,
+            returnToTab: MainActivity.Tab? = null,
+            returnToRoute: String? = null
+        ): android.content.Intent {
+            return android.content.Intent(context, RegisterActivity::class.java)
+                .withAuthReturn(returnToTab, returnToRoute)
+        }
     }
 
     private val googleSignInLauncher = registerForActivityResult(
@@ -66,7 +77,7 @@ class RegisterActivity : AppCompatActivity() {
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             val hPadding = resources.getDimensionPixelSize(R.dimen.auth_screen_padding)
-            val vPadding = resources.getDimensionPixelSize(R.dimen.auth_screen_padding)
+            val vPadding = resources.getDimensionPixelSize(R.dimen.auth_screen_vertical_inset_padding)
             v.setPadding(hPadding, systemBars.top + vPadding, hPadding, systemBars.bottom + vPadding)
             insets
         }
@@ -113,13 +124,13 @@ class RegisterActivity : AppCompatActivity() {
 
     private fun setupRegisterActions() {
         findViewById<View>(R.id.ivBack)?.setOnClickListener {
-            navigateToMainTab(MainActivity.Tab.PROFILE)
+            finishAuthEntry()
         }
         findViewById<View>(R.id.ivAppLogo)?.setOnClickListener {
             navigateToMainTab(MainActivity.Tab.HOME)
         }
         findViewById<View>(R.id.tvGoToLogin)?.setOnClickListener {
-            navigateNoShift(LoginActivity::class.java)
+            startActivity(LoginActivity.createIntent(this).copyAuthReturnFrom(intent))
         }
         configureFacebookAvailability()
         setupGoogleLogin()
@@ -140,6 +151,8 @@ class RegisterActivity : AppCompatActivity() {
         }
 
         btnRegister?.setOnClickListener {
+            if (isRegisterSubmitting) return@setOnClickListener
+
             val name = etFullName.text?.toString().orEmpty().trim()
             val email = etEmail.text?.toString().orEmpty().trim()
             val password = etPassword.text?.toString().orEmpty()
@@ -156,26 +169,31 @@ class RegisterActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            // Disable button and show loading state
-            btnRegister.isEnabled = false
-            btnRegister.text = getString(R.string.register_submitting)
-
             lifecycleScope.launch {
-                val result = FirebaseAuthManager.register(email, password, name)
-                result.fold(
-                    onSuccess = {
-                        GuestSessionMerger.mergeIntoCurrentUser(this@RegisterActivity)
-                        markInputState(R.id.cardFullNameField, InputFieldState.SUCCESS)
-                        markInputState(R.id.cardEmailField, InputFieldState.SUCCESS)
-                        markInputState(R.id.cardPasswordField, InputFieldState.SUCCESS)
-                        navigateToMainTab(MainActivity.Tab.HOME)
-                    },
-                    onFailure = { e ->
-                        btnRegister.isEnabled = true
-                        btnRegister.text = getString(R.string.register_btn_label)
-                        showMotionSnackbar(FirebaseAuthManager.friendlyError(e))
+                setRegisterLoading(btnRegister, true)
+                try {
+                    val result = FirebaseAuthManager.register(email, password, name)
+                    result.fold(
+                        onSuccess = {
+                            lifecycleScope.launch(Dispatchers.IO) {
+                                GuestSessionMerger.mergeIntoCurrentUser(this@RegisterActivity)
+                            }
+                            lifecycleScope.launch { runCatching { FirebaseAuthManager.sendEmailVerification() } }
+                            markInputState(R.id.cardFullNameField, InputFieldState.SUCCESS)
+                            markInputState(R.id.cardEmailField, InputFieldState.SUCCESS)
+                            markInputState(R.id.cardPasswordField, InputFieldState.SUCCESS)
+                            showMotionSnackbar(getString(R.string.auth_verification_sent))
+                            completeAuthFlow()
+                        },
+                        onFailure = { e ->
+                            showMotionSnackbar(FirebaseAuthManager.friendlyError(this@RegisterActivity, e))
+                        }
+                    )
+                } finally {
+                    if (!isFinishing && !isDestroyed) {
+                        setRegisterLoading(btnRegister, false)
                     }
-                )
+                }
             }
         }
 
@@ -253,11 +271,13 @@ class RegisterActivity : AppCompatActivity() {
             val result = FirebaseAuthManager.signInWithFacebook(token)
             result.fold(
                 onSuccess = {
-                    GuestSessionMerger.mergeIntoCurrentUser(this@RegisterActivity)
-                    navigateToMainTab(MainActivity.Tab.HOME)
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        GuestSessionMerger.mergeIntoCurrentUser(this@RegisterActivity)
+                    }
+                    completeAuthFlow()
                 },
                 onFailure = { e ->
-                    showMotionSnackbar(FirebaseAuthManager.friendlyError(e))
+                    showMotionSnackbar(FirebaseAuthManager.friendlyError(this@RegisterActivity, e))
                 }
             )
         }
@@ -282,10 +302,12 @@ class RegisterActivity : AppCompatActivity() {
             val result = FirebaseAuthManager.signInWithGoogle(idToken)
             result.fold(
                 onSuccess = {
-                    GuestSessionMerger.mergeIntoCurrentUser(this@RegisterActivity)
-                    navigateToMainTab(MainActivity.Tab.HOME)
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        GuestSessionMerger.mergeIntoCurrentUser(this@RegisterActivity)
+                    }
+                    completeAuthFlow()
                 },
-                onFailure = { e -> showMotionSnackbar(FirebaseAuthManager.friendlyError(e)) }
+                onFailure = { e -> showMotionSnackbar(FirebaseAuthManager.friendlyError(this@RegisterActivity, e)) }
             )
         }
     }
@@ -305,5 +327,34 @@ class RegisterActivity : AppCompatActivity() {
             clientToken.isNotBlank() &&
             !appId.startsWith("YOUR_") &&
             !clientToken.startsWith("YOUR_")
+    }
+
+    private fun finishAuthEntry() {
+        intent.authReturnTab()?.let {
+            navigateToMainTab(it)
+            return
+        }
+        finishWithMotion(isForward = false)
+    }
+
+    private fun setRegisterLoading(button: TextView, isLoading: Boolean) {
+        isRegisterSubmitting = isLoading
+        button.isEnabled = !isLoading
+        button.text =
+            getString(if (isLoading) R.string.register_submitting else R.string.register_btn_label)
+    }
+
+    private fun completeAuthFlow() {
+        when (intent.authReturnRoute()) {
+            AUTH_RETURN_ROUTE_CHECKOUT -> {
+                startActivity(android.content.Intent(this, CheckoutDetailsActivity::class.java))
+                finishWithMotion(isForward = true)
+            }
+            AUTH_RETURN_ROUTE_ORDERS -> {
+                startActivity(android.content.Intent(this, OrdersHistoryActivity::class.java))
+                finishWithMotion(isForward = true)
+            }
+            else -> navigateToMainTab(intent.authReturnTab() ?: MainActivity.Tab.HOME)
+        }
     }
 }

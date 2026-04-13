@@ -1,0 +1,26 @@
+appId: isim.ia2y.myapplication
+tags:
+  - shopper
+  - sync
+  - catalog
+---
+- launchApp
+- extendedWaitUntil:
+    visible:
+      id: "layoutSearchBar"
+    timeout: 20000
+- tapOn:
+    id: "layoutSearchBar"
+- extendedWaitUntil:
+    visible:
+      id: "etSearch"
+    timeout: 10000
+- tapOn:
+    id: "etSearch"
+- inputText: "romarin"
+- pressKey: enter
+- extendedWaitUntil:
+    visible: "Huile capillaire au romarin"
+    timeout: 45000
+- takeScreenshot: "10-shopper-search-romarin"
+- assertVisible: "Huile capillaire au romarin"

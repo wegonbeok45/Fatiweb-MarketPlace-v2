@@ -11,6 +11,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -23,38 +24,73 @@ class OrderDetailsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_order_details)
+        val scrollDetails = findViewById<View>(R.id.scrollOrderDetails)
+        val orderState = findViewById<View>(R.id.layoutOrderState)
+        val scrollBaseBottomPadding = scrollDetails.paddingBottom
+        val orderStateBaseBottomPadding = orderState.paddingBottom
+        val extraBottomSpacing = resources.getDimensionPixelSize(R.dimen.space_24)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.orderDetailsRoot)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0)
+            scrollDetails.updatePadding(
+                bottom = scrollBaseBottomPadding + systemBars.bottom + extraBottomSpacing
+            )
+            orderState.updatePadding(bottom = orderStateBaseBottomPadding + systemBars.bottom)
             insets
         }
 
         findViewById<View>(R.id.ivBack)?.setOnClickListener { finishWithMotion(isForward = false) }
         findViewById<View>(R.id.btnOrderSupport)?.setOnClickListener { showSupportDialog() }
+        findViewById<View>(R.id.btnOrderStateAction)?.setOnClickListener { loadOrder() }
         applyPressFeedback(R.id.ivBack, R.id.btnOrderSupport)
+        renderOrderState(loading = true)
         loadOrder()
     }
 
     private fun loadOrder() {
         val uid = FirebaseAuthManager.currentUser?.uid ?: run {
-            showMotionSnackbar(getString(R.string.order_details_login_required))
-            finishWithMotion(isForward = false)
+            renderOrderState(
+                loading = false,
+                title = getString(R.string.order_details_state_login_title),
+                message = getString(R.string.order_details_login_required),
+                actionLabel = getString(R.string.order_details_state_login_action)
+            ) {
+                startActivity(
+                    LoginActivity.createIntent(
+                        this,
+                        returnToRoute = AUTH_RETURN_ROUTE_ORDERS
+                    )
+                )
+            }
             return
         }
         val orderId = intent.getStringExtra(EXTRA_ORDER_ID).orEmpty()
         if (orderId.isBlank()) {
-            showMotionSnackbar(getString(R.string.order_details_not_found))
-            finishWithMotion(isForward = false)
+            renderOrderState(
+                loading = false,
+                title = getString(R.string.order_details_state_missing_title),
+                message = getString(R.string.order_details_not_found),
+                actionLabel = getString(R.string.order_details_state_missing_action)
+            ) {
+                finishWithMotion(isForward = false)
+            }
             return
         }
 
+        renderOrderState(loading = true)
         lifecycleScope.launch {
             runCatching { FirestoreService.fetchOrder(uid, orderId) }
                 .onSuccess { order ->
                     val resolvedOrder = order ?: LocalOrderStore.findById(this@OrderDetailsActivity, orderId)
                     if (resolvedOrder == null) {
-                        showMotionSnackbar(getString(R.string.order_details_not_found))
-                        finishWithMotion(isForward = false)
+                        renderOrderState(
+                            loading = false,
+                            title = getString(R.string.order_details_state_missing_title),
+                            message = getString(R.string.order_details_not_found),
+                            actionLabel = getString(R.string.order_details_state_missing_action)
+                        ) {
+                            finishWithMotion(isForward = false)
+                        }
                     } else {
                         bindOrder(resolvedOrder)
                     }
@@ -64,25 +100,28 @@ class OrderDetailsActivity : AppCompatActivity() {
                     if (localOrder != null) {
                         bindOrder(localOrder)
                     } else {
-                        showMotionSnackbar(getString(R.string.order_details_load_failed))
+                        renderOrderState(
+                            loading = false,
+                            title = getString(R.string.order_details_state_error_title),
+                            message = getString(R.string.order_details_load_failed),
+                            actionLabel = getString(R.string.order_details_state_error_action)
+                        ) {
+                            loadOrder()
+                        }
                     }
                 }
         }
     }
 
     private fun bindOrder(order: AppOrder) {
+        renderOrderState(loading = false, showContent = true)
         findViewById<TextView>(R.id.tvOrderDetailsId)?.text = order.displayId
         findViewById<TextView>(R.id.tvOrderDetailsStatus)?.text = order.statusLabel(this)
         findViewById<TextView>(R.id.tvOrderDetailsDate)?.text =
             getString(R.string.order_details_created_on, order.formattedDate)
-        findViewById<TextView>(R.id.tvOrderDetailsEta)?.text =
-            if (order.estimatedDeliveryLabel.isNotBlank()) {
-                getString(R.string.order_details_eta, order.estimatedDeliveryLabel)
-            } else {
-                getString(R.string.order_details_eta_pending)
-            }
+        findViewById<TextView>(R.id.tvOrderDetailsEta)?.text = buildEtaText(order)
         val addressText = buildString {
-            val snapshot = order.deliveryAddressSnapshot
+            val snapshot = order.shippingAddress
             if (snapshot != null) {
                 append(snapshot.recipientName)
                 if (snapshot.summaryLine.isNotBlank()) append("\n").append(snapshot.summaryLine)
@@ -100,36 +139,62 @@ class OrderDetailsActivity : AppCompatActivity() {
 
         val itemsContainer = findViewById<LinearLayout>(R.id.layoutOrderDetailsItems)
         itemsContainer?.removeAllViews()
-        order.items.forEach { (productId, quantity) ->
-            val snapshot = order.itemSnapshots[productId]
-            val product = ProductCatalog.byId(productId)
-
-            if (product == null && snapshot == null) return@forEach
-
+        order.items.forEach { item ->
             val itemView = layoutInflater.inflate(R.layout.item_confirmation_product, itemsContainer, false)
-            val title = product?.title ?: snapshot?.title ?: ""
-            val subtitle = product?.subtitle ?: snapshot?.subtitle ?: ""
-            val price = product?.price ?: snapshot?.price ?: 0.0
-            val imageUrl = product?.imageUrl ?: snapshot?.imageUrl ?: ""
-            val imageRes = product?.imageRes ?: snapshot?.imageRes
 
             itemView.findViewById<ImageView>(R.id.ivConfirmItemImage)
-                ?.loadCatalogImage(imageUrl, imageRes)
-            itemView.findViewById<TextView>(R.id.tvConfirmItemName)?.text = title
+                ?.loadCatalogImage(item.thumbnailUrl, R.drawable.placeholder)
+            itemView.findViewById<TextView>(R.id.tvConfirmItemName)?.text = item.name
             itemView.findViewById<TextView>(R.id.tvConfirmItemDetails)?.text =
-                getString(R.string.order_details_item_meta, quantity, subtitle)
-            itemView.findViewById<TextView>(R.id.tvConfirmItemPrice)?.text = formatDt(price * quantity)
+                getString(R.string.order_details_item_qty, item.quantity)
+            itemView.findViewById<TextView>(R.id.tvConfirmItemPrice)?.text =
+                formatDt(item.priceAtPurchase * item.quantity)
             itemsContainer?.addView(itemView)
         }
 
         val timelineContainer = findViewById<LinearLayout>(R.id.layoutOrderTimeline)
         timelineContainer?.removeAllViews()
-        val formatter = SimpleDateFormat("dd MMM yyyy • HH:mm", Locale.FRANCE)
-        order.statusTimeline.sortedBy { it.changedAt }.forEach { entry ->
+        val formatter = SimpleDateFormat("dd MMM yyyy - HH:mm", Locale.FRANCE)
+        order.trackingEvents.sortedBy { it.changedAt }.forEach { entry ->
             val itemView = layoutInflater.inflate(R.layout.item_order_timeline_entry, timelineContainer, false)
             itemView.findViewById<TextView>(R.id.tvTimelineStatus)?.text = orderStatusLabel(this, entry.status)
             itemView.findViewById<TextView>(R.id.tvTimelineTime)?.text = formatter.format(Date(entry.changedAt))
             timelineContainer?.addView(itemView)
+        }
+    }
+
+    private fun buildEtaText(order: AppOrder): String {
+        return when (order.status.lowercase(Locale.getDefault())) {
+            "delivered" -> getString(R.string.order_details_eta_delivered)
+            "cancelled" -> getString(R.string.order_details_eta_cancelled)
+            "shipped" -> getString(
+                R.string.order_details_eta,
+                SimpleDateFormat("dd MMM", Locale.FRANCE).format(Date(order.createdAtMillis + 2 * 86_400_000L))
+            )
+            else -> getString(
+                R.string.order_details_eta,
+                SimpleDateFormat("dd MMM", Locale.FRANCE).format(Date(order.createdAtMillis + 4 * 86_400_000L))
+            )
+        }
+    }
+
+    private fun renderOrderState(
+        loading: Boolean,
+        showContent: Boolean = false,
+        title: String = "",
+        message: String = "",
+        actionLabel: String = "",
+        action: (() -> Unit)? = null
+    ) {
+        findViewById<View>(R.id.orderDetailsLoading)?.visibility = if (loading) View.VISIBLE else View.GONE
+        findViewById<View>(R.id.scrollOrderDetails)?.visibility = if (showContent) View.VISIBLE else View.GONE
+        findViewById<View>(R.id.layoutOrderState)?.visibility = if (!loading && !showContent) View.VISIBLE else View.GONE
+        findViewById<TextView>(R.id.tvOrderStateTitle)?.text = title
+        findViewById<TextView>(R.id.tvOrderStateMessage)?.text = message
+        findViewById<com.google.android.material.button.MaterialButton>(R.id.btnOrderStateAction)?.apply {
+            visibility = if (action == null) View.GONE else View.VISIBLE
+            text = actionLabel
+            setOnClickListener { action?.invoke() }
         }
     }
 
@@ -143,10 +208,13 @@ class OrderDetailsActivity : AppCompatActivity() {
             .setItems(options) { _, which ->
                 when (which) {
                     0 -> openWhatsApp(getString(R.string.support_whatsapp_number))
-                    1 -> openEmail(getString(R.string.support_email), "Question commande " + (findViewById<TextView>(R.id.tvOrderDetailsId)?.text ?: ""))
+                    1 -> openEmail(
+                        getString(R.string.support_email),
+                        "Question commande " + (findViewById<TextView>(R.id.tvOrderDetailsId)?.text ?: "")
+                    )
                 }
             }
-            .setNegativeButton(getString(R.string.profile_edit_cancel), null)
+            .setNegativeButton(getString(R.string.admin_dialog_close), null)
             .show()
     }
 

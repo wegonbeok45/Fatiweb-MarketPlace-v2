@@ -14,6 +14,7 @@ import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.lifecycle.lifecycleScope
@@ -43,20 +44,36 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         tabDataPrefetcher = TabDataPrefetcher(this)
-
         ViewCompat.setOnApplyWindowInsetsListener(binding.main) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, 0, systemBars.right, 0)
-            
+
+            binding.hostFragmentContainer.setPadding(
+                binding.hostFragmentContainer.paddingLeft,
+                systemBars.top,
+                binding.hostFragmentContainer.paddingRight,
+                0
+            )
+            binding.hostTabLoadingOverlay.setPadding(
+                binding.hostTabLoadingOverlay.paddingLeft,
+                systemBars.top,
+                binding.hostTabLoadingOverlay.paddingRight,
+                0
+            )
             binding.hostLayoutBottomNav.apply {
-                setPadding(paddingLeft, paddingTop, paddingRight, systemBars.bottom + 2)
+                updateLayoutParams<androidx.constraintlayout.widget.ConstraintLayout.LayoutParams> {
+                    bottomMargin = systemBars.bottom
+                }
+                setPadding(paddingLeft, paddingTop, paddingRight, 0)
             }
-            
+
             insets
         }
 
         setupBottomNav()
         setupTabLoadingUi()
+        binding.root.findViewById<View?>(R.id.chatFab)?.visibility = View.GONE
+        binding.root.findViewById<View?>(R.id.chatFabDot)?.visibility = View.GONE
         binding.main.post {
             AppStartupCoordinator.startDeferred(this)
         }
@@ -126,13 +143,9 @@ class MainActivity : AppCompatActivity() {
     fun selectTab(tab: Tab, animate: Boolean = true) {
         if (isTabLoading) return
 
-        if ((tab == Tab.CART || tab == Tab.PROFILE) && !FirebaseAuthManager.isLoggedIn) {
-            startActivity(LoginActivity.createIntent(this))
-            return
-        }
-
         runCatching {
             if (tab == currentTab && supportFragmentManager.findFragmentByTag(tab.name) != null) {
+                (supportFragmentManager.findFragmentByTag(tab.name) as? TabReselectionHandler)?.onTabReselected()
                 updateBottomNavSelection(tab)
                 updateTabIndicator(tab, animate = animate)
                 updateHostCartBadge()
@@ -255,13 +268,13 @@ class MainActivity : AppCompatActivity() {
             currentTab = tab
             pendingTabSelection = null
             loadingErrorTab = null
-            isTabLoading = false
-            showTabLoading(loading = false, errorMessage = null)
-            setBottomNavEnabled(true)
-            updateBottomNavSelection(tab)
-            binding.hostLayoutBottomNav.post {
-                updateTabIndicator(tab, animate = false)
-            }
+                isTabLoading = false
+                showTabLoading(loading = false, errorMessage = null)
+                setBottomNavEnabled(true)
+                updateBottomNavSelection(tab)
+                binding.hostLayoutBottomNav.post {
+                    updateTabIndicator(tab, animate = false)
+                }
             updateHostCartBadge()
         }.onFailure { error ->
             Log.e(TAG, "Failed to open initial tab: $tab", error)

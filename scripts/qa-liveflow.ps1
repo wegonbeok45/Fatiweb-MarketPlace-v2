@@ -109,6 +109,7 @@ if (-not $FlowPath -and $env:QA_ADMIN_EMAIL -and $env:QA_ADMIN_PASSWORD) {
 $sharedMaestroArgs = @(
     "test",
     "--device", $DeviceId,
+    "--no-reinstall-driver",
     "--format", "HTML-DETAILED",
     "--flatten-debug-output",
     "--no-ansi"

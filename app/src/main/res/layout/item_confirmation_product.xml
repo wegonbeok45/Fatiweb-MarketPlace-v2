@@ -3,22 +3,26 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
     android:gravity="top"
-    android:layout_marginBottom="16dp">
+    android:layout_marginBottom="12dp"
+    android:orientation="horizontal">
 
     <com.google.android.material.card.MaterialCardView
-        android:layout_width="60dp"
-        android:layout_height="80dp"
-        app:cardCornerRadius="8dp"
+        android:layout_width="56dp"
+        android:layout_height="72dp"
+        android:layout_marginEnd="14dp"
+        app:cardBackgroundColor="@color/colorSurfaceVariant"
+        app:cardCornerRadius="@dimen/corner_radius_medium"
         app:cardElevation="0dp"
-        android:layout_marginEnd="16dp">
+        app:strokeColor="@color/colorBorderLight"
+        app:strokeWidth="1dp">
         <ImageView
             android:id="@+id/ivConfirmItemImage"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:contentDescription="@string/cd_product_image"
             android:scaleType="centerCrop"
-            android:src="@drawable/product1example"  android:contentDescription="@string/cd_product_image" />
+            android:src="@drawable/product1example" />
     </com.google.android.material.card.MaterialCardView>
 
     <LinearLayout
@@ -28,8 +32,10 @@
         android:orientation="vertical">
         <TextView
             android:id="@+id/tvConfirmItemName"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="2"
             android:text="@string/auto_produit_e30e"
             android:textSize="@dimen/text_size_caption"
             android:textColor="?attr/colorOnSurface"
@@ -37,8 +43,11 @@
             android:fontFamily="@font/plus_jakarta_sans" />
         <TextView
             android:id="@+id/tvConfirmItemDetails"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:ellipsize="end"
+            android:maxLines="1"
             android:text="@string/auto_taille_m_couleur_standard_d6cb"
             android:textSize="@dimen/text_size_overline"
             android:textColor="@color/profile_text_muted"
@@ -54,9 +63,8 @@
         android:includeFontPadding="false"
         android:maxLines="1"
         android:text="@string/auto_000_dt_6f0d"
-        android:textSize="@dimen/text_size_caption"
+        android:textSize="@dimen/text_size_overline"
         android:textColor="?attr/colorOnSurface"
         android:textStyle="bold"
         android:fontFamily="@font/plus_jakarta_sans" />
 </LinearLayout>
-
