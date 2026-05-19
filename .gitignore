@@ -26,6 +26,14 @@ fatiweb-marketplace-firebase-adminsdk-fbsvc-ee9d682cc5.json
 service_account.json
 *firebase-adminsdk-*.json
 *.hprof
+**/service_account*.json
+**/*service-account*.json
+**/*-adminsdk-*.json
+**/*.hprof
+*.keystore
+*.jks
+*.p12
+*.pem
 build_*.txt
 build_*.log
 all_errors_*.txt
@@ -33,4 +41,6 @@ log_*.txt
 out.txt
 firebase_functions_setup/node_modules/
 firebase_functions_setup/lib/
+firebase_functions_setup/lib-scripts/
+categories/
 local.secrets.properties

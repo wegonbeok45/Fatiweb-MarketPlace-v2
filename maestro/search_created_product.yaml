@@ -1,0 +1,13 @@
+appId: isim.ia2y.myapplication
+---
+- tapOn:
+    id: "isim.ia2y.myapplication:id/hostNavProfile"
+- tapOn:
+    id: "isim.ia2y.myapplication:id/cardAdmin"
+- tapOn:
+    id: "isim.ia2y.myapplication:id/adminNavProduits"
+- tapOn:
+    id: "isim.ia2y.myapplication:id/adminProduitsSearchInput"
+- eraseText
+- inputText: "Lampe artisanale"
+- takeScreenshot: admin-products-search-lampe

@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="rectangle">
-    <solid android:color="@color/home_add_cart_bg" />
-    <corners android:radius="@dimen/home_add_cart_button_radius" />
-</shape>

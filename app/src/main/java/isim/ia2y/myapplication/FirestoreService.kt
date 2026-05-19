@@ -6,6 +6,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.SetOptions
+import com.google.firebase.firestore.Source
 import kotlinx.coroutines.tasks.await
 
 /**
@@ -27,6 +28,9 @@ object FirestoreService {
         val uid: String = "",
         val name: String = "",
         val email: String = "",
+        val phone: String = "",
+        val role: String = UserRoles.CLIENT,
+        val avatarUrl: String = "",
         val orderCount: Int = 0,
         val createdAt: Long = 0L
     )
@@ -65,16 +69,17 @@ object FirestoreService {
     }
 
     // Delegation to specialized services
-    suspend fun fetchProducts() = ProductService.fetchProducts()
+    suspend fun fetchProducts(source: Source = Source.DEFAULT) = ProductService.fetchProducts(source = source)
     suspend fun saveProduct(product: Product) = ProductService.saveProduct(product)
     suspend fun deleteProduct(productId: String) = ProductService.deleteProduct(productId)
 
     suspend fun saveOrder(uid: String, order: AppOrder, deliveryType: String = "standard") =
         OrderService.saveOrder(uid, order, deliveryType)
-    suspend fun fetchOrders(uid: String) = OrderService.fetchOrders(uid)
+    suspend fun fetchOrders(uid: String, source: Source = Source.DEFAULT) = OrderService.fetchOrders(uid, source = source)
     suspend fun fetchOrder(uid: String, orderId: String) = OrderService.fetchOrder(uid, orderId)
     suspend fun fetchAllOrders() = AdminService.fetchAllOrders()
     suspend fun fetchAllClients() = AdminService.fetchAllClients()
+    suspend fun promoteUserToVendeur(userId: String) = AdminService.promoteUserToVendeur(userId)
     suspend fun updateOrderStatus(uid: String, orderId: String, newStatus: String) = OrderService.updateOrderStatus(uid, orderId, newStatus)
 
     suspend fun saveUserProfile(
@@ -87,7 +92,8 @@ object FirestoreService {
         UserService.saveUserProfile(uid, name, email, avatarUrl, roleOverride)
     suspend fun updateUserProfileName(uid: String, name: String) = UserService.updateUserProfileName(uid, name)
     suspend fun fetchUserProfile(uid: String) = UserService.fetchUserProfile(uid)
-    suspend fun fetchUserRole(uid: String) = UserService.fetchUserRole(uid)
+    suspend fun fetchUserRole(uid: String, forceRefresh: Boolean = false) =
+        UserService.fetchUserRole(uid, forceRefresh)
     suspend fun isCurrentUserAdmin() = UserService.isCurrentUserAdmin()
     fun clearCache() = UserService.clearCache()
     suspend fun fetchAddresses(uid: String) = UserService.fetchAddresses(uid)
@@ -106,6 +112,7 @@ object FirestoreService {
 
     suspend fun fetchNotifications() = NotificationService.fetchNotifications()
     suspend fun fetchUserInboxNotifications(uid: String) = NotificationService.fetchUserInboxNotifications(uid)
+    suspend fun fetchPublicAnnouncementNotifications() = NotificationService.fetchPublicAnnouncementNotifications()
     suspend fun fetchInAppNotifications() = NotificationService.fetchInAppNotifications()
     suspend fun createInAppNotification(
         title: String,

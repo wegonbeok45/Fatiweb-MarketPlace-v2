@@ -1,0 +1,17 @@
+appId: isim.ia2y.myapplication
+---
+- tapOn:
+    point: "50%,59%"
+- extendedWaitUntil:
+    visible:
+      id: "isim.ia2y.myapplication:id/adminProductEditorBtnAutofill"
+    timeout: 15000
+- tapOn:
+    id: "isim.ia2y.myapplication:id/adminProductEditorBtnAutofill"
+- tapOn:
+    id: "isim.ia2y.myapplication:id/adminProductEditorBtnSave"
+- extendedWaitUntil:
+    visible:
+      id: "isim.ia2y.myapplication:id/adminProduitsBtnAdd"
+    timeout: 90000
+- takeScreenshot: admin-products-after-image-product

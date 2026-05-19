@@ -3,6 +3,7 @@ package isim.ia2y.myapplication
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
@@ -39,20 +40,20 @@ class AdminOrdersAdapter(
             
             // Reusing status styling logic if possible, or copied from Activity
             val ctx = itemView.context
-            when (order.status) {
-                "delivered" -> {
+            when (OrderStatuses.normalize(order.status)) {
+                OrderStatuses.DELIVERED -> {
                     badge.setCardBackgroundColor(ContextCompat.getColor(ctx, R.color.status_chip_bg_delivered))
                     badgeText.setTextColor(ContextCompat.getColor(ctx, R.color.status_chip_text_delivered))
                 }
-                "pending" -> {
+                OrderStatuses.PENDING -> {
                     badge.setCardBackgroundColor(ContextCompat.getColor(ctx, R.color.status_chip_bg_pending))
                     badgeText.setTextColor(ContextCompat.getColor(ctx, R.color.status_chip_text_pending))
                 }
-                "preparing" -> {
+                OrderStatuses.PREPARING, OrderStatuses.CONFIRMED -> {
                     badge.setCardBackgroundColor(ContextCompat.getColor(ctx, R.color.status_chip_bg_preparing))
                     badgeText.setTextColor(ContextCompat.getColor(ctx, R.color.status_chip_text_preparing))
                 }
-                "shipped" -> {
+                OrderStatuses.SHIPPED -> {
                     badge.setCardBackgroundColor(ContextCompat.getColor(ctx, R.color.status_chip_bg_shipped))
                     badgeText.setTextColor(ContextCompat.getColor(ctx, R.color.status_chip_text_shipped))
                 }
@@ -93,24 +94,55 @@ class AdminClientsAdapter(
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         fun bind(client: FirestoreService.ClientInfo) {
             val resources = itemView.context.resources
+            val avatarImage = itemView.findViewById<ImageView>(R.id.adminClientAvatarImage)
+            val avatarInitial = itemView.findViewById<TextView>(R.id.adminClientAvatarInitial)
+            avatarInitial.text = if (client.name.isNotBlank()) client.name.take(1).uppercase() else "?"
+            if (client.avatarUrl.isNotBlank()) {
+                avatarImage.visibility = View.VISIBLE
+                avatarInitial.visibility = View.GONE
+                avatarImage.loadAvatarImage(client.avatarUrl)
+            } else {
+                avatarImage.visibility = View.GONE
+                avatarInitial.visibility = View.VISIBLE
+            }
+
             itemView.findViewById<TextView>(R.id.adminClientName).text = client.name
-            itemView.findViewById<TextView>(R.id.adminClientEmail).text = client.email
+            itemView.findViewById<TextView>(R.id.adminClientEmail).text =
+                listOf(client.email, client.phone)
+                    .filter { it.isNotBlank() }
+                    .joinToString(" - ")
+                    .ifBlank { client.uid }
             itemView.findViewById<TextView>(R.id.adminClientId).text =
-                resources.getQuantityString(
-                    R.plurals.admin_order_count,
-                    client.orderCount,
-                    client.orderCount
-                )
-            itemView.findViewById<TextView>(R.id.adminClientAvatarInitial).text = if (client.name.isNotBlank()) client.name.take(1).uppercase() else "?"
+                listOf(
+                    resources.getQuantityString(
+                        R.plurals.admin_order_count,
+                        client.orderCount,
+                        client.orderCount
+                    ),
+                    client.roleLabel(),
+                    client.joinedDateLabel()
+                ).filter { it.isNotBlank() }.joinToString(" - ")
             itemView.setOnClickListener { onClick(client) }
         }
     }
 
     class ClientDiffCallback : DiffUtil.ItemCallback<FirestoreService.ClientInfo>() {
         override fun areItemsTheSame(oldItem: FirestoreService.ClientInfo, newItem: FirestoreService.ClientInfo): Boolean =
-            oldItem.email == newItem.email
+            oldItem.uid == newItem.uid
 
         override fun areContentsTheSame(oldItem: FirestoreService.ClientInfo, newItem: FirestoreService.ClientInfo): Boolean =
             oldItem == newItem
     }
+}
+
+private fun FirestoreService.ClientInfo.roleLabel(): String = when (role) {
+    UserRoles.ADMIN -> "Admin"
+    UserRoles.VENDEUR -> "Vendeur"
+    else -> "Client"
+}
+
+private fun FirestoreService.ClientInfo.joinedDateLabel(): String {
+    if (createdAt <= 0L) return ""
+    return java.text.SimpleDateFormat("dd MMM yyyy", java.util.Locale.getDefault())
+        .format(java.util.Date(createdAt))
 }

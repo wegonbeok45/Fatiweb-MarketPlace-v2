@@ -1,151 +1,274 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:cardBackgroundColor="@color/colorSurface"
-    app:cardCornerRadius="@dimen/corner_radius_medium"
-    app:cardElevation="0dp"
-    app:strokeColor="@color/colorBorderLight"
-    app:strokeWidth="1dp">
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground"
+    app:cardBackgroundColor="@color/home_screen_bg"
+    app:cardCornerRadius="@dimen/product_card_corner_radius"
+    app:cardElevation="@dimen/product_card_elevation"
+    app:strokeWidth="@dimen/space_0">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:paddingStart="@dimen/product_card_inner_padding"
+        android:paddingTop="@dimen/product_card_inner_padding"
+        android:paddingEnd="@dimen/product_card_inner_padding"
+        android:paddingBottom="@dimen/product_card_content_padding_bottom">
 
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/home_product_image_height">
-
-            <ImageView
-                android:id="@+id/homeDynamicProductImage"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:contentDescription="@string/cd_product_image"
-                android:scaleType="centerCrop"
-                app:srcCompat="@drawable/placeholder" />
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/homeDynamicImageFrame"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/product_card_image_height"
+            app:cardBackgroundColor="@color/product_card_image_surface"
+            app:cardCornerRadius="@dimen/product_card_image_radius"
+            app:cardElevation="@dimen/space_0"
+            app:strokeWidth="@dimen/space_0"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
             <FrameLayout
-                android:id="@+id/homeDynamicFavoriteButton"
-                android:layout_width="@dimen/home_product_heart_size"
-                android:layout_height="@dimen/home_product_heart_size"
-                android:layout_gravity="top|end"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:clickable="true"
-                android:focusable="true">
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
 
                 <ImageView
-                    android:id="@+id/homeDynamicFavoriteIcon"
-                    android:layout_width="@dimen/home_product_heart_icon_size"
-                    android:layout_height="@dimen/home_product_heart_icon_size"
-                    android:layout_gravity="center"
-                    app:srcCompat="@drawable/ic_home_heart"
-                    app:tint="@color/home_text_primary" />
-            </FrameLayout>
+                    android:id="@+id/homeDynamicProductImage"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:contentDescription="@string/cd_product_image"
+                    android:scaleType="centerCrop"
+                    app:srcCompat="@drawable/placeholder" />
 
-            <TextView
-                android:id="@+id/homeDynamicProductStockText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom|start"
-                android:layout_margin="@dimen/space_8"
-                android:background="@drawable/bg_home_meta_pill"
-                android:backgroundTint="@color/colorPrimary"
-                android:fontFamily="@font/plus_jakarta_sans_bold"
-                android:paddingHorizontal="8dp"
-                android:paddingVertical="3dp"
-                android:textColor="@color/colorOnPrimary"
-                android:textSize="9sp"
-                android:visibility="gone"
-                tools:text="NEW"
-                tools:visibility="visible" />
-        </FrameLayout>
+                <ImageView
+                    android:id="@+id/homeDynamicFavoriteButton"
+                    android:layout_width="@dimen/product_card_floating_button_size"
+                    android:layout_height="@dimen/product_card_floating_button_size"
+                    android:layout_gravity="top|end"
+                    android:layout_marginTop="@dimen/space_10"
+                    android:layout_marginEnd="@dimen/space_10"
+                    android:background="@drawable/bg_product_floating_circle"
+                    android:contentDescription="@string/cd_favorite"
+                    android:elevation="@dimen/product_card_elevation"
+                    android:padding="@dimen/product_card_floating_button_padding"
+                    app:srcCompat="@drawable/ic_home_heart"
+                    app:tint="@color/home_ref_text_primary" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/homeDynamicAddCartButton"
+                    android:layout_width="@dimen/product_card_floating_button_size"
+                    android:layout_height="@dimen/product_card_floating_button_size"
+                    android:layout_gravity="bottom|end"
+                    android:layout_marginEnd="@dimen/space_10"
+                    android:layout_marginBottom="@dimen/space_10"
+                    android:contentDescription="@string/details_add_to_cart"
+                    android:insetLeft="@dimen/space_0"
+                    android:insetTop="@dimen/space_0"
+                    android:insetRight="@dimen/space_0"
+                    android:insetBottom="@dimen/space_0"
+                    android:minWidth="@dimen/space_0"
+                    android:minHeight="@dimen/space_0"
+                    android:padding="@dimen/product_card_floating_button_padding"
+                    android:text=""
+                    android:visibility="gone"
+                    app:backgroundTint="@color/product_card_floating_surface"
+                    app:cornerRadius="@dimen/product_card_floating_button_radius"
+                    app:elevation="@dimen/product_card_elevation"
+                    app:icon="@drawable/ic_home_add_cart"
+                    app:iconGravity="textStart"
+                    app:iconPadding="@dimen/space_0"
+                    app:iconSize="@dimen/product_card_chip_icon_size"
+                    app:iconTint="@color/home_ref_text_primary"
+                    app:rippleColor="@color/home_ref_border"
+                    tools:visibility="visible" />
+            </FrameLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <TextView
+            android:id="@+id/homeDynamicProductTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/product_card_content_padding_horizontal"
+            android:layout_marginTop="@dimen/space_12"
+            android:layout_marginEnd="@dimen/space_8"
+            android:ellipsize="end"
+            android:fontFamily="@font/manrope_semibold"
+            android:includeFontPadding="false"
+            android:lineSpacingExtra="@dimen/space_2"
+            android:maxLines="2"
+            android:minLines="2"
+            android:textColor="@color/home_ref_text_primary"
+            android:textSize="@dimen/product_card_text_title"
+            app:layout_constraintEnd_toStartOf="@id/homeDynamicProductPrice"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/homeDynamicImageFrame"
+            tools:text="Spider Legacy Hoodie Green" />
+
+        <TextView
+            android:id="@+id/homeDynamicProductPrice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_12"
+            android:layout_marginEnd="@dimen/product_card_content_padding_horizontal"
+            android:ellipsize="end"
+            android:fontFamily="@font/manrope_bold"
+            android:includeFontPadding="false"
+            android:maxLines="1"
+            android:textColor="@color/home_ref_text_primary"
+            android:textSize="@dimen/product_card_text_price"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/homeDynamicImageFrame"
+            tools:text="52 DT" />
+
+        <TextView
+            android:id="@+id/homeDynamicProductPriceOriginal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:layout_marginEnd="@dimen/product_card_content_padding_horizontal"
+            android:ellipsize="end"
+            android:fontFamily="@font/manrope_semibold"
+            android:includeFontPadding="false"
+            android:maxLines="1"
+            android:textColor="@color/discount_strike_red"
+            android:textSize="11sp"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/homeDynamicProductPrice"
+            tools:text="65 DT"
+            tools:visibility="visible" />
+
+        <TextView
+            android:id="@+id/homeDynamicProductDiscountBadge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/space_10"
+            android:layout_marginTop="@dimen/space_10"
+            android:background="@drawable/bg_discount_badge"
+            android:fontFamily="@font/manrope_bold"
+            android:includeFontPadding="false"
+            android:paddingStart="8dp"
+            android:paddingTop="3dp"
+            android:paddingEnd="8dp"
+            android:paddingBottom="3dp"
+            android:textColor="@android:color/white"
+            android:textSize="11sp"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="@id/homeDynamicImageFrame"
+            app:layout_constraintTop_toTopOf="@id/homeDynamicImageFrame"
+            tools:text="-20%"
+            tools:visibility="visible" />
+
+        <TextView
+            android:id="@+id/homeDynamicProductOrigin"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/product_card_content_padding_horizontal"
+            android:layout_marginTop="@dimen/space_6"
+            android:layout_marginEnd="@dimen/product_card_content_padding_horizontal"
+            android:ellipsize="end"
+            android:fontFamily="@font/manrope_regular"
+            android:includeFontPadding="false"
+            android:maxLines="1"
+            android:textColor="@color/home_ref_text_secondary"
+            android:textSize="@dimen/product_card_text_seller"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/homeDynamicProductTitle"
+            tools:text="Mohmed Gnounou" />
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="@dimen/home_product_info_min_height"
-            android:orientation="vertical"
-            android:paddingHorizontal="@dimen/space_8"
-            android:paddingTop="@dimen/space_8"
-            android:paddingBottom="@dimen/space_8">
+            android:id="@+id/homeDynamicRatingRow"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/product_card_chip_height"
+            android:layout_marginStart="@dimen/product_card_content_padding_horizontal"
+            android:layout_marginTop="@dimen/space_10"
+            android:layout_marginEnd="@dimen/space_8"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toStartOf="@id/homeDynamicCategoryChip"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/homeDynamicProductOrigin">
+
+            <ImageView
+                android:layout_width="@dimen/product_card_star_size"
+                android:layout_height="@dimen/product_card_star_size"
+                android:contentDescription="@null"
+                app:srcCompat="@drawable/ic_home_star"
+                app:tint="@color/home_ref_gold" />
 
             <TextView
-                android:id="@+id/homeDynamicProductTitle"
-                android:layout_width="match_parent"
+                android:id="@+id/homeDynamicProductRating"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/space_4"
                 android:ellipsize="end"
-                android:fontFamily="@font/plus_jakarta_sans_medium"
-                android:lineSpacingMultiplier="1.2"
-                android:maxLines="2"
-                android:minLines="2"
-                android:textColor="@color/text_primary"
-                android:textSize="@dimen/text_size_caption"
-                tools:text="Premium Handcrafted Tunisian Fouta with Traditional Patterns" />
+                android:fontFamily="@font/manrope_semibold"
+                android:includeFontPadding="false"
+                android:maxLines="1"
+                android:textColor="@color/product_card_rating_text"
+                android:textSize="@dimen/product_card_text_meta"
+                tools:text="4.8 (12)" />
+        </LinearLayout>
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/space_2"
-                android:gravity="center_vertical"
-                android:minHeight="20dp"
-                android:orientation="horizontal">
+        <LinearLayout
+            android:id="@+id/homeDynamicCategoryChip"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/product_card_chip_height"
+            android:layout_marginEnd="@dimen/product_card_content_padding_horizontal"
+            android:background="@drawable/bg_product_category_chip"
+            android:gravity="center"
+            android:maxWidth="@dimen/product_card_category_max_width"
+            android:orientation="horizontal"
+            android:paddingStart="@dimen/space_8"
+            android:paddingEnd="@dimen/space_8"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/homeDynamicRatingRow">
 
-                <TextView
-                    android:id="@+id/homeDynamicProductOrigin"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:ellipsize="end"
-                    android:fontFamily="@font/plus_jakarta_sans_regular"
-                    android:maxLines="1"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="@dimen/text_size_overline"
-                    tools:text="Hammamet, Tunisia" />
-
-                <ImageView
-                    android:layout_width="@dimen/space_8"
-                    android:layout_height="@dimen/space_8"
-                    android:layout_marginEnd="@dimen/space_2"
-                    app:srcCompat="@drawable/ic_home_star"
-                    app:tint="@color/text_secondary" />
-
-                <TextView
-                    android:id="@+id/homeDynamicProductRating"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/plus_jakarta_sans_bold"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="@dimen/text_size_overline"
-                    tools:text="4.9" />
-            </LinearLayout>
+            <ImageView
+                android:layout_width="@dimen/product_card_chip_icon_size"
+                android:layout_height="@dimen/product_card_chip_icon_size"
+                android:contentDescription="@null"
+                app:srcCompat="@drawable/ic_bottom_nav_categories"
+                app:tint="@color/product_card_chip_text" />
 
             <TextView
-                android:id="@+id/homeDynamicProductPrice"
-                android:layout_width="match_parent"
+                android:id="@+id/homeDynamicProductCategory"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/space_4"
-                android:fontFamily="@font/plus_jakarta_sans_bold"
-                android:textColor="@color/text_primary"
-                android:textSize="@dimen/text_size_body"
-                tools:text="35.000 DT" />
-
+                android:layout_marginStart="@dimen/space_4"
+                android:ellipsize="end"
+                android:fontFamily="@font/manrope_semibold"
+                android:includeFontPadding="false"
+                android:maxWidth="@dimen/product_card_category_text_max_width"
+                android:maxLines="1"
+                android:textColor="@color/product_card_chip_text"
+                android:textSize="@dimen/product_card_text_meta"
+                tools:text="Fashion" />
         </LinearLayout>
 
         <View
             android:id="@+id/homeDynamicProductStockChip"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:visibility="gone" />
+            android:layout_width="@dimen/space_0"
+            android:layout_height="@dimen/space_0"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/homeDynamicProductSubtitle"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:visibility="gone" />
-
-    </LinearLayout>
+            android:layout_width="@dimen/space_0"
+            android:layout_height="@dimen/space_0"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>

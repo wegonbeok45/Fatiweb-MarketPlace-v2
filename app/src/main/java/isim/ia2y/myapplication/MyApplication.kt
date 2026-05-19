@@ -2,45 +2,85 @@ package isim.ia2y.myapplication
 
 import android.app.Application
 import android.util.Log
+import coil.ImageLoader
+import coil.ImageLoaderFactory
+import coil.disk.DiskCache
+import coil.memory.MemoryCache
+import coil.request.CachePolicy
 import com.google.firebase.appcheck.FirebaseAppCheck
 import com.google.firebase.appcheck.playintegrity.PlayIntegrityAppCheckProviderFactory
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FirebaseFirestoreSettings
 
-class MyApplication : Application() {
+class MyApplication : Application(), ImageLoaderFactory {
+    companion object {
+        lateinit var instance: MyApplication
+            private set
+    }
+
     override fun onCreate() {
         super.onCreate()
+        instance = this
         configureAppCheck()
+        configureFirestoreOffline()
+        UserService.init(this)
+        FirebaseAuthManager.syncCrashlyticsUser()
         LanguageManager.ensureDefaultAndApply(this)
     }
 
+    private val firebaseAppCheck: FirebaseAppCheck get() = FirebaseAppCheck.getInstance()
+
     private fun configureAppCheck() {
-        val firebaseAppCheck = FirebaseAppCheck.getInstance()
+        val appCheck = firebaseAppCheck
         if (BuildConfig.DEBUG) {
-            if (installDebugAppCheckProvider(firebaseAppCheck)) {
-                Log.d("MyApplication", "Firebase App Check configured with debug provider.")
-            } else {
-                firebaseAppCheck.installAppCheckProviderFactory(
-                    PlayIntegrityAppCheckProviderFactory.getInstance()
-                )
-                Log.w("MyApplication", "Debug App Check provider missing; falling back to Play Integrity.")
+            val debugProviderFactory = runCatching {
+                Class.forName("com.google.firebase.appcheck.debug.DebugAppCheckProviderFactory")
+                    .getMethod("getInstance")
+                    .invoke(null) as com.google.firebase.appcheck.AppCheckProviderFactory
+            }.onFailure { error ->
+                Log.w("MyApplication", "Firebase App Check debug provider is unavailable.", error)
+            }.getOrNull()
+
+            if (debugProviderFactory != null) {
+                appCheck.installAppCheckProviderFactory(debugProviderFactory)
+                appCheck.setTokenAutoRefreshEnabled(true)
+                Log.d("MyApplication", "Using Firebase App Check debug provider for Firebase Storage uploads.")
             }
-        } else {
-            firebaseAppCheck.installAppCheckProviderFactory(
-                PlayIntegrityAppCheckProviderFactory.getInstance()
-            )
+            return
         }
-        firebaseAppCheck.setTokenAutoRefreshEnabled(true)
+
+        appCheck.installAppCheckProviderFactory(
+            PlayIntegrityAppCheckProviderFactory.getInstance()
+        )
+        appCheck.setTokenAutoRefreshEnabled(true)
     }
 
-    private fun installDebugAppCheckProvider(firebaseAppCheck: FirebaseAppCheck): Boolean {
-        return runCatching {
-            val factoryClass = Class.forName("com.google.firebase.appcheck.debug.DebugAppCheckProviderFactory")
-            val factory = factoryClass.getMethod("getInstance").invoke(null)
-            val providerFactoryClass = Class.forName("com.google.firebase.appcheck.AppCheckProviderFactory")
-            val installMethod = firebaseAppCheck.javaClass.getMethod(
-                "installAppCheckProviderFactory",
-                providerFactoryClass
-            )
-            installMethod.invoke(firebaseAppCheck, factory)
-        }.isSuccess
+    private fun configureFirestoreOffline() {
+        val db = FirebaseFirestore.getInstance()
+        val settings = FirebaseFirestoreSettings.Builder()
+            .setCacheSizeBytes(FirebaseFirestoreSettings.CACHE_SIZE_UNLIMITED)
+            .setPersistenceEnabled(true)
+            .build()
+        db.firestoreSettings = settings
+    }
+
+    override fun newImageLoader(): ImageLoader {
+        return ImageLoader.Builder(this)
+            .crossfade(120)
+            .memoryCachePolicy(CachePolicy.ENABLED)
+            .diskCachePolicy(CachePolicy.ENABLED)
+            .respectCacheHeaders(false)
+            .memoryCache {
+                MemoryCache.Builder(this)
+                    .maxSizePercent(0.12)
+                    .build()
+            }
+            .diskCache {
+                DiskCache.Builder()
+                    .directory(cacheDir.resolve("coil_product_cache"))
+                    .maxSizeBytes(64L * 1024L * 1024L)
+                    .build()
+            }
+            .build()
     }
 }

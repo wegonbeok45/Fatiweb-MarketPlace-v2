@@ -2,4 +2,13 @@
 <resources>
     <item name="etEditProfileName" type="id" />
     <item name="etResetPasswordEmail" type="id" />
+    <item name="messagingDayLabel" type="id" />
+    <item name="messagingMessageLine" type="id" />
+    <item name="messagingMessageAvatar" type="id" />
+    <item name="messagingMessageBubble" type="id" />
+    <item name="messagingMessageImage" type="id" />
+    <item name="messagingMessageText" type="id" />
+    <item name="messagingMessageMeta" type="id" />
+    <item name="messagingMessageProgress" type="id" />
+    <item name="messagingMessageReaction" type="id" />
 </resources>

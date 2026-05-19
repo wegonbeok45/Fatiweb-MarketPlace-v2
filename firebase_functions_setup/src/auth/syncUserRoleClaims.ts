@@ -1,16 +1,20 @@
 import {logger} from "firebase-functions";
 import {onDocumentWritten} from "firebase-functions/v2/firestore";
+import {FUNCTIONS_REGION} from "../shared/callableOptions";
 import {COLLECTIONS, USER_ROLES} from "../shared/constants";
 import {auth} from "../shared/firestore";
 
 export const syncUserRoleClaims = onDocumentWritten(
-  `${COLLECTIONS.USERS}/{userId}`,
+  {
+    document: `${COLLECTIONS.USERS}/{userId}`,
+    region: FUNCTIONS_REGION,
+  },
   async (event) => {
     const userId = event.params.userId;
-    const beforeRole = event.data?.before?.get("role");
-    const afterRole = event.data?.after?.get("role");
+    const beforeRole = normalizeRole(event.data?.before?.get("role"));
+    const afterRole = normalizeRole(event.data?.after?.get("role"));
 
-    if (beforeRole === afterRole && event.data?.after?.exists) {
+    if (event.data?.before?.exists && beforeRole === afterRole && event.data?.after?.exists) {
       return;
     }
 
@@ -29,11 +33,12 @@ export const syncUserRoleClaims = onDocumentWritten(
       return;
     }
 
-    const isAdmin = afterRole === USER_ROLES.ADMIN;
+    const normalizedRole = afterRole;
+    const isAdmin = normalizedRole === USER_ROLES.ADMIN;
     const nextClaims = {
       ...existingClaims,
       admin: isAdmin,
-      role: isAdmin ? USER_ROLES.ADMIN : USER_ROLES.CLIENT,
+      role: normalizedRole,
     };
 
     await auth.setCustomUserClaims(userId, nextClaims);
@@ -43,3 +48,12 @@ export const syncUserRoleClaims = onDocumentWritten(
     });
   },
 );
+
+function normalizeRole(role: unknown): string {
+  const value = typeof role === "string" ? role.trim().toLowerCase() : "";
+  if (value === USER_ROLES.ADMIN) return USER_ROLES.ADMIN;
+  if (value === USER_ROLES.VENDEUR || value === "vendor" || value === "seller") {
+    return USER_ROLES.VENDEUR;
+  }
+  return USER_ROLES.CLIENT;
+}

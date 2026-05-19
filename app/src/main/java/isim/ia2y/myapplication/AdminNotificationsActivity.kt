@@ -1,6 +1,8 @@
 package isim.ia2y.myapplication
 
 import android.os.Bundle
+import android.util.Log
+import android.view.MotionEvent
 import android.view.View
 import android.widget.AutoCompleteTextView
 import android.widget.EditText
@@ -15,6 +17,10 @@ import kotlinx.coroutines.launch
 
 class AdminNotificationsActivity : AppCompatActivity() {
     private data class AudienceOption(val key: String, val label: String)
+
+    companion object {
+        private const val TAG = "AdminNotifications"
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,8 +72,21 @@ class AdminNotificationsActivity : AppCompatActivity() {
                 audienceOptions.map { it.label }
             )
         )
+        audienceInput.threshold = 0
         audienceInput.setText(audienceOptions.first().label, false)
-        audienceInput.setOnClickListener { audienceInput.showDropDown() }
+        audienceInput.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) audienceInput.post { audienceInput.showDropDown() }
+        }
+        audienceInput.setOnClickListener {
+            audienceInput.post { audienceInput.showDropDown() }
+        }
+        audienceInput.setOnTouchListener { _, event ->
+            if (event.action == MotionEvent.ACTION_UP) {
+                audienceInput.requestFocus()
+                audienceInput.post { audienceInput.showDropDown() }
+            }
+            false
+        }
 
         titleInput.isEnabled = true
         messageInput.isEnabled = true
@@ -77,7 +96,6 @@ class AdminNotificationsActivity : AppCompatActivity() {
         statusText?.text = getString(R.string.admin_announcements_status_idle)
 
         sendButton.setOnClickListener {
-            val uid = FirebaseAuthManager.currentUser?.uid ?: return@setOnClickListener
             val title = titleInput.text?.toString().orEmpty().trim()
             val message = messageInput.text?.toString().orEmpty().trim()
             val audience = audienceOptions.firstOrNull {
@@ -96,7 +114,7 @@ class AdminNotificationsActivity : AppCompatActivity() {
             statusText?.text = getString(R.string.admin_announcements_status_progress)
             lifecycleScope.launch {
                 runCatching {
-                    FirestoreService.createInAppNotification(title, message, uid, audience)
+                    BackendFunctionsService.sendAnnouncement(title, message, audience)
                 }.onSuccess {
                     titleInput.text?.clear()
                     messageInput.text?.clear()
@@ -105,9 +123,13 @@ class AdminNotificationsActivity : AppCompatActivity() {
                     loadHistory()
                     statusText?.text = getString(R.string.admin_announcements_status_success)
                     showMotionSnackbar(getString(R.string.admin_announcements_publish_success))
-                }.onFailure {
+                }.onFailure { error ->
+                    Log.e(TAG, "Failed to send announcement", error)
                     statusText?.text = getString(R.string.admin_announcements_status_error)
-                    showMotionSnackbar(getString(R.string.admin_announcements_publish_error))
+                    showMotionSnackbar(
+                        error.message?.takeIf { it.isNotBlank() }
+                            ?: getString(R.string.admin_announcements_publish_error)
+                    )
                 }
                 sendButton.isEnabled = true
                 sendButton.text = getString(R.string.admin_announcements_publish)

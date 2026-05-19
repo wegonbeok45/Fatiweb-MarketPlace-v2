@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/categoryProductsRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/home_screen_bg">
+
+    <!-- ═══════════════════════════════════════════════════ -->
+    <!-- Hero header — full-bleed image w/ gradient overlay -->
+    <!-- ═══════════════════════════════════════════════════ -->
+    <FrameLayout
+        android:id="@+id/layoutCategoryHero"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/category_hero_height"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/ivCategoryHeroImage"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:contentDescription="@null"
+            android:scaleType="centerCrop"
+            tools:src="@drawable/categorie2" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/bg_explore_hero_overlay" />
+
+        <!-- Frosted circular back button -->
+        <ImageButton
+            android:id="@+id/btnCategoryBack"
+            android:layout_width="@dimen/category_hero_back_size"
+            android:layout_height="@dimen/category_hero_back_size"
+            android:layout_gravity="top|start"
+            android:layout_marginStart="@dimen/home_horizontal_padding"
+            android:layout_marginTop="14dp"
+            android:background="@drawable/bg_explore_hero_circle"
+            android:contentDescription="@string/cd_back"
+            android:padding="9dp"
+            android:src="@drawable/back"
+            app:tint="@color/home_ref_hero_start" />
+
+        <!-- Hero text block — title + count + breadcrumb -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:orientation="vertical"
+            android:paddingStart="@dimen/home_horizontal_padding"
+            android:paddingEnd="@dimen/home_horizontal_padding"
+            android:paddingBottom="18dp">
+
+            <TextView
+                android:id="@+id/tvCategoryBreadcrumb"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:fontFamily="@font/manrope_medium"
+                android:includeFontPadding="false"
+                android:letterSpacing="0.08"
+                android:maxLines="1"
+                android:textAllCaps="true"
+                android:textColor="#EDD09A"
+                android:textSize="11sp"
+                tools:text="Marketplace / Artisanat" />
+
+            <TextView
+                android:id="@+id/tvCategoryProductsTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:fontFamily="@font/manrope_semibold"
+                android:includeFontPadding="false"
+                android:maxLines="2"
+                android:shadowColor="#80000000"
+                android:shadowDx="0"
+                android:shadowDy="2"
+                android:shadowRadius="6"
+                android:textColor="#FFFFFF"
+                android:textSize="28sp"
+                tools:text="Artisanat &amp; décoration" />
+
+            <TextView
+                android:id="@+id/tvCategoryProductsCount"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:fontFamily="@font/manrope_regular"
+                android:includeFontPadding="false"
+                android:textColor="#E6FFFFFF"
+                android:textSize="13sp"
+                tools:text="12 produits disponibles" />
+        </LinearLayout>
+    </FrameLayout>
+
+    <!-- ═══════════════════════════════════════════════════ -->
+    <!-- Sort & filter chips                                -->
+    <!-- ═══════════════════════════════════════════════════ -->
+    <HorizontalScrollView
+        android:id="@+id/scrollCategoryFilters"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:clipToPadding="false"
+        android:fadingEdge="horizontal"
+        android:fadingEdgeLength="16dp"
+        android:overScrollMode="never"
+        android:paddingStart="@dimen/home_horizontal_padding"
+        android:paddingTop="14dp"
+        android:paddingEnd="@dimen/home_horizontal_padding"
+        android:paddingBottom="6dp"
+        android:requiresFadingEdge="horizontal"
+        android:scrollbars="none"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/layoutCategoryHero">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/chipGroupCategorySort"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:chipSpacingHorizontal="6dp"
+                app:selectionRequired="true"
+                app:singleLine="true"
+                app:singleSelection="true" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipCategoryInStock"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:checkable="true"
+                android:fontFamily="@font/manrope_medium"
+                android:text="@string/category_filter_in_stock"
+                android:textColor="@color/category_chip_text"
+                android:textSize="12sp"
+                app:checkedIconVisible="false"
+                app:chipBackgroundColor="@color/category_chip_background"
+                app:chipMinHeight="@dimen/category_filter_chip_height"
+                app:chipStrokeColor="@color/category_chip_stroke"
+                app:chipStrokeWidth="@dimen/category_filter_chip_stroke" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipCategoryBio"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:checkable="true"
+                android:fontFamily="@font/manrope_medium"
+                android:text="@string/category_filter_bio"
+                android:textColor="@color/category_chip_text"
+                android:textSize="12sp"
+                app:checkedIconVisible="false"
+                app:chipBackgroundColor="@color/category_chip_background"
+                app:chipMinHeight="@dimen/category_filter_chip_height"
+                app:chipStrokeColor="@color/category_chip_stroke"
+                app:chipStrokeWidth="@dimen/category_filter_chip_stroke" />
+        </LinearLayout>
+    </HorizontalScrollView>
+
+    <!-- ═══════════════════════════════════════════════════ -->
+    <!-- Product Grid                                       -->
+    <!-- ═══════════════════════════════════════════════════ -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvCategoryProducts"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:paddingStart="@dimen/home_horizontal_padding"
+        android:paddingTop="10dp"
+        android:paddingEnd="@dimen/home_horizontal_padding"
+        android:paddingBottom="@dimen/home_bottom_safe_content_padding"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/scrollCategoryFilters"
+        tools:itemCount="6"
+        tools:listitem="@layout/item_home_catalog_product" />
+
+    <!-- ═══════════════════════════════════════════════════ -->
+    <!-- Empty State                                        -->
+    <!-- ═══════════════════════════════════════════════════ -->
+    <LinearLayout
+        android:id="@+id/layoutCategoryEmptyState"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/home_horizontal_padding"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="@dimen/home_horizontal_padding"
+        android:background="@drawable/bg_home_empty_state_panel"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:paddingStart="20dp"
+        android:paddingTop="32dp"
+        android:paddingEnd="20dp"
+        android:paddingBottom="32dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/scrollCategoryFilters"
+        tools:visibility="visible">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/manrope_semibold"
+            android:gravity="center"
+            android:text="@string/category_empty_title"
+            android:textColor="@color/home_ref_text_primary"
+            android:textSize="15sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:fontFamily="@font/manrope_regular"
+            android:gravity="center"
+            android:lineSpacingExtra="2dp"
+            android:text="@string/category_empty_subtitle"
+            android:textColor="@color/home_ref_text_secondary"
+            android:textSize="13sp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCategoryClearFilters"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_marginTop="16dp"
+            android:fontFamily="@font/manrope_medium"
+            android:text="@string/category_clear_filters"
+            android:textAllCaps="false"
+            android:textColor="@color/home_chip_text"
+            android:textSize="13sp"
+            app:backgroundTint="@color/home_chip_bg"
+            app:cornerRadius="@dimen/home_search_radius" />
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

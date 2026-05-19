@@ -48,10 +48,10 @@
         <LinearLayout
             android:id="@+id/adminNavDashboard"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:gravity="center_horizontal"
-            android:paddingTop="@dimen/space_4"
-            android:paddingBottom="@dimen/space_4"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingTop="@dimen/space_8"
+            android:paddingBottom="@dimen/space_8"
             android:orientation="vertical"
             android:clickable="true"
             android:focusable="true"
@@ -59,14 +59,13 @@
             app:layout_constraintEnd_toStartOf="@id/adminNavCommandes"
             app:layout_constraintHorizontal_chainStyle="spread"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
 
             <ImageView
                 android:id="@+id/adminNavDashboardIcon"
                 android:layout_width="@dimen/main_bottom_nav_icon_size"
                 android:layout_height="@dimen/main_bottom_nav_icon_size"
-                android:minWidth="48dp"
-                android:minHeight="48dp"
                 android:contentDescription="@string/cd_admin_dashboard"
                 app:srcCompat="@drawable/ic_admin_shield"
                 app:tint="@color/home_nav_inactive" />
@@ -79,7 +78,7 @@
                 android:textSize="@dimen/text_size_overline"
                 android:textColor="@color/home_nav_inactive"
                 android:layout_marginTop="@dimen/admin_bottom_nav_label_margin_top"
-                android:fontFamily="@font/plus_jakarta_sans_regular"
+                android:fontFamily="@font/manrope_regular"
                 android:maxLines="1"
                 android:ellipsize="end" />
         </LinearLayout>
@@ -88,17 +87,18 @@
         <LinearLayout
             android:id="@+id/adminNavCommandes"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:gravity="center_horizontal"
-            android:paddingTop="@dimen/space_4"
-            android:paddingBottom="@dimen/space_4"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingTop="@dimen/space_8"
+            android:paddingBottom="@dimen/space_8"
             android:orientation="vertical"
             android:clickable="true"
             android:focusable="true"
             android:background="?selectableItemBackgroundBorderless"
             app:layout_constraintEnd_toStartOf="@id/adminNavProduits"
             app:layout_constraintStart_toEndOf="@id/adminNavDashboard"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
 
             <ImageView
                 android:id="@+id/adminNavCommandesIcon"
@@ -116,7 +116,7 @@
                 android:textSize="@dimen/text_size_overline"
                 android:textColor="@color/home_nav_inactive"
                 android:layout_marginTop="@dimen/admin_bottom_nav_label_margin_top"
-                android:fontFamily="@font/plus_jakarta_sans_regular"
+                android:fontFamily="@font/manrope_regular"
                 android:maxLines="1"
                 android:ellipsize="end" />
         </LinearLayout>
@@ -125,24 +125,23 @@
         <LinearLayout
             android:id="@+id/adminNavProduits"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:gravity="center_horizontal"
-            android:paddingTop="@dimen/space_4"
-            android:paddingBottom="@dimen/space_4"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingTop="@dimen/space_8"
+            android:paddingBottom="@dimen/space_8"
             android:orientation="vertical"
             android:clickable="true"
             android:focusable="true"
             android:background="?selectableItemBackgroundBorderless"
             app:layout_constraintEnd_toStartOf="@id/adminNavClients"
             app:layout_constraintStart_toEndOf="@id/adminNavCommandes"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
 
             <ImageView
                 android:id="@+id/adminNavProduitsIcon"
                 android:layout_width="@dimen/main_bottom_nav_icon_size"
                 android:layout_height="@dimen/main_bottom_nav_icon_size"
-                android:minWidth="48dp"
-                android:minHeight="48dp"
                 android:contentDescription="@string/cd_admin_products"
                 app:srcCompat="@drawable/ic_admin_nav_produits"
                 app:tint="@color/home_nav_inactive" />
@@ -155,7 +154,7 @@
                 android:textSize="@dimen/text_size_overline"
                 android:textColor="@color/home_nav_inactive"
                 android:layout_marginTop="@dimen/admin_bottom_nav_label_margin_top"
-                android:fontFamily="@font/plus_jakarta_sans_regular"
+                android:fontFamily="@font/manrope_regular"
                 android:maxLines="1"
                 android:ellipsize="end" />
         </LinearLayout>
@@ -164,24 +163,23 @@
         <LinearLayout
             android:id="@+id/adminNavClients"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:gravity="center_horizontal"
-            android:paddingTop="@dimen/space_4"
-            android:paddingBottom="@dimen/space_4"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingTop="@dimen/space_8"
+            android:paddingBottom="@dimen/space_8"
             android:orientation="vertical"
             android:clickable="true"
             android:focusable="true"
             android:background="?selectableItemBackgroundBorderless"
             app:layout_constraintEnd_toStartOf="@id/adminNavNotifications"
             app:layout_constraintStart_toEndOf="@id/adminNavProduits"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
 
             <ImageView
                 android:id="@+id/adminNavClientsIcon"
                 android:layout_width="@dimen/main_bottom_nav_icon_size"
                 android:layout_height="@dimen/main_bottom_nav_icon_size"
-                android:minWidth="48dp"
-                android:minHeight="48dp"
                 android:contentDescription="@string/cd_admin_clients"
                 app:srcCompat="@drawable/ic_admin_nav_clients"
                 app:tint="@color/home_nav_inactive" />
@@ -194,7 +192,7 @@
                 android:textSize="@dimen/text_size_overline"
                 android:textColor="@color/home_nav_inactive"
                 android:layout_marginTop="@dimen/admin_bottom_nav_label_margin_top"
-                android:fontFamily="@font/plus_jakarta_sans_regular"
+                android:fontFamily="@font/manrope_regular"
                 android:maxLines="1"
                 android:ellipsize="end" />
         </LinearLayout>
@@ -203,17 +201,18 @@
         <LinearLayout
             android:id="@+id/adminNavNotifications"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:gravity="center_horizontal"
-            android:paddingTop="@dimen/space_4"
-            android:paddingBottom="@dimen/space_4"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingTop="@dimen/space_8"
+            android:paddingBottom="@dimen/space_8"
             android:orientation="vertical"
             android:clickable="true"
             android:focusable="true"
             android:background="?selectableItemBackgroundBorderless"
             app:layout_constraintEnd_toStartOf="@id/adminNavSettings"
             app:layout_constraintStart_toEndOf="@id/adminNavClients"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
 
             <ImageView
                 android:id="@+id/adminNavNotificationsIcon"
@@ -231,12 +230,12 @@
                 android:textSize="@dimen/text_size_overline"
                 android:textColor="@color/home_nav_inactive"
                 android:layout_marginTop="@dimen/admin_bottom_nav_label_margin_top"
-                android:fontFamily="@font/plus_jakarta_sans_regular"
+                android:fontFamily="@font/manrope_regular"
                 android:maxLines="1"
                 android:ellipsize="end" />
         </LinearLayout>
 
-        <!-- Paramètres (hidden from bottom nav, now moved to top bar) -->
+        <!-- ParamÃ¨tres (hidden from bottom nav, now moved to top bar) -->
         <LinearLayout
             android:id="@+id/adminNavSettings"
             android:layout_width="0dp"
@@ -250,14 +249,13 @@
             android:background="?selectableItemBackgroundBorderless"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/adminNavNotifications"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
 
             <ImageView
                 android:id="@+id/adminNavSettingsIcon"
                 android:layout_width="22dp"
                 android:layout_height="22dp"
-                android:minWidth="48dp"
-                android:minHeight="48dp"
                 android:contentDescription="@string/cd_admin_settings"
                 app:srcCompat="@drawable/ic_admin_nav_settings"
                 app:tint="@color/home_nav_inactive" />
@@ -270,10 +268,11 @@
                 android:textSize="@dimen/text_size_overline"
                 android:textColor="@color/home_nav_inactive"
                 android:layout_marginTop="5dp"
-                android:fontFamily="@font/plus_jakarta_sans_regular"
+                android:fontFamily="@font/manrope_regular"
                 android:maxLines="1"
                 android:ellipsize="end" />
         </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </LinearLayout>
+

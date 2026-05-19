@@ -1,7 +1,7 @@
 package isim.ia2y.myapplication
 
 import android.util.Log
-import com.google.firebase.auth.FacebookAuthProvider
+import android.net.Uri
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
@@ -13,7 +13,11 @@ import com.google.firebase.auth.userProfileChangeRequest
 import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.FirebaseTooManyRequestsException
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.TimeoutCancellationException
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
 import kotlinx.coroutines.tasks.await
 
@@ -23,34 +27,23 @@ import kotlinx.coroutines.tasks.await
  */
 object FirebaseAuthManager {
     private const val TAG = "FirebaseAuthManager"
-    private const val AUTH_REQUEST_TIMEOUT_MS = 15_000L
+    private const val AUTH_REQUEST_TIMEOUT_MS = 35_000L
     private const val CLAIMS_TIMEOUT_MS = 5_000L
     private const val PROFILE_SYNC_TIMEOUT_MS = 8_000L
 
     private val auth: FirebaseAuth get() = FirebaseAuth.getInstance()
+    private val backgroundScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     /** The currently signed-in user, or null if no one is logged in. */
     val currentUser: FirebaseUser? get() = auth.currentUser
 
-    /** True if a real (non-guest) user is logged in. */
-    val isLoggedIn: Boolean get() = auth.currentUser != null
+    /** The current non-anonymous user. Anonymous checkout accounts are treated as guests in UI/local stores. */
+    val currentRealUser: FirebaseUser? get() = auth.currentUser?.takeUnless { it.isAnonymous }
 
-    /**
-     * Sign in with Facebook token.
-     */
-    suspend fun signInWithFacebook(token: String): Result<FirebaseUser> {
-        return runAuthAction {
-            val credential = FacebookAuthProvider.getCredential(token)
-            val result = awaitAuthRequest { auth.signInWithCredential(credential).await() }
-            val user = requireNotNull(result.user) { "Authenticated Facebook user missing" }
-            syncUserProfileSafely(
-                user = user,
-                fallbackName = user.displayName ?: "User",
-                fallbackEmail = user.email ?: ""
-            )
-            user
-        }
-    }
+    val currentRealUid: String? get() = currentRealUser?.uid
+
+    /** True if a real (non-guest) user is logged in. */
+    val isLoggedIn: Boolean get() = currentRealUser != null
 
     /**
      * Sign in with Google ID token.
@@ -60,11 +53,13 @@ object FirebaseAuthManager {
             val credential = GoogleAuthProvider.getCredential(idToken, null)
             val result = awaitAuthRequest { auth.signInWithCredential(credential).await() }
             val user = requireNotNull(result.user) { "Authenticated Google user missing" }
-            syncUserProfileSafely(
+            setCrashlyticsUser(user)
+            syncUserProfileInBackground(
                 user = user,
                 fallbackName = user.displayName ?: "User",
                 fallbackEmail = user.email ?: ""
             )
+            warmUserRoleInBackground(user)
             user
         }
     }
@@ -76,11 +71,28 @@ object FirebaseAuthManager {
         return runAuthAction {
             val result = awaitAuthRequest { auth.signInWithEmailAndPassword(email, password).await() }
             val user = requireNotNull(result.user) { "Authenticated email user missing" }
-            syncUserProfileSafely(
+            setCrashlyticsUser(user)
+            syncUserProfileInBackground(
                 user = user,
                 fallbackName = user.displayName ?: user.email?.substringBefore("@").orEmpty(),
                 fallbackEmail = user.email.orEmpty()
             )
+            warmUserRoleInBackground(user)
+            user
+        }
+    }
+
+    suspend fun signInAnonymously(): Result<FirebaseUser> {
+        return runAuthAction {
+            val result = awaitAuthRequest { auth.signInAnonymously().await() }
+            val user = requireNotNull(result.user) { "Anonymous user missing" }
+            setCrashlyticsUser(user)
+            syncUserProfileInBackground(
+                user = user,
+                fallbackName = "Guest",
+                fallbackEmail = ""
+            )
+            warmUserRoleInBackground(user)
             user
         }
     }
@@ -92,17 +104,19 @@ object FirebaseAuthManager {
         return runAuthAction {
             val result = awaitAuthRequest { auth.createUserWithEmailAndPassword(email, password).await() }
             val user = requireNotNull(result.user) { "Registered user missing" }
+            setCrashlyticsUser(user)
 
             val profileUpdates = userProfileChangeRequest {
                 this.displayName = displayName
             }
             awaitAuthRequest { user.updateProfile(profileUpdates).await() }
 
-            syncUserProfileSafely(
+            syncUserProfileInBackground(
                 user = user,
                 fallbackName = displayName,
                 fallbackEmail = email
             )
+            warmUserRoleInBackground(user)
             user
         }
     }
@@ -125,11 +139,36 @@ object FirebaseAuthManager {
         }
     }
 
+    suspend fun updatePhotoUrl(photoUrl: String): Result<FirebaseUser> {
+        val user = auth.currentUser ?: return Result.failure(IllegalStateException("No user logged in"))
+        return runAuthAction {
+            val profileUpdates = userProfileChangeRequest {
+                photoUri = Uri.parse(photoUrl)
+            }
+            awaitAuthRequest { user.updateProfile(profileUpdates).await() }
+            user
+        }
+    }
+
     /**
      * Sign out the current user.
      */
     fun signOut() {
+        val uid = auth.currentUser?.uid
+        UserService.clearCache()
+        AdminService.clearAllCaches()
+        AdminSession.clear()
+        AppStartupCoordinator.resetDeferred()
+        CatalogSyncManager.stop()
+        if (!uid.isNullOrBlank()) {
+            FcmTokenService.clearTokenForSignOut(MyApplication.instance, uid)
+        }
         auth.signOut()
+        clearCrashlyticsUser()
+    }
+
+    fun syncCrashlyticsUser() {
+        setCrashlyticsUser(auth.currentUser)
     }
 
     private suspend fun resolveRoleFromClaims(user: FirebaseUser): String? {
@@ -179,10 +218,12 @@ object FirebaseAuthManager {
         return try {
             Result.success(block())
         } catch (e: TimeoutCancellationException) {
+            Log.w(TAG, "Firebase auth request timed out after ${AUTH_REQUEST_TIMEOUT_MS}ms", e)
             Result.failure(e)
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
+            Log.w(TAG, "Firebase auth request failed: ${e.message}", e)
             Result.failure(e)
         }
     }
@@ -219,11 +260,47 @@ object FirebaseAuthManager {
         }
     }
 
+    private fun syncUserProfileInBackground(
+        user: FirebaseUser,
+        fallbackName: String,
+        fallbackEmail: String
+    ) {
+        backgroundScope.launch {
+            syncUserProfileSafely(user, fallbackName, fallbackEmail)
+        }
+    }
+
+    private fun warmUserRoleInBackground(user: FirebaseUser) {
+        backgroundScope.launch {
+            runCatching { UserService.fetchUserRole(user.uid, forceRefresh = true) }
+        }
+    }
+
+    private fun setCrashlyticsUser(user: FirebaseUser?) {
+        if (user == null) {
+            clearCrashlyticsUser()
+            return
+        }
+        CrashlyticsHelper.setUserId(user.uid)
+        CrashlyticsHelper.setCustomKey("auth_is_anonymous", user.isAnonymous)
+        CrashlyticsHelper.setCustomKey(
+            "auth_email_domain",
+            user.email?.substringAfter("@", missingDelimiterValue = "")?.takeIf { it.isNotBlank() } ?: "none"
+        )
+    }
+
+    private fun clearCrashlyticsUser() {
+        CrashlyticsHelper.setUserId(null)
+        CrashlyticsHelper.setCustomKey("auth_is_anonymous", false)
+        CrashlyticsHelper.setCustomKey("auth_email_domain", "none")
+    }
+
     private suspend fun resolveRoleFromClaimsSafely(user: FirebaseUser): String? {
         return try {
             withTimeout(CLAIMS_TIMEOUT_MS) {
                 resolveRoleFromClaims(user)
             }
+                ?.takeIf { role -> role == UserRoles.ADMIN || role == UserRoles.VENDEUR }
         } catch (_: TimeoutCancellationException) {
             null
         } catch (error: CancellationException) {

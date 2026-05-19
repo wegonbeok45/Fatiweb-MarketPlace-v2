@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="10dp"
+    app:cardBackgroundColor="@color/profile_header_bg"
+    app:cardCornerRadius="20dp"
+    app:cardElevation="0dp"
+    app:strokeColor="@color/profile_section_stroke"
+    app:strokeWidth="1dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="12dp">
+
+        <ImageView
+            android:id="@+id/adminClientOrderImage"
+            android:layout_width="74dp"
+            android:layout_height="74dp"
+            android:background="@color/colorSurfaceVariant"
+            android:scaleType="centerCrop"
+            android:src="@drawable/placeholder" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/adminClientOrderTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:fontFamily="@font/poppins_semibold"
+                android:maxLines="1"
+                android:textColor="@color/profile_text_primary"
+                android:textSize="14sp"
+                tools:text="#FW-123ABC - Pending" />
+
+            <TextView
+                android:id="@+id/adminClientOrderMeta"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:textColor="@color/profile_text_secondary"
+                android:textSize="12sp"
+                tools:text="13 mai 2026 - 2 articles" />
+
+            <TextView
+                android:id="@+id/adminClientOrderProducts"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="7dp"
+                android:lineSpacingExtra="2dp"
+                android:textColor="@color/profile_text_secondary"
+                android:textSize="12sp"
+                tools:text="1x Hoodie - 27 DT\n2x Sac - 80 DT" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/adminClientOrderTotal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:fontFamily="@font/poppins_semibold"
+            android:textColor="@color/profile_text_primary"
+            android:textSize="15sp"
+            tools:text="52 DT" />
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

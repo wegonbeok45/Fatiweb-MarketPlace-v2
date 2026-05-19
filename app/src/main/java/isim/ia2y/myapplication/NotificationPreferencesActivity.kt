@@ -7,7 +7,9 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.materialswitch.MaterialSwitch
+import kotlinx.coroutines.launch
 
 class NotificationPreferencesActivity : AppCompatActivity() {
 
@@ -16,11 +18,13 @@ class NotificationPreferencesActivity : AppCompatActivity() {
     private lateinit var switchPromotions: MaterialSwitch
     private lateinit var switchAnnouncements: MaterialSwitch
     private lateinit var summaryText: TextView
+    private var isRendering = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_notification_preferences)
+        AppNotificationChannels.ensureCreated(this)
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -31,6 +35,9 @@ class NotificationPreferencesActivity : AppCompatActivity() {
         bindViews()
         bindActions()
         render(NotificationPreferencesStore.load(this))
+        lifecycleScope.launch {
+            render(NotificationPreferencesStore.refreshFromCloud(this@NotificationPreferencesActivity))
+        }
     }
 
     private fun bindViews() {
@@ -47,7 +54,8 @@ class NotificationPreferencesActivity : AppCompatActivity() {
     }
 
     private fun bindActions() {
-        val listener = { _: View ->
+        val listener = listener@ { _: View ->
+            if (isRendering) return@listener
             val preferences = NotificationPreferences(
                 pushEnabled = switchPush.isChecked,
                 orderUpdates = switchOrders.isChecked,
@@ -55,6 +63,9 @@ class NotificationPreferencesActivity : AppCompatActivity() {
                 announcements = switchAnnouncements.isChecked
             )
             NotificationPreferencesStore.save(this, preferences)
+            if (preferences.pushEnabled) {
+                maybeRequestNotificationPermissionForPush(force = true)
+            }
             render(preferences)
         }
         listOf(switchPush, switchOrders, switchPromotions, switchAnnouncements).forEach {
@@ -63,10 +74,12 @@ class NotificationPreferencesActivity : AppCompatActivity() {
     }
 
     private fun render(preferences: NotificationPreferences) {
+        isRendering = true
         switchPush.isChecked = preferences.pushEnabled
         switchOrders.isChecked = preferences.orderUpdates
         switchPromotions.isChecked = preferences.promotions
         switchAnnouncements.isChecked = preferences.announcements
+        isRendering = false
 
         val activeCount = listOf(
             preferences.orderUpdates,
@@ -74,7 +87,7 @@ class NotificationPreferencesActivity : AppCompatActivity() {
             preferences.announcements
         ).count { it }
 
-        summaryText.text = if (!preferences.pushEnabled) {
+        summaryText.text = if (!preferences.pushEnabled || !hasNotificationPostPermission()) {
             getString(R.string.notification_preferences_summary_muted)
         } else {
             getString(R.string.notification_preferences_summary_active, activeCount)
@@ -85,5 +98,18 @@ class NotificationPreferencesActivity : AppCompatActivity() {
             it.isEnabled = childEnabled
             it.alpha = if (childEnabled) 1f else 0.5f
         }
+    }
+
+    @Suppress("DEPRECATION")
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        if (handleNotificationPermissionResult(requestCode, grantResults)) {
+            render(NotificationPreferencesStore.load(this))
+            return
+        }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 }

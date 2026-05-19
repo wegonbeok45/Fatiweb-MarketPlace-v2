@@ -40,7 +40,7 @@
             android:textSize="@dimen/text_size_caption"
             android:textColor="?attr/colorOnSurface"
             android:textStyle="bold"
-            android:fontFamily="@font/plus_jakarta_sans" />
+            android:fontFamily="@font/manrope" />
         <TextView
             android:id="@+id/tvConfirmItemDetails"
             android:layout_width="match_parent"
@@ -51,7 +51,7 @@
             android:text="@string/auto_taille_m_couleur_standard_d6cb"
             android:textSize="@dimen/text_size_overline"
             android:textColor="@color/profile_text_muted"
-            android:fontFamily="@font/plus_jakarta_sans" />
+            android:fontFamily="@font/manrope" />
     </LinearLayout>
 
     <TextView
@@ -66,5 +66,6 @@
         android:textSize="@dimen/text_size_overline"
         android:textColor="?attr/colorOnSurface"
         android:textStyle="bold"
-        android:fontFamily="@font/plus_jakarta_sans" />
+        android:fontFamily="@font/manrope" />
 </LinearLayout>
+

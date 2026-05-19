@@ -9,6 +9,8 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 
 const val NOTIFICATION_PERMISSION_REQUEST_CODE = 951
 
@@ -29,6 +31,32 @@ private fun Context.markNotificationPermissionGranted(granted: Boolean) {
     permissionsPrefs().edit().putBoolean(KEY_NOTIFICATION_PERMISSION_GRANTED, granted).apply()
 }
 
+fun Context.hasNotificationPostPermission(): Boolean {
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return true
+    return ContextCompat.checkSelfPermission(
+        this,
+        Manifest.permission.POST_NOTIFICATIONS
+    ) == PackageManager.PERMISSION_GRANTED
+}
+
+fun AppCompatActivity.maybeRequestNotificationPermissionForPush(force: Boolean = false): Boolean {
+    if (hasNotificationPostPermission()) {
+        markNotificationPermissionGranted(true)
+        syncFcmTokenIfAllowed()
+        return true
+    }
+
+    if (force || !wasNotificationPermissionRequested()) {
+        markNotificationPermissionRequested()
+        ActivityCompat.requestPermissions(
+            this,
+            arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+            NOTIFICATION_PERMISSION_REQUEST_CODE
+        )
+    }
+    return false
+}
+
 fun AppCompatActivity.bindNotificationEntry(vararg ids: Int) {
     ids.forEach { viewId ->
         findViewById<View?>(viewId)?.setOnClickListener {
@@ -37,34 +65,19 @@ fun AppCompatActivity.bindNotificationEntry(vararg ids: Int) {
     }
 }
 
+fun AppCompatActivity.openNotificationsScreenWithPermissionCheck() {
+    handleNotificationEntryClick()
+}
+
 private fun AppCompatActivity.handleNotificationEntryClick() {
-    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+    if (hasNotificationPostPermission()) {
         markNotificationPermissionGranted(true)
         openNotificationsScreen()
         return
     }
 
-    val hasPermission = ContextCompat.checkSelfPermission(
-        this,
-        Manifest.permission.POST_NOTIFICATIONS
-    ) == PackageManager.PERMISSION_GRANTED
-    if (hasPermission) {
-        markNotificationPermissionGranted(true)
-        openNotificationsScreen()
-        return
-    }
-
-    if (!wasNotificationPermissionRequested()) {
-        markNotificationPermissionRequested()
-        ActivityCompat.requestPermissions(
-            this,
-            arrayOf(Manifest.permission.POST_NOTIFICATIONS),
-            NOTIFICATION_PERMISSION_REQUEST_CODE
-        )
-        return
-    }
-
-    showToast(getString(R.string.notifications_permission_denied_hint))
+    maybeRequestNotificationPermissionForPush(force = true)
+    openNotificationsScreen()
 }
 
 fun AppCompatActivity.handleNotificationPermissionResult(
@@ -76,11 +89,21 @@ fun AppCompatActivity.handleNotificationPermissionResult(
     val granted = grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED
     markNotificationPermissionGranted(granted)
     if (granted) {
-        openNotificationsScreen()
-    } else {
+        syncFcmTokenIfAllowed()
+    }
+    if (!granted) {
         showToast(getString(R.string.notifications_permission_denied_hint))
     }
     return true
+}
+
+private fun AppCompatActivity.syncFcmTokenIfAllowed() {
+    if (!FirebaseAuthManager.isLoggedIn) return
+    if (!NotificationPreferencesStore.load(this).pushEnabled) return
+    val appContext = applicationContext
+    lifecycleScope.launch {
+        runCatching { FcmTokenService.syncCurrentUserToken(appContext) }
+    }
 }
 
 fun AppCompatActivity.openNotificationsScreen() {

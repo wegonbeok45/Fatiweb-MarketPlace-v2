@@ -5,6 +5,8 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
 enum class DashboardInlineTab(val navTab: AdminNavTab, val titleRes: Int) {
@@ -40,6 +42,7 @@ class AdminViewModel(application: Application) : AndroidViewModel(application) {
     val error: LiveData<String?> = _error
 
     private var lastDashboardLoadAt: Long = 0L
+    private var dashboardLoadJob: Job? = null
 
     private fun appStr(resId: Int): String = getApplication<Application>().getString(resId)
 
@@ -54,7 +57,6 @@ class AdminViewModel(application: Application) : AndroidViewModel(application) {
         }
 
         viewModelScope.launch {
-            _isLoading.value = true
             val role = runCatching { UserService.isCurrentUserAdmin() }.getOrNull()
             if (role == true) {
                 AdminSession.markVerified(uid)
@@ -62,13 +64,13 @@ class AdminViewModel(application: Application) : AndroidViewModel(application) {
             } else {
                 _error.value = appStr(R.string.admin_access_denied)
             }
-            _isLoading.value = false
         }
     }
 
     fun loadDashboardData(force: Boolean = false) {
         val now = System.currentTimeMillis()
-        if (!force && _isLoading.value == true) return
+        if (!force && dashboardLoadJob?.isActive == true) return
+        if (force) dashboardLoadJob?.cancel()
         if (
             !force &&
             lastDashboardLoadAt > 0L &&
@@ -80,36 +82,44 @@ class AdminViewModel(application: Application) : AndroidViewModel(application) {
             return
         }
 
-        viewModelScope.launch {
+        dashboardLoadJob = viewModelScope.launch {
             _isLoading.value = true
-            var hadFailure = false
+            val statsDeferred = async { runCatching { AdminService.fetchAdminStats() } }
+            val ordersDeferred = async { runCatching { AdminService.fetchRecentOrders() } }
+            val clientsDeferred = async { runCatching { AdminService.fetchRecentClients() } }
 
-            runCatching { AdminService.fetchAdminStats() }
+            var failed = false
+            statsDeferred.await()
                 .onSuccess { _stats.postValue(it) }
                 .onFailure {
-                    hadFailure = true
-                    _stats.postValue(FirestoreService.AdminStats())
+                    failed = true
+                    if (_stats.value == null) {
+                        _stats.postValue(FirestoreService.AdminStats())
+                    }
                 }
 
-            runCatching { AdminService.fetchAllOrders() }
+            ordersDeferred.await()
                 .onSuccess { _orders.postValue(it) }
                 .onFailure {
-                    hadFailure = true
-                    _orders.postValue(emptyList())
+                    failed = true
+                    if (_orders.value == null) {
+                        _orders.postValue(emptyList())
+                    }
                 }
 
-            runCatching { AdminService.fetchAllClients() }
+            clientsDeferred.await()
                 .onSuccess { _clients.postValue(it) }
                 .onFailure {
-                    hadFailure = true
-                    _clients.postValue(emptyList())
+                    failed = true
+                    if (_clients.value == null) {
+                        _clients.postValue(emptyList())
+                    }
                 }
 
-            if (hadFailure) {
+            if (failed) {
                 _error.postValue(appStr(R.string.admin_dashboard_data_error))
-            } else {
-                lastDashboardLoadAt = System.currentTimeMillis()
             }
+            lastDashboardLoadAt = System.currentTimeMillis()
             _isLoading.value = false
         }
     }

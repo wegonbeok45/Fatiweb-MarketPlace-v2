@@ -1,85 +1,162 @@
 package isim.ia2y.myapplication
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.content.Context
 import android.net.Uri
-import android.util.Base64
+import android.provider.OpenableColumns
 import android.util.Log
-import android.webkit.MimeTypeMap
-import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.StorageException
+import com.google.firebase.perf.FirebasePerformance
+import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.StorageMetadata
-import com.google.firebase.storage.StorageReference
-import kotlinx.coroutines.delay
+import com.google.firebase.storage.ktx.storage
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withPermit
 import java.io.ByteArrayOutputStream
 
 object ProductImageStorage {
     private const val TAG = "ProductImageStorage"
     private const val MAX_UPLOAD_BYTES = 10 * 1024 * 1024
-    private const val INLINE_TARGET_MAX_BYTES = 220 * 1024
+    private const val MAX_SOURCE_IMAGE_BYTES = 30 * 1024 * 1024
     private const val MAX_IMAGE_DIMENSION = 1600
+    private const val PRODUCT_IMAGES_ROOT = "product_images"
+    private const val USER_AVATARS_ROOT = "user_avatars"
 
     private data class PreparedImage(
         val bytes: ByteArray,
-        val contentType: String,
-        val extension: String
+        val contentType: String
     )
 
-    private val storage get() = FirebaseStorage.getInstance().reference
-
-    suspend fun uploadProductImage(context: Context, productId: String, uri: Uri): String {
-        val preparedImage = prepareImageForUpload(context, uri)
-        val remoteRef = storage
-            .child("product_images")
-            .child(productId)
-            .child("${System.currentTimeMillis()}.${preparedImage.extension}")
-
-        val metadata = StorageMetadata.Builder()
-            .setContentType(preparedImage.contentType)
-            .build()
-
-        return try {
-            remoteRef.putBytes(preparedImage.bytes, metadata).await()
-            awaitDownloadUrl(remoteRef)
-        } catch (error: Exception) {
-            Log.w(TAG, "Remote upload failed for $productId, using inline image fallback: ${error.message}")
-            buildInlineImageDataUrl(preparedImage)
-        }
+    suspend fun uploadProductImage(
+        context: Context,
+        productId: String,
+        uri: Uri,
+        ownerId: String = FirebaseAuthManager.currentRealUid.orEmpty()
+    ): String = withContext(Dispatchers.IO) {
+        val safeProductId = productId.safeStorageSegment("product")
+        val safeOwnerId = ownerId.safeStorageSegment("owner")
+        uploadFirebaseImage(
+            context = context,
+            uri = uri,
+            storagePath = "$PRODUCT_IMAGES_ROOT/$safeOwnerId/$safeProductId/${safeProductId}_${System.currentTimeMillis()}.jpg",
+            traceName = "product_image_upload"
+        )
     }
 
-    private suspend fun awaitDownloadUrl(remoteRef: StorageReference): String {
-        repeat(5) { attempt ->
-            try {
-                return remoteRef.downloadUrl.await().toString()
-            } catch (error: Exception) {
-                val storageError = error as? StorageException
-                if (storageError?.errorCode != StorageException.ERROR_OBJECT_NOT_FOUND || attempt == 4) {
-                    throw error
+    suspend fun uploadProductImages(
+        context: Context,
+        productId: String,
+        uris: List<Uri>,
+        maxParallelUploads: Int = 2,
+        ownerId: String = FirebaseAuthManager.currentRealUid.orEmpty()
+    ): List<String> = coroutineScope {
+        if (uris.isEmpty()) return@coroutineScope emptyList()
+        val semaphore = Semaphore(maxParallelUploads.coerceIn(1, 3))
+        uris.mapIndexed { index, uri ->
+            async(Dispatchers.IO) {
+                semaphore.withPermit {
+                    uploadProductImage(context, "${productId}_${index + 1}", uri, ownerId)
                 }
-                delay(250L * (attempt + 1))
             }
+        }.awaitAll()
+    }
+
+    suspend fun uploadUserAvatar(
+        context: Context,
+        uid: String,
+        uri: Uri
+    ): String = withContext(Dispatchers.IO) {
+        val safeUid = uid.trim().replace("/", "_").take(128).ifBlank { "user" }
+        uploadFirebaseImage(
+            context = context,
+            uri = uri,
+            storagePath = "$USER_AVATARS_ROOT/$safeUid/avatar_${System.currentTimeMillis()}.jpg",
+            traceName = "user_avatar_storage_upload"
+        )
+    }
+
+    private suspend fun uploadFirebaseImage(
+        context: Context,
+        uri: Uri,
+        storagePath: String,
+        traceName: String
+    ): String {
+        val trace = FirebasePerformance.getInstance().newTrace(traceName)
+        trace.start()
+        val preparedImage = prepareImageForUpload(context, uri)
+        trace.putMetric("compressed_bytes", preparedImage.bytes.size.toLong())
+
+        return try {
+            val metadata = StorageMetadata.Builder()
+                .setContentType(preparedImage.contentType)
+                .setCacheControl("public, max-age=31536000, immutable")
+                .build()
+            val ref = Firebase.storage.reference.child(storagePath)
+            ref.putBytes(preparedImage.bytes, metadata).await()
+            val downloadUrl = ref.downloadUrl.await().toString()
+            trace.putMetric("uploaded_bytes", preparedImage.bytes.size.toLong())
+            Log.d(TAG, "Uploaded image to Firebase Storage: $storagePath")
+            downloadUrl
+        } catch (error: Exception) {
+            Log.w(TAG, "Firebase Storage image upload failed for $storagePath: ${error.message}", error)
+            throw error
+        } finally {
+            trace.stop()
         }
-        throw IllegalStateException("Image upload finished but the download URL was unavailable.")
     }
 
     private fun prepareImageForUpload(context: Context, uri: Uri): PreparedImage {
-        val normalized = normalizeToCompressedJpeg(context, uri)
+        rejectOversizedSource(context, uri)
+        val normalized = try {
+            normalizeToCompressedJpeg(context, uri)
+        } catch (error: OutOfMemoryError) {
+            throw IllegalStateException("Selected image is too large to process.", error)
+        }
         if (normalized != null) return normalized
 
-        val contentType = resolveContentType(context, uri)
-        val extension = resolveExtension(context, uri, contentType)
-        val rawBytes = context.contentResolver.openInputStream(uri)?.use { it.readBytes() }
-            ?: throw IllegalStateException("Unable to read the selected image.")
+        val rawBytes = try {
+            context.contentResolver.openInputStream(uri)?.use { it.readBytes() }
+                ?: throw IllegalStateException("Unable to read the selected image.")
+        } catch (error: OutOfMemoryError) {
+            throw IllegalStateException("Selected image is too large to upload.", error)
+        }
         if (rawBytes.size > MAX_UPLOAD_BYTES) {
             throw IllegalStateException("Selected image is too large to upload.")
         }
         return PreparedImage(
             bytes = rawBytes,
-            contentType = contentType,
-            extension = extension
+            contentType = resolveImageContentType(context, uri)
         )
+    }
+
+    private fun rejectOversizedSource(context: Context, uri: Uri) {
+        val size = resolveSourceSizeBytes(context, uri) ?: return
+        if (size > MAX_SOURCE_IMAGE_BYTES) {
+            throw IllegalStateException("Selected image is too large to process.")
+        }
+    }
+
+    private fun resolveSourceSizeBytes(context: Context, uri: Uri): Long? {
+        val metadataSize = runCatching {
+            context.contentResolver.query(uri, arrayOf(OpenableColumns.SIZE), null, null, null)
+                ?.use { cursor ->
+                    val index = cursor.getColumnIndex(OpenableColumns.SIZE)
+                    if (index >= 0 && cursor.moveToFirst()) cursor.getLong(index) else null
+                }
+        }.getOrNull()
+        if (metadataSize != null && metadataSize > 0L) return metadataSize
+
+        return runCatching {
+            context.contentResolver.openAssetFileDescriptor(uri, "r")?.use { descriptor ->
+                descriptor.length.takeIf { it > 0L }
+            }
+        }.getOrNull()
     }
 
     private fun normalizeToCompressedJpeg(context: Context, uri: Uri): PreparedImage? {
@@ -102,8 +179,7 @@ object ProductImageStorage {
 
         return PreparedImage(
             bytes = compressedBytes,
-            contentType = "image/jpeg",
-            extension = "jpg"
+            contentType = "image/jpeg"
         )
     }
 
@@ -124,7 +200,7 @@ object ProductImageStorage {
         var quality = 86
         bitmap.compress(Bitmap.CompressFormat.JPEG, quality, output)
 
-        while (output.size() > INLINE_TARGET_MAX_BYTES && quality > 42) {
+        while (output.size() > 900 * 1024 && quality > 42) {
             output.reset()
             quality -= 8
             bitmap.compress(Bitmap.CompressFormat.JPEG, quality, output)
@@ -137,22 +213,16 @@ object ProductImageStorage {
         return output.toByteArray()
     }
 
-    private fun buildInlineImageDataUrl(preparedImage: PreparedImage): String {
-        val base64 = Base64.encodeToString(preparedImage.bytes, Base64.NO_WRAP)
-        return "data:${preparedImage.contentType};base64,$base64"
-    }
-
-    private fun resolveExtension(context: Context, uri: Uri, contentType: String): String {
-        val mime = context.contentResolver.getType(uri).orEmpty().ifBlank { contentType }
-        return MimeTypeMap.getSingleton().getExtensionFromMimeType(mime)
-            ?.lowercase()
-            ?.takeIf { it.isNotBlank() }
-            ?: "jpg"
-    }
-
-    private fun resolveContentType(context: Context, uri: Uri): String {
+    private fun resolveImageContentType(context: Context, uri: Uri): String {
         return context.contentResolver.getType(uri)
             ?.takeIf { it.startsWith("image/") }
             ?: "image/jpeg"
+    }
+
+    private fun String.safeStorageSegment(fallback: String): String {
+        return replace("[^a-zA-Z0-9_-]+".toRegex(), "_")
+            .trim('_')
+            .take(96)
+            .ifBlank { fallback }
     }
 }

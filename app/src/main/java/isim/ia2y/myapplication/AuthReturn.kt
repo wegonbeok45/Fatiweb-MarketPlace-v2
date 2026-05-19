@@ -4,9 +4,11 @@ import android.content.Intent
 
 const val EXTRA_AUTH_RETURN_TAB = "auth_return_tab"
 const val EXTRA_AUTH_RETURN_ROUTE = "auth_return_route"
+const val EXTRA_GUEST_CHECKOUT = "guest_checkout"
 
 const val AUTH_RETURN_ROUTE_CHECKOUT = "checkout"
 const val AUTH_RETURN_ROUTE_ORDERS = "orders"
+const val AUTH_RETURN_ROUTE_CART = "cart"
 
 fun Intent.withAuthReturn(
     tab: MainActivity.Tab? = null,

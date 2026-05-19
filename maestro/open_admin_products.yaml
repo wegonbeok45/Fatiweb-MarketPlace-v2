@@ -1,0 +1,10 @@
+appId: isim.ia2y.myapplication
+---
+- launchApp
+- tapOn:
+    id: "isim.ia2y.myapplication:id/hostNavProfile"
+- tapOn:
+    id: "isim.ia2y.myapplication:id/cardAdmin"
+- tapOn:
+    id: "isim.ia2y.myapplication:id/adminNavProduits"
+- takeScreenshot: admin-products-current

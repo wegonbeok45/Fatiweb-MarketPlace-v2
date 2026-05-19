@@ -135,7 +135,7 @@ object GeneratedProductArt {
             color = Color.WHITE
             textSize = 16f * density
             typeface = android.graphics.Typeface.create("sans-serif-medium", android.graphics.Typeface.NORMAL)
-            letterSpacing = 0.08f
+            letterSpacing = 0f
         }
         drawCenteredText(
             canvas = canvas,
@@ -237,17 +237,19 @@ object GeneratedProductArt {
 
     private fun paletteFor(category: String): Palette {
         val accent = when (category.trim().lowercase(Locale.getDefault())) {
-            "food" -> Color.parseColor("#5F5A56")
-            "beauty" -> Color.parseColor("#5A636B")
+            "food-and-grocery" -> Color.parseColor("#5F5A56")
+            "beauty-and-health" -> Color.parseColor("#5A636B")
             "fashion" -> Color.parseColor("#525A66")
-            "decor" -> Color.parseColor("#626A72")
+            "home-and-furniture", "real-estate" -> Color.parseColor("#626A72")
+            "electronics", "digital-products" -> Color.parseColor("#4D5D67")
             else -> Color.parseColor("#67615D")
         }
         val accentMuted = when (category.trim().lowercase(Locale.getDefault())) {
-            "food" -> Color.parseColor("#C8C3BE")
-            "beauty" -> Color.parseColor("#C5CCD2")
+            "food-and-grocery" -> Color.parseColor("#C8C3BE")
+            "beauty-and-health" -> Color.parseColor("#C5CCD2")
             "fashion" -> Color.parseColor("#C3C8D0")
-            "decor" -> Color.parseColor("#CBD1D5")
+            "home-and-furniture", "real-estate" -> Color.parseColor("#CBD1D5")
+            "electronics", "digital-products" -> Color.parseColor("#C1CBD1")
             else -> Color.parseColor("#CEC8C3")
         }
         return Palette(
@@ -263,15 +265,8 @@ object GeneratedProductArt {
         )
     }
 
-    private fun categoryLabel(context: Context, category: String): String = when (
-        category.trim().lowercase(Locale.getDefault())
-    ) {
-        "food" -> context.getString(R.string.product_category_food)
-        "beauty" -> context.getString(R.string.product_category_beauty)
-        "fashion" -> context.getString(R.string.product_category_fashion)
-        "decor" -> context.getString(R.string.product_category_decor)
-        else -> context.getString(R.string.product_category_craft)
-    }
+    private fun categoryLabel(context: Context, category: String): String =
+        MarketplaceCategories.displayNameFor(category)
 
     private fun truncateMiddle(value: String, maxLength: Int): String {
         if (value.length <= maxLength) return value

@@ -1,0 +1,15 @@
+appId: isim.ia2y.myapplication
+---
+- extendedWaitUntil:
+    visible:
+      id: "isim.ia2y.myapplication:id/adminProduitsSearchInput"
+    timeout: 15000
+- eraseText
+- inputText: "Lampe artisanale de Sidi Bou Said"
+- extendedWaitUntil:
+    visible: "Lampe artisanale de Sidi Bou Said"
+    timeout: 15000
+- tapOn:
+    id: "isim.ia2y.myapplication:id/adminProductBtnDelete"
+- tapOn: "Supprimer"
+- takeScreenshot: admin-products-after-targeted-delete

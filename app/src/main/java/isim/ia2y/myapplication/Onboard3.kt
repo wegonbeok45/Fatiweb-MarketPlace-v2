@@ -58,9 +58,7 @@ class Onboard3 : AppCompatActivity() {
             finish()
         }
         findViewById<View>(R.id.btnGetStarted)?.setOnClickListener {
-            setOnboardingCompleted()
-            navigateToMainTab(MainActivity.Tab.HOME)
-            finish()
+            navigateNoShift(RoleSelectionActivity::class.java)
         }
         bindComingSoon(R.id.cardDeliveryIllustration)
         applyPressFeedback(

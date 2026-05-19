@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle">
-    <solid android:color="@color/home_surface_raised" />
-    <corners android:radius="@dimen/home_search_radius" />
+    <solid android:color="@color/home_ref_surface" />
+    <corners android:radius="@dimen/home_ref_search_radius" />
 </shape>

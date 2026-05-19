@@ -98,13 +98,12 @@ class FavoritesActivity : AppCompatActivity() {
             card.layoutParams = params
 
             card.findViewById<ImageView>(R.id.ivFavoriteProductImage)
-                ?.loadCatalogImage(product.imageUrl, product.imageRes)
-            card.findViewById<TextView>(R.id.tvFavoriteTag)?.apply {
-                text = product.tag
-                visibility = if (product.tag.isBlank()) View.GONE else View.VISIBLE
-            }
+                ?.loadCatalogImage(product.previewImageUrl(), product.catalogFallbackImageRes())
             card.findViewById<TextView>(R.id.tvFavoriteTitle)?.text = product.title
             card.findViewById<TextView>(R.id.tvFavoritePrice)?.text = formatDt(product.unitPrice)
+            card.findViewById<TextView>(R.id.tvFavoriteSeller)?.text = product.sellerDisplayName
+            card.findViewById<TextView>(R.id.tvFavoriteRating)?.text = productCardRatingText(product)
+            card.findViewById<TextView>(R.id.tvFavoriteCategory)?.text = productCardCategoryLabel(product)
 
             card.findViewById<View>(R.id.btnFavoriteToggle)?.setOnClickListener {
                 FavoritesStore.setFavorite(this, product.id, false)
@@ -116,8 +115,11 @@ class FavoritesActivity : AppCompatActivity() {
                 renderFavorites()
             }
 
-            card.findViewById<MaterialButton>(R.id.btnFavoriteAddCart)?.setOnClickListener {
-                val addedQuantity = CartStore.add(this, product.id)
+            card.findViewById<MaterialButton>(R.id.btnFavoriteAddCart)?.apply {
+                alpha = if (product.stock > 0) 1f else 0.45f
+                isEnabled = product.stock > 0
+                setOnClickListener {
+                val addedQuantity = CartStore.add(this@FavoritesActivity, product.id)
                 if (addedQuantity <= 0) {
                     showMotionSnackbar(getString(R.string.product_stock_limit_reached), R.id.layoutBottomNav)
                     return@setOnClickListener
@@ -127,6 +129,7 @@ class FavoritesActivity : AppCompatActivity() {
                     getString(R.string.product_added_to_cart, product.title),
                     R.id.layoutBottomNav
                 )
+                }
             }
 
             card.setOnClickListener {

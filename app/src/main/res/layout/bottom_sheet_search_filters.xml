@@ -25,7 +25,7 @@
         android:text="@string/search_filter_title"
         android:textColor="@color/colorOnSurface"
         android:textSize="@dimen/text_size_subtitle"
-        android:fontFamily="@font/plus_jakarta_sans_bold" />
+        android:fontFamily="@font/manrope_semibold" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -34,7 +34,7 @@
         android:text="@string/search_filter_category"
         android:textColor="@color/colorOnSurface"
         android:textSize="@dimen/text_size_caption"
-        android:fontFamily="@font/plus_jakarta_sans_bold" />
+        android:fontFamily="@font/manrope_semibold" />
 
     <com.google.android.material.chip.ChipGroup
         android:id="@+id/chipGroupFilterCategory"
@@ -96,7 +96,7 @@
         android:text="@string/search_filter_price"
         android:textColor="@color/colorOnSurface"
         android:textSize="@dimen/text_size_caption"
-        android:fontFamily="@font/plus_jakarta_sans_bold" />
+        android:fontFamily="@font/manrope_semibold" />
 
     <com.google.android.material.slider.RangeSlider
         android:id="@+id/sliderPriceRange"
@@ -113,7 +113,7 @@
         android:layout_marginTop="@dimen/space_4"
         android:textColor="@color/colorOnSurfaceVariant"
         android:textSize="@dimen/text_size_caption"
-        android:fontFamily="@font/plus_jakarta_sans_regular" />
+        android:fontFamily="@font/manrope_regular" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -122,7 +122,7 @@
         android:text="@string/search_filter_location"
         android:textColor="@color/colorOnSurface"
         android:textSize="@dimen/text_size_caption"
-        android:fontFamily="@font/plus_jakarta_sans_bold" />
+        android:fontFamily="@font/manrope_semibold" />
 
     <com.google.android.material.chip.ChipGroup
         android:id="@+id/chipGroupLocation"
@@ -170,7 +170,7 @@
         android:layout_marginTop="@dimen/space_16"
         android:text="@string/search_filter_bio_naturel"
         android:textColor="@color/colorOnSurface"
-        android:fontFamily="@font/plus_jakarta_sans_regular" />
+        android:fontFamily="@font/manrope_regular" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -196,3 +196,4 @@
             android:text="@string/search_filter_apply" />
     </LinearLayout>
 </LinearLayout>
+

@@ -22,7 +22,7 @@
             android:layout_height="wrap_content"
             android:textColor="@color/home_text_primary"
             android:textSize="@dimen/text_size_caption"
-            android:fontFamily="@font/plus_jakarta_sans_bold" />
+            android:fontFamily="@font/manrope_semibold" />
 
         <TextView
             android:id="@+id/tvOrderDate"
@@ -31,7 +31,7 @@
             android:layout_marginTop="@dimen/space_2"
             android:textColor="@color/home_text_secondary"
             android:textSize="@dimen/text_size_overline"
-            android:fontFamily="@font/plus_jakarta_sans_regular" />
+            android:fontFamily="@font/manrope_regular" />
 
         <TextView
             android:id="@+id/tvOrderItems"
@@ -42,7 +42,7 @@
             android:maxLines="2"
             android:textColor="@color/home_text_primary"
             android:textSize="@dimen/text_size_caption"
-            android:fontFamily="@font/plus_jakarta_sans_regular" />
+            android:fontFamily="@font/manrope_regular" />
 
         <HorizontalScrollView
             android:id="@+id/hsvOrderThumbnails"
@@ -73,7 +73,7 @@
                 android:layout_weight="1"
                 android:textColor="@color/home_text_primary"
                 android:textSize="@dimen/text_size_body"
-                android:fontFamily="@font/plus_jakarta_sans_bold" />
+                android:fontFamily="@font/manrope_semibold" />
 
             <TextView
                 android:id="@+id/tvOrderStatus"
@@ -86,8 +86,33 @@
                 android:paddingBottom="@dimen/space_4"
                 android:textColor="@color/home_chip_text"
                 android:textSize="@dimen/text_size_overline"
-                android:fontFamily="@font/plus_jakarta_sans_medium" />
+                android:fontFamily="@font/manrope_medium" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_10"
+            android:gravity="end"
+            android:orientation="horizontal">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnOrderSecondary"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:textAllCaps="false"
+                app:cornerRadius="14dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnOrderPrimary"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_marginStart="@dimen/space_8"
+                android:textAllCaps="false"
+                app:cornerRadius="14dp" />
         </LinearLayout>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>
+
 

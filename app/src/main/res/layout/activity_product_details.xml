@@ -81,6 +81,7 @@
                         android:clickable="false"
                         android:contentDescription="@string/auto_favorite_0116"
                         android:focusable="false"
+                        android:background="@android:color/transparent"
                         android:padding="4dp"
                         android:scaleType="centerInside"
                         app:lottie_autoPlay="false"
@@ -107,6 +108,7 @@
                     app:srcCompat="@android:drawable/ic_menu_share"
                     app:tint="@color/home_text_primary" />
             </com.google.android.material.card.MaterialCardView>
+
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -146,18 +148,76 @@
                     app:cardCornerRadius="@dimen/corner_radius_large"
                     app:cardElevation="0dp"
                     app:strokeColor="@color/colorOutline"
+                    app:strokeWidth="1.5dp">
+
+                    <androidx.viewpager2.widget.ViewPager2
+                        android:id="@+id/pagerProductImages"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/details_image_height"
+                        android:contentDescription="@string/details_image_cd" />
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/btnGalleryPrev"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_gravity="center_vertical|start"
+                    android:layout_marginStart="12dp"
+                    android:clickable="true"
+                    android:contentDescription="@string/details_gallery_previous"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackgroundBorderless"
+                    android:visibility="gone"
+                    app:cardBackgroundColor="@color/home_ref_badge_bg"
+                    app:cardCornerRadius="24dp"
+                    app:cardElevation="0dp"
+                    app:strokeColor="@color/home_ref_border"
                     app:strokeWidth="1dp">
 
                     <ImageView
-                        android:id="@+id/ivProductImage"
                         android:layout_width="match_parent"
-                        android:layout_height="@dimen/details_image_height"
-                        android:adjustViewBounds="false"
-                        android:contentDescription="@string/details_image_cd"
-                        android:scaleType="centerCrop"
-                        tools:src="@drawable/product1example" />
+                        android:layout_height="match_parent"
+                        android:contentDescription="@null"
+                        android:padding="13dp"
+                        android:rotation="180"
+                        app:srcCompat="@drawable/ic_profile_chevron_right"
+                        app:tint="@color/home_ref_text_primary" />
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/btnGalleryNext"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_gravity="center_vertical|end"
+                    android:layout_marginEnd="12dp"
+                    android:clickable="true"
+                    android:contentDescription="@string/details_gallery_next"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackgroundBorderless"
+                    android:visibility="gone"
+                    app:cardBackgroundColor="@color/home_ref_badge_bg"
+                    app:cardCornerRadius="24dp"
+                    app:cardElevation="0dp"
+                    app:strokeColor="@color/home_ref_border"
+                    app:strokeWidth="1dp">
+
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:contentDescription="@null"
+                        android:padding="13dp"
+                        app:srcCompat="@drawable/ic_profile_chevron_right"
+                        app:tint="@color/home_ref_text_primary" />
                 </com.google.android.material.card.MaterialCardView>
             </FrameLayout>
+
+            <LinearLayout
+                android:id="@+id/layoutGalleryDots"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="@dimen/space_8"
+                android:orientation="horizontal" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -171,7 +231,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="@drawable/bg_home_meta_pill"
-                    android:fontFamily="@font/plus_jakarta_sans_bold"
+                    android:fontFamily="@font/manrope_semibold"
                     android:paddingStart="@dimen/space_10"
                     android:paddingTop="@dimen/space_4"
                     android:paddingEnd="@dimen/space_10"
@@ -187,7 +247,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/space_8"
                     android:background="@drawable/bg_details_chip_success"
-                    android:fontFamily="@font/plus_jakarta_sans_bold"
+                    android:fontFamily="@font/manrope_semibold"
                     android:paddingStart="@dimen/space_10"
                     android:paddingTop="@dimen/space_4"
                     android:paddingEnd="@dimen/space_10"
@@ -216,7 +276,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/space_4"
-                    android:fontFamily="@font/plus_jakarta_sans_bold"
+                    android:fontFamily="@font/manrope_semibold"
                     android:textColor="@color/home_text_primary"
                     android:textSize="@dimen/text_size_caption"
                     tools:text="4.8" />
@@ -226,7 +286,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/space_8"
-                    android:fontFamily="@font/plus_jakarta_sans_medium"
+                    android:fontFamily="@font/manrope_medium"
                     android:textColor="@color/home_text_secondary"
                     android:textSize="@dimen/text_size_caption"
                     tools:text="(128 reviews)" />
@@ -237,23 +297,136 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_14"
-                android:fontFamily="@font/plus_jakarta_sans_bold"
+                android:fontFamily="@font/manrope_semibold"
                 android:lineSpacingExtra="2dp"
                 android:textColor="@color/home_text_primary"
                 android:textSize="@dimen/text_size_title"
                 android:textStyle="bold"
                 tools:text="Traditional Tunisian Balgha" />
 
-            <TextView
-                android:id="@+id/tvPrice"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_6"
-                android:fontFamily="@font/plus_jakarta_sans_bold"
-                android:textColor="?attr/colorPrimary"
-                android:textSize="@dimen/text_size_subtitle"
-                android:textStyle="bold"
-                tools:text="45.500 TND" />
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tvPrice"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/manrope_semibold"
+                    android:textColor="?attr/colorPrimary"
+                    android:textSize="@dimen/text_size_subtitle"
+                    android:textStyle="bold"
+                    tools:text="45.500 TND" />
+
+                <TextView
+                    android:id="@+id/tvPriceOriginal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:fontFamily="@font/manrope_semibold"
+                    android:textColor="@color/discount_strike_red"
+                    android:textSize="14sp"
+                    android:visibility="gone"
+                    tools:text="60.000 TND"
+                    tools:visibility="visible" />
+
+                <TextView
+                    android:id="@+id/tvDiscountBadge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:background="@drawable/bg_discount_badge"
+                    android:fontFamily="@font/manrope_bold"
+                    android:paddingStart="8dp"
+                    android:paddingTop="3dp"
+                    android:paddingEnd="8dp"
+                    android:paddingBottom="3dp"
+                    android:textColor="@android:color/white"
+                    android:textSize="12sp"
+                    android:visibility="gone"
+                    tools:text="-25%"
+                    tools:visibility="visible" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/layoutSellerSummary"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_10"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardSellerAvatar"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    app:cardCornerRadius="14dp"
+                    app:cardElevation="0dp"
+                    app:strokeColor="@color/colorBorderLight"
+                    app:strokeWidth="1dp">
+
+                    <ImageView
+                        android:id="@+id/ivSellerAvatar"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:contentDescription="@string/cd_profile_avatar"
+                        android:scaleType="centerCrop"
+                        app:srcCompat="@drawable/profile_avatar_art" />
+                </com.google.android.material.card.MaterialCardView>
+
+                <TextView
+                    android:id="@+id/tvSellerName"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/space_8"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/manrope_medium"
+                    android:textColor="@color/home_text_secondary"
+                    android:textSize="@dimen/text_size_caption"
+                    tools:text="FatiWeb" />
+
+                <ImageView
+                    android:id="@+id/btnContactSeller"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginStart="@dimen/space_6"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/details_contact_seller"
+                    android:padding="9dp"
+                    app:srcCompat="@drawable/ic_chat_bubble"
+                    app:tint="@color/home_text_primary" />
+
+                <TextView
+                    android:id="@+id/tvSellerVerifiedBadge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_home_meta_pill"
+                    android:fontFamily="@font/manrope_semibold"
+                    android:paddingStart="@dimen/space_8"
+                    android:paddingTop="@dimen/space_4"
+                    android:paddingEnd="@dimen/space_8"
+                    android:paddingBottom="@dimen/space_4"
+                    android:text="@string/details_seller_verified"
+                    android:textColor="@color/colorAccentDeep"
+                    android:textSize="@dimen/text_size_overline"
+                    android:visibility="gone"
+                    tools:visibility="visible" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tvSellerTrustMeta"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_4"
+                android:fontFamily="@font/manrope_regular"
+                android:textColor="@color/home_text_secondary"
+                android:textSize="@dimen/text_size_caption"
+                android:visibility="gone"
+                tools:text="4.8 seller rating - 124 sold"
+                tools:visibility="visible" />
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardProductTrust"
@@ -277,7 +450,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:background="@drawable/bg_home_meta_pill"
-                        android:fontFamily="@font/plus_jakarta_sans_medium"
+                        android:fontFamily="@font/manrope_medium"
                         android:paddingStart="@dimen/space_10"
                         android:paddingTop="@dimen/space_4"
                         android:paddingEnd="@dimen/space_10"
@@ -291,7 +464,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/space_12"
-                        android:fontFamily="@font/plus_jakarta_sans_bold"
+                        android:fontFamily="@font/manrope_semibold"
                         android:textColor="@color/home_text_primary"
                         android:textSize="@dimen/text_size_caption"
                         tools:text="Ready to ship within 24 hours." />
@@ -301,7 +474,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/space_6"
-                        android:fontFamily="@font/plus_jakarta_sans_regular"
+                        android:fontFamily="@font/manrope_regular"
                         android:lineSpacingExtra="3dp"
                         android:text="@string/details_editorial_intro"
                         android:textColor="@color/home_text_secondary"
@@ -314,7 +487,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_24"
-                android:fontFamily="@font/plus_jakarta_sans_bold"
+                android:fontFamily="@font/manrope_semibold"
                 android:text="@string/details_description_title"
                 android:textColor="@color/home_text_primary"
                 android:textSize="@dimen/text_size_body"
@@ -325,7 +498,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_10"
-                android:fontFamily="@font/plus_jakarta_sans_regular"
+                android:fontFamily="@font/manrope_regular"
                 android:lineSpacingExtra="5dp"
                 android:textColor="@color/home_text_secondary"
                 android:textSize="@dimen/text_size_caption"
@@ -352,7 +525,7 @@
                         android:id="@+id/tvBullet1"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:fontFamily="@font/plus_jakarta_sans_regular"
+                        android:fontFamily="@font/manrope_regular"
                         android:textColor="@color/home_text_primary"
                         android:textSize="@dimen/text_size_caption"
                         tools:text="- Handmade by Tunisian artisans" />
@@ -362,7 +535,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/space_8"
-                        android:fontFamily="@font/plus_jakarta_sans_regular"
+                        android:fontFamily="@font/manrope_regular"
                         android:textColor="@color/home_text_primary"
                         android:textSize="@dimen/text_size_caption"
                         tools:text="- Premium natural materials" />
@@ -372,7 +545,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/space_8"
-                        android:fontFamily="@font/plus_jakarta_sans_regular"
+                        android:fontFamily="@font/manrope_regular"
                         android:textColor="@color/home_text_primary"
                         android:textSize="@dimen/text_size_caption"
                         tools:text="- Designed for everyday comfort" />
@@ -384,7 +557,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_24"
-                android:fontFamily="@font/plus_jakarta_sans_bold"
+                android:fontFamily="@font/manrope_semibold"
                 android:text="@string/details_quantity_label"
                 android:textColor="@color/home_text_primary"
                 android:textSize="@dimen/text_size_body"
@@ -426,7 +599,7 @@
                     android:id="@+id/tvQuantity"
                     android:layout_width="52dp"
                     android:layout_height="match_parent"
-                    android:fontFamily="@font/plus_jakarta_sans_bold"
+                    android:fontFamily="@font/manrope_semibold"
                     android:gravity="center"
                     android:textColor="@color/home_text_primary"
                     android:textSize="@dimen/text_size_body"
@@ -452,8 +625,221 @@
                         android:textStyle="bold" />
                 </com.google.android.material.card.MaterialCardView>
             </LinearLayout>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardReviewComposer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_16"
+                app:cardBackgroundColor="@color/colorSurface"
+                app:cardCornerRadius="@dimen/corner_radius_large"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/colorBorderLight"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="@dimen/space_16">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/manrope_semibold"
+                        android:text="@string/details_review_dialog_title"
+                        android:textColor="@color/home_text_primary"
+                        android:textSize="@dimen/text_size_body" />
+
+                    <LinearLayout
+                        android:id="@+id/layoutReviewStars"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_10"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:id="@+id/ivReviewStar1"
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:background="?selectableItemBackgroundBorderless"
+                            android:clickable="true"
+                            android:contentDescription="@null"
+                            android:focusable="true"
+                            android:padding="3dp"
+                            android:scaleType="centerInside"
+                            app:srcCompat="@drawable/ic_star_outline"
+                            app:tint="@color/colorBorderLight" />
+
+                        <ImageView
+                            android:id="@+id/ivReviewStar2"
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:layout_marginStart="4dp"
+                            android:background="?selectableItemBackgroundBorderless"
+                            android:clickable="true"
+                            android:contentDescription="@null"
+                            android:focusable="true"
+                            android:padding="3dp"
+                            android:scaleType="centerInside"
+                            app:srcCompat="@drawable/ic_star_outline"
+                            app:tint="@color/colorBorderLight" />
+
+                        <ImageView
+                            android:id="@+id/ivReviewStar3"
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:layout_marginStart="4dp"
+                            android:background="?selectableItemBackgroundBorderless"
+                            android:clickable="true"
+                            android:contentDescription="@null"
+                            android:focusable="true"
+                            android:padding="3dp"
+                            android:scaleType="centerInside"
+                            app:srcCompat="@drawable/ic_star_outline"
+                            app:tint="@color/colorBorderLight" />
+
+                        <ImageView
+                            android:id="@+id/ivReviewStar4"
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:layout_marginStart="4dp"
+                            android:background="?selectableItemBackgroundBorderless"
+                            android:clickable="true"
+                            android:contentDescription="@null"
+                            android:focusable="true"
+                            android:padding="3dp"
+                            android:scaleType="centerInside"
+                            app:srcCompat="@drawable/ic_star_outline"
+                            app:tint="@color/colorBorderLight" />
+
+                        <ImageView
+                            android:id="@+id/ivReviewStar5"
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:layout_marginStart="4dp"
+                            android:background="?selectableItemBackgroundBorderless"
+                            android:clickable="true"
+                            android:contentDescription="@null"
+                            android:focusable="true"
+                            android:padding="3dp"
+                            android:scaleType="centerInside"
+                            app:srcCompat="@drawable/ic_star_outline"
+                            app:tint="@color/colorBorderLight" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/tvReviewStarsError"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_6"
+                        android:fontFamily="@font/manrope_regular"
+                        android:includeFontPadding="false"
+                        android:textColor="@color/colorError"
+                        android:textSize="@dimen/text_size_overline"
+                        android:visibility="gone"
+                        tools:text="Choisissez au moins une etoile."
+                        tools:visibility="visible" />
+
+                    <EditText
+                        android:id="@+id/etReviewComment"
+                        android:layout_width="match_parent"
+                        android:layout_height="104dp"
+                        android:layout_marginTop="@dimen/space_10"
+                        android:background="@drawable/bg_home_search"
+                        android:fontFamily="@font/manrope_regular"
+                        android:gravity="top|start"
+                        android:hint="@string/details_review_comment_hint"
+                        android:inputType="textMultiLine|textCapSentences"
+                        android:maxLength="280"
+                        android:maxLines="5"
+                        android:minLines="3"
+                        android:padding="@dimen/space_14"
+                        android:textColor="@color/home_text_primary"
+                        android:textColorHint="@color/home_text_secondary"
+                        android:textSize="@dimen/text_size_caption" />
+
+                    <TextView
+                        android:id="@+id/tvReviewCounter"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_6"
+                        android:fontFamily="@font/manrope_regular"
+                        android:text="@string/details_review_counter_initial"
+                        android:textColor="@color/home_text_secondary"
+                        android:textSize="@dimen/text_size_overline" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnWriteReview"
+                        style="@style/AppButton.Primary"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:layout_marginTop="@dimen/space_12"
+                        android:text="@string/details_review_submit"
+                        android:textAllCaps="false" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <ProgressBar
+                android:id="@+id/progressReviews"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="@dimen/space_12"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/tvReviewsSummary"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_12"
+                android:textColor="@color/home_text_secondary"
+                android:textSize="@dimen/text_size_caption" />
+
+            <LinearLayout
+                android:id="@+id/layoutReviewsList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_8"
+                android:orientation="vertical" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
+
+    <LinearLayout
+        android:id="@+id/layoutDetailsSkeleton"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        android:padding="@dimen/details_horizontal_padding"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/layoutBottomBar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/layoutTopBar">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/details_image_height"
+            android:background="@drawable/bg_home_loading_panel" />
+
+        <View
+            android:layout_width="72dp"
+            android:layout_height="18dp"
+            android:layout_marginTop="@dimen/space_16"
+            android:background="@drawable/bg_home_loading_panel" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="32dp"
+            android:layout_marginTop="@dimen/space_14"
+            android:background="@drawable/bg_home_loading_panel" />
+
+        <View
+            android:layout_width="160dp"
+            android:layout_height="24dp"
+            android:layout_marginTop="@dimen/space_8"
+            android:background="@drawable/bg_home_loading_panel" />
+    </LinearLayout>
 
     <ProgressBar
         android:id="@+id/loadingIndicator"
@@ -467,67 +853,128 @@
         app:layout_constraintTop_toBottomOf="@id/layoutTopBar" />
 
     <com.google.android.material.card.MaterialCardView
+        android:id="@+id/layoutDetailsErrorState"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/details_horizontal_padding"
+        android:layout_marginEnd="@dimen/details_horizontal_padding"
+        android:visibility="gone"
+        app:cardBackgroundColor="@color/home_surface_raised"
+        app:cardCornerRadius="@dimen/corner_radius_large"
+        app:cardElevation="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/layoutTopBar"
+        app:strokeColor="@color/colorOutline"
+        app:strokeWidth="1dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:padding="@dimen/space_24">
+
+            <TextView
+                android:id="@+id/tvDetailsErrorTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/manrope_semibold"
+                android:gravity="center"
+                android:text="@string/details_load_error_title"
+                android:textColor="@color/home_text_primary"
+                android:textSize="@dimen/text_size_subtitle"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvDetailsErrorSubtitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_8"
+                android:fontFamily="@font/manrope_regular"
+                android:gravity="center"
+                android:lineSpacingExtra="2dp"
+                android:text="@string/details_load_error_subtitle"
+                android:textColor="@color/home_text_secondary"
+                android:textSize="@dimen/text_size_caption" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnDetailsRetry"
+                style="@style/AppButton.Primary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_16"
+                android:minHeight="48dp"
+                android:text="@string/cart_sync_retry_action" />
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+<com.google.android.material.card.MaterialCardView
         android:id="@+id/layoutBottomBar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:cardBackgroundColor="@color/colorSurface"
         app:cardCornerRadius="0dp"
-        app:cardElevation="0dp"
+        app:cardElevation="4dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:strokeColor="@color/colorBorderLight"
-        app:strokeWidth="1dp">
+        app:strokeWidth="0dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:paddingStart="@dimen/space_20"
-            android:paddingTop="@dimen/space_16"
-            android:paddingEnd="@dimen/space_20"
-            android:paddingBottom="@dimen/space_16">
+            android:paddingStart="@dimen/space_16"
+            android:paddingTop="@dimen/space_12"
+            android:paddingEnd="@dimen/space_16"
+            android:paddingBottom="@dimen/space_12">
 
             <LinearLayout
                 android:id="@+id/layoutTotal"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/tvTotalLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:fontFamily="@font/plus_jakarta_sans_medium"
+                    android:fontFamily="@font/manrope_regular"
                     android:text="@string/details_total_label"
                     android:textColor="@color/home_text_secondary"
-                    android:textSize="@dimen/text_size_overline" />
+                    android:textSize="@dimen/text_size_overline"
+                    android:visibility="gone" />
 
                 <TextView
                     android:id="@+id/tvTotalValue"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/space_2"
-                    android:fontFamily="@font/plus_jakarta_sans_bold"
+                    android:fontFamily="@font/manrope_bold"
                     android:textColor="?attr/colorPrimary"
-                    android:textSize="@dimen/text_size_subtitle"
-                    android:textStyle="bold"
+                    android:textSize="@dimen/text_size_title"
                     tools:text="45.500 TND" />
             </LinearLayout>
 
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnAddToCart"
-                android:layout_width="0dp"
-                android:layout_height="52dp"
-                android:layout_marginStart="@dimen/space_14"
-                android:layout_weight="1"
-                android:fontFamily="@font/plus_jakarta_sans_bold"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:fontFamily="@font/manrope_semibold"
+                android:letterSpacing="0"
+                android:paddingStart="@dimen/space_20"
+                android:paddingEnd="@dimen/space_20"
                 android:text="@string/details_add_to_cart"
                 android:textAllCaps="false"
-                android:textSize="@dimen/text_size_caption"
-                android:textStyle="bold"
-                app:cornerRadius="@dimen/corner_radius_large"
+                android:textSize="@dimen/text_size_body"
+                app:cornerRadius="24dp"
                 app:elevation="0dp"
                 app:icon="@drawable/ic_home_add_cart"
                 app:iconGravity="textStart"

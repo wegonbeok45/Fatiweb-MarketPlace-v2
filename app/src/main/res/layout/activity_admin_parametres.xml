@@ -69,7 +69,7 @@
                         android:layout_height="wrap_content"
 
                         android:text="@string/app_name"
-                        android:fontFamily="@font/plus_jakarta_sans_bold"
+                        android:fontFamily="@font/manrope_semibold"
                         android:textColor="@android:color/white"
                         android:textSize="@dimen/text_size_title" />
 
@@ -91,7 +91,7 @@
 
                 android:text="@string/admin_settings_delivery_title"
                 android:textColor="@color/profile_text_primary"
-                android:fontFamily="@font/plus_jakarta_sans_bold"
+                android:fontFamily="@font/manrope_semibold"
                 android:textSize="@dimen/text_size_subtitle"
                 android:layout_marginBottom="8dp" />
 
@@ -226,7 +226,7 @@
 
                 android:text="@string/admin_settings_payments_title"
                 android:textColor="@color/profile_text_primary"
-                android:fontFamily="@font/plus_jakarta_sans_bold"
+                android:fontFamily="@font/manrope_semibold"
                 android:textSize="@dimen/text_size_subtitle"
                 android:layout_marginBottom="8dp" />
 
@@ -372,3 +372,6 @@
         android:layout_gravity="bottom" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+
+

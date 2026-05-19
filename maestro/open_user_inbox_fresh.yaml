@@ -1,0 +1,5 @@
+appId: isim.ia2y.myapplication
+---
+- tapOn:
+    id: "isim.ia2y.myapplication:id/ivTopNotifications"
+- takeScreenshot: user-notifications-inbox

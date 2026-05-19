@@ -5,6 +5,7 @@ import android.view.View
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.AutoCompleteTextView
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -20,13 +21,8 @@ class AdminCommandesActivity : AppCompatActivity() {
 
     private val allOrders = mutableListOf<Pair<String, AppOrder>>()
     private val orderFilters by lazy {
-        listOf(
-            OrderFilterOption("all", getString(R.string.admin_filter_all)),
-            OrderFilterOption("pending", getString(R.string.order_status_pending)),
-            OrderFilterOption("preparing", getString(R.string.order_status_preparing)),
-            OrderFilterOption("shipped", getString(R.string.order_status_shipped)),
-            OrderFilterOption("delivered", getString(R.string.order_status_delivered))
-        )
+        listOf(OrderFilterOption("all", getString(R.string.admin_filter_all))) +
+            OrderStatuses.supported.map { OrderFilterOption(it, orderStatusLabel(this, it)) }
     }
     private var lastVisible: com.google.firebase.firestore.DocumentSnapshot? = null
     private var isLastPage = false
@@ -34,6 +30,14 @@ class AdminCommandesActivity : AppCompatActivity() {
     private val pageSize = 20
     private var searchQuery = ""
     private var selectedFilter = "all"
+    private val orderDetailsLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == RESULT_OK) reloadOrders()
+    }
+    private val ordersAdapter = AdminOrdersAdapter { uid, order ->
+        openOrderDetails(uid, order)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,6 +50,7 @@ class AdminCommandesActivity : AppCompatActivity() {
 
         val recycler = findViewById<RecyclerView>(R.id.adminCommandesList)
         recycler?.layoutManager = LinearLayoutManager(this)
+        recycler?.adapter = ordersAdapter
         
         recycler?.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
@@ -137,7 +142,7 @@ class AdminCommandesActivity : AppCompatActivity() {
                 val newItems = snapshot.documents.mapNotNull { doc ->
                     val data = doc.data ?: return@mapNotNull null
                     val uid = data["uid"] as? String ?: return@mapNotNull null
-                    uid to AppOrder.fromMap(data)
+                    uid to AppOrder.fromMap(data).copy(id = doc.id)
                 }
 
                 if (newItems.isEmpty()) {
@@ -147,12 +152,21 @@ class AdminCommandesActivity : AppCompatActivity() {
                     lastVisible = snapshot.documents.lastOrNull()
                     if (newItems.size < pageSize) isLastPage = true
                 }
-                loadStats()
                 renderOrders()
             }.onFailure {
                 isLoading = false
                 findViewById<ProgressBar>(R.id.adminCommandesProgress)?.visibility = View.GONE
-                showMotionSnackbar("Erreur lors du chargement des commandes")
+                if (allOrders.isEmpty()) {
+                    isLastPage = true
+                    findViewById<TextView>(R.id.adminCommandesEmpty)?.apply {
+                        text = getString(R.string.admin_orders_load_failed)
+                        visibility = View.VISIBLE
+                    }
+                    ordersAdapter.submitList(emptyList())
+                } else {
+                    renderOrders()
+                }
+                showMotionSnackbar(getString(R.string.admin_orders_load_failed))
             }
         }
     }
@@ -162,7 +176,13 @@ class AdminCommandesActivity : AppCompatActivity() {
         val emptyView = findViewById<TextView>(R.id.adminCommandesEmpty)
         val filteredOrders = filteredOrders()
 
-        if (filteredOrders.isEmpty() && isLastPage) {
+        if (isLoading && allOrders.isEmpty()) {
+            emptyView?.visibility = View.GONE
+            ordersAdapter.submitList(emptyList())
+            return
+        }
+
+        if (filteredOrders.isEmpty() && (isLastPage || allOrders.isNotEmpty())) {
             emptyView?.visibility = View.VISIBLE
             emptyView?.text = getString(
                 if (searchQuery.isNotBlank() || selectedFilter != "all") {
@@ -171,30 +191,19 @@ class AdminCommandesActivity : AppCompatActivity() {
                     R.string.admin_orders_empty
                 }
             )
-            recycler.adapter = AdminOrdersAdapter { _, _ -> }.apply { submitList(emptyList()) }
+            ordersAdapter.submitList(emptyList())
             return
         }
 
         emptyView?.visibility = View.GONE
-        var adapter = recycler.adapter as? AdminOrdersAdapter
-        if (adapter == null) {
-            adapter = AdminOrdersAdapter { uid, order ->
-                showOrderDetailsDialog(uid, order)
-            }
-            recycler.adapter = adapter
-        }
-        adapter.submitList(ArrayList(filteredOrders))
+        if (recycler.adapter == null) recycler.adapter = ordersAdapter
+        ordersAdapter.submitList(ArrayList(filteredOrders))
     }
 
     private fun showStatusDialog(uid: String, order: AppOrder) {
-        val statuses = arrayOf(
-            getString(R.string.order_status_pending),
-            getString(R.string.order_status_preparing),
-            getString(R.string.order_status_shipped),
-            getString(R.string.order_status_delivered)
-        )
-        val keys = arrayOf("pending", "preparing", "shipped", "delivered")
-        val currentIndex = keys.indexOfFirst { it == order.status }.coerceAtLeast(0)
+        val keys = OrderStatuses.supported.toTypedArray()
+        val statuses = keys.map { orderStatusLabel(this, it) }.toTypedArray()
+        val currentIndex = keys.indexOfFirst { it == OrderStatuses.normalize(order.status) }.coerceAtLeast(0)
 
         android.app.AlertDialog.Builder(this)
             .setTitle(getString(R.string.admin_order_change_status_title, order.displayId))
@@ -202,11 +211,11 @@ class AdminCommandesActivity : AppCompatActivity() {
                 val newStatus = keys[which]
                 dialog.dismiss()
                 lifecycleScope.launch {
-                    runCatching { FirestoreService.updateOrderStatus(uid, order.id, newStatus) }
-                        .onSuccess {
+                    runCatching { OrderService.updateOrderStatus(uid, order.id, newStatus) }
+                        .onSuccess { updatedOrder ->
                             val index = allOrders.indexOfFirst { it.second.id == order.id }
                             if (index >= 0) {
-                                allOrders[index] = uid to allOrders[index].second.withStatus(newStatus)
+                                allOrders[index] = uid to updatedOrder.copy(id = order.id)
                             }
                             loadStats()
                             renderOrders()
@@ -245,12 +254,28 @@ class AdminCommandesActivity : AppCompatActivity() {
         return allOrders.filter { (_, order) ->
             val matchesQuery = searchQuery.isBlank() || order.displayId.contains(searchQuery, true) ||
                 order.items.any { it.name.contains(searchQuery, true) }
-            val matchesFilter = selectedFilter == "all" || order.status == selectedFilter
+            val matchesFilter = selectedFilter == "all" ||
+                OrderStatuses.normalize(order.status) == selectedFilter
             matchesQuery && matchesFilter
         }
     }
 
-    private fun updateStatsFromLoadedOrders() {
+    private fun openOrderDetails(uid: String, order: AppOrder) {
+        val id = order.id
+        if (id.isBlank()) {
+            showMotionSnackbar(getString(R.string.admin_orders_load_failed))
+            return
+        }
+        orderDetailsLauncher.launch(AdminOrderDetailsActivity.createIntent(this, uid, id))
+    }
+
+    private fun reloadOrders() {
+        allOrders.clear()
+        lastVisible = null
+        isLastPage = false
+        isLoading = false
+        ordersAdapter.submitList(emptyList())
+        loadNextPage()
         loadStats()
     }
 

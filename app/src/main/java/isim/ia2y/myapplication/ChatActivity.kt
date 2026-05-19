@@ -21,6 +21,14 @@ import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.launch
 
 class ChatActivity : AppCompatActivity() {
+    companion object {
+        private const val EXTRA_PREFILL = "extra_prefill"
+
+        fun createIntent(from: android.content.Context, prefilledMessage: String? = null): Intent =
+            Intent(from, ChatActivity::class.java).apply {
+                putExtra(EXTRA_PREFILL, prefilledMessage)
+            }
+    }
 
     private val viewModel: ChatViewModel by viewModels()
     private lateinit var adapter: ChatAdapter
@@ -61,6 +69,11 @@ class ChatActivity : AppCompatActivity() {
 
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
         viewModel.addWelcomeMessage()
+        intent.getStringExtra(EXTRA_PREFILL)
+            ?.takeIf { it.isNotBlank() }
+            ?.let { prompt ->
+                recyclerView.post { sendCurrentMessage(prompt) }
+            }
     }
 
     private fun bindViews() {
@@ -167,10 +180,5 @@ class ChatActivity : AppCompatActivity() {
     private fun hideKeyboard() {
         val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(inputField.windowToken, 0)
-    }
-
-    companion object {
-        fun createIntent(from: android.content.Context): Intent =
-            Intent(from, ChatActivity::class.java)
     }
 }

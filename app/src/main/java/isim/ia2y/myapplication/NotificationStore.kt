@@ -14,7 +14,10 @@ data class AppNotification(
     val title: String,
     val message: String,
     val timestamp: Long,
-    var isRead: Boolean = false
+    var isRead: Boolean = false,
+    val route: String = "",
+    val entityRef: String = "",
+    val orderId: String = ""
 )
 
 object NotificationStore {
@@ -29,7 +32,7 @@ object NotificationStore {
         return context.getSharedPreferences("${accountKey}_$PREFS_NAME", Context.MODE_PRIVATE)
     }
 
-    private fun currentUidOrNull(): String? = runCatching { FirebaseAuthManager.currentUser?.uid }.getOrNull()
+    private fun currentUidOrNull(): String? = runCatching { FirebaseAuthManager.currentRealUid }.getOrNull()
 
     private fun getAllForAccount(context: Context, accountKey: String): List<AppNotification> {
         val json = getPrefsForAccount(context, accountKey).getString(KEY_NOTIFICATIONS, "[]") ?: "[]"
@@ -43,7 +46,10 @@ object NotificationStore {
                     title = obj.getString("title"),
                     message = obj.getString("message"),
                     timestamp = obj.getLong("timestamp"),
-                    isRead = obj.optBoolean("isRead", false)
+                    isRead = obj.optBoolean("isRead", false),
+                    route = obj.optString("route"),
+                    entityRef = obj.optString("entityRef"),
+                    orderId = obj.optString("orderId")
                 )
             )
         }
@@ -64,7 +70,21 @@ object NotificationStore {
     suspend fun refreshFromCloud(context: Context): List<AppNotification> {
         val uid = currentUidOrNull()
         val remote = if (uid != null) {
-            FirestoreService.fetchUserInboxNotifications(uid)
+            val readIds = getAllForAccount(context, uid)
+                .filter { it.isRead }
+                .map { it.id }
+                .toSet() + runCatching { FirestoreService.fetchNotificationReadIds(uid) }.getOrDefault(emptySet())
+            val inbox = runCatching { FirestoreService.fetchUserInboxNotifications(uid) }.getOrDefault(emptyList())
+            val publicAnnouncements = FirestoreService.fetchPublicAnnouncementNotifications()
+            (inbox + publicAnnouncements)
+                .distinctBy { it.id }
+                .map { notification ->
+                    notification.apply {
+                        if (id in readIds) isRead = true
+                    }
+                }
+                .sortedByDescending { it.timestamp }
+                .take(50)
         } else {
             emptyList()
         }
@@ -84,6 +104,22 @@ object NotificationStore {
         syncCurrentReadStateToCloud(unreadIds)
     }
 
+    fun markRead(context: Context, notificationId: String) {
+        val notifications = getAll(context)
+        val unreadIds = notifications
+            .filter { it.id == notificationId && !it.isRead }
+            .map { it.id }
+            .toSet()
+        if (unreadIds.isEmpty()) return
+        notifications.forEach { notification ->
+            if (notification.id == notificationId) {
+                notification.isRead = true
+            }
+        }
+        saveAll(context, notifications)
+        syncCurrentReadStateToCloud(unreadIds)
+    }
+
     private fun saveAll(context: Context, notifications: List<AppNotification>) {
         saveAllForAccount(context, currentUidOrNull() ?: GUEST_KEY, notifications)
     }
@@ -98,6 +134,9 @@ object NotificationStore {
                 put("message", it.message)
                 put("timestamp", it.timestamp)
                 put("isRead", it.isRead)
+                put("route", it.route)
+                put("entityRef", it.entityRef)
+                put("orderId", it.orderId)
             }
             array.put(obj)
         }

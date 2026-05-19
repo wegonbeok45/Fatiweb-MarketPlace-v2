@@ -9,14 +9,42 @@
 
     <application
         android:name=".MyApplication"
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@mipmap/ic_launcher"
         android:supportsRtl="true"
         android:theme="@style/Theme.MyApplication">
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="order_updates" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/notification" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_color"
+            android:resource="@color/colorPrimary" />
+
+        <service
+            android:name=".FatiFirebaseMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/product_image_file_paths" />
+        </provider>
+
         <activity
             android:name=".AdminDashboardActivity"
             android:exported="false"
@@ -30,7 +58,23 @@
             android:exported="false"
             android:theme="@style/Theme.MyApplication.Admin" />
         <activity
+            android:name=".AdminClientDetailsActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MyApplication.Admin" />
+        <activity
+            android:name=".AdminOrderDetailsActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MyApplication.Admin" />
+        <activity
             android:name=".AdminProduitsActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MyApplication.Admin" />
+        <activity
+            android:name=".SellerDashboardActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MyApplication.Admin" />
+        <activity
+            android:name=".SellerOrdersActivity"
             android:exported="false"
             android:theme="@style/Theme.MyApplication.Admin" />
         <activity
@@ -46,10 +90,25 @@
             android:exported="false"
             android:theme="@style/Theme.MyApplication.Admin" />
         <activity
+            android:name=".RoleSelectionActivity"
+            android:exported="false" />
+        <activity
             android:name=".LanguageSettingsActivity"
             android:exported="false" />
         <activity
             android:name=".SettingsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".AboutCuratorActivity"
+            android:exported="false" />
+        <activity
+            android:name=".HelpCenterActivity"
+            android:exported="false" />
+        <activity
+            android:name=".PaymentMethodsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".PersonalDetailsActivity"
             android:exported="false" />
         <activity
             android:name=".NotificationPreferencesActivity"
@@ -64,6 +123,9 @@
             android:name=".SearchActivity"
             android:exported="false" />
         <activity
+            android:name=".CategoryProductsActivity"
+            android:exported="false" />
+        <activity
             android:name=".AddressesActivity"
             android:exported="false" />
         <activity
@@ -72,6 +134,13 @@
         <activity
             android:name=".OrderDetailsActivity"
             android:exported="false" />
+        <activity
+            android:name=".MessagingInboxActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ConversationActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
 
         <activity
             android:name=".FavoritesActivity"
@@ -104,7 +173,8 @@
         </activity>
         <activity
             android:name=".MainActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:theme="@style/Theme.MyApplication" />
         <activity
             android:name=".CheckoutDetailsActivity"
             android:exported="false" />

@@ -7,10 +7,12 @@ import {
 } from "./constants";
 
 const orderTransitionMap: Record<OrderStatus, readonly OrderStatus[]> = {
-  pending: ["preparing", "shipped", "delivered"],
-  preparing: ["shipped", "delivered"],
-  shipped: ["delivered"],
-  delivered: [],
+  pending: ["pending", "confirmed", "cancelled"],
+  confirmed: ["confirmed", "preparing", "cancelled"],
+  preparing: ["preparing", "shipped", "cancelled"],
+  shipped: ["shipped", "delivered", "cancelled"],
+  delivered: ["delivered"],
+  cancelled: ["cancelled"],
 };
 
 export function asRecord(value: unknown): Record<string, unknown> | null {
@@ -86,6 +88,12 @@ export function normalizeProductStatus(value: unknown): ProductStatus {
 
 export function normalizeOrderStatus(value: unknown): OrderStatus {
   const normalized = asTrimmedString(value, "pending").toLowerCase();
+  if (normalized === "processing") {
+    return "preparing";
+  }
+  if (["failed", "returned", "refunded"].includes(normalized)) {
+    return "cancelled";
+  }
   return (ORDER_STATUSES as readonly string[]).includes(normalized) ?
     normalized as OrderStatus :
     "pending";
@@ -122,10 +130,20 @@ export function appendOrderTrackingEvent(
 export function generateSearchKeywords(...values: Array<string | string[]>): string[] {
   const tokens = values
     .flatMap((value) => Array.isArray(value) ? value : [value])
-    .flatMap((value) => value.toLowerCase().split(/[^a-z0-9\u0600-\u06ff]+/i))
+    .flatMap((value) => value.toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .split(/[^a-z0-9\u0600-\u06ff]+/i))
     .map((value) => value.trim())
     .filter((value) => value.length >= 3);
-  return Array.from(new Set(tokens));
+  const expanded = tokens.flatMap((token) => {
+    const prefixes: string[] = [token];
+    for (let length = 3; length < token.length; length += 1) {
+      prefixes.push(token.slice(0, length));
+    }
+    return prefixes;
+  });
+  return Array.from(new Set(expanded));
 }
 
 export function chunk<T>(items: T[], size: number): T[][] {

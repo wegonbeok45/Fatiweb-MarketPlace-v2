@@ -9,20 +9,32 @@
     "start": "npm run shell",
     "deploy": "firebase deploy --only functions",
     "logs": "firebase functions:log",
-    "test": "node --test lib/test/**/*.test.js"
+    "test": "node --test lib/test/**/*.test.js",
+    "build:scripts": "tsc -p tsconfig.scripts.json",
+    "seed:categories": "npm run build:scripts && node lib-scripts/scripts/seedCategories.js",
+    "seed:categories:dry-run": "npm run build:scripts && node lib-scripts/scripts/seedCategories.js --dry-run --project=fatiweb-marketplace",
+    "upload:local-category-images:dry": "npm run build:scripts && node lib-scripts/scripts/uploadLocalCategoryImages.js --dry-run --project=fatiweb-marketplace",
+    "upload:local-category-images": "npm run build:scripts && node lib-scripts/scripts/uploadLocalCategoryImages.js --project=fatiweb-marketplace",
+    "import:category-images:dry": "npm run build:scripts && node lib-scripts/scripts/importCategoryImages.js --dry-run --project=fatiweb-marketplace",
+    "import:category-images": "npm run build:scripts && node lib-scripts/scripts/importCategoryImages.js --project=fatiweb-marketplace"
   },
   "engines": {
-    "node": "18"
+    "node": "22"
   },
   "main": "lib/index.js",
   "dependencies": {
-    "firebase-admin": "^11.8.0",
-    "firebase-functions": "^4.3.1"
+    "firebase-admin": "^13.10.0",
+    "firebase-functions": "^7.2.5",
+    "sharp": "^0.33.5"
   },
   "devDependencies": {
+    "@types/markdown-it": "^14.1.2",
     "@types/node": "^20.17.24",
+    "@typescript-eslint/eslint-plugin": "^8.59.4",
+    "@typescript-eslint/parser": "^8.59.4",
     "eslint": "^8.9.0",
     "eslint-config-google": "^0.14.0",
+    "markdown-it": "^14.1.1",
     "typescript": "^5.6.3"
   },
   "private": true

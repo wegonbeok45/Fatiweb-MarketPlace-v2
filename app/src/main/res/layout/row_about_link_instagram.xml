@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cardInstagram"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:padding="@dimen/space_16">
+
+    <ImageView
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:contentDescription="@string/about_curator_instagram_title"
+        app:srcCompat="@drawable/ic_profile_nav_user"
+        app:tint="@color/profile_text_secondary" />
+
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/space_12"
+        android:layout_weight="1"
+        android:fontFamily="@font/manrope_medium"
+        android:text="@string/about_curator_instagram_title"
+        android:textColor="@color/profile_text_primary"
+        android:textSize="@dimen/text_size_body" />
+
+    <ImageView
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:contentDescription="@string/cd_chevron"
+        app:srcCompat="@drawable/ic_profile_chevron_right"
+        app:tint="@color/profile_chevron" />
+</LinearLayout>
+

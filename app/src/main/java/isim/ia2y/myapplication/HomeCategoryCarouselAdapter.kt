@@ -8,18 +8,26 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
 data class HomeCategoryItem(
-    val labelResId: Int,
-    val iconResId: Int,
-    val categoryKey: String
+    val label: String,
+    val imageUrl: String,
+    val imageResId: Int,
+    val categoryKey: String,
+    val badgeIconResId: Int
 )
 
 class HomeCategoryCarouselAdapter(
-    private val items: List<HomeCategoryItem>,
+    initialItems: List<HomeCategoryItem>,
     private val onClick: (HomeCategoryItem) -> Unit
 ) : RecyclerView.Adapter<HomeCategoryCarouselAdapter.ViewHolder>() {
+    private var items: List<HomeCategoryItem> = initialItems
 
     init {
         setHasStableIds(true)
+    }
+
+    fun submitList(nextItems: List<HomeCategoryItem>) {
+        items = nextItems
+        notifyDataSetChanged()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -29,17 +37,14 @@ class HomeCategoryCarouselAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val item = items[position % items.size]
+        val item = items[position]
         holder.bind(item)
     }
 
-    override fun getItemCount(): Int = if (items.isEmpty()) 0 else Int.MAX_VALUE
+    override fun getItemCount(): Int = items.size
 
-    override fun getItemId(position: Int): Long = if (items.isEmpty()) {
-        RecyclerView.NO_ID
-    } else {
-        items[position % items.size].categoryKey.hashCode().toLong()
-    }
+    override fun getItemId(position: Int): Long = items.getOrNull(position)?.categoryKey?.hashCode()?.toLong()
+        ?: RecyclerView.NO_ID
 
     class ViewHolder(
         itemView: View,
@@ -53,12 +58,31 @@ class HomeCategoryCarouselAdapter(
             itemView.setOnClickListener {
                 currentItem?.let(onClick)
             }
+            itemView.setOnTouchListener { v, event ->
+                when (event.action) {
+                    android.view.MotionEvent.ACTION_DOWN -> {
+                        v.animate().scaleX(0.97f).scaleY(0.97f).setDuration(150).start()
+                    }
+                    android.view.MotionEvent.ACTION_UP, android.view.MotionEvent.ACTION_CANCEL -> {
+                        v.animate().scaleX(1.0f).scaleY(1.0f).setDuration(150).start()
+                    }
+                }
+                false
+            }
         }
 
         fun bind(item: HomeCategoryItem) {
             currentItem = item
-            icon.setImageResource(item.iconResId)
-            label.setText(item.labelResId)
+            icon.visibility = View.VISIBLE
+            icon.imageTintList = null
+            icon.clearColorFilter()
+            icon.loadCatalogImage(
+                item.imageUrl,
+                item.imageResId,
+                requestedSizePx = 480,
+                crossfadeMillis = 180
+            )
+            label.text = item.label
         }
     }
 }

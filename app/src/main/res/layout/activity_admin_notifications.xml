@@ -21,16 +21,14 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/adminNotifTopBar"
             android:layout_width="match_parent"
-            android:layout_height="64dp"
-            android:paddingStart="16dp"
-            android:paddingTop="8dp"
-            android:paddingEnd="16dp"
-            android:paddingBottom="8dp">
+            android:layout_height="@dimen/admin_top_bar_height"
+            android:paddingStart="@dimen/app_top_bar_horizontal_padding"
+            android:paddingEnd="@dimen/app_top_bar_horizontal_padding">
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/adminNotifIvBack"
-                android:layout_width="44dp"
-                android:layout_height="44dp"
+                android:layout_width="@dimen/app_top_bar_side_slot_size"
+                android:layout_height="@dimen/app_top_bar_side_slot_size"
                 android:clickable="true"
                 android:focusable="true"
                 android:foreground="?attr/selectableItemBackgroundBorderless"
@@ -56,11 +54,11 @@
                 android:id="@+id/adminNotifTvTitle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="14dp"
+                android:layout_marginStart="@dimen/admin_top_title_margin_start"
                 android:text="@string/admin_announcements_title"
                 android:textColor="@color/profile_text_primary"
-                android:fontFamily="@font/plus_jakarta_sans_bold"
-                android:textSize="@dimen/text_size_subtitle"
+                android:fontFamily="@font/manrope_semibold"
+                android:textSize="@dimen/app_top_bar_title_size"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/adminNotifIvSettings"
                 app:layout_constraintStart_toEndOf="@id/adminNotifIvBack"
@@ -68,8 +66,8 @@
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/adminNotifIvSettings"
-                android:layout_width="44dp"
-                android:layout_height="44dp"
+                android:layout_width="@dimen/app_top_bar_side_slot_size"
+                android:layout_height="@dimen/app_top_bar_side_slot_size"
                 android:clickable="true"
                 android:focusable="true"
                 android:foreground="?attr/selectableItemBackgroundBorderless"
@@ -138,7 +136,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:background="@drawable/bg_home_meta_pill"
-                        android:fontFamily="@font/plus_jakarta_sans_medium"
+                        android:fontFamily="@font/manrope_medium"
                         android:paddingStart="10dp"
                         android:paddingTop="6dp"
                         android:paddingEnd="10dp"
@@ -170,7 +168,7 @@
                             android:textColor="@android:color/white"
                             android:textColorHint="@color/home_text_secondary"
                             android:textSize="@dimen/text_size_caption"
-                            android:fontFamily="@font/plus_jakarta_sans_regular"
+                            android:fontFamily="@font/manrope_regular"
                             android:inputType="text"
                             android:imeOptions="actionNext" />
                     </com.google.android.material.card.MaterialCardView>
@@ -199,7 +197,7 @@
                             android:textColor="@android:color/white"
                             android:textColorHint="@color/home_text_secondary"
                             android:textSize="@dimen/text_size_caption"
-                            android:fontFamily="@font/plus_jakarta_sans_regular"
+                            android:fontFamily="@font/manrope_regular"
                             android:inputType="textMultiLine"
                             android:imeOptions="actionDone" />
                     </com.google.android.material.card.MaterialCardView>
@@ -231,7 +229,7 @@
                             android:textColor="@android:color/white"
                             android:textColorHint="@color/home_text_secondary"
                             android:textSize="@dimen/text_size_caption"
-                            android:fontFamily="@font/plus_jakarta_sans_regular"
+                            android:fontFamily="@font/manrope_regular"
                             android:inputType="none"
                             tools:text="Tous les utilisateurs" />
                     </com.google.android.material.card.MaterialCardView>
@@ -241,7 +239,7 @@
                         android:id="@+id/adminNotifBtnSend"
                         android:layout_width="match_parent"
                         android:layout_height="52dp"
-                        android:fontFamily="@font/plus_jakarta_sans_bold"
+                        android:fontFamily="@font/manrope_semibold"
                         android:text="@string/admin_announcements_publish"
                         android:textSize="@dimen/text_size_body"
                         app:backgroundTint="@color/home_surface_raised"
@@ -266,7 +264,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/admin_announcements_history_title"
                 android:textColor="@color/profile_text_primary"
-                android:fontFamily="@font/plus_jakarta_sans_bold"
+                android:fontFamily="@font/manrope_semibold"
                 android:textSize="@dimen/text_size_subtitle"
                 android:layout_marginBottom="12dp" />
 
@@ -324,3 +322,6 @@
         android:layout_gravity="bottom" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+
+

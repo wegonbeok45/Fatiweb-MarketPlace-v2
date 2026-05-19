@@ -37,7 +37,7 @@ class AdminDashboardActivity : AppCompatActivity() {
 
     private val ordersAdapter = AdminOrdersAdapter { uid, order -> showStatusDialogInline(uid, order) }
     private val clientsAdapter = AdminClientsAdapter { client ->
-        showToast(getString(R.string.admin_client_selected, client.name))
+        startActivity(AdminClientDetailsActivity.createIntent(this, client.uid))
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -58,7 +58,7 @@ class AdminDashboardActivity : AppCompatActivity() {
             setupBottomNav()
             setupQuickActions()
             setupObservers()
-            renderAdminStats(FirestoreService.AdminStats(), emptyList())
+            renderAdminStatsPlaceholder()
 
             if (viewModel.isVerified.value != true) {
                 viewModel.verifyAdmin(uid)
@@ -92,7 +92,7 @@ class AdminDashboardActivity : AppCompatActivity() {
             viewModel.loadDashboardData()
         }.onFailure { e ->
             Log.e(logTag, "Failed to init admin dashboard", e)
-            showToast(getString(R.string.coming_soon))
+            showToast(getString(R.string.admin_dashboard_load_failed))
             finish()
         }
     }
@@ -201,19 +201,15 @@ class AdminDashboardActivity : AppCompatActivity() {
 
     private fun switchTab(tab: DashboardInlineTab, animate: Boolean) {
         if (tab == activeTab && tab != DashboardInlineTab.OVERVIEW) {
-            when (tab) {
-                DashboardInlineTab.COMMANDES -> loadInlineOrders()
-                DashboardInlineTab.CLIENTS -> loadInlineClients()
-                DashboardInlineTab.OVERVIEW -> Unit
-            }
+            viewModel.loadDashboardData(force = true)
             return
         }
 
-        activeTab = tab
         if (viewModel.activeTab.value != tab) {
             viewModel.setTab(tab)
+        } else {
+            renderSelectedTab(tab, animate)
         }
-        renderSelectedTab(tab, animate)
     }
 
     private fun renderSelectedTab(tab: DashboardInlineTab, animate: Boolean) {
@@ -243,7 +239,7 @@ class AdminDashboardActivity : AppCompatActivity() {
         }
         recycler.adapter = ordersAdapter
         renderInlineOrders(viewModel.orders.value.orEmpty())
-        viewModel.loadDashboardData()
+        if (viewModel.orders.value == null) viewModel.loadDashboardData()
     }
 
     private fun loadInlineClients() {
@@ -254,7 +250,7 @@ class AdminDashboardActivity : AppCompatActivity() {
         }
         recycler.adapter = clientsAdapter
         renderInlineClients(viewModel.clients.value.orEmpty())
-        viewModel.loadDashboardData()
+        if (viewModel.clients.value == null) viewModel.loadDashboardData()
     }
 
     private fun renderInlineOrders(orders: List<Pair<String, AppOrder>>) {
@@ -408,6 +404,22 @@ class AdminDashboardActivity : AppCompatActivity() {
             getString(R.string.admin_dashboard_stock_meta, inactiveProducts)
     }
 
+    private fun renderAdminStatsPlaceholder() {
+        val placeholder = getString(R.string.str_2f43b4)
+        listOf(
+            R.id.adminTvCommandesVal,
+            R.id.adminTvRevenueVal,
+            R.id.adminTvClientsVal,
+            R.id.adminTvStockVal
+        ).forEach { id ->
+            findViewById<TextView>(id)?.text = placeholder
+        }
+        findViewById<TextView>(R.id.adminTvWelcomeChipSync)?.text =
+            getString(R.string.admin_dashboard_chip_sync)
+        findViewById<TextView>(R.id.adminTvWelcomeChipInventory)?.text =
+            getString(R.string.admin_dashboard_chip_inventory, 0)
+    }
+
     private fun renderDashboardOrdersPreview(orders: List<Pair<String, AppOrder>>) {
         val rows = listOf(
             intArrayOf(R.id.adminOrderRow1, R.id.adminOrderId1, R.id.adminOrderName1, R.id.adminOrderPrice1),
@@ -439,14 +451,9 @@ class AdminDashboardActivity : AppCompatActivity() {
     }
 
     private fun showStatusDialogInline(uid: String, order: AppOrder) {
-        val statuses = arrayOf(
-            getString(R.string.admin_status_pending),
-            getString(R.string.admin_status_preparing),
-            getString(R.string.admin_status_shipped),
-            getString(R.string.admin_status_delivered)
-        )
-        val keys = arrayOf("pending", "preparing", "shipped", "delivered")
-        val currentIndex = keys.indexOf(order.status).coerceAtLeast(0)
+        val keys = OrderStatuses.supported.toTypedArray()
+        val statuses = keys.map { orderStatusLabel(this, it) }.toTypedArray()
+        val currentIndex = keys.indexOf(OrderStatuses.normalize(order.status)).coerceAtLeast(0)
 
         androidx.appcompat.app.AlertDialog.Builder(this)
             .setTitle(getString(R.string.admin_change_status_title, order.displayId))

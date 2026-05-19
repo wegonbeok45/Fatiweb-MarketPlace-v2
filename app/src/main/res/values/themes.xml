@@ -22,8 +22,8 @@
         <item name="android:windowLightStatusBar">true</item>
         <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
         <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
-        <item name="android:fontFamily">@font/plus_jakarta_sans</item>
-        <item name="fontFamily">@font/plus_jakarta_sans</item>
+        <item name="android:fontFamily">@font/manrope</item>
+        <item name="fontFamily">@font/manrope</item>
     </style>
         
     <!-- Smooth Window Animations - Only enable for the main customer app-->
@@ -47,3 +47,4 @@
     </style>
 
 </resources>
+

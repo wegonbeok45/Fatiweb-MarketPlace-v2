@@ -69,6 +69,10 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun mapErrorToMessage(error: Exception): String = when {
+        (error as? BackendFunctionException)?.code == com.google.firebase.functions.FirebaseFunctionsException.Code.RESOURCE_EXHAUSTED ->
+            app.getString(R.string.chat_error_quota)
+        (error as? BackendFunctionException)?.code == com.google.firebase.functions.FirebaseFunctionsException.Code.FAILED_PRECONDITION ->
+            app.getString(R.string.chat_error_auth)
         error.message?.contains("RATE_LIMIT") == true ->
             app.getString(R.string.chat_error_rate_limit)
         error.message?.contains("blocked by safety filter") == true ->

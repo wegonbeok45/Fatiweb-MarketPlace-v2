@@ -68,6 +68,13 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
+    <TextView
+        android:id="@+id/sectionLocalization"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/settings_language_title"
+        android:visibility="gone" />
+
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/cardLanguage"
         android:layout_width="match_parent"
@@ -234,8 +241,15 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.card.MaterialCardView>
 
+    <TextView
+        android:id="@+id/sectionPreferences"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/settings_notifications_title"
+        android:visibility="gone" />
+
     <com.google.android.material.card.MaterialCardView
-        android:id="@+id/cardSupport"
+        android:id="@+id/cardHelpCenter"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/space_12"
@@ -314,8 +328,15 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.card.MaterialCardView>
 
+    <TextView
+        android:id="@+id/sectionSupport"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/settings_support_title"
+        android:visibility="gone" />
+
     <com.google.android.material.card.MaterialCardView
-        android:id="@+id/cardAbout"
+        android:id="@+id/cardAboutCurator"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/space_12"

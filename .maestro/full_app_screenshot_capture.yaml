@@ -1,0 +1,631 @@
+appId: isim.ia2y.myapplication
+tags:
+  - capture
+  - all-screens
+  - full-app
+---
+# ═══════════════════════════════════════════════════════════════
+#  FatiWeb – Full App Screenshot Capture
+#  Navigates every reachable screen and takes a screenshot.
+#  Screenshots are saved under: ~/.maestro/tests/
+#  Run:  maestro test .maestro/full_app_screenshot_capture.yaml
+# ═══════════════════════════════════════════════════════════════
+
+# ────────────────────────── 1. ONBOARDING ──────────────────────────
+- launchApp:
+    clearState: true
+
+# Dismiss any crash dialogs
+- retry:
+    maxRetries: 3
+    commands:
+      - tapOn:
+          id: "android:id/aerr_wait"
+          optional: true
+      - tapOn:
+          text: "Wait"
+          optional: true
+      - extendedWaitUntil:
+          visible:
+            id: "btnNext"
+          timeout: 15000
+
+- takeScreenshot: "01_onboarding_screen_1"
+
+- tapOn:
+    id: "btnNext"
+    waitToSettleTimeoutMs: 1500
+- extendedWaitUntil:
+    visible:
+      id: "btnContinue"
+    timeout: 10000
+- takeScreenshot: "02_onboarding_screen_2"
+
+- tapOn:
+    id: "btnContinue"
+    waitToSettleTimeoutMs: 1500
+- extendedWaitUntil:
+    visible:
+      id: "btnGetStarted"
+    timeout: 10000
+- takeScreenshot: "03_onboarding_screen_3"
+
+# ────────────────────────── 2. HOME (Guest) ──────────────────────────
+- tapOn:
+    id: "btnGetStarted"
+    waitToSettleTimeoutMs: 1500
+- extendedWaitUntil:
+    visible:
+      id: "layoutSearchBar"
+    timeout: 20000
+- takeScreenshot: "04_home_guest"
+
+# Scroll down to see more content
+- swipe:
+    start: 50%, 80%
+    end: 50%, 30%
+    duration: 500
+- takeScreenshot: "05_home_guest_scrolled"
+# Scroll back up
+- swipe:
+    start: 50%, 30%
+    end: 50%, 80%
+    duration: 500
+
+# ────────────────────────── 3. SEARCH SCREEN ──────────────────────────
+- tapOn:
+    id: "layoutSearchBar"
+    waitToSettleTimeoutMs: 1500
+- extendedWaitUntil:
+    visible:
+      id: "layoutDefaultState"
+    timeout: 10000
+- takeScreenshot: "06_search_screen_empty"
+
+- pressKey: back
+
+# ────────────────────────── 4. EXPLORE / CATEGORIES ──────────────────────────
+- extendedWaitUntil:
+    visible:
+      id: "navExplore"
+    timeout: 10000
+- tapOn:
+    id: "navExplore"
+    waitToSettleTimeoutMs: 1500
+- extendedWaitUntil:
+    visible:
+      id: "scrollExploreContent"
+    timeout: 10000
+- takeScreenshot: "07_explore_categories"
+
+# ────────────────────────── 5. CART (Guest / Empty) ──────────────────────────
+- tapOn:
+    id: "navCart"
+    waitToSettleTimeoutMs: 1500
+- takeScreenshot: "08_cart_empty_guest"
+
+# ────────────────────────── 6. PROFILE (Guest) ──────────────────────────
+- tapOn:
+    id: "navProfile"
+    waitToSettleTimeoutMs: 1500
+- extendedWaitUntil:
+    visible:
+      id: "cardOrders"
+    timeout: 10000
+- takeScreenshot: "09_profile_guest"
+
+# Scroll profile to see more items
+- swipe:
+    start: 50%, 80%
+    end: 50%, 30%
+    duration: 500
+- takeScreenshot: "10_profile_guest_scrolled"
+- swipe:
+    start: 50%, 30%
+    end: 50%, 80%
+    duration: 500
+
+# ────────────────────────── 7. AUTH GATE ──────────────────────────
+- tapOn:
+    id: "cardOrders"
+    waitToSettleTimeoutMs: 1500
+- extendedWaitUntil:
+    visible:
+      id: "btnAuthCreateAccount"
+    timeout: 10000
+- takeScreenshot: "11_auth_gate"
+
+# ────────────────────────── 8. REGISTER SCREEN ──────────────────────────
+- tapOn:
+    id: "btnAuthCreateAccount"
+    waitToSettleTimeoutMs: 1500
+- takeScreenshot: "12_register_screen"
+- pressKey: back
+
+# ────────────────────────── 9. LOGIN SCREEN ──────────────────────────
+- extendedWaitUntil:
+    visible:
+      id: "btnAuthExistingClient"
+    timeout: 10000
+- tapOn:
+    id: "btnAuthExistingClient"
+    waitToSettleTimeoutMs: 1500
+- extendedWaitUntil:
+    visible:
+      id: "btnLogin"
+    timeout: 10000
+- takeScreenshot: "13_login_screen"
+
+# ────────────────────────── 10. LOG IN AS ADMIN ──────────────────────────
+- tapOn:
+    id: "etEmail"
+    waitToSettleTimeoutMs: 500
+- inputText: "speedyjj08@gmail.com"
+- hideKeyboard
+- tapOn:
+    id: "etPassword"
+    waitToSettleTimeoutMs: 500
+- inputText: "mahamedtaher2004"
+- hideKeyboard
+- tapOn:
+    id: "btnLogin"
+    waitToSettleTimeoutMs: 1500
+
+# Wait for the app to load after login
+- extendedWaitUntil:
+    visible:
+      id: "layoutSearchBar"
+    timeout: 30000
+
+# ────────────────────────── 11. HOME (Authenticated) ──────────────────────────
+- takeScreenshot: "14_home_authenticated"
+- swipe:
+    start: 50%, 80%
+    end: 50%, 30%
+    duration: 500
+- takeScreenshot: "15_home_authenticated_scrolled"
+- swipe:
+    start: 50%, 30%
+    end: 50%, 80%
+    duration: 500
+
+# ────────────────────────── 12. SEARCH (Authenticated) ──────────────────────────
+- tapOn:
+    id: "layoutSearchBar"
+    waitToSettleTimeoutMs: 1500
+- extendedWaitUntil:
+    visible:
+      id: "layoutDefaultState"
+    timeout: 10000
+- takeScreenshot: "16_search_authenticated"
+- pressKey: back
+
+# ────────────────────────── 13. EXPLORE (Authenticated) ──────────────────────────
+- extendedWaitUntil:
+    visible:
+      id: "navExplore"
+    timeout: 10000
+- tapOn:
+    id: "navExplore"
+    waitToSettleTimeoutMs: 1500
+- extendedWaitUntil:
+    visible:
+      id: "scrollExploreContent"
+    timeout: 10000
+- takeScreenshot: "17_explore_authenticated"
+
+# ────────────────────────── 14. PRODUCT DETAILS ──────────────────────────
+- tapOn:
+    id: "navHome"
+    waitToSettleTimeoutMs: 1500
+- extendedWaitUntil:
+    visible:
+      id: "layoutSearchBar"
+    timeout: 10000
+# Scroll down to find a product
+- swipe:
+    start: 50%, 80%
+    end: 50%, 30%
+    duration: 500
+- swipe:
+    start: 50%, 80%
+    end: 50%, 30%
+    duration: 500
+- extendedWaitUntil:
+    visible:
+      id: "homeDynamicProductTitle"
+    timeout: 10000
+- tapOn:
+    id: "homeDynamicProductTitle"
+    waitToSettleTimeoutMs: 1500
+- extendedWaitUntil:
+    visible:
+      id: "btnAddToCart"
+    timeout: 10000
+- takeScreenshot: "18_product_details"
+
+# Scroll product details
+- swipe:
+    start: 50%, 80%
+    end: 50%, 30%
+    duration: 500
+- takeScreenshot: "19_product_details_scrolled"
+
+# Add to cart
+- tapOn:
+    id: "btnAddToCart"
+    waitToSettleTimeoutMs: 1000
+- takeScreenshot: "20_product_added_to_cart"
+- pressKey: back
+
+# ────────────────────────── 15. CART (With Items) ──────────────────────────
+- extendedWaitUntil:
+    visible:
+      id: "navCart"
+    timeout: 10000
+- tapOn:
+    id: "navCart"
+    waitToSettleTimeoutMs: 1500
+- extendedWaitUntil:
+    visible:
+      id: "btnCheckout"
+    timeout: 10000
+- takeScreenshot: "21_cart_with_items"
+
+# ────────────────────────── 16. CHECKOUT FLOW ──────────────────────────
+- tapOn:
+    id: "btnCheckout"
+    waitToSettleTimeoutMs: 1500
+- extendedWaitUntil:
+    visible:
+      id: "btnCheckoutContinue"
+    timeout: 10000
+- takeScreenshot: "22_checkout_step1_address"
+
+- tapOn:
+    id: "btnCheckoutContinue"
+    waitToSettleTimeoutMs: 1500
+- extendedWaitUntil:
+    visible:
+      id: "cardPayCash"
+    timeout: 10000
+- takeScreenshot: "23_checkout_step2_payment"
+
+# Go back from checkout (don't actually place the order)
+- pressKey: back
+- pressKey: back
+
+# ────────────────────────── 17. FAVORITES ──────────────────────────
+- extendedWaitUntil:
+    visible:
+      id: "navHome"
+    timeout: 10000
+- tapOn:
+    id: "navHome"
+    waitToSettleTimeoutMs: 1500
+
+# ────────────────────────── 18. PROFILE (Authenticated) ──────────────────────────
+- tapOn:
+    id: "navProfile"
+    waitToSettleTimeoutMs: 1500
+- extendedWaitUntil:
+    visible:
+      id: "tvUserName"
+    timeout: 20000
+- takeScreenshot: "24_profile_authenticated"
+
+# Scroll profile
+- swipe:
+    start: 50%, 80%
+    end: 50%, 30%
+    duration: 500
+- takeScreenshot: "25_profile_authenticated_scrolled"
+- swipe:
+    start: 50%, 30%
+    end: 50%, 80%
+    duration: 500
+
+# ────────────────────────── 19. ORDERS HISTORY ──────────────────────────
+- tapOn:
+    id: "cardOrders"
+    waitToSettleTimeoutMs: 1500
+- extendedWaitUntil:
+    visible:
+      id: "scrollOrders"
+    timeout: 15000
+- takeScreenshot: "26_orders_history"
+- tapOn:
+    id: "ivBack"
+    waitToSettleTimeoutMs: 1000
+
+# ────────────────────────── 20. ADDRESSES ──────────────────────────
+- extendedWaitUntil:
+    visible:
+      id: "cardAddresses"
+    timeout: 10000
+- tapOn:
+    id: "cardAddresses"
+    waitToSettleTimeoutMs: 1500
+- extendedWaitUntil:
+    visible:
+      id: "scrollAddresses"
+    timeout: 15000
+- takeScreenshot: "27_addresses"
+- tapOn:
+    id: "ivBack"
+    waitToSettleTimeoutMs: 1000
+
+# ────────────────────────── 21. NOTIFICATIONS ──────────────────────────
+- extendedWaitUntil:
+    visible:
+      id: "ivNotifications"
+    timeout: 10000
+- tapOn:
+    id: "ivNotifications"
+    waitToSettleTimeoutMs: 1500
+- extendedWaitUntil:
+    visible:
+      id: "tvClearAll"
+    timeout: 10000
+- takeScreenshot: "28_notifications"
+- tapOn:
+    id: "ivBack"
+    waitToSettleTimeoutMs: 1000
+
+# ────────────────────────── 22. SETTINGS ──────────────────────────
+- extendedWaitUntil:
+    visible:
+      id: "cardSettings"
+    timeout: 10000
+- tapOn:
+    id: "cardSettings"
+    waitToSettleTimeoutMs: 1500
+- extendedWaitUntil:
+    visible:
+      id: "cardLanguage"
+    timeout: 10000
+- takeScreenshot: "29_settings"
+
+# Scroll settings
+- swipe:
+    start: 50%, 80%
+    end: 50%, 30%
+    duration: 500
+- takeScreenshot: "30_settings_scrolled"
+- swipe:
+    start: 50%, 30%
+    end: 50%, 80%
+    duration: 500
+
+# ────────────────────────── 23. LANGUAGE SETTINGS ──────────────────────────
+- tapOn:
+    id: "cardLanguage"
+    waitToSettleTimeoutMs: 1500
+- extendedWaitUntil:
+    visible:
+      id: "cardLanguageOptions"
+    timeout: 10000
+- takeScreenshot: "31_language_settings"
+- tapOn:
+    id: "ivBack"
+    waitToSettleTimeoutMs: 1000
+
+# ────────────────────────── 24. NOTIFICATION PREFERENCES ──────────────────────────
+- extendedWaitUntil:
+    visible:
+      id: "cardNotifications"
+    timeout: 10000
+- tapOn:
+    id: "cardNotifications"
+    waitToSettleTimeoutMs: 1500
+- takeScreenshot: "32_notification_preferences"
+- tapOn:
+    id: "ivBack"
+    waitToSettleTimeoutMs: 1000
+
+# ────────────────────────── 25. ABOUT CURATOR ──────────────────────────
+- extendedWaitUntil:
+    visible:
+      id: "cardAbout"
+    timeout: 10000
+- tapOn:
+    id: "cardAbout"
+    waitToSettleTimeoutMs: 1500
+- takeScreenshot: "33_about_curator"
+- pressKey: back
+
+# ────────────────────────── 26. HELP CENTER (from Settings) ──────────────────────────
+- extendedWaitUntil:
+    visible:
+      id: "cardSupport"
+    timeout: 10000
+- tapOn:
+    id: "cardSupport"
+    waitToSettleTimeoutMs: 1500
+- takeScreenshot: "34_help_center"
+- pressKey: back
+
+# Go back to Profile
+- tapOn:
+    id: "ivBack"
+    waitToSettleTimeoutMs: 1000
+
+# ────────────────────────── 27. HELP (from Profile) ──────────────────────────
+- extendedWaitUntil:
+    visible:
+      id: "cardHelp"
+    timeout: 10000
+# Scroll down to see help
+- swipe:
+    start: 50%, 80%
+    end: 50%, 30%
+    duration: 500
+- tapOn:
+    id: "cardHelp"
+    waitToSettleTimeoutMs: 1500
+- takeScreenshot: "35_help_from_profile"
+- pressKey: back
+
+# ═══════════════════════════════════════════════════════════════
+#          ADMIN SECTION
+# ═══════════════════════════════════════════════════════════════
+
+# Go back to profile top
+- swipe:
+    start: 50%, 30%
+    end: 50%, 80%
+    duration: 500
+- swipe:
+    start: 50%, 30%
+    end: 50%, 80%
+    duration: 500
+
+# ────────────────────────── 28. ADMIN DASHBOARD ──────────────────────────
+- extendedWaitUntil:
+    visible:
+      id: "cardAdmin"
+    timeout: 10000
+- tapOn:
+    id: "cardAdmin"
+    waitToSettleTimeoutMs: 1500
+- extendedWaitUntil:
+    visible:
+      id: "adminNavDashboard"
+    timeout: 20000
+- takeScreenshot: "36_admin_dashboard"
+
+# Scroll dashboard
+- swipe:
+    start: 50%, 80%
+    end: 50%, 30%
+    duration: 500
+- takeScreenshot: "37_admin_dashboard_scrolled"
+- swipe:
+    start: 50%, 30%
+    end: 50%, 80%
+    duration: 500
+
+# ────────────────────────── 29. ADMIN ORDERS ──────────────────────────
+- tapOn:
+    id: "adminNavCommandes"
+    waitToSettleTimeoutMs: 1500
+- extendedWaitUntil:
+    visible:
+      id: "adminInlineCommandesTvTotal"
+    timeout: 15000
+- takeScreenshot: "38_admin_orders"
+
+# Scroll orders
+- swipe:
+    start: 50%, 80%
+    end: 50%, 30%
+    duration: 500
+- takeScreenshot: "39_admin_orders_scrolled"
+- swipe:
+    start: 50%, 30%
+    end: 50%, 80%
+    duration: 500
+
+# ────────────────────────── 30. ADMIN CLIENTS ──────────────────────────
+- tapOn:
+    id: "adminNavClients"
+    waitToSettleTimeoutMs: 1500
+- extendedWaitUntil:
+    visible:
+      id: "adminInlineClientsTvTotal"
+    timeout: 15000
+- takeScreenshot: "40_admin_clients"
+
+# ────────────────────────── 31. ADMIN PRODUCTS ──────────────────────────
+- tapOn:
+    id: "adminNavProduits"
+    waitToSettleTimeoutMs: 1500
+- extendedWaitUntil:
+    visible:
+      id: "adminProduitsBtnAdd"
+    timeout: 15000
+- takeScreenshot: "41_admin_products"
+
+# Scroll products
+- swipe:
+    start: 50%, 80%
+    end: 50%, 30%
+    duration: 500
+- takeScreenshot: "42_admin_products_scrolled"
+- swipe:
+    start: 50%, 30%
+    end: 50%, 80%
+    duration: 500
+
+# ────────────────────────── 32. ADMIN PRODUCT EDITOR ──────────────────────────
+- tapOn:
+    id: "adminProduitsBtnAdd"
+    waitToSettleTimeoutMs: 1500
+- extendedWaitUntil:
+    visible:
+      id: "adminProductEditorBtnSave"
+    timeout: 15000
+- takeScreenshot: "43_admin_product_editor"
+
+# Scroll editor
+- swipe:
+    start: 50%, 80%
+    end: 50%, 30%
+    duration: 500
+- takeScreenshot: "44_admin_product_editor_scrolled"
+
+- tapOn:
+    id: "adminProductEditorIvBack"
+    waitToSettleTimeoutMs: 1000
+
+# ────────────────────────── 33. ADMIN NOTIFICATIONS ──────────────────────────
+- extendedWaitUntil:
+    visible:
+      id: "adminNavNotifications"
+    timeout: 10000
+- tapOn:
+    id: "adminNavNotifications"
+    waitToSettleTimeoutMs: 1500
+- extendedWaitUntil:
+    visible:
+      id: "adminNotifBtnSend"
+    timeout: 15000
+- takeScreenshot: "45_admin_notifications"
+
+# ────────────────────────── 34. ADMIN SETTINGS / PARAMETRES ──────────────────────────
+- tapOn:
+    id: "adminNotifIvSettings"
+    waitToSettleTimeoutMs: 1500
+- extendedWaitUntil:
+    visible:
+      id: "adminParamCardLivraison"
+    timeout: 15000
+- takeScreenshot: "46_admin_parametres"
+
+# Scroll parameters
+- swipe:
+    start: 50%, 80%
+    end: 50%, 30%
+    duration: 500
+- takeScreenshot: "47_admin_parametres_scrolled"
+- swipe:
+    start: 50%, 30%
+    end: 50%, 80%
+    duration: 500
+
+# ────────────────────────── 35. ADMIN SETTINGS DIALOG ──────────────────────────
+- tapOn:
+    id: "adminParamLivrStandardEditGroup"
+    waitToSettleTimeoutMs: 1500
+- extendedWaitUntil:
+    visible:
+      id: "etEditPrice"
+    timeout: 10000
+- takeScreenshot: "48_admin_settings_dialog"
+- tapOn:
+    id: "btnEditPriceCancel"
+    waitToSettleTimeoutMs: 1000
+
+# ════════════════════════════════════════════════════════════
+#  DONE – All screenshots captured!
+# ════════════════════════════════════════════════════════════

@@ -14,23 +14,16 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.facebook.CallbackManager
-import com.facebook.FacebookCallback
-import com.facebook.FacebookException
-import com.facebook.login.LoginManager
-import com.facebook.login.LoginResult
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import isim.ia2y.myapplication.databinding.ActivityLoginBinding
 
 class LoginActivity : AppCompatActivity() {
     private var passwordVisible = false
     private var isEmailLoginSubmitting = false
-    private lateinit var callbackManager: CallbackManager
     private lateinit var googleSignInClient: GoogleSignInClient
     private lateinit var binding: ActivityLoginBinding
 
@@ -87,7 +80,6 @@ class LoginActivity : AppCompatActivity() {
             v.setPadding(hPadding, systemBars.top + vPadding, hPadding, systemBars.bottom + vPadding)
             insets
         }
-        callbackManager = CallbackManager.Factory.create()
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken(getString(R.string.google_web_client_id))
             .requestEmail()
@@ -107,7 +99,6 @@ class LoginActivity : AppCompatActivity() {
         }
         revealViewsInOrder(
             R.id.ivBack,
-            R.id.ivAppLogo,
             R.id.cardWelcomePanel,
             R.id.tvWelcomeTitle,
             R.id.tvWelcomeSubtitle,
@@ -124,17 +115,29 @@ class LoginActivity : AppCompatActivity() {
         binding.ivBack.setOnClickListener {
             finishAuthEntry()
         }
-        binding.ivAppLogo.setOnClickListener {
-            navigateToMainTab(MainActivity.Tab.HOME)
-        }
         binding.tvSignUp.setOnClickListener {
             startActivity(RegisterActivity.createIntent(this).copyAuthReturnFrom(intent))
         }
-        configureFacebookAvailability()
         setupGoogleLogin()
 
         binding.tvForgotPassword.setOnClickListener {
             showResetPasswordDialog()
+        }
+
+        binding.btnContinueAsGuest?.setOnClickListener {
+            setResult(RESULT_OK)
+            val returnTab = intent.authReturnTab()
+            val returnRoute = intent.authReturnRoute()
+
+            if (returnRoute == AUTH_RETURN_ROUTE_CHECKOUT || returnRoute == AUTH_RETURN_ROUTE_CART) {
+                startActivity(android.content.Intent(this, CheckoutDetailsActivity::class.java).apply {
+                    putExtra(EXTRA_GUEST_CHECKOUT, true)
+                })
+                finishWithMotion(isForward = true)
+            } else {
+                navigateToMainTab(returnTab ?: MainActivity.Tab.HOME)
+                finishWithMotion(isForward = false)
+            }
         }
 
         val etEmail = binding.etEmail
@@ -170,9 +173,8 @@ class LoginActivity : AppCompatActivity() {
                     val result = FirebaseAuthManager.signIn(email, password)
                     result.fold(
                         onSuccess = {
-                            lifecycleScope.launch(Dispatchers.IO) {
-                                GuestSessionMerger.mergeIntoCurrentUser(this@LoginActivity)
-                            }
+                            GuestSessionMerger.mergeIntoCurrentUserInBackground(this@LoginActivity)
+                            AnalyticsTracker.login("email")
                             markInputState(R.id.cardEmailField, InputFieldState.SUCCESS)
                             markInputState(R.id.cardPasswordField, InputFieldState.SUCCESS)
                             completeAuthFlow()
@@ -207,82 +209,12 @@ class LoginActivity : AppCompatActivity() {
         }
         applyPressFeedback(
             R.id.ivBack,
-            R.id.ivAppLogo,
             R.id.tvSignUp,
             R.id.tvForgotPassword,
             R.id.btnLogin,
             R.id.btnGoogle,
-            R.id.btnFacebook,
             R.id.ivPasswordToggle
         )
-    }
-
-    private fun configureFacebookAvailability() {
-        val btnFacebook = binding.btnFacebook
-        if (!isFacebookConfigured()) {
-            btnFacebook.visibility = View.GONE
-            val btnGoogle = binding.btnGoogle
-            (btnGoogle.layoutParams as? androidx.constraintlayout.widget.ConstraintLayout.LayoutParams)?.apply {
-                endToEnd = androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.PARENT_ID
-                endToStart = androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.UNSET
-                startToStart = androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.PARENT_ID
-                startToEnd = androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.UNSET
-                width = 0
-                btnGoogle.layoutParams = this
-            }
-            return
-        }
-        setupFacebookLogin()
-    }
-
-    private fun setupFacebookLogin() {
-        val btnFacebook = binding.btnFacebook
-        
-        btnFacebook.setOnClickListener {
-            LoginManager.getInstance().logInWithReadPermissions(
-                this,
-                callbackManager,
-                listOf("email", "public_profile")
-            )
-        }
-
-        LoginManager.getInstance().registerCallback(callbackManager, object : FacebookCallback<LoginResult> {
-            override fun onSuccess(result: LoginResult) {
-                handleFacebookAccessToken(result.accessToken.token)
-            }
-
-            override fun onCancel() {
-                showMotionSnackbar(getString(R.string.auth_cancelled))
-            }
-
-            override fun onError(error: FacebookException) {
-                showMotionSnackbar(getString(R.string.auth_facebook_error, error.message ?: ""))
-            }
-        })
-    }
-
-    private fun handleFacebookAccessToken(token: String) {
-        lifecycleScope.launch {
-            val result = FirebaseAuthManager.signInWithFacebook(token)
-            result.fold(
-                onSuccess = {
-                    lifecycleScope.launch(Dispatchers.IO) {
-                        GuestSessionMerger.mergeIntoCurrentUser(this@LoginActivity)
-                    }
-                    completeAuthFlow()
-                },
-                onFailure = { e ->
-                    showMotionSnackbar(FirebaseAuthManager.friendlyError(this@LoginActivity, e))
-                }
-            )
-        }
-    }
-
-    // Forward Facebook activity results to its callback manager
-    @Suppress("DEPRECATION")
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: android.content.Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        callbackManager.onActivityResult(requestCode, resultCode, data)
     }
 
     private fun setupGoogleLogin() {
@@ -296,9 +228,8 @@ class LoginActivity : AppCompatActivity() {
             val result = FirebaseAuthManager.signInWithGoogle(idToken)
             result.fold(
                 onSuccess = {
-                    lifecycleScope.launch(Dispatchers.IO) {
-                        GuestSessionMerger.mergeIntoCurrentUser(this@LoginActivity)
-                    }
+                    GuestSessionMerger.mergeIntoCurrentUserInBackground(this@LoginActivity)
+                    AnalyticsTracker.login("google")
                     completeAuthFlow()
                 },
                 onFailure = { e -> showMotionSnackbar(FirebaseAuthManager.friendlyError(this@LoginActivity, e)) }
@@ -306,20 +237,10 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    private fun isFacebookConfigured(): Boolean {
-        val appId = getString(R.string.facebook_app_id)
-        val clientToken = getString(R.string.facebook_client_token)
-        return appId.isNotBlank() &&
-            clientToken.isNotBlank() &&
-            !appId.startsWith("YOUR_") &&
-            !clientToken.startsWith("YOUR_")
-    }
-
     private fun showResetPasswordDialog() {
         val prefill = binding.etEmail.text?.toString().orEmpty()
         val view = layoutInflater.inflate(R.layout.dialog_single_input, null)
         val input = view.findViewById<EditText>(R.id.etDialogInput).apply {
-            id = R.id.etResetPasswordEmail
             inputType = android.text.InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS
             hint = getString(R.string.auto_text_035)
             if (prefill.isNotBlank()) {

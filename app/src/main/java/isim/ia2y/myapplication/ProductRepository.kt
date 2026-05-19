@@ -9,6 +9,7 @@ data class Product(
     val title: String,
     val subtitle: String,
     val price: Double,
+    val priceMinor: Long = toMinorUnits(price),
     val rating: Double,
     val reviewsCount: Int,
     val tags: List<String>,
@@ -17,14 +18,26 @@ data class Product(
     @DrawableRes val imageRes: Int,
     val imageUrl: String? = null,
     val imageUrls: List<String> = emptyList(),
-    val category: String = "craft",
+    val thumbnailUrl: String? = null,
+    val thumbnailUrls: List<String> = emptyList(),
+    val category: String = "electronics",
     val categoryIds: List<String> = emptyList(),
+    val categoryLeafId: String = categoryIds.lastOrNull() ?: category,
     val origin: String = "tunisia",
     val stock: Int = 0,
     val isBio: Boolean = false,
     val isActive: Boolean = true,
     val status: String = "published",
+    val discountPercent: Int = 0,
     val searchKeywords: List<String> = emptyList(),
+    val sellerId: String = "",
+    val sellerName: String = "",
+    val sellerAvatarUrl: String = "",
+    val sellerVerifiedAt: Any? = null,
+    val sellerMemberSince: Any? = null,
+    val sellerTotalSold: Int = 0,
+    val sellerRating: Double = 0.0,
+    val sellerRatingCount: Int = 0,
     val createdAt: Any? = null,
     val updatedAt: Any? = null
 ) {
@@ -41,7 +54,12 @@ data class Product(
         is Map<*, *> -> (res["seconds"] as? Number)?.toLong()?.let { it * 1000 } ?: 0L
         else -> 0L
     }
-    val unitPrice: Double get() = price
+    val effectivePrice: Double get() = fromMinorUnits(priceMinor)
+    val discountPercentClamped: Int get() = discountPercent.coerceIn(0, 90)
+    val hasDiscount: Boolean get() = discountPercentClamped > 0
+    val discountedPrice: Double
+        get() = if (hasDiscount) effectivePrice * (1.0 - discountPercentClamped / 100.0) else effectivePrice
+    val unitPrice: Double get() = discountedPrice
     val tag: String get() = tags.firstOrNull().orEmpty()
     val isDisplayReady: Boolean
         get() = title.trim().length >= 3 &&
@@ -56,20 +74,36 @@ data class Product(
             append(tags.joinToString(" ")).append(' ')
             append(category).append(' ')
             append(origin).append(' ')
+            append(sellerName).append(' ')
             append(if (isBio) "bio naturel " else "")
         }.lowercase(Locale.getDefault())
     }
+
+    val sellerDisplayName: String
+        get() = sellerName.trim().ifBlank { "Fati" }
 }
+
+@DrawableRes
+fun Product.catalogFallbackImageRes(): Int =
+    imageRes.takeIf { it != 0 } ?: ProductCatalog.imageForCategory(category)
+
+fun Product.mainImageUrl(): String? =
+    imageUrls.firstOrNull { it.isNotBlank() } ?: imageUrl?.takeIf { it.isNotBlank() }
+
+fun Product.previewImageUrl(): String? =
+    thumbnailUrls.firstOrNull { it.isNotBlank() }
+        ?: thumbnailUrl?.takeIf { it.isNotBlank() }
+        ?: mainImageUrl()
 
 object ProductCatalog {
 
     private val seedProducts = emptyList<Product>()
 
     private val localVisualMap = mapOf(
-        "chechia" to Product("chechia", "", "", 0.0, 0.0, 0, emptyList(), "", emptyList(), R.drawable.product1example),
-        "bijoux" to Product("bijoux", "", "", 0.0, 0.0, 0, emptyList(), "", emptyList(), R.drawable.product2example),
-        "marqoum" to Product("marqoum", "", "", 0.0, 0.0, 0, emptyList(), "", emptyList(), R.drawable.product3example),
-        "balgha" to Product("balgha", "", "", 0.0, 0.0, 0, emptyList(), "", emptyList(), R.drawable.product4example)
+        "chechia" to Product(id = "chechia", title = "", subtitle = "", price = 0.0, rating = 0.0, reviewsCount = 0, tags = emptyList(), description = "", bullets = emptyList(), imageRes = R.drawable.product1example),
+        "bijoux" to Product(id = "bijoux", title = "", subtitle = "", price = 0.0, rating = 0.0, reviewsCount = 0, tags = emptyList(), description = "", bullets = emptyList(), imageRes = R.drawable.product2example),
+        "marqoum" to Product(id = "marqoum", title = "", subtitle = "", price = 0.0, rating = 0.0, reviewsCount = 0, tags = emptyList(), description = "", bullets = emptyList(), imageRes = R.drawable.product3example),
+        "balgha" to Product(id = "balgha", title = "", subtitle = "", price = 0.0, rating = 0.0, reviewsCount = 0, tags = emptyList(), description = "", bullets = emptyList(), imageRes = R.drawable.product4example)
     )
 
     @Volatile
@@ -126,28 +160,27 @@ object ProductCatalog {
         return normalized.ifBlank { "product_${System.currentTimeMillis()}" }
     }
 
-    fun imageForCategory(category: String): Int = when (category.lowercase(Locale.getDefault())) {
-        "food" -> R.drawable.img_explore_epices
-        "beauty" -> R.drawable.img_explore_cosmetiques
-        "fashion" -> R.drawable.img_explore_vetements
-        "decor" -> R.drawable.img_explore_decoration
-        else -> R.drawable.img_explore_artisanat
-    }
+    fun imageForCategory(category: String): Int = MarketplaceCategories.imageResFor(category)
 
     fun legacyImageRes(productId: String): Int? = localVisualMap[productId]?.imageRes
 
     private fun mergeLocalVisuals(product: Product): Product {
-        // Only use local fallback if there is no remote image URL
-        if (!product.imageUrl.isNullOrBlank()) return product
+        val finalImageUrl = product.mainImageUrl()
+        val finalImageUrls = product.imageUrls
+            .filter { it.isNotBlank() }
+            .ifEmpty { finalImageUrl?.let(::listOf).orEmpty() }
+        val finalThumbnailUrl = product.thumbnailUrl?.takeIf { it.isNotBlank() }
+            ?: product.thumbnailUrls.firstOrNull { it.isNotBlank() }
+        val finalThumbnailUrls = product.thumbnailUrls
+            .filter { it.isNotBlank() }
+            .ifEmpty { finalThumbnailUrl?.let(::listOf).orEmpty() }
 
-        val key = localVisualMap.keys.firstOrNull {
-            product.id.contains(it, ignoreCase = true) || product.title.contains(it, ignoreCase = true)
-        }
-        val localVisual = if (key != null) localVisualMap[key] else null
-        
         return product.copy(
-            imageRes = localVisual?.imageRes ?: if (product.imageRes != 0) product.imageRes else imageForCategory(product.category),
-            imageUrl = localVisual?.imageUrl ?: product.imageUrl
+            imageRes = product.imageRes.takeIf { it != 0 } ?: 0,
+            imageUrl = finalImageUrl,
+            imageUrls = finalImageUrls,
+            thumbnailUrl = finalThumbnailUrl,
+            thumbnailUrls = finalThumbnailUrls
         )
     }
 }

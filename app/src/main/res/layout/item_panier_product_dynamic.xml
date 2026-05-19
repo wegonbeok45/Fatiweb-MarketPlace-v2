@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     app:cardBackgroundColor="@color/home_surface_raised"
-    app:cardCornerRadius="@dimen/corner_radius_large"
+    app:cardCornerRadius="@dimen/product_card_corner_radius"
     app:cardElevation="0dp"
     app:strokeColor="@color/colorBorderLight"
     app:strokeWidth="1dp">
@@ -13,15 +13,15 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingStart="@dimen/space_14"
-        android:paddingTop="@dimen/space_14"
-        android:paddingEnd="@dimen/space_14"
-        android:paddingBottom="@dimen/space_14">
+        android:paddingStart="@dimen/space_16"
+        android:paddingTop="@dimen/space_16"
+        android:paddingEnd="@dimen/space_16"
+        android:paddingBottom="@dimen/space_16">
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardCartItemImage"
-            android:layout_width="84dp"
-            android:layout_height="84dp"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
             app:cardBackgroundColor="@color/home_surface_soft"
             app:cardCornerRadius="@dimen/corner_radius_medium"
             app:cardElevation="0dp"
@@ -40,11 +40,11 @@
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/btnRemoveItem"
-            android:layout_width="@dimen/surface_button_size"
-            android:layout_height="@dimen/surface_button_size"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:contentDescription="@string/cd_delete"
             app:cardBackgroundColor="@color/home_surface_soft"
-            app:cardCornerRadius="@dimen/surface_button_corner_radius"
+            app:cardCornerRadius="8dp"
             app:cardElevation="0dp"
             app:strokeColor="@color/colorBorderLight"
             app:strokeWidth="1dp"
@@ -52,8 +52,8 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <ImageView
-                android:layout_width="18dp"
-                android:layout_height="18dp"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
                 android:layout_gravity="center"
                 android:contentDescription="@string/cd_delete"
                 app:srcCompat="@drawable/ic_panier_delete"
@@ -64,10 +64,10 @@
             android:id="@+id/tvCartItemTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/space_12"
+            android:layout_marginStart="@dimen/space_14"
             android:layout_marginEnd="@dimen/space_10"
             android:ellipsize="end"
-            android:fontFamily="@font/plus_jakarta_sans_bold"
+            android:fontFamily="@font/manrope_semibold"
             android:maxLines="2"
             android:textColor="@color/home_text_primary"
             android:textSize="@dimen/text_size_body"
@@ -81,10 +81,10 @@
             android:id="@+id/tvCartItemSubtitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/space_4"
+            android:layout_marginTop="@dimen/space_6"
             android:layout_marginEnd="@dimen/space_10"
             android:ellipsize="end"
-            android:fontFamily="@font/plus_jakarta_sans_regular"
+            android:fontFamily="@font/manrope_regular"
             android:maxLines="1"
             android:textColor="@color/home_text_secondary"
             android:textSize="@dimen/text_size_caption"
@@ -95,48 +95,54 @@
 
         <TextView
             android:id="@+id/tvCartItemPrice"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/space_10"
-            android:fontFamily="@font/plus_jakarta_sans_bold"
+            android:layout_marginTop="@dimen/space_12"
+            android:layout_marginEnd="@dimen/space_10"
+            android:ellipsize="end"
+            android:fontFamily="@font/manrope_semibold"
+            android:maxLines="1"
             android:textColor="?attr/colorPrimary"
             android:textSize="@dimen/text_size_body"
             android:textStyle="bold"
+            app:layout_constraintEnd_toStartOf="@id/layoutQty"
             app:layout_constraintStart_toStartOf="@id/tvCartItemTitle"
-            app:layout_constraintTop_toBottomOf="@id/tvCartItemSubtitle"
+            app:layout_constraintBottom_toBottomOf="@id/cardCartItemImage"
             tools:text="45.500 DT" />
 
         <LinearLayout
             android:id="@+id/layoutQty"
             android:layout_width="wrap_content"
-            android:layout_height="44dp"
-            android:background="@drawable/bg_home_meta_pill"
+            android:layout_height="@dimen/panier_qty_height"
+            android:background="@drawable/bg_panier_qty_container"
             android:gravity="center_vertical"
             android:orientation="horizontal"
             android:paddingStart="2dp"
             android:paddingEnd="2dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
+            app:layout_constraintBottom_toBottomOf="@id/cardCartItemImage"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvCartItemPrice">
 
             <TextView
                 android:id="@+id/btnQtyMinus"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:background="@drawable/bg_home_meta_pill"
-                android:backgroundTint="?attr/colorPrimary"
+                android:layout_width="@dimen/panier_qty_button_size"
+                android:layout_height="@dimen/panier_qty_button_size"
+                android:background="@drawable/bg_panier_qty_button"
                 android:contentDescription="@string/cd_decrease_qty"
                 android:gravity="center"
+                android:includeFontPadding="false"
                 android:text="@string/auto_text_102"
-                android:textColor="@android:color/white"
-                android:textSize="@dimen/text_size_subtitle"
+                android:textColor="@color/panier_qty_symbol"
+                android:textSize="@dimen/panier_text_size_qty"
                 android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tvQtyValue"
-                android:layout_width="40dp"
+                android:layout_width="@dimen/panier_qty_value_width"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/plus_jakarta_sans_bold"
+                android:fontFamily="@font/manrope_semibold"
                 android:gravity="center"
+                android:includeFontPadding="false"
                 android:text="@string/auto_text_123"
                 android:textColor="@color/home_text_primary"
                 android:textSize="@dimen/text_size_caption"
@@ -144,17 +150,18 @@
 
             <TextView
                 android:id="@+id/btnQtyPlus"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:background="@drawable/bg_home_meta_pill"
-                android:backgroundTint="?attr/colorPrimary"
+                android:layout_width="@dimen/panier_qty_button_size"
+                android:layout_height="@dimen/panier_qty_button_size"
+                android:background="@drawable/bg_panier_qty_button"
                 android:contentDescription="@string/cd_increase_qty"
                 android:gravity="center"
+                android:includeFontPadding="false"
                 android:text="@string/auto_text_103"
-                android:textColor="@android:color/white"
-                android:textSize="@dimen/text_size_subtitle"
+                android:textColor="@color/panier_qty_symbol"
+                android:textSize="@dimen/panier_text_size_qty"
                 android:textStyle="bold" />
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </com.google.android.material.card.MaterialCardView>
+

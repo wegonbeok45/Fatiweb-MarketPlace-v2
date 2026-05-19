@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="@color/home_ref_badge_icon"
+        android:pathData="M12,3c3.31,0 6,2.69 6,6 0,2.2 -1.19,4.12 -2.96,5.16L15.04,18H17v2H7v-2h1.96v-3.84C7.19,13.12 6,11.2 6,9c0,-3.31 2.69,-6 6,-6zM12,5c-2.21,0 -4,1.79 -4,4 0,1.67 1.02,3.1 2.47,3.7l0.49,0.2V18h2.08v-5.1l0.49,-0.2C14.98,12.1 16,10.67 16,9c0,-2.21 -1.79,-4 -4,-4z" />
+</vector>

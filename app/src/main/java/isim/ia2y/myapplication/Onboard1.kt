@@ -45,7 +45,7 @@ class Onboard1 : AppCompatActivity() {
 
     private fun setupOnboardingActions() {
         findViewById<View>(R.id.ivBack)?.setOnClickListener {
-            navigateWithMotion(LoadingScreen::class.java, isForward = false)
+            finishWithMotion(isForward = false)
         }
         findViewById<View>(R.id.tvSkip)?.setOnClickListener {
             setOnboardingCompleted()

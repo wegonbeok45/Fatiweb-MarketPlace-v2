@@ -12,7 +12,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/chatTopBar"
         android:layout_width="0dp"
-        android:layout_height="64dp"
+        android:layout_height="56dp"
         android:background="@color/colorSurface"
         android:elevation="3dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -21,8 +21,8 @@
 
         <ImageView
             android:id="@+id/chatBtnBack"
-            android:layout_width="44dp"
-            android:layout_height="44dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:layout_marginStart="8dp"
             android:background="?selectableItemBackgroundBorderless"
             android:clickable="true"
@@ -38,24 +38,21 @@
 
         <androidx.cardview.widget.CardView
             android:id="@+id/chatBotAvatarCard"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:layout_marginStart="8dp"
-            app:cardBackgroundColor="@color/colorPrimary"
-            app:cardCornerRadius="18dp"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginStart="6dp"
+            app:cardBackgroundColor="@color/home_ref_gold_soft"
+            app:cardCornerRadius="16dp"
             app:cardElevation="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@id/chatBtnBack"
             app:layout_constraintTop_toTopOf="parent">
 
-            <TextView
+            <ImageView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:fontFamily="@font/plus_jakarta_sans_bold"
-                android:gravity="center"
-                android:text="F"
-                android:textColor="@color/colorOnPrimary"
-                android:textSize="16sp" />
+                android:scaleType="centerCrop"
+                android:src="@drawable/ai_pfp" />
         </androidx.cardview.widget.CardView>
 
         <LinearLayout
@@ -72,16 +69,19 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/plus_jakarta_sans_bold"
+                android:fontFamily="@font/manrope_semibold"
+                android:includeFontPadding="false"
                 android:text="@string/chat_title"
                 android:textColor="@color/colorPrimary"
-                android:textSize="15sp" />
+                android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/chatStatusText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/plus_jakarta_sans_regular"
+                android:layout_marginTop="1dp"
+                android:fontFamily="@font/manrope_regular"
+                android:includeFontPadding="false"
                 android:text="@string/chat_status_online"
                 android:textColor="@color/text_secondary"
                 android:textSize="11sp" />
@@ -102,10 +102,10 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="10dp"
         android:layout_marginEnd="16dp"
         app:cardBackgroundColor="@color/profile_card_bg"
-        app:cardCornerRadius="18dp"
+        app:cardCornerRadius="14dp"
         app:cardElevation="0dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -117,26 +117,103 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="14dp">
+            android:paddingStart="12dp"
+            android:paddingTop="10dp"
+            android:paddingEnd="12dp"
+            android:paddingBottom="10dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/plus_jakarta_sans_bold"
+                android:fontFamily="@font/manrope_semibold"
+                android:includeFontPadding="false"
                 android:text="@string/chat_disclaimer_title"
                 android:textColor="@color/text_primary"
-                android:textSize="13sp" />
+                android:textSize="12sp" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:fontFamily="@font/plus_jakarta_sans_regular"
+                android:layout_marginTop="2dp"
+                android:fontFamily="@font/manrope_regular"
+                android:includeFontPadding="false"
+                android:lineSpacingExtra="1dp"
                 android:text="@string/chat_disclaimer_body"
                 android:textColor="@color/text_secondary"
-                android:textSize="12sp" />
+                android:textSize="11sp" />
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
+
+    <HorizontalScrollView
+        android:id="@+id/chatSuggestionRow"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_8"
+        android:overScrollMode="never"
+        android:scrollbars="none"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/chatTrustCard">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/chatSuggestionProducts"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:text="@string/chat_suggestion_products"
+                android:textAllCaps="false"
+                android:textSize="12sp"
+                app:cornerRadius="18dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/chatSuggestionOrders"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:layout_marginStart="6dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:text="@string/chat_suggestion_orders"
+                android:textAllCaps="false"
+                android:textSize="12sp"
+                app:cornerRadius="18dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/chatSuggestionDelivery"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:layout_marginStart="6dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:text="@string/chat_suggestion_delivery"
+                android:textAllCaps="false"
+                android:textSize="12sp"
+                app:cornerRadius="18dp" />
+        </LinearLayout>
+    </HorizontalScrollView>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/chatRecyclerView"
@@ -149,7 +226,7 @@
         app:layout_constraintBottom_toTopOf="@id/chatErrorCard"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/chatTrustCard"
+        app:layout_constraintTop_toBottomOf="@id/chatSuggestionRow"
         tools:listitem="@layout/item_chat_bot" />
 
     <LinearLayout
@@ -163,12 +240,12 @@
         app:layout_constraintBottom_toTopOf="@id/chatErrorCard"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/chatTrustCard">
+        app:layout_constraintTop_toBottomOf="@id/chatSuggestionRow">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="@font/plus_jakarta_sans_bold"
+            android:fontFamily="@font/manrope_semibold"
             android:gravity="center"
             android:text="@string/chat_empty_title"
             android:textColor="@color/text_primary"
@@ -178,48 +255,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
-            android:fontFamily="@font/plus_jakarta_sans_regular"
+            android:fontFamily="@font/manrope_regular"
             android:gravity="center"
             android:text="@string/chat_empty_subtitle"
             android:textColor="@color/text_secondary"
             android:textSize="13sp" />
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
-            android:gravity="center"
-            android:orientation="horizontal">
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/chatSuggestionProducts"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:minHeight="40dp"
-                android:text="@string/chat_suggestion_products"
-                android:textAllCaps="false" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/chatSuggestionOrders"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:minHeight="40dp"
-                android:text="@string/chat_suggestion_orders"
-                android:textAllCaps="false" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/chatSuggestionDelivery"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:minHeight="40dp"
-                android:text="@string/chat_suggestion_delivery"
-                android:textAllCaps="false" />
-        </LinearLayout>
     </LinearLayout>
 
     <com.google.android.material.card.MaterialCardView
@@ -254,7 +295,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:fontFamily="@font/plus_jakarta_sans_regular"
+                android:fontFamily="@font/manrope_regular"
                 android:textColor="@color/text_primary"
                 android:textSize="12sp"
                 tools:text="Connexion instable. Reessayez dans quelques secondes." />
@@ -279,7 +320,7 @@
         android:background="@color/colorSurface"
         android:elevation="6dp"
         android:paddingHorizontal="12dp"
-        android:paddingVertical="10dp"
+        android:paddingVertical="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
@@ -289,7 +330,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             app:cardBackgroundColor="@color/home_search_bg"
-            app:cardCornerRadius="24dp"
+            app:cardCornerRadius="22dp"
             app:cardElevation="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/chatBtnSend"
@@ -301,26 +342,26 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@null"
-                android:fontFamily="@font/plus_jakarta_sans_regular"
+                android:fontFamily="@font/manrope_regular"
                 android:hint="@string/chat_hint"
                 android:inputType="textMultiLine|textCapSentences"
                 android:maxLines="4"
-                android:minHeight="48dp"
-                android:paddingHorizontal="18dp"
-                android:paddingVertical="12dp"
+                android:minHeight="44dp"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="10dp"
                 android:textColor="@color/text_primary"
                 android:textColorHint="@color/text_tertiary"
-                android:textSize="14sp" />
+                android:textSize="13sp" />
         </androidx.cardview.widget.CardView>
 
         <androidx.cardview.widget.CardView
             android:id="@+id/chatBtnSend"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
             android:layout_marginStart="8dp"
             android:contentDescription="@string/chat_send"
             app:cardBackgroundColor="@color/colorPrimary"
-            app:cardCornerRadius="24dp"
+            app:cardCornerRadius="22dp"
             app:cardElevation="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -329,7 +370,7 @@
             <ImageView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:padding="13dp"
+                android:padding="11dp"
                 android:scaleType="centerInside"
                 app:srcCompat="@drawable/ic_send"
                 app:tint="@color/colorOnPrimary" />
@@ -338,3 +379,4 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+

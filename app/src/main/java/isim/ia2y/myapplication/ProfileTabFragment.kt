@@ -12,6 +12,7 @@ import android.view.View
 import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -19,10 +20,11 @@ import androidx.core.view.isGone
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.card.MaterialCardView
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Locale
@@ -34,10 +36,12 @@ class ProfileTabFragment : Fragment() {
 
     private var _binding: FragmentProfileTabBinding? = null
     private val binding get() = _binding!!
+    private lateinit var profileViewModel: ProfileViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
+        profileViewModel = ViewModelProvider(this)[ProfileViewModel::class.java]
         _binding = FragmentProfileTabBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -47,8 +51,6 @@ class ProfileTabFragment : Fragment() {
         _binding = null
     }
 
-    private val avatarPrefsName = "profile_prefs"
-    private val avatarUriKey = "avatar_uri"
     private val logTag = "ProfileTabFragment"
     private val mainHandler = Handler(Looper.getMainLooper())
     private var latestProfile: FirestoreService.UserProfile? = null
@@ -60,25 +62,20 @@ class ProfileTabFragment : Fragment() {
         if (uri == null) return@registerForActivityResult
         
         val uid = FirebaseAuthManager.currentUser?.uid ?: return@registerForActivityResult
+        val appContext = context?.applicationContext ?: return@registerForActivityResult
         
         lifecycleScope.launch {
-            val progress = (activity as? AppCompatActivity)?.showMotionSnackbar(getString(R.string.profile_avatar_uploading))
-            runCatching { UserAvatarStorage.uploadAvatar(requireContext(), uid, uri) }
+            (activity as? AppCompatActivity)?.showMotionSnackbar(getString(R.string.profile_avatar_uploading))
+            runCatching { UserAvatarService.uploadAndSaveAvatar(appContext, uid, uri) }
                 .onSuccess { remoteUrl ->
-                    UserService.updateUserAvatarUrl(uid, remoteUrl)
-                    loadAvatarFromPath(remoteUrl)
+                    if (!isAdded) return@onSuccess
+                    latestProfile = latestProfile?.copy(avatarUrl = remoteUrl)
+                    loadAvatarUrl(remoteUrl)
                     (activity as? AppCompatActivity)?.showMotionSnackbar(getString(R.string.profile_avatar_updated))
                 }
                 .onFailure { error ->
                     Log.e(logTag, "Avatar upload failed", error)
                     (activity as? AppCompatActivity)?.showMotionSnackbar(getString(R.string.profile_avatar_update_failed))
-                    
-                    // Fallback to local
-                    val savedPath = copyUriToInternalStorage(uri)
-                    if (savedPath != null) {
-                        saveAvatarPath(savedPath)
-                        loadAvatarFromPath(savedPath)
-                    }
                 }
         }
     }
@@ -86,29 +83,30 @@ class ProfileTabFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         runCatching {
-            view.applyStatusBarInset()
             binding.layoutBottomNav.isGone = true
             binding.viewBottomDivider.isGone = true
             setupProfileActions()
             binding.tvUserName.text = getString(R.string.user_guest_name)
             updatePrimaryAccountAction(FirebaseAuthManager.isLoggedIn)
+            observeProfileInfo()
             restoreAvatar()
             refreshProfileLocation()
+            renderRecentlyViewedProducts()
             (activity as? AppCompatActivity)?.revealViewsInOrder(
                 R.id.layoutTopBar,
                 R.id.layoutHeader,
-                R.id.cardAdmin,
                 R.id.cardOrders,
-                R.id.cardAddresses,
                 R.id.cardAccountCenter,
+                R.id.cardNotifications,
+                R.id.cardAddresses,
                 R.id.cardSettings,
-                R.id.cardPrivacy,
                 R.id.cardHelp,
+                R.id.cardAbout,
                 R.id.cardLogout
             )
         }.onFailure { error ->
             Log.e(logTag, "Failed to initialize profile tab", error)
-            (activity as? AppCompatActivity)?.showToast(getString(R.string.coming_soon))
+            (activity as? AppCompatActivity)?.showToast(getString(R.string.profile_load_failed))
             (activity as? MainActivity)?.selectTab(MainActivity.Tab.HOME, animate = false)
         }
     }
@@ -118,24 +116,84 @@ class ProfileTabFragment : Fragment() {
         (activity as? MainActivity)?.updateHostCartBadge()
         refreshProfileLocation()
         refreshUserInfo()
+        renderRecentlyViewedProducts()
     }
 
 
 
+    private fun observeProfileInfo() {
+        profileViewModel.userInfo.observe(viewLifecycleOwner) { info ->
+            val firebaseUser = FirebaseAuthManager.currentUser ?: return@observe
+            val profile = info?.profile
+            val role = normalizeRole(info?.role ?: profile?.role)
+            latestProfile = profile
+            latestRole = role
+            if (role == UserRoles.ADMIN) {
+                AdminSession.markVerified(firebaseUser.uid)
+            }
+            if (!profile?.name.isNullOrBlank()) {
+                _binding?.tvUserName?.text = profile?.name
+            }
+            if (!profile?.avatarUrl.isNullOrBlank()) {
+                loadAvatarUrl(profile?.avatarUrl)
+            } else {
+                loadAvatarUrl(null)
+            }
+            updateAdminDashboardEntry(firebaseUser.uid, role)
+            _binding?.tvRole?.text = displayRoleLabel(role)
+            val email = firebaseUser.email.orEmpty()
+            if (email.isBlank()) {
+                _binding?.tvAccountHint?.visibility = View.GONE
+            } else {
+                val emailStatus = getString(
+                    if (firebaseUser.isEmailVerified) R.string.profile_email_verified
+                    else R.string.profile_email_unverified
+                )
+                _binding?.tvAccountHint?.text =
+                    getString(R.string.profile_account_hint_format, email, emailStatus)
+                _binding?.tvAccountHint?.visibility = View.VISIBLE
+            }
+        }
+
+        profileViewModel.loadError.observe(viewLifecycleOwner) { error ->
+            error ?: return@observe
+            Log.w(logTag, "Failed to refresh profile info", error)
+            (activity as? AppCompatActivity)?.showMotionSnackbar(getString(R.string.profile_load_failed))
+        }
+    }
+
     private fun setupProfileActions() {
+        val root = binding.root
+        binding.tvTopBrand.setOnClickListener {
+            (activity as? MainActivity)?.selectTab(MainActivity.Tab.HOME, animate = false)
+        }
         binding.ivBack.setOnClickListener {
             (activity as? MainActivity)?.selectTab(MainActivity.Tab.HOME, animate = false)
         }
         val cardAdmin = binding.cardAdmin
         cardAdmin.visibility = View.GONE
         cardAdmin.setOnClickListener {
-            (activity as? AppCompatActivity)?.navigateNoShift(AdminDashboardActivity::class.java)
+            val destination = if (latestRole == UserRoles.VENDEUR) {
+                SellerDashboardActivity::class.java
+            } else {
+                AdminDashboardActivity::class.java
+            }
+            (activity as? AppCompatActivity)?.navigateNoShift(destination)
         }
-        (activity as? AppCompatActivity)?.bindNotificationEntry(R.id.ivNotifications)
-        binding.cardEdit.visibility = if (FirebaseAuthManager.isLoggedIn) View.VISIBLE else View.GONE
-        binding.tvRole.text = getString(R.string.profile_signup_chip)
+        binding.ivNotifications.setOnClickListener {
+            (activity as? AppCompatActivity)?.openNotificationsScreenWithPermissionCheck()
+        }
+        updateProfileEditActions(FirebaseAuthManager.isLoggedIn)
+        binding.tvRole.text = displayRoleLabel("guest")
         binding.cardAvatar.setOnClickListener { openAvatarPicker() }
         binding.cardEdit.setOnClickListener { openAvatarPicker() }
+        binding.btnEditProfileHeader.setOnClickListener {
+            if (FirebaseAuthManager.isLoggedIn) {
+                showEditProfileDialog()
+            } else {
+                showAuthGate()
+            }
+        }
         binding.tvUserName.setOnClickListener {
             if (FirebaseAuthManager.isLoggedIn) {
                 showEditProfileDialog()
@@ -150,10 +208,16 @@ class ProfileTabFragment : Fragment() {
                 showAuthGate()
             }
         }
-        binding.cardSettings.setOnClickListener {
+        root.findViewById<View>(R.id.cardSettings)?.setOnClickListener {
             (activity as? AppCompatActivity)?.navigateNoShift(SettingsActivity::class.java)
         }
-        binding.cardAccountCenter.setOnClickListener { showAccountCenterDialog() }
+        root.findViewById<View>(R.id.cardAccountCenter)?.setOnClickListener {
+            if (FirebaseAuthManager.isLoggedIn) {
+                (activity as? AppCompatActivity)?.navigateNoShift(PersonalDetailsActivity::class.java)
+            } else {
+                showAuthGate(returnToTab = MainActivity.Tab.PROFILE)
+            }
+        }
         binding.cardOrders.setOnClickListener {
             if (FirebaseAuthManager.isLoggedIn) {
                 (activity as? AppCompatActivity)?.navigateNoShift(OrdersHistoryActivity::class.java)
@@ -161,12 +225,28 @@ class ProfileTabFragment : Fragment() {
                 showAuthGate(returnRoute = AUTH_RETURN_ROUTE_ORDERS)
             }
         }
-        binding.cardAddresses.setOnClickListener {
+        binding.cardWishlistQuick.setOnClickListener {
+            (activity as? AppCompatActivity)?.navigateNoShift(FavoritesActivity::class.java)
+        }
+        binding.cardQuickAddresses.setOnClickListener {
             if (FirebaseAuthManager.isLoggedIn) {
                 (activity as? AppCompatActivity)?.navigateNoShift(AddressesActivity::class.java)
             } else {
                 showAuthGate(returnToTab = MainActivity.Tab.PROFILE)
             }
+        }
+        binding.cardQuickSupport.setOnClickListener {
+            (activity as? AppCompatActivity)?.navigateNoShift(HelpCenterActivity::class.java)
+        }
+        root.findViewById<View>(R.id.cardAddresses)?.setOnClickListener {
+            if (FirebaseAuthManager.isLoggedIn) {
+                (activity as? AppCompatActivity)?.navigateNoShift(AddressesActivity::class.java)
+            } else {
+                showAuthGate(returnToTab = MainActivity.Tab.PROFILE)
+            }
+        }
+        root.findViewById<View>(R.id.cardNotifications)?.setOnClickListener {
+            (activity as? AppCompatActivity)?.navigateNoShift(NotificationPreferencesActivity::class.java)
         }
         binding.tvLocation.setOnClickListener {
             val context = context ?: return@setOnClickListener
@@ -181,8 +261,15 @@ class ProfileTabFragment : Fragment() {
                 )
             }
         }
-        binding.cardPrivacy.setOnClickListener { showPrivacyDialog() }
-        binding.cardHelp.setOnClickListener { showSupportDialog() }
+        root.findViewById<View>(R.id.cardHelp)?.setOnClickListener {
+            (activity as? AppCompatActivity)?.navigateNoShift(HelpCenterActivity::class.java)
+        }
+        root.findViewById<View>(R.id.cardAbout)?.setOnClickListener {
+            (activity as? AppCompatActivity)?.navigateNoShift(AboutCuratorActivity::class.java)
+        }
+        root.findViewById<View>(R.id.profileRecentSeeAll)?.setOnClickListener {
+            (activity as? MainActivity)?.selectTab(MainActivity.Tab.EXPLORE)
+        }
         binding.cardLogout.setOnClickListener {
             if (FirebaseAuthManager.isLoggedIn) {
                 FirebaseAuthManager.signOut()
@@ -194,20 +281,92 @@ class ProfileTabFragment : Fragment() {
         updatePrimaryAccountAction(FirebaseAuthManager.isLoggedIn)
         (activity as? AppCompatActivity)?.applyPressFeedback(
             R.id.ivBack,
+            R.id.tvTopBrand,
             R.id.ivNotifications,
             R.id.tvRole,
             R.id.tvLocation,
             R.id.cardAvatar,
             R.id.cardEdit,
+            R.id.btnEditProfileHeader,
             R.id.tvUserName,
+            R.id.cardAdmin,
             R.id.cardOrders,
+            R.id.cardWishlistQuick,
+            R.id.cardQuickAddresses,
+            R.id.cardQuickSupport,
             R.id.cardAddresses,
             R.id.cardAccountCenter,
+            R.id.cardNotifications,
             R.id.cardSettings,
-            R.id.cardPrivacy,
             R.id.cardHelp,
+            R.id.cardAbout,
+            R.id.profileRecentSeeAll,
             R.id.cardLogout
         )
+    }
+
+    private fun renderRecentlyViewedProducts() {
+        val bind = _binding ?: return
+        val context = context ?: return
+        val list = bind.root.findViewById<LinearLayout>(R.id.profileRecentlyViewedList) ?: return
+        val scroll = bind.root.findViewById<View>(R.id.profileRecentlyViewedScroll)
+        val empty = bind.root.findViewById<TextView>(R.id.profileRecentlyViewedEmpty)
+        val seeAll = bind.root.findViewById<View>(R.id.profileRecentSeeAll)
+        val header = bind.root.findViewById<View>(R.id.layoutProfileRecentlyViewedHeader)
+        val products = RecentlyViewedStore.getProducts(context, limit = 12)
+
+        list.removeAllViews()
+        if (products.isEmpty()) {
+            scroll?.visibility = View.GONE
+            empty?.visibility = View.GONE
+            seeAll?.visibility = View.GONE
+            header?.visibility = View.GONE
+            return
+        }
+
+        empty?.visibility = View.GONE
+        scroll?.visibility = View.VISIBLE
+        seeAll?.visibility = View.VISIBLE
+        header?.visibility = View.VISIBLE
+        products.forEachIndexed { index, product ->
+            list.addView(buildRecentlyViewedCard(product, index == products.lastIndex))
+        }
+    }
+
+    private fun buildRecentlyViewedCard(product: Product, isLast: Boolean): View {
+        val context = requireContext()
+        val cardWidth = resources.getDimensionPixelSize(R.dimen.home_product_carousel_card_width)
+        val spacing = resources.getDimensionPixelSize(R.dimen.space_12)
+        val card = layoutInflater.inflate(R.layout.item_home_catalog_product, null, false).apply {
+            layoutParams = LinearLayout.LayoutParams(cardWidth, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
+                marginEnd = if (isLast) 0 else spacing
+            }
+            findViewById<ImageView>(R.id.homeDynamicProductImage)
+                ?.loadCatalogImage(product.previewImageUrl(), product.catalogFallbackImageRes(), requestedSizePx = 640)
+            findViewById<TextView>(R.id.homeDynamicProductTitle)?.text = product.title
+            findViewById<TextView>(R.id.homeDynamicProductPrice)?.text = formatDt(product.unitPrice)
+            findViewById<TextView>(R.id.homeDynamicProductOrigin)?.text = product.sellerDisplayName
+            findViewById<TextView>(R.id.homeDynamicProductRating)?.text = productCardRatingText(product)
+            findViewById<TextView>(R.id.homeDynamicProductCategory)?.text = productCardCategoryLabel(product)
+            findViewById<ImageView>(R.id.homeDynamicFavoriteButton)?.apply {
+                val isFavorite = FavoritesStore.isFavorite(context, product.id)
+                setImageResource(if (isFavorite) R.drawable.ic_home_heart_filled else R.drawable.ic_home_heart)
+                setColorFilter(
+                    ContextCompat.getColor(
+                        context,
+                        if (isFavorite) R.color.home_heart_active else R.color.home_ref_text_primary
+                    )
+                )
+                setOnClickListener {
+                    FavoritesStore.toggleFavorite(context, product.id)
+                    renderRecentlyViewedProducts()
+                }
+            }
+            setOnClickListener {
+                (activity as? AppCompatActivity)?.navigateToProductDetails(product.id)
+            }
+        }
+        return card
     }
 
     private fun openAvatarPicker() {
@@ -218,66 +377,13 @@ class ProfileTabFragment : Fragment() {
         pickAvatarLauncher.launch("image/*")
     }
 
-    /**
-     * Copies the picked image into internal app storage and returns the absolute file path.
-     * Storing a raw file path (not a file:// URI) avoids FileUriExposedException on Android 7+.
-     */
-    private fun copyUriToInternalStorage(uri: Uri): String? {
-        val uid = FirebaseAuthManager.currentUser?.uid ?: return null
-        return runCatching {
-            val context = requireContext()
-            val inputStream = context.contentResolver.openInputStream(uri) ?: return null
-            val file = java.io.File(context.filesDir, "avatar_${uid}.jpg")
-            java.io.FileOutputStream(file).use { output ->
-                inputStream.use { input -> input.copyTo(output) }
-            }
-            file.absolutePath
-        }.getOrNull()
-    }
-
-    private fun saveAvatarPath(path: String) {
-        val uid = FirebaseAuthManager.currentUser?.uid ?: return
-        requireContext().getSharedPreferences(avatarPrefsName, Context.MODE_PRIVATE)
-            .edit()
-            .putString("${avatarUriKey}_$uid", path)
-            .apply()
-    }
-
-    private fun loadAvatarFromPath(path: String) {
+    private fun loadAvatarUrl(url: String?) {
         val imageView = _binding?.ivAvatar ?: return
-        
-        if (path.startsWith("http")) {
-            imageView.loadCatalogImage(path, R.drawable.placeholder)
+        if (!url.isNullOrBlank()) {
+            imageView.loadAvatarImage(url)
             return
         }
-
-        runCatching {
-            val options = android.graphics.BitmapFactory.Options()
-            options.inJustDecodeBounds = true
-            android.graphics.BitmapFactory.decodeFile(path, options)
-
-            val reqSize = 256
-            var inSampleSize = 1
-            if (options.outHeight > reqSize || options.outWidth > reqSize) {
-                val halfHeight = options.outHeight / 2
-                val halfWidth = options.outWidth / 2
-                while (halfHeight / inSampleSize >= reqSize && halfWidth / inSampleSize >= reqSize) {
-                    inSampleSize *= 2
-                }
-            }
-
-            options.inJustDecodeBounds = false
-            options.inSampleSize = inSampleSize
-            
-            val bitmap = android.graphics.BitmapFactory.decodeFile(path, options)
-            if (bitmap != null) {
-                imageView.setImageBitmap(bitmap)
-            } else {
-                Log.w(logTag, "Avatar bitmap was null for path: $path")
-            }
-        }.onFailure { e ->
-            Log.e(logTag, "Failed to load avatar from path", e)
-        }
+        imageView.setImageResource(R.drawable.profile_avatar_art)
     }
 
     private fun restoreAvatar() {
@@ -291,26 +397,13 @@ class ProfileTabFragment : Fragment() {
                     .getOrNull()
                 
                 if (profile?.avatarUrl != null) {
-                    loadAvatarFromPath(profile.avatarUrl)
+                    loadAvatarUrl(profile.avatarUrl)
                     return@launch
                 }
-                
-                // Local fallback
-                val context = context ?: return@launch
-                val saved = context.getSharedPreferences(avatarPrefsName, Context.MODE_PRIVATE)
-                    .getString("${avatarUriKey}_$uid", null)
-                if (saved != null) {
-                    val filePath = if (saved.startsWith("file://")) {
-                        Uri.parse(saved).path ?: return@launch
-                    } else {
-                        saved
-                    }
-                    val file = java.io.File(filePath)
-                    if (file.exists()) {
-                        loadAvatarFromPath(filePath)
-                    }
-                }
+                loadAvatarUrl(null)
             }
+        } else {
+            loadAvatarUrl(null)
         }
     }
 
@@ -319,13 +412,23 @@ class ProfileTabFragment : Fragment() {
         val bind = _binding ?: return
         val firebaseUser = FirebaseAuthManager.currentUser
         if (firebaseUser != null) {
-            bind.cardAdmin.visibility = View.GONE
+            val cachedRole = UserService.cachedRole(firebaseUser.uid)
+            if (cachedRole != null) {
+                latestRole = normalizeRole(cachedRole)
+                updateAdminDashboardEntry(firebaseUser.uid, latestRole)
+                bind.tvRole.text = displayRoleLabel(latestRole)
+            } else {
+                updateAdminDashboardEntry(firebaseUser.uid, latestRole)
+            }
             bind.tvUserName.text =
                 firebaseUser.displayName?.ifEmpty { null } ?: getString(R.string.user_guest_name)
             bind.tvAccountHint.text = firebaseUser.email.orEmpty()
             bind.tvAccountHint.visibility = if (firebaseUser.email.isNullOrBlank()) View.GONE else View.VISIBLE
-            bind.cardEdit.visibility = View.VISIBLE
+            updateProfileEditActions(isLoggedIn = true)
             updatePrimaryAccountAction(isLoggedIn = true)
+            profileViewModel.loadUserInfo(firebaseUser.uid, forceRefresh = false)
+            return
+            /*
             lifecycleScope.launch {
                 runCatching {
                     val profileDeferred = async(Dispatchers.IO) {
@@ -373,17 +476,70 @@ class ProfileTabFragment : Fragment() {
                     (activity as? AppCompatActivity)?.showMotionSnackbar(getString(R.string.profile_load_failed))
                 }
             }
+            */
         } else {
+            profileViewModel.clear()
             latestProfile = null
             latestRole = "guest"
             bind.tvUserName.text = getString(R.string.user_guest_name)
-            bind.tvRole.text = getString(R.string.profile_signup_chip)
+            bind.tvRole.text = displayRoleLabel("guest")
             bind.tvAccountHint.text = getString(R.string.profile_guest_hint)
             bind.tvAccountHint.visibility = View.VISIBLE
+            resetAdminCardState(bind.cardAdmin)
             bind.cardAdmin.visibility = View.GONE
-            bind.cardEdit.visibility = View.GONE
+            loadAvatarUrl(null)
+            updateProfileEditActions(isLoggedIn = false)
             updatePrimaryAccountAction(isLoggedIn = false)
         }
+    }
+
+    private fun updateProfileEditActions(isLoggedIn: Boolean) {
+        val visibility = if (isLoggedIn) View.VISIBLE else View.GONE
+        _binding?.cardEdit?.visibility = visibility
+        _binding?.btnEditProfileHeader?.visibility = visibility
+    }
+
+    private fun updateAdminDashboardEntry(uid: String, role: String?) {
+        val button = _binding?.cardAdmin ?: return
+        val normalizedRole = normalizeRole(role)
+        val shouldShow = normalizedRole == UserRoles.ADMIN || normalizedRole == UserRoles.VENDEUR || AdminSession.isVerified(uid)
+        button.animate().cancel()
+        button.visibility = if (shouldShow) View.VISIBLE else View.GONE
+        button.text = getString(
+            if (normalizedRole == UserRoles.VENDEUR) R.string.profile_seller_dashboard_action
+            else R.string.profile_admin_dashboard_action
+        )
+        resetAdminCardState(button)
+    }
+
+    private fun resetAdminCardState(button: View) {
+        button.animate().cancel()
+        button.alpha = 1f
+        button.translationX = 0f
+        button.translationY = 0f
+        button.scaleX = 1f
+        button.scaleY = 1f
+    }
+
+    private fun normalizeRole(role: String?): String {
+        return when (role?.trim()?.lowercase(Locale.getDefault())) {
+            UserRoles.ADMIN -> UserRoles.ADMIN
+            UserRoles.VENDEUR, "seller", "vendor" -> UserRoles.VENDEUR
+            UserRoles.CLIENT, "buyer", "customer" -> UserRoles.CLIENT
+            "guest", null, "" -> "guest"
+            else -> UserRoles.CLIENT
+        }
+    }
+
+    private fun displayRoleLabel(role: String): String {
+        return getString(
+            when (normalizeRole(role)) {
+                UserRoles.ADMIN -> R.string.profile_role_admin
+                UserRoles.VENDEUR -> R.string.profile_role_vendeur
+                UserRoles.CLIENT -> R.string.profile_role_client
+                else -> R.string.profile_role_guest
+            }
+        )
     }
 
     private fun updatePrimaryAccountAction(isLoggedIn: Boolean) {
@@ -442,7 +598,6 @@ class ProfileTabFragment : Fragment() {
 
         val view = layoutInflater.inflate(R.layout.dialog_single_input, null)
         val input = view.findViewById<EditText>(R.id.etDialogInput).apply {
-            id = R.id.etEditProfileName
             inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_FLAG_CAP_WORDS
             hint = getString(R.string.profile_edit_hint_name)
             val currentName = _binding?.tvUserName?.text?.toString().orEmpty()

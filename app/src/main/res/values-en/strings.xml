@@ -1,15 +1,11 @@
-﻿<resources>
+<resources>
     <string name="app_name">FatiWeb Market</string>
-    <string name="coming_soon">Coming soon</string>
-    <string name="search_coming_soon">Search coming soon</string>
-    <string name="login_placeholder_success">Login successful</string>
-    <string name="register_placeholder_success">Account created</string>
-    <string name="checkout_placeholder">Checkout coming soon</string>
-    <string name="qty_placeholder">Quantity update coming soon</string>
     <string name="details_top_title">Product details</string>
     <string name="details_back">Back</string>
     <string name="details_share">Share</string>
     <string name="details_image_cd">Product image</string>
+    <string name="details_gallery_previous">Previous image</string>
+    <string name="details_gallery_next">Next image</string>
     <string name="details_reviews_count">(%1$d reviews)</string>
     <string name="details_description_title">Description</string>
     <string name="details_editorial_caption">FatiWeb premium selection</string>
@@ -20,7 +16,6 @@
     <string name="details_add_to_cart">Add to cart</string>
     <string name="details_added_to_cart">%1$d items added to cart</string>
     <string name="details_added_partial_to_cart">%1$d items added</string>
-    <string name="details_share_todo">Share to be implemented</string>
     <string name="details_product_not_found">Product not found</string>
     <string name="alert_dialog_title">Alert</string>
     <string name="alert_dialog_message">Do you want to enable alerts for new products and offers?</string>
@@ -46,10 +41,7 @@
     <string name="product_added_to_cart">%1$s added to cart</string>
     <string name="login_validation_error">Please check your email and password.</string>
     <string name="register_validation_error">Please fill all fields correctly.</string>
-    <string name="loading_progress_percent">%1$d%%</string>
-    <string name="loading_progress_full">100%</string>
     <string name="user_guest_name">Guest user</string>
-    <string name="details_star_symbol">&#9733;</string>
     <string name="details_check_symbol">&#10003;</string>
     <string name="settings_title">Settings</string>
     <string name="settings_back">Back</string>
@@ -61,14 +53,10 @@
     <string name="settings_support_subtitle">WhatsApp and email help from the app team</string>
     <string name="settings_about_title">About</string>
     <string name="settings_about_subtitle">App version and FatiWeb information</string>
-    <string name="settings_about_message">FatiWeb Market\nVersion %1$s\n\nMobile marketplace for Tunisian creations and specialty products.</string>
     <string name="admin_title_dashboard">Dashboard</string>
     <string name="admin_title_orders">Orders</string>
     <string name="admin_title_clients">Clients</string>
-    <string name="admin_title_products">Products</string>
-    <string name="admin_title_notifications">Notifications</string>
     <string name="admin_title_settings">Settings</string>
-    <string name="home_add_to_cart_short">Add</string>
     <string name="language_settings_title">Language</string>
     <string name="language_option_french">French</string>
     <string name="language_option_english">English</string>
@@ -76,9 +64,6 @@
     <string name="auto_text_001">FatiWeb logo</string>
     <string name="auto_text_002">FatiWeb Market</string>
     <string name="auto_text_003">Favorites</string>
-    <string name="auto_text_004">Search</string>
-    <string name="auto_text_005">Search Tunisian products</string>
-    <string name="auto_text_006">Filters</string>
     <string name="auto_text_007">Home</string>
     <string name="auto_text_008">Explore</string>
     <string name="auto_text_009">Cart</string>
@@ -98,9 +83,6 @@
     <string name="auto_text_041">Facebook</string>
     <string name="auto_text_042">No account yet?</string>
     <string name="auto_text_043">Sign up</string>
-    <string name="auto_text_050">Categories</string>
-    <string name="auto_text_051">See all</string>
-    <string name="auto_text_055">Featured products</string>
     <string name="auto_text_081">Skip</string>
     <string name="auto_text_082">Curated Tunisian craft, beautifully presented</string>
     <string name="auto_text_084">Next &gt;</string>
@@ -110,11 +92,9 @@
     <string name="auto_text_097">Your cart is empty.</string>
     <string name="auto_text_098">Subtotal</string>
     <string name="auto_text_100">Shipping</string>
-    <string name="auto_text_101">Checkout</string>
     <string name="cart_header_badge">Cash on delivery</string>
     <string name="cart_header_helper">Review your items, keep a clear total, and finish checkout with tracked delivery across Tunisia.</string>
     <string name="cart_count_chip_zero">0 items</string>
-    <string name="cart_count_chip">%1$d items</string>
     <string name="cart_empty_subtitle">Add a crafted piece, pantry staple, or gift-worthy product to get your order started.</string>
     <string name="cart_empty_action">Browse products</string>
     <string name="cart_summary_badge">Order summary</string>
@@ -124,33 +104,16 @@
     <string name="auto_text_106">Full name</string>
     <string name="auto_text_109">Or sign up with</string>
     <string name="auto_text_110">Already have an account?</string>
-    <string name="auto_text_111">Guest user</string>
-    <string name="auto_text_112">Tunis, Tunisia</string>
-    <string name="auto_text_113">My orders</string>
-    <string name="auto_text_114">History and live tracking</string>
-    <string name="auto_text_115">Delivery addresses</string>
-    <string name="auto_text_116">Manage your shipping addresses</string>
-    <string name="auto_text_117">Settings</string>
-    <string name="auto_text_118">Privacy, language and alerts</string>
-    <string name="auto_text_119">Help &amp; Support</string>
-    <string name="auto_text_120">Contact us, FAQ</string>
     <string name="auto_text_121">Log out</string>
     <string name="currency_dt">DT</string>
-    <string name="price_amount_chechia">45.000</string>
-    <string name="price_amount_bijoux">120.000</string>
-    <string name="price_amount_marqoum">350.000</string>
-    <string name="price_amount_balgha">65.000</string>
     <string name="search_cancel">Cancel</string>
     <string name="search_recent_title">Recent searches</string>
     <string name="search_recent_empty">No recent searches yet.</string>
     <string name="search_popular_title">Popular in Tunisia</string>
     <string name="search_suggestions_title">Suggestions</string>
     <string name="search_header_title">Search</string>
-    <string name="search_header_subtitle">Browse a more refined and better sorted catalog</string>
-    <string name="search_curated_badge">Premium curation</string>
     <string name="search_discovery_title">Find the pieces that deserve attention faster.</string>
     <string name="search_discovery_subtitle">Food, craft, fashion, and beauty presented with clearer hierarchy and more useful filters.</string>
-    <string name="search_results_count">%1$d results for "%2$s"</string>
     <string name="search_sort_price_low">Price low to high</string>
     <string name="search_sort_price_high">Price high to low</string>
     <string name="search_sort_popular">Popular</string>
@@ -174,21 +137,13 @@
     <string name="search_hint_category_products">Search in %1$s</string>
     <string name="search_empty_title">No products found</string>
     <string name="search_empty_subtitle">Try another keyword or adjust filters</string>
+    <string name="search_empty_recovery_subtitle">Try %1$s, or browse popular collections.</string>
     <string name="search_backend_error_title">The catalog is temporarily unavailable</string>
     <string name="search_backend_error_subtitle">We could not fetch products from the backend. Please try again shortly.</string>
     <string name="search_backend_error_toast">We could not load more products right now.</string>
     <string name="search_browse_categories">Browse categories</string>
+    <string name="search_card_price">%1$s DT</string>
     <string name="home_catalog_error">The catalog could not be loaded right now. Please try again.</string>
-    <string name="explore_header_title">Collections</string>
-    <string name="explore_header_subtitle">Cleaner, sharper, more premium category worlds</string>
-    <string name="explore_editorial_badge">Worldwide appeal</string>
-    <string name="explore_editorial_title">A more inspiring storefront for Tunisian craftsmanship.</string>
-    <string name="explore_editorial_subtitle">Each collection now highlights mood, material, and purchase intent instead of stacking generic template cards.</string>
-    <string name="explore_card_craft_badge">Atelier edition</string>
-    <string name="explore_card_craft_copy">Ceramics, weaving, and objects with real presence at home.</string>
-    <string name="explore_card_beauty_copy">Care rituals and natural beauty presented like a thoughtful gift category.</string>
-    <string name="explore_card_food_copy">Spices, pantry staples, and oils that make the cart feel tempting.</string>
-    <string name="explore_card_fashion_copy">Textile pieces and accessories with a more editorial fashion lens.</string>
     <string name="orders_history_title">Order history</string>
     <string name="orders_history_empty">No orders yet.</string>
     <string name="orders_history_empty_subtitle">Your confirmed orders will appear here with delivery progress and detailed status updates.</string>
@@ -201,20 +156,16 @@
     <string name="favorites_empty_action">Discover products</string>
     <string name="address_current_label">Current address</string>
     <string name="address_add_button">Add new address</string>
-    <string name="address_current_badge">Current</string>
-    <string name="address_set_current">Set as current</string>
-    <string name="address_add_title">Add address</string>
-    <string name="address_add_hint">Enter your new delivery address.</string>
-    <string name="address_add_input_hint">Example: Medina, Tunis</string>
-    <string name="address_add_confirm">Add</string>
-    <string name="address_add_validation">Please enter an address.</string>
     <string name="common_see_all">See all</string>
     <string name="home_refresh_catalog">Refresh catalog</string>
+    <string name="home_try_again">Try again</string>
+    <string name="home_offline_title">You\'re offline</string>
+    <string name="home_offline_subtitle">Connect to the internet to discover fresh products.</string>
+    <string name="home_showing_saved_products">Showing saved products</string>
     <string name="home_section_categories">Categories</string>
     <string name="home_section_featured">Featured now</string>
     <string name="home_section_latest">New arrivals</string>
     <string name="home_section_discover">Discover more</string>
-    <string name="home_shipping_standard">Standard delivery: 7 DT</string>
     <string name="home_section_empty">No products to show right now.</string>
     <string name="product_state_hidden">Hidden</string>
     <string name="product_state_out_of_stock">Out of stock</string>
@@ -228,9 +179,6 @@
     <string name="product_category_beauty">Beauty</string>
     <string name="product_category_decor">Home decor</string>
     <string name="product_default_tag">TUNISIA</string>
-    <string name="admin_dashboard_products_count">%1$d products</string>
-    <string name="admin_dashboard_active_products_count">%1$d active</string>
-    <string name="admin_dashboard_low_stock_caption">Needs restock</string>
     <string name="admin_dashboard_load_failed">Unable to load the dashboard right now.</string>
     <string name="admin_product_editor_title_add">Add product</string>
     <string name="admin_product_editor_title_edit">Edit %1$s</string>
@@ -266,16 +214,16 @@
     <string name="admin_product_editor_fix_errors">Complete the highlighted fields to continue.</string>
     <string name="admin_product_editor_saved_new">Product added to the catalog.</string>
     <string name="admin_product_editor_saved_edit">Product updated.</string>
-    <string name="admin_product_editor_save_failed">Unable to save this product. %1$s</string>
     <string name="admin_product_editor_save_failed_generic">Unable to save this product right now.</string>
     <string name="admin_product_editor_save_failed_network">The network request failed while saving the product.</string>
     <string name="admin_product_editor_save_failed_permissions">Your account is not allowed to edit this product.</string>
+    <string name="admin_product_editor_publish_failed_permissions">You don\'t have permission to publish products.</string>
+    <string name="admin_product_editor_edit_failed_permissions">You don\'t have permission to edit this product.</string>
     <string name="admin_product_editor_save_failed_image">The image upload failed. Try again on a better connection or with another image.</string>
     <string name="admin_product_editor_discard_title">Leave without saving?</string>
     <string name="admin_product_editor_discard_message">Your unsaved changes will be lost.</string>
     <string name="admin_product_editor_discard_keep">Keep editing</string>
     <string name="admin_product_editor_discard_confirm">Leave</string>
-    <string name="admin_product_editor_image_upload_failed_fallback">The product will be saved without the selected photo. You can retry the image upload afterward.</string>
     <string name="admin_announcements_title">Announcements</string>
     <string name="admin_announcements_compose_title">Publish an announcement</string>
     <string name="admin_announcements_title_hint">Announcement title</string>
@@ -300,9 +248,6 @@
     <string name="main_tab_load_failed">Could not open this tab. Please try again.</string>
 
     <string name="checkout_add_address_first">Add a delivery address before confirming your order.</string>
-    <string name="checkout_login_required_title">Sign in to continue</string>
-    <string name="checkout_login_required_message">Your account keeps your address, delivery tracking, and order history in sync.</string>
-    <string name="checkout_login_action">Sign in</string>
     <string name="checkout_address_required_title">Add a delivery address</string>
     <string name="checkout_address_action">Add address</string>
     <string name="checkout_address_placeholder">Add a delivery address</string>
@@ -315,14 +260,13 @@
     <string name="profile_settings_title">Account settings</string>
 
     <string name="profile_edit_title">Edit profile</string>
+    <string name="profile_recently_viewed_title">Recently viewed</string>
     <string name="profile_edit_hint_name">Full name</string>
     <string name="profile_edit_cancel">Cancel</string>
     <string name="profile_edit_save">Save</string>
     <string name="profile_name_invalid">Enter a valid full name.</string>
     <string name="profile_updated">Profile updated.</string>
     <string name="profile_support_title">Help &amp; support</string>
-    <string name="profile_support_message">Need help with an order, delivery, or your account?\n\nEmail: support@fatiweb.tn\nPhone: +216 70 000 000</string>
-    <string name="profile_support_close">Close</string>
 
     <string name="admin_verify_failed">Could not verify administrator access.</string>
     <string name="admin_access_denied">Access denied or verification failed.</string>
@@ -338,10 +282,9 @@
     <string name="admin_order_change_status_title">Change status - %1$s</string>
     <string name="admin_order_change_status_cta">Update status</string>
     <string name="admin_order_detail_message">Status: %1$s\nPayment: %2$s\nItems: %3$d\nTotal: %4$s\nClient: %5$s</string>
-    <string name="admin_products_load_failed">Could not load products.</string>
     <string name="admin_product_deleted">Product deleted.</string>
     <string name="admin_product_delete_failed">Could not delete this product.</string>
-    <string name="admin_payments_online_hint">Online payments will be enabled with the final payment gateway.</string>
+    <string name="admin_product_edit_own_only">You can edit only your own products.</string>
     <string name="admin_shipping_load_failed">Could not load shipping fees.</string>
     <string name="admin_shipping_updated">Shipping rates updated.</string>
     <string name="admin_shipping_save_failed">Could not save shipping rates.</string>
@@ -350,7 +293,7 @@
     <string name="admin_client_unknown_date">Unknown date</string>
     <string name="admin_client_fallback_name">Unnamed client</string>
     <string name="admin_client_fallback_email">Email unavailable</string>
-    <string name="admin_client_detail_message">Email: %1$s\nUID: %2$s\nOrders: %3$d\nJoined: %4$s</string>
+    <string name="admin_client_detail_message">Email: %1$s\nPhone: %2$s\nRole: %3$s\nUID: %4$s\nOrders: %5$d\nJoined: %6$s</string>
     <string name="admin_client_contact">Contact</string>
     <string name="admin_order_fallback_label">Order</string>
     <string name="admin_products_empty_filtered">No products match this search.</string>
@@ -401,18 +344,16 @@
     <string name="admin_dashboard_recent_order_subtitle">%1$s &#8226; %2$s</string>
     <string name="admin_dashboard_quick_add_subtitle">Catalog</string>
     <string name="admin_dashboard_quick_orders_subtitle">Tracking</string>
-    <string name="admin_dashboard_quick_settings_subtitle">Settings</string>
+    <string name="admin_dashboard_quick_settings_subtitle">Configuration</string>
 
     <string name="order_details_login_required">Sign in to view this order.</string>
     <string name="order_details_not_found">Order not found.</string>
     <string name="order_details_load_failed">Could not load this order.</string>
     <string name="order_details_created_on">Order placed on %1$s</string>
     <string name="order_details_eta">Estimated delivery: %1$s</string>
-    <string name="order_details_eta_pending">Estimated delivery to be confirmed</string>
     <string name="order_details_address_missing">Delivery address not available</string>
     <string name="order_details_instructions">Instructions: %1$s</string>
     <string name="order_help_title">Order help</string>
-    <string name="order_help_message">Questions about your order?\n\nEmail: support@fatiweb.tn\nPhone: +216 70 000 000\nHours: 9:00 - 18:00</string>
     <string name="order_details_total">Total: %1$s</string>
     
     <string name="order_details_item_qty">Qty: %1$d</string>
@@ -428,9 +369,11 @@
     <string name="order_details_eta_cancelled">Order cancelled</string>
 
     <string name="order_status_pending">Pending</string>
+    <string name="order_status_confirmed">Confirmed</string>
     <string name="order_status_preparing">Preparing</string>
     <string name="order_status_shipped">Shipped</string>
     <string name="order_status_delivered">Delivered</string>
+    <string name="order_status_cancelled">Cancelled</string>
 
     <string name="auth_google_sign_in_failed">Google sign-in failed. Please try again.</string>
     <string name="auth_cancelled">Sign-in cancelled</string>
@@ -445,11 +388,10 @@
     <string name="register_submitting">Creating account...</string>
 
     <string name="search_category_decor">Home decor</string>
-    <string name="admin_product_editor_action_autofill">Prefill</string>
-    <string name="admin_product_editor_autofill_done">Fields filled automatically.</string>
+    <string name="admin_product_editor_action_autofill">Use AI</string>
+    <string name="admin_product_editor_autofill_done">Fields filled by AI.</string>
     <string name="generated_product_art_caption">Auto-crafted fallback image</string>
     <string name="notification_preferences_title">Notification preferences</string>
-    <string name="notification_preferences_badge">Control</string>
     <string name="notification_preferences_heading">Choose the alerts that matter most</string>
     <string name="notification_preferences_summary_muted">Notifications are muted on this device.</string>
     <string name="notification_preferences_summary_active">%1$d categories are active on this device.</string>
@@ -484,6 +426,7 @@
     <string name="profile_privacy_message">Your account information stays attached to your Firebase profile. You can manage notifications, review addresses, and get help without exposing your data publicly.</string>
     <string name="profile_privacy_settings_action">Open settings</string>
     <string name="profile_account_hint_format">%1$s &#8226; %2$s</string>
+    <string name="profile_avatar_login_required">Sign in to change your profile photo.</string>
     
     <string name="notifications_clear_all">Mark read</string>
     <string name="notifications_load_error">Unable to load your notifications.</string>
@@ -541,8 +484,86 @@
     <string name="admin_settings_debug_seed_running">Syncing sample catalog...</string>
     <string name="admin_settings_debug_seed_progress">Syncing: %1$d / %2$d</string>
     <string name="admin_settings_debug_seed_done">Sample catalog synced</string>
+    <string name="cart_sync_failed">Unable to sync your cart.</string>
+    <string name="cart_sync_retrying">Retrying cart sync...</string>
+    <string name="cart_sync_banner_failed_title">Cart not synced</string>
+    <string name="cart_sync_banner_failed_message">Your items are saved on this phone. Retry to save them to your account.</string>
+    <string name="cart_sync_banner_retrying_title">Syncing cart</string>
+    <string name="cart_sync_banner_retrying_message">We are trying again to save your cart.</string>
+    <string name="cart_sync_retry_action">Retry</string>
+    <string name="details_reviews_see_all">See all reviews (%1$d)</string>
+    <string name="details_reviews_all_title">All reviews</string>
+    <string name="details_reviews_load_more">Load more reviews</string>
+    <string name="details_review_counter">%1$d/%2$d characters</string>
+    <string name="details_review_counter_initial">0/280</string>
+    <string name="details_review_verified_hint">Only customers who bought this product can publish a review.</string>
+    <string name="details_review_dialog_title">Your review</string>
+    <string name="details_review_comment_hint">Write your review...</string>
+    <string name="details_review_comment_required">Add a short review.</string>
+    <string name="details_review_rating_required">Choose a rating before submitting.</string>
+    <string name="details_review_submit">Submit review</string>
+    <string name="details_review_saved">Review saved.</string>
+    <string name="details_review_failed">Could not save the review.</string>
+    <string name="details_review_login_required">Sign in to leave a review.</string>
+    <string name="details_seller_verified">Verified</string>
+    <string name="details_contact_seller">Contact seller</string>
+    <string name="details_seller_rating">%1$.1f seller</string>
+    <string name="details_seller_total_sold">%1$d sold</string>
+    <string name="details_seller_member_since">active member</string>
     <string name="admin_settings_debug_seed_success">The sample catalog has been refreshed.</string>
     <string name="admin_settings_debug_seed_failed">Sync failed: %1$s</string>
     <string name="admin_settings_debug_seed_helper">Available only in debug builds.</string>
-</resources>
+    <string name="seller_dashboard_title">Seller space</string>
+    <string name="seller_dashboard_hero_title">Your sales, products, and orders.</string>
+    <string name="seller_dashboard_hero_subtitle">Add and manage products linked to your seller account.</string>
+    <string name="seller_dashboard_add_action">Add product</string>
+    <string name="seller_dashboard_products_action">Products</string>
+    <string name="seller_dashboard_orders_action">Orders</string>
+    <string name="seller_dashboard_clients_bought">Clients bought</string>
+    <string name="seller_dashboard_money_received">Sold amount</string>
+    <string name="seller_dashboard_orders_to_track">To track</string>
+    <string name="seller_dashboard_products_overview">Active products</string>
+    <string name="seller_dashboard_products_ratio">%1$d/%2$d</string>
+    <string name="seller_dashboard_hero_meta">%1$d seller orders - %2$d items sold</string>
+    <string name="seller_dashboard_hero_meta_placeholder">Orders and sold items</string>
+    <string name="seller_dashboard_stock_meta">%1$d products low in stock</string>
+    <string name="seller_dashboard_stock_meta_placeholder">Seller stock</string>
+    <string name="seller_dashboard_recent_orders">Recent orders</string>
+    <string name="seller_dashboard_load_failed">Could not load seller space.</string>
+    <string name="seller_orders_title">Seller orders</string>
+    <string name="seller_orders_header">Orders to handle</string>
+    <string name="seller_orders_empty">No seller orders yet.</string>
+    <string name="seller_orders_unknown_client">Client</string>
+    <string name="seller_orders_row_client">%1$s - %2$d items</string>
+    <string name="external_whatsapp_unavailable">No compatible app is installed to open WhatsApp.</string>
+    <string name="external_email_unavailable">No compatible email app is installed.</string>
+    <string name="seller_order_detail_client">Client</string>
+    <string name="seller_order_detail_phone">Phone</string>
+    <string name="seller_order_detail_address">Address</string>
+    <string name="seller_order_detail_status">Status</string>
+    <string name="seller_order_detail_items">Sold items</string>
+    <string name="seller_order_detail_seller_total">Seller total</string>
+    <string name="seller_order_detail_item_meta">Qty %1$d - %2$s each - %3$s</string>
+    <string name="admin_order_item_qty_price">Qty %1$d × %2$s</string>
 
+    <!-- Admin bottom-nav labels (were FR-only auto_* keys) -->
+    <string name="auto_dashboard_2938">Dashboard</string>
+    <string name="auto_commandes_66c3">Orders</string>
+    <string name="auto_produits_88c6">Products</string>
+    <string name="auto_clients_0f55">Clients</string>
+    <string name="auto_notifs_b962">Alerts</string>
+    <string name="auto_paramtres_e778">Settings</string>
+
+    <!-- Admin price-edit dialog (were FR-only auto_* keys) -->
+    <string name="auto_modifier_le_prix_3e06">Edit price</string>
+    <string name="auto_nouveau_prix_dt_25d7">New price (DT)</string>
+    <string name="auto_annuler_d12c">Cancel</string>
+    <string name="auto_enregistrer_aed8">Save</string>
+
+    <!-- Admin misc labels used as static placeholders in adapter-backed views -->
+    <string name="auto_commande_87ef">Order</string>
+
+    <string name="cd_refresh">Refresh</string>
+    <string name="cd_back">Back</string>
+    <string name="cd_settings">Settings</string>
+</resources>

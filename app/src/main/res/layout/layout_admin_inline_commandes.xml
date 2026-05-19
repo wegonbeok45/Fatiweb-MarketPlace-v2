@@ -52,7 +52,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/auto_total_96b0"
+                        android:text="@string/admin_orders_total_label"
                         android:textColor="@color/profile_text_secondary"
                         android:textSize="@dimen/text_size_overline" />
                 </LinearLayout>
@@ -89,7 +89,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/auto_en_attente_4391"
+                        android:text="@string/admin_orders_pending_label"
                         android:textColor="@color/profile_text_secondary"
                         android:textSize="@dimen/text_size_overline" />
                 </LinearLayout>
@@ -125,7 +125,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/auto_livrees_e8f0"
+                        android:text="@string/admin_orders_delivered_label"
                         android:textColor="@color/profile_text_secondary"
                         android:textSize="@dimen/text_size_overline" />
                 </LinearLayout>
@@ -136,7 +136,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/space_12"
-            android:text="@string/auto_commandes_recentes_5821"
+            android:text="@string/admin_orders_recent_title"
             android:textColor="@color/profile_text_primary"
             android:textSize="@dimen/text_size_body" />
 

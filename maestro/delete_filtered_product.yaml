@@ -1,0 +1,6 @@
+appId: isim.ia2y.myapplication
+---
+- tapOn:
+    id: "isim.ia2y.myapplication:id/adminProductBtnDelete"
+- tapOn: "Supprimer"
+- takeScreenshot: admin-products-after-filtered-delete

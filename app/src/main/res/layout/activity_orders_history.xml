@@ -76,18 +76,19 @@
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="132dp"
                     android:layout_height="132dp"
-                    app:cardBackgroundColor="@color/home_surface_raised"
+                    app:cardBackgroundColor="@android:color/transparent"
                     app:cardCornerRadius="@dimen/corner_radius_large"
                     app:cardElevation="0dp"
-                    app:strokeColor="@color/colorOutline"
-                    app:strokeWidth="1dp">
+                    app:strokeWidth="0dp">
 
                     <com.airbnb.lottie.LottieAnimationView
                         android:id="@+id/ivEmptyOrdersAnimation"
                         android:layout_width="104dp"
                         android:layout_height="104dp"
                         android:layout_gravity="center"
+                        android:background="@android:color/transparent"
                         android:contentDescription="@string/cd_back"
+                        android:scaleType="centerInside"
                         app:lottie_autoPlay="true"
                         app:lottie_loop="true"
                         app:lottie_rawRes="@raw/anim_empty_orders" />
@@ -102,14 +103,14 @@
                     android:text="@string/orders_history_empty"
                     android:textColor="@color/home_text_primary"
                     android:textSize="@dimen/text_size_subtitle"
-                    android:fontFamily="@font/plus_jakarta_sans_bold" />
+                    android:fontFamily="@font/manrope_semibold" />
 
                 <TextView
                     android:id="@+id/tvEmptyOrdersSubtitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/space_8"
-                    android:fontFamily="@font/plus_jakarta_sans_regular"
+                    android:fontFamily="@font/manrope_regular"
                     android:gravity="center"
                     android:lineSpacingExtra="2dp"
                     android:maxLines="3"
@@ -146,4 +147,24 @@
             android:layout_gravity="center"
             android:visibility="gone" />
     </FrameLayout>
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/chipGroupOrders"
+        android:layout_width="1dp"
+        android:layout_height="1dp"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chipOrdersDelivered"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/orders_history_filter_delivered" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chipOrdersCancelled"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/orders_history_filter_cancelled" />
+    </com.google.android.material.chip.ChipGroup>
 </androidx.constraintlayout.widget.ConstraintLayout>

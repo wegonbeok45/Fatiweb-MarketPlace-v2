@@ -70,10 +70,9 @@ class AdminParametresActivity : AppCompatActivity() {
 
     private fun configurePaymentSection() {
         findViewById<View>(R.id.adminParamCardPaiement)?.apply {
-            alpha = 0.65f
-            setOnClickListener {
-                showMotionSnackbar(getString(R.string.admin_payments_online_hint))
-            }
+            alpha = 1f
+            isClickable = false
+            isFocusable = false
         }
     }
 

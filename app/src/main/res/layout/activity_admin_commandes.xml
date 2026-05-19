@@ -21,15 +21,16 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/adminCommandesTopBar"
             android:layout_width="match_parent"
-            android:layout_height="64dp"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp">
+            android:layout_height="@dimen/admin_top_bar_height"
+            android:paddingStart="@dimen/app_top_bar_horizontal_padding"
+            android:paddingEnd="@dimen/app_top_bar_horizontal_padding">
 
             <ImageView
                 android:id="@+id/adminCommandesIvBack"
-                android:layout_width="22dp"
-                android:layout_height="22dp"
-                android:contentDescription="@string/cd_stat_icon"
+                android:layout_width="@dimen/app_top_bar_side_slot_size"
+                android:layout_height="@dimen/app_top_bar_side_slot_size"
+                android:padding="11dp"
+                android:contentDescription="@string/cd_back"
                 android:clickable="true"
                 android:focusable="true"
                 android:background="?selectableItemBackgroundBorderless"
@@ -43,10 +44,10 @@
                 android:id="@+id/adminCommandesTvTitle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="14dp"
+                android:layout_marginStart="@dimen/admin_top_title_margin_start"
                 android:text="@string/admin_title_orders"
                 android:textColor="@color/profile_text_primary"
-                android:textSize="@dimen/text_size_subtitle"
+                android:textSize="@dimen/app_top_bar_title_size"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/adminCommandesIvSettings"
                 app:layout_constraintStart_toEndOf="@id/adminCommandesIvBack"
@@ -54,10 +55,11 @@
 
             <ImageView
                 android:id="@+id/adminCommandesIvSettings"
-                android:layout_width="22dp"
-                android:layout_height="22dp"
+                android:layout_width="@dimen/app_top_bar_side_slot_size"
+                android:layout_height="@dimen/app_top_bar_side_slot_size"
+                android:padding="11dp"
                 android:layout_marginEnd="4dp"
-                android:contentDescription="@string/cd_stat_icon"
+                android:contentDescription="@string/cd_settings"
                 android:clickable="true"
                 android:focusable="true"
                 android:background="?selectableItemBackgroundBorderless"
@@ -354,3 +356,5 @@
         android:layout_gravity="bottom" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+

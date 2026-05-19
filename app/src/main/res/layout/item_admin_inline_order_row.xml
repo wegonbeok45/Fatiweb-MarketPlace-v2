@@ -92,7 +92,7 @@
             android:gravity="center"
             android:paddingStart="8dp"
             android:paddingEnd="8dp"
-            android:text="@string/auto_en_attente_4391"
+            android:text="@string/admin_orders_pending_label"
             android:textColor="@color/status_text_warning"
             android:textSize="@dimen/text_size_overline" />
     </com.google.android.material.card.MaterialCardView>

@@ -29,8 +29,9 @@ object CartFirestoreService {
             mapOf(
                 "productId" to productId,
                 "nameSnapshot" to (product?.title ?: ""),
-                "thumbnailUrl" to (product?.imageUrls?.firstOrNull() ?: product?.imageUrl ?: ""),
-                "priceSnapshot" to (product?.price ?: 0.0),
+                "thumbnailUrl" to (product?.previewImageUrl() ?: ""),
+                "priceSnapshot" to (product?.unitPrice ?: 0.0),
+                "priceSnapshotMinor" to (product?.let { toMinorUnits(it.unitPrice) } ?: 0L),
                 "quantity" to qty,
                 "addedAt" to com.google.firebase.Timestamp.now()
             )

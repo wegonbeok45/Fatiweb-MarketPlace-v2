@@ -48,6 +48,14 @@ private val TAB_TO_NAV_ID: Map<AdminNavTab, Int> = mapOf(
     AdminNavTab.SETTINGS      to R.id.adminNavSettings
 )
 
+private val VISIBLE_BOTTOM_NAV_TABS = listOf(
+    AdminNavTab.DASHBOARD,
+    AdminNavTab.COMMANDES,
+    AdminNavTab.PRODUITS,
+    AdminNavTab.CLIENTS,
+    AdminNavTab.NOTIFICATIONS
+)
+
 /**
  * Resolves which AdminNavTab THIS activity represents, so that
  * onResume can always refresh the bottom-nav to the correct state.
@@ -72,7 +80,7 @@ fun AppCompatActivity.setupAdminTopBar(title: String) {
         }
     }
     findViewById<View?>(R.id.adminShieldBadge)?.setOnClickListener {
-        showToast(getString(R.string.coming_soon))
+        showToast(getString(R.string.admin_verify_failed))
     }
 
     applyPressFeedback(
@@ -83,11 +91,13 @@ fun AppCompatActivity.setupAdminTopBar(title: String) {
 }
 
 fun AppCompatActivity.selectAdminBottomNav(activeTab: AdminNavTab, animate: Boolean = true) {
+    ensureAdminBottomNavVisible()
     val activeColor = ContextCompat.getColor(this, R.color.profile_text_primary)
     val inactiveColor = ContextCompat.getColor(this, R.color.home_nav_inactive)
     val shouldAnimate = animate && !isReducedMotionEnabled()
 
-    TAB_TO_NAV_ID.forEach { (tab, viewId) ->
+    VISIBLE_BOTTOM_NAV_TABS.forEach { tab ->
+        val viewId = TAB_TO_NAV_ID[tab] ?: return@forEach
         val isActive = tab == activeTab
         if (shouldAnimate) {
             animateAdminNavItemColor(viewId, if (isActive) activeColor else inactiveColor, isActive)
@@ -96,7 +106,12 @@ fun AppCompatActivity.selectAdminBottomNav(activeTab: AdminNavTab, animate: Bool
         }
     }
 
-    val targetId = TAB_TO_NAV_ID[activeTab] ?: return
+    val targetId = TAB_TO_NAV_ID[activeTab]?.takeIf { activeTab in VISIBLE_BOTTOM_NAV_TABS }
+    if (targetId == null) {
+        findViewById<View?>(R.id.admin_nav_indicator)?.visibility = View.INVISIBLE
+        return
+    }
+    findViewById<View?>(R.id.admin_nav_indicator)?.visibility = View.VISIBLE
     if (shouldAnimate) {
         animateAdminPillTo(targetId)
     } else {
@@ -115,7 +130,8 @@ fun AppCompatActivity.setupAdminBottomNav(activeTab: AdminNavTab) {
     refreshAdminBottomNav(activeTab)
 
     // Wire click listeners (only needs to happen once per activity creation)
-    TAB_TO_NAV_ID.forEach { (tab, viewId) ->
+    VISIBLE_BOTTOM_NAV_TABS.forEach { tab ->
+        val viewId = TAB_TO_NAV_ID[tab] ?: return@forEach
         findViewById<View?>(viewId)?.setOnClickListener {
             val myTab = resolveAdminTab()
             if (tab == myTab) return@setOnClickListener   // already here
@@ -124,7 +140,7 @@ fun AppCompatActivity.setupAdminBottomNav(activeTab: AdminNavTab) {
     }
 
     // Press feedback on all tabs
-    applyPressFeedback(*TAB_TO_NAV_ID.values.toIntArray())
+    applyPressFeedback(*VISIBLE_BOTTOM_NAV_TABS.mapNotNull { TAB_TO_NAV_ID[it] }.toIntArray())
 }
 
 /**
@@ -133,16 +149,21 @@ fun AppCompatActivity.setupAdminBottomNav(activeTab: AdminNavTab) {
  * Call from onResume() so that coming back via REORDER_TO_FRONT refreshes the state.
  */
 fun AppCompatActivity.refreshAdminBottomNav(activeTab: AdminNavTab) {
+    ensureAdminBottomNavVisible()
     val activeColor   = ContextCompat.getColor(this, R.color.profile_text_primary)
     val inactiveColor = ContextCompat.getColor(this, R.color.home_nav_inactive)
 
     // Apply active/inactive tint immediately
-    TAB_TO_NAV_ID.forEach { (tab, viewId) ->
+    VISIBLE_BOTTOM_NAV_TABS.forEach { tab ->
+        val viewId = TAB_TO_NAV_ID[tab] ?: return@forEach
         setAdminNavItemColor(viewId, if (tab == activeTab) activeColor else inactiveColor, isActive = tab == activeTab)
     }
 
     // Snap pill to the correct position (no animation)
-    snapAdminPillTo(TAB_TO_NAV_ID[activeTab] ?: R.id.adminNavDashboard)
+    val targetId = TAB_TO_NAV_ID[activeTab]?.takeIf { activeTab in VISIBLE_BOTTOM_NAV_TABS }
+    findViewById<View?>(R.id.admin_nav_indicator)?.visibility =
+        if (targetId == null) View.INVISIBLE else View.VISIBLE
+    targetId?.let(::snapAdminPillTo)
 }
 
 /* ------------------------------------------------------------------ */
@@ -168,12 +189,14 @@ private fun AppCompatActivity.animateAdminNavAndNavigate(
     tab: AdminNavTab,
     currentTab: AdminNavTab
 ) {
+    ensureAdminBottomNavVisible()
     val activeColor   = ContextCompat.getColor(this, R.color.profile_text_primary)
     val inactiveColor = ContextCompat.getColor(this, R.color.home_nav_inactive)
     val reducedMotion = isReducedMotionEnabled()
 
     // Color transition
-    TAB_TO_NAV_ID.forEach { (t, viewId) ->
+    VISIBLE_BOTTOM_NAV_TABS.forEach { t ->
+        val viewId = TAB_TO_NAV_ID[t] ?: return@forEach
         val isActive = t == tab
         if (reducedMotion) {
             setAdminNavItemColor(viewId, if (isActive) activeColor else inactiveColor, isActive)
@@ -189,8 +212,37 @@ private fun AppCompatActivity.animateAdminNavAndNavigate(
     // Navigate after a small delay so the user can see the pill slide
     findViewById<View?>(targetId)?.postDelayed({
         runCatching { navigateToAdminTab(tab) }
-            .onFailure { showToast(getString(R.string.coming_soon)) }
+            .onFailure { showToast(getString(R.string.main_tab_load_failed)) }
     }, 120L)
+}
+
+private fun AppCompatActivity.ensureAdminBottomNavVisible() {
+    val navIds = listOf(R.id.adminBottomNav) + VISIBLE_BOTTOM_NAV_TABS.mapNotNull { TAB_TO_NAV_ID[it] }
+    navIds.forEach { id ->
+        findViewById<View?>(id)?.apply {
+            animate().cancel()
+            visibility = View.VISIBLE
+            alpha = 1f
+            translationX = 0f
+            translationY = 0f
+            scaleX = 1f
+            scaleY = 1f
+        }
+    }
+    VISIBLE_BOTTOM_NAV_TABS.mapNotNull { TAB_TO_NAV_ID[it] }.forEach { id ->
+        val item = findViewById<LinearLayout?>(id) ?: return@forEach
+        for (index in 0 until item.childCount) {
+            item.getChildAt(index)?.apply {
+                animate().cancel()
+                visibility = View.VISIBLE
+                alpha = 1f
+                translationX = 0f
+                translationY = 0f
+                scaleX = 1f
+                scaleY = 1f
+            }
+        }
+    }
 }
 
 private fun AppCompatActivity.animateAdminPillTo(@IdRes targetNavId: Int) {

@@ -12,13 +12,13 @@
         android:id="@+id/layoutTopSection"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="@color/colorSurface"
+        android:background="@color/home_ref_bg"
         android:elevation="0dp"
         android:orientation="vertical"
-        android:paddingStart="@dimen/home_horizontal_padding"
-        android:paddingTop="@dimen/space_12"
-        android:paddingEnd="@dimen/home_horizontal_padding"
-        android:paddingBottom="@dimen/space_10"
+        android:paddingStart="@dimen/home_ref_horizontal_padding"
+        android:paddingTop="@dimen/home_ref_top_padding"
+        android:paddingEnd="@dimen/home_ref_horizontal_padding"
+        android:paddingBottom="12dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -27,123 +27,111 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <ImageView
-                    android:id="@+id/ivHomeLogo"
-                    android:layout_width="@dimen/home_logo_width"
-                    android:layout_height="@dimen/home_logo_height"
-                    android:contentDescription="@string/auto_text_001"
-                    android:scaleType="fitCenter"
-                    app:srcCompat="@drawable/fatiweblogo" />
-
-                <TextView
-                    android:id="@+id/tvBrand"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/space_12"
-                    android:fontFamily="@font/plus_jakarta_sans_bold"
-                    android:text="@string/auto_text_002"
-                    android:textColor="@color/home_text_primary"
-                    android:textSize="@dimen/text_size_subtitle"
-                    android:textStyle="bold" />
-            </LinearLayout>
-
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="@dimen/surface_button_size"
-                android:layout_height="@dimen/surface_button_size"
-                app:cardBackgroundColor="@color/home_surface_soft"
-                app:cardCornerRadius="@dimen/surface_button_corner_radius"
-                app:cardElevation="0dp"
-                app:strokeColor="@color/colorOutline"
-                app:strokeWidth="1dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <ImageView
-                    android:id="@+id/ivTopNotifications"
-                    android:layout_width="@dimen/surface_button_icon_size"
-                    android:layout_height="@dimen/surface_button_icon_size"
-                    android:layout_gravity="center"
-                    android:contentDescription="@string/notifications_title"
-                    app:srcCompat="@drawable/notification"
-                    app:tint="@color/home_text_primary" />
-            </com.google.android.material.card.MaterialCardView>
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/space_12"
-            android:background="@drawable/bg_home_meta_pill"
-            android:fontFamily="@font/plus_jakarta_sans_medium"
-            android:paddingStart="@dimen/space_10"
-            android:paddingTop="@dimen/space_4"
-            android:paddingEnd="@dimen/space_10"
-            android:paddingBottom="@dimen/space_4"
-            android:text="@string/cart_header_badge"
-            android:textColor="@color/home_meta_text"
-            android:textSize="@dimen/text_size_overline"
-            android:textStyle="bold"
-            android:visibility="gone" />
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/space_8">
-
             <TextView
                 android:id="@+id/tvCartTitle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/plus_jakarta_sans_bold"
+                android:fontFamily="@font/manrope_semibold"
+                android:includeFontPadding="false"
                 android:text="@string/auto_text_096"
-                android:textColor="@color/home_text_primary"
-                android:textSize="@dimen/text_size_subtitle"
-                android:textStyle="bold"
-                app:layout_constraintEnd_toStartOf="@id/tvCartCountChip"
+                android:textColor="@color/home_ref_text_primary"
+                android:textSize="22sp"
+                app:layout_constraintBottom_toBottomOf="@id/layoutTopActions"
+                app:layout_constraintEnd_toStartOf="@id/layoutTopActions"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/layoutTopActions" />
+
+            <LinearLayout
+                android:id="@+id/layoutTopActions"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <FrameLayout
+                    android:id="@+id/notificationContainer"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp">
+
+                    <ImageView
+                        android:id="@+id/ivTopNotifications"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_gravity="center"
+                        android:contentDescription="@string/notifications_title"
+                        app:srcCompat="@drawable/notification"
+                        app:tint="@color/home_ref_nav_icon" />
+
+                    <View
+                        android:id="@+id/notificationBadge"
+                        android:layout_width="8dp"
+                        android:layout_height="8dp"
+                        android:layout_gravity="end|top"
+                        android:layout_marginTop="9dp"
+                        android:layout_marginEnd="9dp"
+                        android:background="@drawable/bg_notification_badge"
+                        android:backgroundTint="@color/home_ref_gold"
+                        android:visibility="gone" />
+                </FrameLayout>
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tvBrand"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:visibility="gone"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/ivHomeLogo"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:visibility="gone"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_4">
 
             <TextView
                 android:id="@+id/tvCartCountChip"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/bg_home_meta_pill"
-                android:fontFamily="@font/plus_jakarta_sans_bold"
+                android:fontFamily="@font/manrope_semibold"
                 android:paddingStart="@dimen/space_10"
-                android:paddingTop="@dimen/space_6"
+                android:paddingTop="@dimen/space_4"
                 android:paddingEnd="@dimen/space_10"
-                android:paddingBottom="@dimen/space_6"
+                android:paddingBottom="@dimen/space_4"
                 android:text="@string/cart_count_chip_zero"
-                android:textColor="@color/home_text_primary"
+                android:textColor="@color/home_meta_text"
                 android:textSize="@dimen/text_size_overline"
-                app:layout_constraintBottom_toBottomOf="@id/tvCartTitle"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@id/tvCartTitle" />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
                 android:id="@+id/tvCartHelper"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/space_4"
-                android:fontFamily="@font/plus_jakarta_sans_regular"
+                android:layout_marginStart="@dimen/space_8"
+                android:fontFamily="@font/manrope_regular"
+                android:includeFontPadding="false"
                 android:lineSpacingExtra="2dp"
                 android:text="@string/cart_header_helper"
-                android:textColor="@color/home_text_secondary"
+                android:textColor="@color/home_ref_text_secondary"
                 android:textSize="@dimen/text_size_caption"
-                android:maxLines="2"
+                android:ellipsize="end"
+                android:maxLines="1"
+                app:layout_constraintBottom_toBottomOf="@id/tvCartCountChip"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tvCartTitle" />
+                app:layout_constraintStart_toEndOf="@id/tvCartCountChip"
+                app:layout_constraintTop_toTopOf="@id/tvCartCountChip" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </LinearLayout>
 
@@ -166,7 +154,79 @@
                 android:paddingStart="@dimen/home_horizontal_padding"
             android:paddingTop="@dimen/space_10"
                 android:paddingEnd="@dimen/home_horizontal_padding"
-                android:paddingBottom="96dp">
+                android:paddingBottom="@dimen/bottom_nav_reserved_space">
+
+            <LinearLayout
+                android:id="@+id/cardCartSyncBanner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/space_10"
+                android:background="@drawable/bg_cart_sync_banner"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="@dimen/space_14"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tvCartSyncTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/manrope_semibold"
+                        android:text="@string/cart_sync_banner_failed_title"
+                        android:textColor="@color/status_text_warning"
+                        android:textSize="@dimen/text_size_caption"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvCartSyncMessage"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_4"
+                        android:fontFamily="@font/manrope_regular"
+                        android:lineSpacingExtra="2dp"
+                        android:text="@string/cart_sync_banner_failed_message"
+                        android:textColor="@color/home_text_secondary"
+                        android:textSize="@dimen/text_size_caption" />
+                </LinearLayout>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnCartSyncRetry"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:layout_marginStart="@dimen/space_12"
+                    android:minWidth="0dp"
+                    android:paddingStart="@dimen/space_14"
+                    android:paddingEnd="@dimen/space_14"
+                    android:text="@string/cart_sync_retry_action"
+                    android:textAllCaps="false"
+                    android:textColor="@color/colorOnPrimary"
+                    android:textSize="@dimen/text_size_caption"
+                    app:backgroundTint="?attr/colorPrimary"
+                    app:cornerRadius="@dimen/corner_radius_medium"
+                    app:elevation="0dp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/layoutCartLoadingState"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <include layout="@layout/item_product_card_shimmer" />
+
+                <include
+                    layout="@layout/item_product_card_shimmer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/panier_product_card_spacing" />
+            </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/layoutEmptyCartState"
@@ -181,18 +241,19 @@
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="96dp"
                     android:layout_height="96dp"
-                    app:cardBackgroundColor="@color/home_surface_raised"
+                    app:cardBackgroundColor="@android:color/transparent"
                     app:cardCornerRadius="@dimen/corner_radius_large"
                     app:cardElevation="0dp"
-                    app:strokeColor="@color/colorOutline"
-                    app:strokeWidth="1dp">
+                    app:strokeWidth="0dp">
 
                     <com.airbnb.lottie.LottieAnimationView
                         android:id="@+id/ivEmptyCartAnimation"
                         android:layout_width="72dp"
                         android:layout_height="72dp"
                         android:layout_gravity="center"
+                        android:background="@android:color/transparent"
                         android:contentDescription="@string/auto_text_097"
+                        android:scaleType="centerInside"
                         app:lottie_autoPlay="true"
                         app:lottie_loop="true"
                         app:lottie_rawRes="@raw/anim_empty_cart" />
@@ -203,7 +264,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/space_14"
-                    android:fontFamily="@font/plus_jakarta_sans_bold"
+                    android:fontFamily="@font/manrope_semibold"
                     android:gravity="center"
                     android:text="@string/auto_text_097"
                     android:textColor="@color/home_text_primary"
@@ -215,7 +276,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/space_8"
-                    android:fontFamily="@font/plus_jakarta_sans_regular"
+                    android:fontFamily="@font/manrope_regular"
                     android:gravity="center"
                     android:lineSpacingExtra="2dp"
                     android:text="@string/cart_empty_subtitle"
@@ -290,7 +351,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="@dimen/space_8"
-                            android:fontFamily="@font/plus_jakarta_sans_medium"
+                            android:fontFamily="@font/manrope_medium"
                             android:text="@string/cart_summary_badge"
                             android:textColor="@color/home_text_primary"
                             android:textSize="@dimen/text_size_overline" />
@@ -305,7 +366,7 @@
                             android:id="@+id/tvSubtotalLabel"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/plus_jakarta_sans_medium"
+                            android:fontFamily="@font/manrope_medium"
                             android:text="@string/auto_text_098"
                             android:textColor="@color/home_text_secondary"
                             android:textSize="@dimen/text_size_caption"
@@ -316,7 +377,7 @@
                             android:id="@+id/tvSubtotalValue"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/plus_jakarta_sans_bold"
+                            android:fontFamily="@font/manrope_semibold"
                             android:text="@string/auto_text_099"
                             android:textColor="@color/home_text_primary"
                             android:textSize="@dimen/text_size_body"
@@ -333,7 +394,7 @@
                             android:id="@+id/tvLivraisonLabel"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/plus_jakarta_sans_medium"
+                            android:fontFamily="@font/manrope_medium"
                             android:text="@string/auto_text_100"
                             android:textColor="@color/home_text_secondary"
                             android:textSize="@dimen/text_size_caption"
@@ -344,7 +405,7 @@
                             android:id="@+id/tvLivraisonValue"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/plus_jakarta_sans_bold"
+                            android:fontFamily="@font/manrope_semibold"
                             android:text="@string/auto_text_099"
                             android:textColor="@color/home_text_primary"
                             android:textSize="@dimen/text_size_body"
@@ -367,7 +428,7 @@
                             android:id="@+id/tvTotalLabel"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/plus_jakarta_sans_bold"
+                            android:fontFamily="@font/manrope_semibold"
                             android:text="@string/details_total_label"
                             android:textColor="@color/home_text_primary"
                             android:textSize="@dimen/text_size_subtitle"
@@ -379,7 +440,7 @@
                             android:id="@+id/tvTotalValue"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/plus_jakarta_sans_bold"
+                            android:fontFamily="@font/manrope_semibold"
                             android:text="@string/auto_text_099"
                             android:textColor="?attr/colorPrimary"
                             android:textSize="@dimen/text_size_subtitle"
@@ -408,7 +469,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/space_12"
-                        android:fontFamily="@font/plus_jakarta_sans_regular"
+                        android:fontFamily="@font/manrope_regular"
                         android:gravity="center"
                         android:text="@string/cart_summary_helper"
                         android:textColor="@color/home_text_secondary"
@@ -418,4 +479,11 @@
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
+    <FrameLayout
+        android:id="@+id/chatContainer"
+        android:layout_width="1dp"
+        android:layout_height="1dp"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

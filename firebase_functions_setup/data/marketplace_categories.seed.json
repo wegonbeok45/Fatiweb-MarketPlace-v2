@@ -1,0 +1,323 @@
+{
+  "version": 1,
+  "collection": "marketplaceCategories",
+  "categories": [
+    {
+      "name": "Electronics",
+      "icon": "smartphone",
+      "featured": true,
+      "listingTypes": ["product"],
+      "searchKeywords": ["electronics", "gadgets", "tech", "devices"],
+      "children": [
+        {"name": "Phones & Accessories", "children": [{"name": "Smartphones"}, {"name": "Cases"}, {"name": "Chargers"}, {"name": "Screen Protectors"}]},
+        {"name": "Computers & Tablets"},
+        {"name": "TVs & Home Theater"},
+        {"name": "Cameras & Photography"},
+        {"name": "Audio & Headphones"},
+        {"name": "Gaming Consoles"},
+        {"name": "Wearables"},
+        {"name": "Smart Home"},
+        {"name": "Networking"},
+        {"name": "Drones"},
+        {"name": "Printers & Scanners"},
+        {"name": "Electronics Parts"}
+      ]
+    },
+    {
+      "name": "Fashion",
+      "icon": "shirt",
+      "featured": true,
+      "listingTypes": ["product"],
+      "searchKeywords": ["fashion", "clothing", "style", "wear"],
+      "children": [
+        {"name": "Women's Clothing"},
+        {"name": "Men's Clothing"},
+        {"name": "Shoes", "children": [{"name": "Sneakers"}, {"name": "Boots"}, {"name": "Sandals"}, {"name": "Formal Shoes"}]},
+        {"name": "Bags & Luggage"},
+        {"name": "Jewelry & Watches"},
+        {"name": "Accessories"},
+        {"name": "Traditional Wear"},
+        {"name": "Kids Clothing"},
+        {"name": "Activewear"},
+        {"name": "Formal Wear"},
+        {"name": "Maternity"},
+        {"name": "Vintage Fashion"}
+      ]
+    },
+    {
+      "name": "Home & Furniture",
+      "icon": "sofa",
+      "featured": true,
+      "listingTypes": ["product", "real_estate"],
+      "searchKeywords": ["home", "furniture", "decor", "living"],
+      "children": [
+        {"name": "Sofas & Seating"},
+        {"name": "Beds & Mattresses"},
+        {"name": "Tables & Desks"},
+        {"name": "Storage & Shelving"},
+        {"name": "Kitchen & Dining"},
+        {"name": "Home Decor"},
+        {"name": "Lighting"},
+        {"name": "Garden & Patio"},
+        {"name": "Appliances"},
+        {"name": "Bedding & Bath"},
+        {"name": "Tools & DIY"},
+        {"name": "Office Furniture"}
+      ]
+    },
+    {
+      "name": "Beauty & Health",
+      "icon": "sparkles",
+      "featured": true,
+      "listingTypes": ["product", "service"],
+      "searchKeywords": ["beauty", "health", "care", "wellness"],
+      "children": [
+        {"name": "Skincare"},
+        {"name": "Haircare"},
+        {"name": "Makeup"},
+        {"name": "Fragrance"},
+        {"name": "Bath & Body"},
+        {"name": "Personal Care Devices"},
+        {"name": "Wellness Supplements"},
+        {"name": "Medical Supplies"},
+        {"name": "Fitness Recovery"},
+        {"name": "Men's Grooming"},
+        {"name": "Natural & Organic"},
+        {"name": "Beauty Services"}
+      ]
+    },
+    {
+      "name": "Sports & Outdoors",
+      "icon": "dumbbell",
+      "featured": false,
+      "listingTypes": ["product"],
+      "searchKeywords": ["sports", "outdoors", "fitness", "activity"],
+      "children": [
+        {"name": "Exercise & Fitness"},
+        {"name": "Team Sports"},
+        {"name": "Camping & Hiking"},
+        {"name": "Cycling"},
+        {"name": "Fishing"},
+        {"name": "Water Sports"},
+        {"name": "Outdoor Recreation"},
+        {"name": "Sportswear"},
+        {"name": "Golf"},
+        {"name": "Running"},
+        {"name": "Yoga & Pilates"},
+        {"name": "Outdoor Gear"}
+      ]
+    },
+    {
+      "name": "Automotive",
+      "icon": "car",
+      "featured": true,
+      "listingTypes": ["vehicle", "product", "service"],
+      "searchKeywords": ["automotive", "cars", "vehicles", "parts"],
+      "children": [
+        {"name": "Cars", "children": [{"name": "Sedans"}, {"name": "SUVs"}, {"name": "Trucks"}, {"name": "Electric & Hybrid"}]},
+        {"name": "Motorcycles"},
+        {"name": "Auto Parts"},
+        {"name": "Tires & Wheels"},
+        {"name": "Car Electronics"},
+        {"name": "Tools & Garage"},
+        {"name": "Oils & Fluids"},
+        {"name": "Car Care"},
+        {"name": "Commercial Vehicles"},
+        {"name": "Boats & Marine"},
+        {"name": "Vehicle Services"},
+        {"name": "Rentals"}
+      ]
+    },
+    {
+      "name": "Real Estate",
+      "icon": "home",
+      "featured": true,
+      "listingTypes": ["real_estate"],
+      "searchKeywords": ["real estate", "property", "rent", "sale"],
+      "children": [
+        {"name": "Apartments for Rent", "children": [{"name": "Studio"}, {"name": "S+1"}, {"name": "S+2"}, {"name": "S+3+"}]},
+        {"name": "Apartments for Sale"},
+        {"name": "Houses for Rent"},
+        {"name": "Houses for Sale"},
+        {"name": "Land"},
+        {"name": "Commercial Property"},
+        {"name": "Vacation Rentals"},
+        {"name": "Shared Rooms"},
+        {"name": "Garages & Parking"},
+        {"name": "Offices & Coworking"},
+        {"name": "Property Services"},
+        {"name": "New Developments"}
+      ]
+    },
+    {
+      "name": "Jobs & Services",
+      "icon": "briefcase",
+      "featured": true,
+      "listingTypes": ["job", "service"],
+      "searchKeywords": ["jobs", "services", "work", "freelance"],
+      "children": [
+        {"name": "Full-Time Jobs"},
+        {"name": "Part-Time Jobs"},
+        {"name": "Freelance"},
+        {"name": "Home Services", "children": [{"name": "Plumbing"}, {"name": "Electrical"}, {"name": "Painting"}, {"name": "Cleaning"}]},
+        {"name": "Repair Services"},
+        {"name": "Delivery & Moving"},
+        {"name": "Education & Tutoring"},
+        {"name": "Events & Catering"},
+        {"name": "Design & Creative"},
+        {"name": "Tech Services"},
+        {"name": "Legal & Finance"},
+        {"name": "Cleaning"},
+        {"name": "Beauty Services"}
+      ]
+    },
+    {
+      "name": "Baby & Toys",
+      "icon": "baby",
+      "featured": false,
+      "listingTypes": ["product"],
+      "searchKeywords": ["baby", "toys", "kids", "children"],
+      "children": [
+        {"name": "Strollers"},
+        {"name": "Car Seats"},
+        {"name": "Baby Clothing"},
+        {"name": "Nursery Furniture"},
+        {"name": "Feeding"},
+        {"name": "Diapers & Care"},
+        {"name": "Toys"},
+        {"name": "Games & Puzzles"},
+        {"name": "Outdoor Toys"},
+        {"name": "School Supplies"},
+        {"name": "Maternity"},
+        {"name": "Baby Safety"}
+      ]
+    },
+    {
+      "name": "Books & Media",
+      "icon": "book-open",
+      "featured": false,
+      "listingTypes": ["product", "digital"],
+      "searchKeywords": ["books", "media", "music", "games"],
+      "children": [
+        {"name": "Books"},
+        {"name": "Textbooks"},
+        {"name": "Comics & Manga"},
+        {"name": "Magazines"},
+        {"name": "Movies"},
+        {"name": "Music"},
+        {"name": "Video Games"},
+        {"name": "Instruments"},
+        {"name": "Collectible Media"},
+        {"name": "Ebooks"},
+        {"name": "Audiobooks"},
+        {"name": "Board Games"}
+      ]
+    },
+    {
+      "name": "Food & Grocery",
+      "icon": "shopping-basket",
+      "featured": true,
+      "listingTypes": ["product"],
+      "searchKeywords": ["food", "grocery", "fresh", "pantry"],
+      "children": [
+        {"name": "Fresh Produce"},
+        {"name": "Meat & Seafood"},
+        {"name": "Bakery"},
+        {"name": "Dairy & Eggs"},
+        {"name": "Pantry Staples"},
+        {"name": "Beverages"},
+        {"name": "Snacks"},
+        {"name": "Organic Food"},
+        {"name": "Prepared Meals"},
+        {"name": "Tunisian Specialties", "children": [{"name": "Harissa"}, {"name": "Olive Oil"}, {"name": "Dates"}, {"name": "Traditional Sweets"}]},
+        {"name": "Spices & Condiments"},
+        {"name": "Wholesale Grocery"}
+      ]
+    },
+    {
+      "name": "Pets",
+      "icon": "paw-print",
+      "featured": false,
+      "listingTypes": ["product", "service"],
+      "searchKeywords": ["pets", "animals", "pet food", "pet care"],
+      "children": [
+        {"name": "Dogs"},
+        {"name": "Cats"},
+        {"name": "Birds"},
+        {"name": "Fish & Aquariums"},
+        {"name": "Small Pets"},
+        {"name": "Pet Food"},
+        {"name": "Pet Accessories"},
+        {"name": "Pet Grooming"},
+        {"name": "Pet Services"},
+        {"name": "Pet Adoption"},
+        {"name": "Veterinary Supplies"},
+        {"name": "Pet Housing"}
+      ]
+    },
+    {
+      "name": "Business & Industrial",
+      "icon": "factory",
+      "featured": false,
+      "listingTypes": ["product", "service"],
+      "searchKeywords": ["business", "industrial", "equipment", "wholesale"],
+      "children": [
+        {"name": "Office Supplies"},
+        {"name": "Restaurant Equipment"},
+        {"name": "Industrial Tools"},
+        {"name": "Construction Materials"},
+        {"name": "Agriculture", "children": [{"name": "Seeds"}, {"name": "Irrigation"}, {"name": "Farm Equipment"}]},
+        {"name": "Medical Equipment"},
+        {"name": "Packaging & Shipping"},
+        {"name": "Retail Fixtures"},
+        {"name": "Safety Equipment"},
+        {"name": "Manufacturing Equipment"},
+        {"name": "Cleaning Supplies"},
+        {"name": "Wholesale Lots"}
+      ]
+    },
+    {
+      "name": "Digital Products",
+      "icon": "download-cloud",
+      "featured": false,
+      "listingTypes": ["digital", "service"],
+      "searchKeywords": ["digital", "software", "downloads", "templates"],
+      "children": [
+        {"name": "Software"},
+        {"name": "Templates", "children": [{"name": "Resume Templates"}, {"name": "Social Media Templates"}, {"name": "Business Templates"}]},
+        {"name": "Graphics & Design"},
+        {"name": "Ebooks & Courses"},
+        {"name": "Digital Art"},
+        {"name": "Music & Audio"},
+        {"name": "Stock Photos"},
+        {"name": "Website Themes"},
+        {"name": "Plugins & Extensions"},
+        {"name": "Licenses & Keys"},
+        {"name": "Online Services"},
+        {"name": "Game Assets"}
+      ]
+    },
+    {
+      "name": "Collectibles & Hobbies",
+      "icon": "gem",
+      "featured": false,
+      "listingTypes": ["product"],
+      "searchKeywords": ["collectibles", "hobbies", "antiques", "crafts"],
+      "children": [
+        {"name": "Antiques"},
+        {"name": "Coins & Currency"},
+        {"name": "Stamps"},
+        {"name": "Trading Cards"},
+        {"name": "Art Collectibles"},
+        {"name": "Handmade Crafts"},
+        {"name": "Model Kits"},
+        {"name": "RC & Drones"},
+        {"name": "Sewing & Crafts"},
+        {"name": "Musical Hobbies"},
+        {"name": "Memorabilia"},
+        {"name": "Vintage Items"},
+        {"name": "Board & Tabletop Games"}
+      ]
+    }
+  ]
+}

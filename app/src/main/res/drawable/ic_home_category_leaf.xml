@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="@color/home_ref_badge_icon"
+        android:pathData="M19.5,4C14.8,4 11.08,5.87 9.07,9.09 7.79,8.67 6.43,8.45 5,8.45V10.45c1.08,0 2.1,0.13 3.05,0.37C7.38,12.21 7,13.76 7,15.45 7,18.52 9.48,21 12.55,21c2.04,0 3.84,-1.1 4.8,-2.74C18.76,15.82 20,11.7 20,6.5V4h-0.5zM12.55,19C10.59,19 9,17.41 9,15.45 9,12.69 10.49,10.21 12.89,8.69 14.5,7.66 16.61,6.98 19,6.83c-0.12,4.12 -1.09,7.42 -3.2,9.92C15.06,18.12 13.9,19 12.55,19zM11.5,12c1.65,0.37 3.13,1.12 4.33,2.19l-1.31,1.51c-0.94,-0.81 -2.1,-1.38 -3.39,-1.67L11.5,12z" />
+</vector>

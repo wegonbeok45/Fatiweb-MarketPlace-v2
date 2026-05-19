@@ -4,6 +4,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
+import android.animation.ValueAnimator
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -44,7 +47,7 @@ class ChatAdapter : ListAdapter<ChatMessage, RecyclerView.ViewHolder>(DIFF) {
         when (holder) {
             is UserVH -> holder.bind(msg)
             is BotVH -> holder.bind(msg)
-            is BotLoadingVH -> { /* static layout, nothing to bind */ }
+            is BotLoadingVH -> holder.bind()
         }
     }
 
@@ -75,26 +78,42 @@ class ChatAdapter : ListAdapter<ChatMessage, RecyclerView.ViewHolder>(DIFF) {
         private val dot1: View = view.findViewById(R.id.chatDot1)
         private val dot2: View = view.findViewById(R.id.chatDot2)
         private val dot3: View = view.findViewById(R.id.chatDot3)
-        private val animators = mutableListOf<android.animation.ObjectAnimator>()
+        private val animators = mutableListOf<AnimatorSet>()
 
-        init {
+        fun bind() {
+            if (animators.any { it.isStarted }) return
             val dots = listOf(dot1, dot2, dot3)
             dots.forEachIndexed { i, dot ->
                 dot.visibility = View.VISIBLE
-                val anim = android.animation.ObjectAnimator.ofFloat(dot, "alpha", 0.3f, 1f).apply {
-                    duration = 600
+                dot.alpha = 0.35f
+                dot.translationY = 0f
+                val alpha = ObjectAnimator.ofFloat(dot, View.ALPHA, 0.35f, 1f).apply {
+                    duration = 420
                     startDelay = (i * 200).toLong()
-                    repeatMode = android.animation.ValueAnimator.REVERSE
-                    repeatCount = android.animation.ValueAnimator.INFINITE
+                    repeatMode = ValueAnimator.REVERSE
+                    repeatCount = ValueAnimator.INFINITE
                 }
-                anim.start()
-                animators.add(anim)
+                val bounce = ObjectAnimator.ofFloat(dot, View.TRANSLATION_Y, 0f, -8f).apply {
+                    duration = 420
+                    startDelay = (i * 200).toLong()
+                    repeatMode = ValueAnimator.REVERSE
+                    repeatCount = ValueAnimator.INFINITE
+                }
+                AnimatorSet().apply {
+                    playTogether(alpha, bounce)
+                    start()
+                    animators.add(this)
+                }
             }
         }
 
         fun cleanup() {
             animators.forEach { it.cancel() }
+            animators.clear()
+            listOf(dot1, dot2, dot3).forEach { dot ->
+                dot.alpha = 1f
+                dot.translationY = 0f
+            }
         }
     }
 }
-

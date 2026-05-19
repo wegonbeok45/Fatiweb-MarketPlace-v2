@@ -1,0 +1,19 @@
+appId: isim.ia2y.myapplication
+---
+- tapOn: "Photos"
+- extendedWaitUntil:
+    visible: "Photo taken on Apr 22, 2026"
+    timeout: 15000
+- tapOn:
+    point: "17%,44%"
+- extendedWaitUntil:
+    visible:
+      id: "isim.ia2y.myapplication:id/adminProductEditorBtnSave"
+    timeout: 15000
+- tapOn:
+    id: "isim.ia2y.myapplication:id/adminProductEditorBtnSave"
+- extendedWaitUntil:
+    visible:
+      id: "isim.ia2y.myapplication:id/adminProduitsBtnAdd"
+    timeout: 90000
+- takeScreenshot: admin-products-after-latest-camera-save

@@ -1,21 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/bg_auth_screen"
-    android:fillViewport="true"
     android:paddingStart="@dimen/auth_screen_padding"
     android:paddingEnd="@dimen/auth_screen_padding"
+    android:paddingTop="8dp"
+    android:paddingBottom="12dp"
     tools:context=".RegisterActivity">
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingTop="8dp"
-        android:paddingBottom="16dp">
 
     <ImageView
         android:id="@+id/ivBack"
@@ -31,38 +26,24 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layoutRegisterContent"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:layout_marginBottom="@dimen/space_12"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toTopOf="@id/layoutLoginRow"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/ivBack">
 
-        <ImageView
-            android:id="@+id/ivAppLogo"
-            android:layout_width="120dp"
-            android:layout_height="70dp"
-            android:adjustViewBounds="true"
-            android:importantForAccessibility="no"
-            android:scaleType="fitCenter"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_chainStyle="packed"
-            app:srcCompat="@drawable/fatiweblogo" />
-
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardRegisterPanel"
             android:layout_width="0dp"
-            android:layout_height="@dimen/auth_hero_height_register"
-            android:layout_marginTop="16dp"
+            android:layout_height="120dp"
             app:cardCornerRadius="@dimen/corner_radius_large"
             app:cardElevation="0dp"
             app:strokeColor="@color/overlay_white_8"
             app:strokeWidth="1dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/ivAppLogo">
+            app:layout_constraintTop_toTopOf="parent">
 
             <FrameLayout
                 android:layout_width="match_parent"
@@ -105,7 +86,7 @@
                             android:text="@string/auto_compte_premium_0868"
                             android:textColor="?attr/colorOnSurface"
                             android:textSize="@dimen/text_size_overline"
-                            android:fontFamily="@font/plus_jakarta_sans_bold" />
+                            android:fontFamily="@font/manrope_semibold" />
                     </com.google.android.material.card.MaterialCardView>
 
                     <TextView
@@ -115,7 +96,7 @@
                         android:text="@string/auto_creez_votre_profil_synchronisez_137e"
                         android:textColor="@android:color/white"
                         android:textSize="@dimen/text_size_title"
-                        android:fontFamily="@font/plus_jakarta_sans_bold"
+                        android:fontFamily="@font/manrope_semibold"
                         android:lineSpacingExtra="2dp"
                         android:maxLines="2" />
 
@@ -144,7 +125,7 @@
                                 android:text="@string/auto_profil_sync_baff"
                                 android:textColor="@android:color/white"
                                 android:textSize="@dimen/text_size_overline"
-                                android:fontFamily="@font/plus_jakarta_sans_medium" />
+                                android:fontFamily="@font/manrope_medium" />
                         </com.google.android.material.card.MaterialCardView>
 
                         <com.google.android.material.card.MaterialCardView
@@ -167,7 +148,7 @@
                                 android:text="@string/auto_favoris_cloud_3c82"
                                 android:textColor="@android:color/white"
                                 android:textSize="@dimen/text_size_overline"
-                                android:fontFamily="@font/plus_jakarta_sans_medium" />
+                                android:fontFamily="@font/manrope_medium" />
                         </com.google.android.material.card.MaterialCardView>
                     </LinearLayout>
                 </LinearLayout>
@@ -435,23 +416,8 @@
                 app:iconPadding="@dimen/space_8"
                 app:iconSize="@dimen/space_20"
                 app:iconTint="@null"
-                app:layout_constraintEnd_toStartOf="@id/btnFacebook"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnFacebook"
-                style="@style/AppButton.Secondary"
-                android:layout_width="0dp"
-                android:layout_marginStart="@dimen/space_12"
-                android:text="@string/auto_text_041"
-                app:icon="@drawable/facebooklogo"
-                app:iconGravity="textStart"
-                app:iconPadding="@dimen/space_8"
-                app:iconSize="@dimen/space_20"
-                app:iconTint="@null"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/btnGoogle"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -461,9 +427,8 @@
         android:id="@+id/layoutLoginRow"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:layout_marginBottom="12dp"
-        app:layout_constraintTop_toBottomOf="@id/layoutRegisterContent"
+        android:layout_marginBottom="4dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
@@ -493,6 +458,5 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
 
-</androidx.core.widget.NestedScrollView>

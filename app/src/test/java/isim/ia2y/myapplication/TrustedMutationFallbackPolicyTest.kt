@@ -33,4 +33,20 @@ class TrustedMutationFallbackPolicyTest {
             )
         )
     }
+
+    @Test
+    fun blocksFallbackForAuthAndHttpSecurityMessages() {
+        listOf(
+            "401 unauthenticated",
+            "403 forbidden",
+            "auth failed",
+            "authentication failed",
+            "permission-denied"
+        ).forEach { message ->
+            assertFalse(
+                message,
+                TrustedMutationFallbackPolicy.allowDirectWriteFallback(IllegalStateException(message))
+            )
+        }
+    }
 }

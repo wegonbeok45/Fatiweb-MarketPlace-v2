@@ -22,50 +22,27 @@
         app:tint="?attr/colorOnSurface" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layoutLoginContent"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:paddingTop="@dimen/space_6"
-        android:paddingBottom="@dimen/space_8"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/ivBack">
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/layoutLoginContent"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/space_8"
         android:layout_marginBottom="@dimen/space_8"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.45">
-
-        <ImageView
-            android:id="@+id/ivAppLogo"
-            android:layout_width="@dimen/auth_logo_width_compact"
-            android:layout_height="@dimen/auth_logo_height_compact"
-            android:adjustViewBounds="true"
-            android:importantForAccessibility="no"
-            android:scaleType="fitCenter"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_chainStyle="packed"
-            app:srcCompat="@drawable/fatiweblogo" />
+        app:layout_constraintTop_toBottomOf="@id/ivBack">
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardWelcomePanel"
             android:layout_width="0dp"
             android:layout_height="@dimen/auth_hero_height_compact"
-            android:layout_marginTop="@dimen/space_12"
             app:cardCornerRadius="@dimen/corner_radius_large"
             app:cardElevation="0dp"
             app:strokeColor="@color/overlay_white_8"
             app:strokeWidth="1dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/ivAppLogo">
+            app:layout_constraintTop_toTopOf="parent">
 
             <FrameLayout
                 android:layout_width="match_parent"
@@ -108,7 +85,7 @@
                             android:text="@string/auto_premium_commerce_9fb5"
                             android:textColor="?attr/colorOnSurface"
                             android:textSize="@dimen/text_size_overline"
-                            android:fontFamily="@font/plus_jakarta_sans_bold" />
+                            android:fontFamily="@font/manrope_semibold" />
                     </com.google.android.material.card.MaterialCardView>
 
                     <TextView
@@ -119,7 +96,7 @@
                         android:text="@string/auto_connexion_rapide_commandes_et_f014"
                         android:textColor="@android:color/white"
                         android:textSize="@dimen/text_size_title"
-                        android:fontFamily="@font/plus_jakarta_sans_bold"
+                        android:fontFamily="@font/manrope_semibold"
                         android:lineSpacingExtra="1dp"
                         android:maxLines="2" />
 
@@ -148,7 +125,7 @@
                                 android:text="@string/auto_firebase_auth_bfe0"
                                 android:textColor="@android:color/white"
                                 android:textSize="@dimen/text_size_overline"
-                                android:fontFamily="@font/plus_jakarta_sans_medium" />
+                                android:fontFamily="@font/manrope_medium" />
                         </com.google.android.material.card.MaterialCardView>
 
                         <com.google.android.material.card.MaterialCardView
@@ -171,7 +148,7 @@
                                 android:text="@string/auto_suivi_commandes_4c65"
                                 android:textColor="@android:color/white"
                                 android:textSize="@dimen/text_size_overline"
-                                android:fontFamily="@font/plus_jakarta_sans_medium" />
+                                android:fontFamily="@font/manrope_medium" />
                         </com.google.android.material.card.MaterialCardView>
                     </LinearLayout>
                 </LinearLayout>
@@ -401,28 +378,35 @@
                 app:iconPadding="@dimen/space_8"
                 app:iconSize="@dimen/space_20"
                 app:iconTint="@null"
-                app:layout_constraintEnd_toStartOf="@id/btnFacebook"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnFacebook"
-                style="@style/AppButton.Secondary"
-                android:layout_width="0dp"
-                android:layout_marginStart="@dimen/space_12"
-                android:minHeight="@dimen/auth_social_button_height"
-                android:paddingTop="10dp"
-                android:paddingBottom="10dp"
-                android:text="@string/auto_text_041"
-                app:icon="@drawable/facebooklogo"
-                app:iconGravity="textStart"
-                app:iconPadding="@dimen/space_8"
-                app:iconSize="@dimen/space_20"
-                app:iconTint="@null"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/btnGoogle"
-                app:layout_constraintTop_toTopOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnContinueAsGuest"
+            style="@style/AppButton.Secondary"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_marginTop="@dimen/space_16"
+            android:text="@string/login_continue_guest"
+            android:textAllCaps="false"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/layoutSocialButtons"
+            app:strokeWidth="0dp" />
+
+        <TextView
+            android:id="@+id/tvOrContinueAs"
+            style="@style/AppText.Caption"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_12"
+            android:text="@string/login_or_continue_as"
+            android:textColor="@color/home_text_secondary"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/btnContinueAsGuest" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/layoutSignUpRow"
@@ -431,7 +415,7 @@
             android:layout_marginTop="@dimen/space_10"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/layoutSocialButtons">
+            app:layout_constraintTop_toBottomOf="@id/tvOrContinueAs">
 
             <TextView
                 android:id="@+id/tvNoAccount"
@@ -458,8 +442,6 @@
                 app:layout_constraintStart_toEndOf="@id/tvNoAccount" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle">
-    <solid android:color="@color/home_nav_pill_bg" />
-    <corners android:radius="@dimen/corner_radius_round" />
-    <size
-        android:width="@dimen/nav_pill_width"
-        android:height="@dimen/nav_pill_height" />
+    <solid android:color="@color/home_ref_gold_soft" />
+    <corners android:radius="28dp" />
 </shape>

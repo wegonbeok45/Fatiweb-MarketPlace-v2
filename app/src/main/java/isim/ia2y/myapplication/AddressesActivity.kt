@@ -45,7 +45,7 @@ class AddressesActivity : AppCompatActivity() {
         }
 
         findViewById<View>(R.id.ivBack)?.setOnClickListener { finishWithMotion(isForward = false) }
-        findViewById<MaterialButton>(R.id.btnAddAddress)?.setOnClickListener { showAddressDialog() }
+        findViewById<View>(R.id.btnAddAddress)?.setOnClickListener { showAddressDialog() }
         findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.rvAddresses)?.layoutManager =
             LinearLayoutManager(this)
         applyPressFeedback(R.id.ivBack, R.id.btnAddAddress)

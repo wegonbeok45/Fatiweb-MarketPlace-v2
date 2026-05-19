@@ -9,11 +9,9 @@
 -keepattributes SourceFile,LineNumberTable
 -renamesourcefileattribute SourceFile
 
-# Firebase
+# Firebase / Play services public SDK types used through generated code and reflection
 -keepattributes Signature
 -keepattributes *Annotation*
--keep class com.google.firebase.** { *; }
--keep class com.google.android.gms.** { *; }
 
 # Kotlin Coroutines
 -keepnames class kotlinx.coroutines.internal.MainDispatcherFactory {}
@@ -25,25 +23,18 @@
 # Google Sign-In
 -keep class com.google.android.gms.auth.** { *; }
 
-# Keep data classes used with Firestore serialization
--keepclassmembers class isim.ia2y.myapplication.** {
-    <fields>;
-    <init>(...);
-}
+# Keep only app model classes that are converted to/from Firebase maps.
+-keepclassmembers class isim.ia2y.myapplication.Product { <fields>; <init>(...); }
+-keepclassmembers class isim.ia2y.myapplication.ProductReview { <fields>; <init>(...); }
+-keepclassmembers class isim.ia2y.myapplication.AppOrder { <fields>; <init>(...); }
+-keepclassmembers class isim.ia2y.myapplication.OrderItem { <fields>; <init>(...); }
+-keepclassmembers class isim.ia2y.myapplication.OrderStatusEntry { <fields>; <init>(...); }
+-keepclassmembers class isim.ia2y.myapplication.DeliveryAddress { <fields>; <init>(...); }
+-keepclassmembers class isim.ia2y.myapplication.DeliveryAddressSnapshot { <fields>; <init>(...); }
+-keepclassmembers class isim.ia2y.myapplication.FirestoreService$* { <fields>; <init>(...); }
 
-# Glide
--keep public class * implements com.bumptech.glide.module.GlideModule
--keep class * extends com.bumptech.glide.module.AppGlideModule { <init>(...); }
--keep public enum com.bumptech.glide.load.ImageHeaderParser$** {
-    **[] $VALUES;
-    public *;
-}
-
-# OkHttp (used by GeminiChatService)
--dontwarn okhttp3.**
+# Coil/Okio are used by Coil's image loader internals.
 -dontwarn okio.**
--keep class okhttp3.** { *; }
--keep interface okhttp3.** { *; }
 
 # org.json (used for Gemini API response parsing)
 -keep class org.json.** { *; }

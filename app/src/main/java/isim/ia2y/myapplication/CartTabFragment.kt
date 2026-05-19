@@ -9,16 +9,24 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isGone
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.airbnb.lottie.LottieAnimationView
 import com.google.android.material.button.MaterialButton
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class CartTabFragment : Fragment(R.layout.fragment_cart_tab) {
     private lateinit var emptyState: View
+    private lateinit var loadingState: View
     private lateinit var emptyText: TextView
     private lateinit var emptyAnimation: LottieAnimationView
     private lateinit var itemsContainer: LinearLayout
+    private lateinit var syncBanner: View
+    private lateinit var syncBannerTitle: TextView
+    private lateinit var syncBannerMessage: TextView
+    private lateinit var syncBannerAction: MaterialButton
     private var summaryGap: View? = null
     private var summaryCard: View? = null
     private lateinit var subtotalValue: TextView
@@ -28,19 +36,27 @@ class CartTabFragment : Fragment(R.layout.fragment_cart_tab) {
     private var cartCountChip: TextView? = null
     private var shouldAnimateListOnNextRender = true
     private var displayedShippingFee = CartStore.LIVRAISON_FEE
+    private var lastCartSyncErrorVersion = 0L
+    private var hasRenderedCartOnce = false
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        view.applyStatusBarInset()
         view.findViewById<View?>(R.id.layoutBottomNav)?.isGone = true
         view.findViewById<View?>(R.id.viewBottomDivider)?.isGone = true
         setupPanierActions(view)
         bindViews(view)
-        renderCart()
+        observeCartSyncState()
+        showCartLoadingState()
+        view.post {
+            if (isAdded && viewLifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
+                renderCart()
+            }
+        }
         loadCommerceConfig()
         (activity as? AppCompatActivity)?.applyPressFeedback(
             R.id.ivHomeLogo,
             R.id.tvBrand,
+            R.id.chatContainer,
             R.id.ivTopNotifications,
             R.id.btnCheckout,
             R.id.btnEmptyCartBrowse
@@ -60,6 +76,10 @@ class CartTabFragment : Fragment(R.layout.fragment_cart_tab) {
     override fun onResume() {
         super.onResume()
         loadCommerceConfig()
+        AnalyticsTracker.viewCart(
+            itemCount = CartStore.itemCount(requireContext()),
+            value = CartStore.subtotal(requireContext())
+        )
         renderCart()
         (activity as? MainActivity)?.updateHostCartBadge()
     }
@@ -80,6 +100,9 @@ class CartTabFragment : Fragment(R.layout.fragment_cart_tab) {
         root.findViewById<View>(R.id.tvBrand)?.setOnClickListener {
             (activity as? MainActivity)?.selectTab(MainActivity.Tab.HOME, animate = false)
         }
+        root.findViewById<View>(R.id.chatContainer)?.setOnClickListener {
+            (activity as? AppCompatActivity)?.navigateNoShift(ChatActivity::class.java)
+        }
         (activity as? AppCompatActivity)?.bindNotificationEntry(R.id.ivTopNotifications)
         root.findViewById<View>(R.id.btnEmptyCartBrowse)?.setOnClickListener {
             (activity as? MainActivity)?.selectTab(MainActivity.Tab.HOME, animate = false)
@@ -94,9 +117,17 @@ class CartTabFragment : Fragment(R.layout.fragment_cart_tab) {
 
     private fun bindViews(root: View) {
         emptyState = root.findViewById(R.id.layoutEmptyCartState)
+        loadingState = root.findViewById(R.id.layoutCartLoadingState)
         emptyText = root.findViewById(R.id.tvEmptyCart)
         emptyAnimation = root.findViewById(R.id.ivEmptyCartAnimation)
         itemsContainer = root.findViewById(R.id.layoutCartItemsContainer)
+        syncBanner = root.findViewById(R.id.cardCartSyncBanner)
+        syncBannerTitle = root.findViewById(R.id.tvCartSyncTitle)
+        syncBannerMessage = root.findViewById(R.id.tvCartSyncMessage)
+        syncBannerAction = root.findViewById(R.id.btnCartSyncRetry)
+        syncBannerAction.setOnClickListener {
+            CartStore.retryCloudSync(requireContext())
+        }
         summaryGap = root.findViewById(R.id.spaceBeforeSummary)
         summaryCard = root.findViewById(R.id.cardSummary)
         subtotalValue = root.findViewById(R.id.tvSubtotalValue)
@@ -104,6 +135,39 @@ class CartTabFragment : Fragment(R.layout.fragment_cart_tab) {
         totalValue = root.findViewById(R.id.tvTotalValue)
         checkoutButton = root.findViewById(R.id.btnCheckout)
         cartCountChip = root.findViewById(R.id.tvCartCountChip)
+    }
+
+    private fun observeCartSyncState() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                CartStore.syncState.collect { state ->
+                    renderCartSyncBanner(state)
+                    val hasNewError = state.errorMessage != null &&
+                        !state.pendingRetry &&
+                        state.version != lastCartSyncErrorVersion
+                    if (hasNewError) {
+                        lastCartSyncErrorVersion = state.version
+                        (activity as? AppCompatActivity)?.showMotionSnackbar(getString(R.string.cart_sync_failed))
+                    }
+                }
+            }
+        }
+    }
+
+    private fun renderCartSyncBanner(state: CartStore.CartSyncState) {
+        if (!::syncBanner.isInitialized) return
+        val shouldShow = state.pendingRetry || state.errorMessage != null
+        syncBanner.visibility = if (shouldShow) View.VISIBLE else View.GONE
+        if (!shouldShow) return
+
+        val isRetrying = state.pendingRetry
+        syncBannerTitle.setText(
+            if (isRetrying) R.string.cart_sync_banner_retrying_title else R.string.cart_sync_banner_failed_title
+        )
+        syncBannerMessage.setText(
+            if (isRetrying) R.string.cart_sync_banner_retrying_message else R.string.cart_sync_banner_failed_message
+        )
+        syncBannerAction.visibility = if (isRetrying) View.GONE else View.VISIBLE
     }
 
     private fun loadCommerceConfig() {
@@ -123,6 +187,8 @@ class CartTabFragment : Fragment(R.layout.fragment_cart_tab) {
 
     private fun renderCart() {
         (activity as? MainActivity)?.updateHostCartBadge()
+        hasRenderedCartOnce = true
+        loadingState.visibility = View.GONE
         itemsContainer.removeAllViews()
 
         var cart = CartStore.getCart(requireContext())
@@ -171,7 +237,7 @@ class CartTabFragment : Fragment(R.layout.fragment_cart_tab) {
             row.layoutParams = params
 
             row.findViewById<ImageView>(R.id.ivCartItemImage)
-                ?.loadCatalogImage(product.imageUrl, product.imageRes)
+                ?.loadCatalogImage(product.previewImageUrl(), product.catalogFallbackImageRes())
             row.findViewById<TextView>(R.id.tvCartItemTitle)?.text = product.title
             row.findViewById<TextView>(R.id.tvCartItemSubtitle)?.apply {
                 text = product.subtitle
@@ -214,5 +280,16 @@ class CartTabFragment : Fragment(R.layout.fragment_cart_tab) {
             (activity as? AppCompatActivity)?.revealSingleView(R.id.cardSummary)
         }
         shouldAnimateListOnNextRender = false
+    }
+
+    private fun showCartLoadingState() {
+        if (!::loadingState.isInitialized || hasRenderedCartOnce) return
+        loadingState.visibility = View.VISIBLE
+        emptyState.visibility = View.GONE
+        itemsContainer.visibility = View.GONE
+        summaryGap?.visibility = View.GONE
+        summaryCard?.visibility = View.GONE
+        checkoutButton?.isEnabled = false
+        checkoutButton?.alpha = 0.52f
     }
 }

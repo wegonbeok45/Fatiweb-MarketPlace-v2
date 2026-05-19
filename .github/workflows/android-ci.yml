@@ -23,17 +23,30 @@ jobs:
           java-version: "17"
           cache: gradle
 
+      - name: Set up Node 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: npm
+          cache-dependency-path: firebase_functions_setup/package-lock.json
+
       - name: Grant execute permission
         run: chmod +x gradlew
 
-      - name: Assemble debug
-        run: ./gradlew assembleDebug
+      - name: Android unit tests
+        run: ./gradlew testDebugUnitTest
+
+      - name: Android lint
+        run: ./gradlew lintDebug
 
       - name: Assemble release
         run: ./gradlew assembleRelease
 
-      - name: Unit tests
-        run: ./gradlew testDebugUnitTest
+      - name: Install Functions dependencies
+        run: npm ci --prefix firebase_functions_setup
 
-      - name: Lint
-        run: ./gradlew lintDebug
+      - name: Build Firebase Functions
+        run: npm --prefix firebase_functions_setup run build
+
+      - name: Firebase Functions tests
+        run: npm --prefix firebase_functions_setup test

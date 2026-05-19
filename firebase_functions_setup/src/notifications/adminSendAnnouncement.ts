@@ -1,54 +1,35 @@
 import {logger} from "firebase-functions";
 import {HttpsError, onCall} from "firebase-functions/v2/https";
-import type {DocumentData, Query} from "firebase-admin/firestore";
 import {
   COLLECTIONS,
   SCHEMA_VERSION,
   USER_ROLES,
-  USER_SUBCOLLECTIONS,
 } from "../shared/constants";
 import {assertAdmin} from "../shared/auth";
 import {admin, db} from "../shared/firestore";
+import {heavyCallableOptions} from "../shared/callableOptions";
 import {asRecord, asString, chunk} from "../shared/domain";
+import {sendPushToUser} from "./push";
 
 type Audience = "all" | "clients" | "admins";
+const PUSH_FAN_OUT_BATCH_SIZE = 50;
+const USER_PAGE_SIZE = 500;
 
 function normalizeAudience(value: unknown): Audience {
   const audience = asString(value, "all").trim().toLowerCase();
   return audience === "admins" || audience === "clients" ? audience : "all";
 }
 
-function looksLikeKeyboardMashing(text: string): boolean {
-  const normalized = text.trim().toLowerCase();
-  const letters = normalized.replace(/[^a-z]/g, "").length;
-  if (letters < 4) return false;
-  if (/[bcdfghjklmnpqrstvwxz]{5,}/.test(normalized)) return true;
-  const vowels = normalized.replace(/[^aeiouy]/g, "").length;
-  return vowels === 0;
-}
-
 function validateAnnouncementCopy(title: string, message: string): void {
-  const normalizedTitle = title.trim().toLowerCase();
-  const normalizedMessage = message.trim().toLowerCase();
-  const blockedSamples = ["juuui", "rrrtzfh", "bienvznuz", "hello"];
-
-  if (
-    normalizedTitle.length < 3 ||
-    normalizedMessage.length < 8 ||
-    blockedSamples.some((sample) =>
-      normalizedTitle.includes(sample) || normalizedMessage.includes(sample),
-    ) ||
-    looksLikeKeyboardMashing(normalizedTitle) ||
-    looksLikeKeyboardMashing(normalizedMessage)
-  ) {
+  if (title.trim().length < 3 || message.trim().length < 5) {
     throw new HttpsError(
       "invalid-argument",
-      "Announcement content looks malformed. Please use a clear title and message.",
+      "Announcement title and message are required.",
     );
   }
 }
 
-export const adminSendAnnouncement = onCall(async (request) => {
+export const adminSendAnnouncement = onCall(heavyCallableOptions, async (request) => {
   const adminContext = await assertAdmin(request);
   const payload = asRecord(request.data) || {};
   const title = asString(payload.title).trim();
@@ -76,46 +57,58 @@ export const adminSendAnnouncement = onCall(async (request) => {
   };
   await notificationRef.set(notificationPayload);
 
-  let usersQuery: Query<DocumentData> = db.collection(COLLECTIONS.USERS);
-  if (audience === "clients") {
-    usersQuery = usersQuery.where("role", "==", USER_ROLES.CLIENT);
-  } else if (audience === "admins") {
-    usersQuery = usersQuery.where("role", "==", USER_ROLES.ADMIN);
-  }
+  const userIds: string[] = [];
+  let lastUserDoc: FirebaseFirestore.QueryDocumentSnapshot | null = null;
+  let reachedEnd = false;
 
-  const usersSnapshot = await usersQuery.get();
-  const userIds = usersSnapshot.docs.map((doc) => doc.id);
-  const inboxEntries = userIds.map((uid) => ({
-    ref: db.collection(COLLECTIONS.USERS)
-      .doc(uid)
-      .collection(USER_SUBCOLLECTIONS.INBOX)
-      .doc(notificationRef.id),
-  }));
-
-  for (const batchEntries of chunk(inboxEntries, 400)) {
-    const batch = db.batch();
-    for (const entry of batchEntries) {
-      batch.set(entry.ref, {
-        id: notificationRef.id,
-        type: "announcement",
-        title,
-        body: message,
-        route: "notifications",
-        entityRef: notificationRef.id,
-        audience,
-        readAt: null,
-        createdAt: admin.firestore.FieldValue.serverTimestamp(),
-        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-        schemaVersion: SCHEMA_VERSION,
-      }, {merge: true});
+  while (!reachedEnd) {
+    let usersQuery = db.collection(COLLECTIONS.USERS)
+      .orderBy(admin.firestore.FieldPath.documentId())
+      .limit(USER_PAGE_SIZE);
+    if (lastUserDoc) {
+      usersQuery = usersQuery.startAfter(lastUserDoc);
     }
-    await batch.commit();
+
+    const usersSnapshot = await usersQuery.get();
+    reachedEnd = usersSnapshot.size < USER_PAGE_SIZE;
+    lastUserDoc = usersSnapshot.docs[usersSnapshot.docs.length - 1] || null;
+
+    userIds.push(...usersSnapshot.docs
+      .filter((doc) => {
+      const role = asString(doc.get("role"), USER_ROLES.CLIENT).trim().toLowerCase();
+      if (audience === "admins") return role === USER_ROLES.ADMIN;
+      if (audience === "clients") return role !== USER_ROLES.ADMIN;
+      return true;
+      })
+      .map((doc) => doc.id));
+  }
+  const pushResults: Array<PromiseSettledResult<void>> = [];
+  for (const userIdBatch of chunk(userIds, PUSH_FAN_OUT_BATCH_SIZE)) {
+    const batchResults = await Promise.allSettled(
+      userIdBatch.map((uid) =>
+        sendPushToUser(uid, title, message, {
+          route: "notifications",
+          notificationId: notificationRef.id,
+          type: "announcement",
+        }, "announcements"),
+      ),
+    );
+    pushResults.push(...batchResults);
+  }
+  const pushFailureCount = pushResults.filter((result) => result.status === "rejected").length;
+  if (pushFailureCount > 0) {
+    logger.warn("Announcement push fan-out had failed recipients", {
+      createdBy: adminContext.uid,
+      audience,
+      pushFailureCount,
+    });
   }
 
   logger.info("Announcement published", {
     createdBy: adminContext.uid,
     audience,
     recipientCount: userIds.length,
+    pushFailureCount,
   });
 
   return {
@@ -125,5 +118,6 @@ export const adminSendAnnouncement = onCall(async (request) => {
       updatedAt: nowMs,
     },
     recipientCount: userIds.length,
+    pushFailureCount,
   };
 });

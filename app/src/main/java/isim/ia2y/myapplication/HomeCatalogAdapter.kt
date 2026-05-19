@@ -1,22 +1,23 @@
 package isim.ia2y.myapplication
 
-import android.content.res.ColorStateList
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import java.util.Locale
 
 class HomeCatalogAdapter(
     private val onToggleFavorite: (Product) -> Unit,
     private val onOpenProduct: (Product) -> Unit,
     private val fixedItemWidthRes: Int? = null
 ) : ListAdapter<Product, HomeCatalogAdapter.ViewHolder>(ProductDiffCallback()) {
+
+    init {
+        setHasStableIds(true)
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
@@ -31,8 +32,17 @@ class HomeCatalogAdapter(
         return ViewHolder(view)
     }
 
+    override fun getItemId(position: Int): Long {
+        return getItem(position).id.hashCode().toLong()
+    }
+
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.bind(getItem(position))
+    }
+
+    override fun onViewRecycled(holder: ViewHolder) {
+        super.onViewRecycled(holder)
+        holder.unbind()
     }
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -40,55 +50,43 @@ class HomeCatalogAdapter(
         private val title = itemView.findViewById<TextView>(R.id.homeDynamicProductTitle)
         private val subtitle = itemView.findViewById<TextView?>(R.id.homeDynamicProductSubtitle)
         private val price = itemView.findViewById<TextView>(R.id.homeDynamicProductPrice)
-        private val stockText = itemView.findViewById<TextView>(R.id.homeDynamicProductStockText)
+        private val priceOriginal = itemView.findViewById<TextView?>(R.id.homeDynamicProductPriceOriginal)
+        private val discountBadge = itemView.findViewById<TextView?>(R.id.homeDynamicProductDiscountBadge)
         private val origin = itemView.findViewById<TextView>(R.id.homeDynamicProductOrigin)
         private val rating = itemView.findViewById<TextView>(R.id.homeDynamicProductRating)
-        private val favorite = itemView.findViewById<View>(R.id.homeDynamicFavoriteButton)
-        private val favoriteIcon = itemView.findViewById<ImageView>(R.id.homeDynamicFavoriteIcon)
+        private val category = itemView.findViewById<TextView>(R.id.homeDynamicProductCategory)
+        private val favorite = itemView.findViewById<ImageView>(R.id.homeDynamicFavoriteButton)
 
         fun bind(product: Product) {
             val ctx = itemView.context
 
-            image.loadCatalogImage(product.imageUrl, product.imageRes)
+            image.loadCatalogImage(product.previewImageUrl(), product.catalogFallbackImageRes(), requestedSizePx = 640)
             title.text = product.title
             subtitle?.text = product.subtitle
-            price.text = formatDt(product.price)
-            origin.text = formatOrigin(product.origin)
-            rating.text = String.format(Locale.US, "%.1f", product.rating)
-
-            when {
-                !product.isActive -> {
-                    stockText.visibility = View.VISIBLE
-                    stockText.text = ctx.getString(R.string.product_state_hidden)
-                    stockText.backgroundTintList = ColorStateList.valueOf(
-                        ContextCompat.getColor(ctx, R.color.stock_chip_bg_hidden)
-                    )
-                    stockText.setTextColor(ContextCompat.getColor(ctx, R.color.stock_chip_text_hidden))
+            price.text = formatDt(product.unitPrice)
+            if (product.hasDiscount) {
+                priceOriginal?.apply {
+                    text = formatDt(product.effectivePrice)
+                    paintFlags = paintFlags or android.graphics.Paint.STRIKE_THRU_TEXT_FLAG
+                    visibility = View.VISIBLE
                 }
-                product.stock <= 0 -> {
-                    stockText.visibility = View.VISIBLE
-                    stockText.text = ctx.getString(R.string.product_state_out_of_stock_short)
-                    stockText.backgroundTintList = ColorStateList.valueOf(
-                        ContextCompat.getColor(ctx, R.color.stock_chip_bg_oos)
-                    )
-                    stockText.setTextColor(ContextCompat.getColor(ctx, R.color.stock_chip_text_oos))
+                discountBadge?.apply {
+                    text = ctx.getString(R.string.product_price_discount_badge, product.discountPercentClamped)
+                    visibility = View.VISIBLE
                 }
-                product.stock in 1..5 -> {
-                    stockText.visibility = View.VISIBLE
-                    stockText.text = ctx.getString(R.string.product_state_low_stock, product.stock)
-                    stockText.backgroundTintList = ColorStateList.valueOf(
-                        ContextCompat.getColor(ctx, R.color.stock_chip_bg_low)
-                    )
-                    stockText.setTextColor(ContextCompat.getColor(ctx, R.color.stock_chip_text_low))
-                }
-                else -> stockText.visibility = View.GONE
+            } else {
+                priceOriginal?.visibility = View.GONE
+                discountBadge?.visibility = View.GONE
             }
-
+            origin.text = product.sellerDisplayName
+            rating.text = productCardRatingText(product)
+            category.text = productCardCategoryLabel(product)
             val isFavorite = FavoritesStore.isFavorite(ctx, product.id)
-            favoriteIcon.setColorFilter(
+            favorite.setImageResource(if (isFavorite) R.drawable.ic_home_heart_filled else R.drawable.ic_home_heart)
+            favorite.setColorFilter(
                 ContextCompat.getColor(
                     ctx,
-                    if (isFavorite) R.color.home_heart_active else R.color.home_text_primary
+                    if (isFavorite) R.color.home_heart_active else R.color.home_ref_text_primary
                 )
             )
             favorite.setOnClickListener {
@@ -98,6 +96,23 @@ class HomeCatalogAdapter(
             }
 
             itemView.setOnClickListener { onOpenProduct(product) }
+            itemView.setOnTouchListener { v, event ->
+                when (event.action) {
+                    android.view.MotionEvent.ACTION_DOWN -> {
+                        v.animate().scaleX(0.97f).scaleY(0.97f).setDuration(150).start()
+                    }
+                    android.view.MotionEvent.ACTION_UP, android.view.MotionEvent.ACTION_CANCEL -> {
+                        v.animate().scaleX(1.0f).scaleY(1.0f).setDuration(150).start()
+                    }
+                }
+                false
+            }
+        }
+
+        fun unbind() {
+            favorite.setOnClickListener(null)
+            itemView.setOnClickListener(null)
+            itemView.setOnTouchListener(null)
         }
     }
 }

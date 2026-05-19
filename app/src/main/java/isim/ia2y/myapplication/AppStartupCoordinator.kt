@@ -13,6 +13,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import com.google.firebase.firestore.Source
 
 enum class CatalogSyncStatus {
     IDLE,
@@ -24,13 +25,17 @@ enum class CatalogSyncStatus {
 data class CatalogSyncState(
     val status: CatalogSyncStatus = CatalogSyncStatus.IDLE,
     val products: List<Product> = emptyList(),
-    val error: Throwable? = null
+    val error: Throwable? = null,
+    val fromCache: Boolean = false
 ) {
     val isRefreshing: Boolean
         get() = status == CatalogSyncStatus.LOADING
 }
 
 object CatalogSyncManager {
+    private const val REALTIME_LISTENER_DELAY_MS = 4_000L
+    private const val CATALOG_CACHE_TTL_MS = 10 * 60 * 1000L
+    private const val HOME_CATALOG_PAGE_SIZE = 24L
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private val syncMutex = Mutex()
     private var listenerRegistration: com.google.firebase.firestore.ListenerRegistration? = null
@@ -44,6 +49,10 @@ object CatalogSyncManager {
     @Volatile
     private var inFlightSync: kotlinx.coroutines.Deferred<List<Product>>? = null
 
+    @Volatile
+    private var realtimeListenerStartRequested = false
+    private var realtimeListenerJob: kotlinx.coroutines.Job? = null
+
     val isRefreshing: Boolean
         get() = syncState.value.isRefreshing
 
@@ -55,13 +64,36 @@ object CatalogSyncManager {
 
     fun publishCachedSnapshot() {
         _isFirstSyncCompleted = true
-        emitSuccess(ProductCatalog.all(includeInactive = true))
+        emitSuccess(ProductCatalog.all(includeInactive = true), fromCache = false)
+    }
+
+    fun stop() {
+        listenerRegistration?.remove()
+        listenerRegistration = null
+        realtimeListenerStartRequested = false
+        realtimeListenerJob?.cancel()
+        realtimeListenerJob = null
+        _isFirstSyncCompleted = false
+        inFlightSync = null
+        emitSuccess(ProductCatalog.all(includeInactive = true), fromCache = true)
     }
 
     suspend fun ensureSynced(force: Boolean = false): List<Product> {
-        val cachedProducts = ProductCatalog.all(includeInactive = true)
-        if (!force && _isFirstSyncCompleted) {
-            emitSuccess(cachedProducts)
+        val appContext = MyApplication.instance
+        var cachedProducts = ProductCatalog.all(includeInactive = true)
+        if (cachedProducts.isEmpty()) {
+            val diskProducts = CatalogDiskCache.load(appContext)
+            if (diskProducts.isNotEmpty()) {
+                ProductCatalog.replaceAll(diskProducts)
+                cachedProducts = ProductCatalog.all(includeInactive = true)
+                _isFirstSyncCompleted = true
+                emitSuccess(cachedProducts, fromCache = true)
+            }
+        }
+        val hasFreshCache = cachedProducts.isNotEmpty() && CatalogDiskCache.isFresh(appContext, CATALOG_CACHE_TTL_MS)
+        if (!force && _isFirstSyncCompleted && hasFreshCache) {
+            emitSuccess(cachedProducts, fromCache = true)
+            startRealtimeListenerDelayed()
             return cachedProducts
         }
 
@@ -71,18 +103,35 @@ object CatalogSyncManager {
 
         val deferred = syncMutex.withLock {
             inFlightSync?.takeIf { it.isActive } ?: scope.async {
-                emitLoading(ProductCatalog.all(includeInactive = true))
-                if (listenerRegistration == null) {
-                    listenerRegistration = ProductService.listenToProducts(
-                        onUpdate = ::handleRealtimeCatalogUpdate,
-                        onError = ::handleRealtimeCatalogError
-                    )
+                val productsBeforeRemote = ProductCatalog.all(includeInactive = true)
+                if (force || productsBeforeRemote.isEmpty()) {
+                    emitLoading(productsBeforeRemote)
+                } else {
+                    emitSuccess(productsBeforeRemote, fromCache = true)
                 }
 
+                if (!force && productsBeforeRemote.isEmpty()) {
+                    val firestoreCachedProducts = readFirestoreCatalogCache()
+                    if (firestoreCachedProducts.isNotEmpty()) {
+                        ProductCatalog.replaceAll(firestoreCachedProducts)
+                        _isFirstSyncCompleted = true
+                        emitSuccess(ProductCatalog.all(includeInactive = true), fromCache = true)
+                    }
+                }
+
+                var remoteError: Throwable? = null
                 val remoteProducts = try {
-                    ProductService.fetchProducts()
+                    val lastSync = CatalogDiskCache.lastSyncMillis(appContext)
+                    val productsBeforeServer = ProductCatalog.all(includeInactive = true)
+                    val canMergeServerUpdates = !force && productsBeforeServer.isNotEmpty() && lastSync > 0L
+                    if (canMergeServerUpdates) {
+                        ProductService.fetchProductsUpdatedAfter(lastSync, limit = HOME_CATALOG_PAGE_SIZE, source = Source.SERVER)
+                    } else {
+                        ProductService.fetchProducts(limit = HOME_CATALOG_PAGE_SIZE, source = Source.SERVER)
+                    }
                 } catch (throwable: Throwable) {
                     if (throwable is CancellationException) throw throwable
+                    remoteError = throwable
                     handleRealtimeCatalogError(throwable)
                     val fallbackProducts = ProductCatalog.all(includeInactive = true)
                     if (fallbackProducts.isNotEmpty()) {
@@ -91,13 +140,24 @@ object CatalogSyncManager {
                         throw throwable
                     }
                 }
+                if (remoteError != null) {
+                    return@async ProductCatalog.all(includeInactive = true)
+                }
 
-                if (remoteProducts != ProductCatalog.all(includeInactive = true)) {
+                val canMergeServerUpdates = !force &&
+                    ProductCatalog.all(includeInactive = true).isNotEmpty() &&
+                    CatalogDiskCache.lastSyncMillis(appContext) > 0L
+                if (canMergeServerUpdates) {
+                    remoteProducts.forEach { ProductCatalog.upsert(it) }
+                } else {
                     ProductCatalog.replaceAll(remoteProducts)
                 }
                 _isFirstSyncCompleted = true
-                emitSuccess(ProductCatalog.all(includeInactive = true))
-                ProductCatalog.all(includeInactive = true)
+                val products = ProductCatalog.all(includeInactive = true)
+                CatalogDiskCache.save(appContext, products)
+                emitSuccess(products, fromCache = false)
+                startRealtimeListenerDelayed()
+                products
             }.also { inFlightSync = it }
         }
 
@@ -110,17 +170,53 @@ object CatalogSyncManager {
         }
     }
 
+    private suspend fun readFirestoreCatalogCache(): List<Product> {
+        return runCatching {
+            ProductService.fetchProducts(source = Source.CACHE)
+        }.getOrDefault(emptyList())
+    }
+
+    private fun startRealtimeListenerDelayed() {
+        if (listenerRegistration != null || realtimeListenerStartRequested) return
+        realtimeListenerStartRequested = true
+        realtimeListenerJob = scope.launch {
+            try {
+                delay(REALTIME_LISTENER_DELAY_MS)
+                if (listenerRegistration == null) {
+                    listenerRegistration = ProductService.listenToProducts(
+                        onUpdate = ::handleRealtimeCatalogUpdate,
+                        onError = ::handleRealtimeCatalogError
+                    )
+                }
+            } finally {
+                realtimeListenerStartRequested = false
+            }
+        }
+    }
+
     private fun handleRealtimeCatalogUpdate(products: List<Product>) {
         ProductCatalog.replaceAll(products)
         _isFirstSyncCompleted = true
-        emitSuccess(ProductCatalog.all(includeInactive = true))
+        val snapshot = ProductCatalog.all(includeInactive = true)
+        CatalogDiskCache.save(MyApplication.instance, snapshot)
+        emitSuccess(snapshot, fromCache = false)
     }
 
     private fun handleRealtimeCatalogError(throwable: Throwable) {
+        listenerRegistration?.remove()
+        listenerRegistration = null
+        realtimeListenerStartRequested = false
+        realtimeListenerJob?.cancel()
+        realtimeListenerJob = null
+        val products = ProductCatalog.all(includeInactive = true)
+        if (products.isNotEmpty()) {
+            _isFirstSyncCompleted = true
+        }
         _syncState.value = CatalogSyncState(
             status = CatalogSyncStatus.ERROR,
-            products = ProductCatalog.all(includeInactive = true),
-            error = throwable
+            products = products,
+            error = throwable,
+            fromCache = products.isNotEmpty()
         )
     }
 
@@ -132,19 +228,22 @@ object CatalogSyncManager {
         )
     }
 
-    private fun emitSuccess(products: List<Product>) {
+    private fun emitSuccess(products: List<Product>, fromCache: Boolean) {
         _syncState.value = CatalogSyncState(
             status = CatalogSyncStatus.SUCCESS,
             products = products,
-            error = null
+            error = null,
+            fromCache = fromCache
         )
     }
 }
 
 object AppStartupCoordinator {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    private const val CATALOG_REFRESH_DELAY_MS = 700L
     private const val SESSION_REFRESH_DELAY_MS = 1200L
     private const val NOTIFICATION_REFRESH_DELAY_MS = 2400L
+    private const val NON_CRITICAL_STARTUP_DELAY_MS = 3500L
 
     @Volatile
     private var deferredStarted = false
@@ -153,7 +252,13 @@ object AppStartupCoordinator {
         if (deferredStarted) return
         deferredStarted = true
         val appContext = context.applicationContext
-        scope.launch { runCatching { CatalogSyncManager.ensureSynced(force = false) } }
+        scope.launch {
+            runCatching { AdminSession.init(appContext) }
+        }
+        scope.launch {
+            delay(CATALOG_REFRESH_DELAY_MS)
+            runCatching { CatalogSyncManager.ensureSynced(force = false) }
+        }
         scope.launch {
             delay(SESSION_REFRESH_DELAY_MS)
             runCatching { CartStore.refreshFromCloud(appContext) }
@@ -168,5 +273,17 @@ object AppStartupCoordinator {
                 }
             }
         }
+        scope.launch {
+            delay(NON_CRITICAL_STARTUP_DELAY_MS)
+            runCatching { AppNotificationChannels.ensureCreated(appContext) }
+            if (FirebaseAuthManager.isLoggedIn && NotificationPreferencesStore.load(appContext).pushEnabled) {
+                runCatching { FcmTokenService.syncCurrentUserToken(appContext) }
+            }
+            runCatching { AnalyticsTracker.appOpen() }
+        }
+    }
+
+    fun resetDeferred() {
+        deferredStarted = false
     }
 }

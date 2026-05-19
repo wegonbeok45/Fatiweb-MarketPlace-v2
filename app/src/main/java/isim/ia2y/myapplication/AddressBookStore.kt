@@ -21,7 +21,7 @@ object AddressBookStore {
     private fun prefsForAccount(context: Context, accountKey: String) =
         context.getSharedPreferences("${accountKey}_$PREFS_NAME", Context.MODE_PRIVATE)
 
-    private fun currentUidOrNull(): String? = runCatching { FirebaseAuthManager.currentUser?.uid }.getOrNull()
+    private fun currentUidOrNull(): String? = runCatching { FirebaseAuthManager.currentRealUid }.getOrNull()
 
     fun getAll(context: Context): MutableList<DeliveryAddress> {
         val raw = prefs(context).getString(KEY_ADDRESSES, "").orEmpty()

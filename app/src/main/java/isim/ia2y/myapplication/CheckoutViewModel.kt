@@ -22,6 +22,12 @@ class CheckoutViewModel : ViewModel() {
     private val _orderResult = MutableLiveData<Result<AppOrder>?>(null)
     val orderResult: LiveData<Result<AppOrder>?> = _orderResult
 
+    private val _userProfile = MutableLiveData<FirestoreService.UserProfile?>(null)
+    val userProfile: LiveData<FirestoreService.UserProfile?> = _userProfile
+
+    private var cachedProfileUid: String? = null
+    private var loadingProfileUid: String? = null
+
     fun setStep(step: Int) {
         _currentStep.value = step
     }
@@ -31,6 +37,7 @@ class CheckoutViewModel : ViewModel() {
     }
 
     fun submitOrder(uid: String, order: AppOrder, deliveryType: String) {
+        if (_isProcessing.value == true) return
         _isProcessing.value = true
         viewModelScope.launch {
             val result = withContext(Dispatchers.IO) {
@@ -39,6 +46,27 @@ class CheckoutViewModel : ViewModel() {
             _orderResult.value = result
             _isProcessing.value = false
         }
+    }
+
+    fun loadUserProfile(uid: String) {
+        if (cachedProfileUid == uid && _userProfile.value != null) return
+        if (loadingProfileUid == uid) return
+
+        loadingProfileUid = uid
+        viewModelScope.launch {
+            val profile = withContext(Dispatchers.IO) {
+                runCatching { FirestoreService.fetchUserProfile(uid) }.getOrNull()
+            }
+            cachedProfileUid = uid
+            loadingProfileUid = null
+            _userProfile.value = profile
+        }
+    }
+
+    fun clearUserProfile() {
+        cachedProfileUid = null
+        loadingProfileUid = null
+        _userProfile.value = null
     }
 
     fun resetOrderResult() {

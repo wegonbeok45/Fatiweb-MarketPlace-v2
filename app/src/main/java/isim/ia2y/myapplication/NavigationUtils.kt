@@ -80,6 +80,14 @@ fun AppCompatActivity.launchMainFromLoader(tab: MainActivity.Tab) {
     overridePendingTransition(0, 0)
 }
 
+fun AppCompatActivity.launchOnboardingFromLoader() {
+    val intent = Intent(this, Onboard1::class.java).apply {
+        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+    }
+    startActivity(intent)
+    overridePendingTransition(0, 0)
+}
+
 fun AppCompatActivity.navigateBackToMain() {
     if (this::class.java == MainActivity::class.java) {
         finishWithMotion(isForward = false)
@@ -127,26 +135,63 @@ fun Activity.navigateToProductDetails(productId: String) {
 }
 
 fun Activity.openWhatsApp(number: String, message: String = "") {
-    try {
-        val cleanNumber = number.replace("+", "").replace(" ", "")
-        val uri = android.net.Uri.parse("https://api.whatsapp.com/send?phone=$cleanNumber&text=${android.net.Uri.encode(message)}")
-        val intent = Intent(Intent.ACTION_VIEW, uri)
-        startActivity(intent)
-    } catch (e: Exception) {
-        Log.e("Nav", "Failed to open WhatsApp", e)
-    }
+    val cleanNumber = number.replace("+", "").replace(" ", "")
+    val uri = android.net.Uri.parse(
+        "https://api.whatsapp.com/send?phone=$cleanNumber&text=${android.net.Uri.encode(message)}"
+    )
+    val intent = Intent(Intent.ACTION_VIEW, uri)
+    startExternalIntent(intent, getString(R.string.external_whatsapp_unavailable))
 }
 
 fun Activity.openEmail(email: String, subject: String = "", body: String = "") {
+    val intent = Intent(Intent.ACTION_SENDTO).apply {
+        data = android.net.Uri.parse("mailto:")
+        putExtra(Intent.EXTRA_EMAIL, arrayOf(email))
+        putExtra(Intent.EXTRA_SUBJECT, subject)
+        putExtra(Intent.EXTRA_TEXT, body)
+    }
+    val chooser = Intent.createChooser(intent, getString(R.string.support_email_label))
+    startExternalIntent(chooser, getString(R.string.external_email_unavailable), intent)
+}
+
+fun Activity.openPhoneDialer(phone: String) {
+    val trimmed = phone.trim()
+    if (trimmed.isBlank()) return
+    val intent = Intent(Intent.ACTION_DIAL).apply {
+        data = android.net.Uri.parse("tel:$trimmed")
+    }
+    startExternalIntent(intent, getString(R.string.external_phone_unavailable))
+}
+
+fun Activity.openInMaps(query: String) {
+    val trimmed = query.trim()
+    if (trimmed.isBlank()) return
+    val encoded = android.net.Uri.encode(trimmed)
+    val geoIntent = Intent(Intent.ACTION_VIEW, android.net.Uri.parse("geo:0,0?q=$encoded"))
+    if (geoIntent.resolveActivity(packageManager) != null) {
+        startExternalIntent(geoIntent, getString(R.string.external_map_unavailable))
+        return
+    }
+    val webIntent = Intent(
+        Intent.ACTION_VIEW,
+        android.net.Uri.parse("https://www.google.com/maps/search/?api=1&query=$encoded")
+    )
+    startExternalIntent(webIntent, getString(R.string.external_map_unavailable))
+}
+
+private fun Activity.startExternalIntent(
+    intent: Intent,
+    unavailableMessage: String,
+    resolveIntent: Intent = intent
+) {
     try {
-        val intent = Intent(Intent.ACTION_SENDTO).apply {
-            data = android.net.Uri.parse("mailto:")
-            putExtra(Intent.EXTRA_EMAIL, arrayOf(email))
-            putExtra(Intent.EXTRA_SUBJECT, subject)
-            putExtra(Intent.EXTRA_TEXT, body)
+        if (resolveIntent.resolveActivity(packageManager) == null) {
+            (this as? AppCompatActivity)?.showError(unavailableMessage)
+            return
         }
         startActivity(intent)
     } catch (e: Exception) {
-        Log.e("Nav", "Failed to open Email", e)
+        Log.e(TAG_NAV, "Failed to open external intent", e)
+        (this as? AppCompatActivity)?.showError(unavailableMessage)
     }
 }

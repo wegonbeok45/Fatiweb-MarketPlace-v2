@@ -168,7 +168,7 @@ data class OrderStatusEntry(
     val changedAt: Long
 ) {
     fun toMap(): Map<String, Any> = mapOf(
-        "status" to status,
+        "status" to OrderStatuses.normalize(status),
         "changedAt" to changedAt
     )
 
@@ -177,7 +177,7 @@ data class OrderStatusEntry(
         fun fromAny(value: Any?): OrderStatusEntry? {
             val map = value as? Map<String, Any?> ?: return null
             return OrderStatusEntry(
-                status = map["status"] as? String ?: return null,
+                status = OrderStatuses.normalize(map["status"] as? String ?: return null),
                 changedAt = (map["changedAt"] as? Number)?.toLong() ?: 0L
             )
         }

@@ -5,9 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="@dimen/admin_top_bar_height"
     android:paddingStart="@dimen/home_horizontal_padding"
-    android:paddingTop="@dimen/space_8"
-    android:paddingEnd="@dimen/home_horizontal_padding"
-    android:paddingBottom="@dimen/space_8">
+    android:paddingEnd="@dimen/home_horizontal_padding">
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/adminIvBack"
@@ -94,7 +92,7 @@
         android:layout_marginStart="@dimen/admin_top_title_margin_start"
         android:layout_marginEnd="@dimen/space_12"
         android:ellipsize="end"
-        android:fontFamily="@font/plus_jakarta_sans_bold"
+        android:fontFamily="@font/manrope_semibold"
         android:maxLines="1"
         android:textColor="@color/profile_text_primary"
         android:textSize="@dimen/text_size_subtitle"
@@ -104,3 +102,5 @@
         app:layout_constraintTop_toTopOf="@id/adminIvBack" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+
+

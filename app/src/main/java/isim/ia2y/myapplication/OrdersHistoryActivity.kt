@@ -10,9 +10,13 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.firebase.firestore.Source
 import kotlinx.coroutines.launch
 
 class OrdersHistoryActivity : AppCompatActivity() {
+    private var allOrders: List<AppOrder> = emptyList()
+    private var selectedFilter: OrderFilter = OrderFilter.ACTIVE
+    private var ordersErrorVisible: Boolean = false
 
     private val ordersAdapter = OrdersHistoryAdapter { order ->
         startActivity(OrderDetailsActivity.createIntent(this, order.id))
@@ -29,9 +33,12 @@ class OrdersHistoryActivity : AppCompatActivity() {
         }
 
         findViewById<View>(R.id.ivBack)?.setOnClickListener { finishWithMotion(isForward = false) }
-        findViewById<View>(R.id.btnOrdersBrowseHome)?.setOnClickListener { handleEmptyStateAction() }
+        findViewById<View>(R.id.btnOrdersBrowseHome)?.setOnClickListener {
+            if (ordersErrorVisible) loadOrders() else handleEmptyStateAction()
+        }
         findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.rvOrders)?.layoutManager =
             LinearLayoutManager(this)
+        bindFilterControls()
         applyPressFeedback(R.id.ivBack, R.id.btnOrdersBrowseHome)
         loadOrders()
     }
@@ -45,10 +52,20 @@ class OrdersHistoryActivity : AppCompatActivity() {
         val localOrders = LocalOrderStore.getAll(this)
         if (localOrders.isNotEmpty()) {
             renderState(ScreenState.Content(localOrders))
+        } else {
+            renderState(ScreenState.Loading)
         }
 
         lifecycleScope.launch {
-            val result = runCatching { FirestoreService.fetchOrders(uid) }
+            runCatching { FirestoreService.fetchOrders(uid, source = Source.CACHE) }
+                .getOrDefault(emptyList())
+                .takeIf { it.isNotEmpty() }
+                ?.let { cachedOrders ->
+                    LocalOrderStore.mergeRemote(this@OrdersHistoryActivity, cachedOrders)
+                    renderState(ScreenState.Content(LocalOrderStore.getAll(this@OrdersHistoryActivity)))
+                }
+
+            val result = runCatching { FirestoreService.fetchOrders(uid, source = Source.SERVER) }
             val state: ScreenState<List<AppOrder>> = result.fold(
                 onSuccess = { orders ->
                     val merged = if (orders.isEmpty()) localOrders else {
@@ -71,39 +88,62 @@ class OrdersHistoryActivity : AppCompatActivity() {
 
     private fun renderState(state: ScreenState<List<AppOrder>>) {
         val recycler = findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.rvOrders) ?: return
-        val empty = findViewById<TextView>(R.id.tvEmptyOrders) ?: return
         val emptyState = findViewById<View>(R.id.layoutEmptyOrdersState) ?: return
         val emptyAnimation = findViewById<com.airbnb.lottie.LottieAnimationView>(R.id.ivEmptyOrdersAnimation)
         val loading = findViewById<ProgressBar>(R.id.loadingIndicator)
 
         when (state) {
             is ScreenState.Content -> {
+                ordersErrorVisible = false
+                allOrders = state.data
                 loading?.visibility = View.GONE
-                recycler.visibility = View.VISIBLE
-                emptyState.visibility = View.GONE
-                empty.visibility = View.GONE
                 resetEmptyAnimation(emptyAnimation)
                 if (recycler.adapter == null) {
                     recycler.adapter = ordersAdapter
                 }
-                ordersAdapter.submitList(state.data)
+                renderFilteredOrders()
             }
             is ScreenState.Empty -> {
+                ordersErrorVisible = false
+                allOrders = emptyList()
                 loading?.visibility = View.GONE
                 recycler.visibility = View.GONE
                 emptyState.visibility = View.VISIBLE
-                empty.visibility = View.VISIBLE
+                configureEmptyState(
+                    title = if (FirebaseAuthManager.currentUser == null) {
+                        getString(R.string.orders_history_guest_title)
+                    } else {
+                        getString(R.string.orders_history_empty)
+                    },
+                    subtitle = if (FirebaseAuthManager.currentUser == null) {
+                        getString(R.string.orders_history_guest_subtitle)
+                    } else {
+                        getString(R.string.orders_history_empty_subtitle)
+                    },
+                    action = if (FirebaseAuthManager.currentUser == null) {
+                        getString(R.string.orders_history_guest_action)
+                    } else {
+                        getString(R.string.orders_history_empty_action)
+                    }
+                )
                 playEmptyAnimation(emptyAnimation)
             }
             is ScreenState.Error -> {
+                ordersErrorVisible = true
+                allOrders = emptyList()
                 loading?.visibility = View.GONE
                 recycler.visibility = View.GONE
                 emptyState.visibility = View.VISIBLE
-                empty.visibility = View.VISIBLE
+                configureEmptyState(
+                    title = state.message,
+                    subtitle = getString(R.string.orders_history_error_subtitle),
+                    action = getString(R.string.cart_sync_retry_action)
+                )
                 playEmptyAnimation(emptyAnimation)
-                showMotionSnackbar(state.message)
             }
             ScreenState.Loading -> {
+                ordersErrorVisible = false
+                allOrders = emptyList()
                 loading?.visibility = View.VISIBLE
                 recycler.visibility = View.GONE
                 emptyState.visibility = View.GONE
@@ -113,11 +153,14 @@ class OrdersHistoryActivity : AppCompatActivity() {
     }
 
     private fun renderGuestState() {
-        findViewById<TextView>(R.id.tvEmptyOrders)?.text = getString(R.string.orders_history_guest_title)
-        findViewById<TextView>(R.id.tvEmptyOrdersSubtitle)?.text = getString(R.string.orders_history_guest_subtitle)
-        (findViewById<View>(R.id.btnOrdersBrowseHome) as? com.google.android.material.button.MaterialButton)
-            ?.text = getString(R.string.orders_history_guest_action)
         renderState(ScreenState.Empty())
+    }
+
+    private fun configureEmptyState(title: String, subtitle: String, action: String) {
+        findViewById<TextView>(R.id.tvEmptyOrders)?.text = title
+        findViewById<TextView>(R.id.tvEmptyOrdersSubtitle)?.text = subtitle
+        (findViewById<View>(R.id.btnOrdersBrowseHome) as? com.google.android.material.button.MaterialButton)
+            ?.text = action
     }
 
     private fun playEmptyAnimation(animationView: com.airbnb.lottie.LottieAnimationView?) {
@@ -146,5 +189,50 @@ class OrdersHistoryActivity : AppCompatActivity() {
         } else {
             navigateToMainTab(MainActivity.Tab.HOME)
         }
+    }
+
+    private fun bindFilterControls() {
+        findViewById<com.google.android.material.chip.ChipGroup>(R.id.chipGroupOrders)
+            ?.setOnCheckedStateChangeListener { _, checkedIds ->
+                selectedFilter = when (checkedIds.firstOrNull()) {
+                    R.id.chipOrdersDelivered -> OrderFilter.DELIVERED
+                    R.id.chipOrdersCancelled -> OrderFilter.CANCELLED
+                    else -> OrderFilter.ACTIVE
+                }
+                renderFilteredOrders()
+            }
+    }
+
+    private fun renderFilteredOrders() {
+        val recycler = findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.rvOrders) ?: return
+        val emptyState = findViewById<View>(R.id.layoutEmptyOrdersState) ?: return
+        val emptyAnimation = findViewById<com.airbnb.lottie.LottieAnimationView>(R.id.ivEmptyOrdersAnimation)
+        val filtered = allOrders.filter { order ->
+            when (selectedFilter) {
+                OrderFilter.ACTIVE -> order.status.lowercase() !in setOf("delivered", "cancelled")
+                OrderFilter.DELIVERED -> order.status.lowercase() == "delivered"
+                OrderFilter.CANCELLED -> order.status.lowercase() == "cancelled"
+            }
+        }
+        ordersErrorVisible = false
+        recycler.visibility = if (filtered.isEmpty()) View.GONE else View.VISIBLE
+        emptyState.visibility = if (filtered.isEmpty()) View.VISIBLE else View.GONE
+        if (filtered.isEmpty()) {
+            configureEmptyState(
+                title = getString(R.string.orders_history_empty),
+                subtitle = getString(R.string.orders_history_empty_subtitle),
+                action = getString(R.string.orders_history_empty_action)
+            )
+            playEmptyAnimation(emptyAnimation)
+        } else {
+            resetEmptyAnimation(emptyAnimation)
+        }
+        ordersAdapter.submitList(filtered)
+    }
+
+    private enum class OrderFilter {
+        ACTIVE,
+        DELIVERED,
+        CANCELLED
     }
 }

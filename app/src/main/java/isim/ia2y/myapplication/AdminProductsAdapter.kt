@@ -6,19 +6,24 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.card.MaterialCardView
-import java.util.Locale
 
 class AdminProductsAdapter(
-    private var items: MutableList<Product>,
+    items: MutableList<Product>,
     private val onEdit: (Product) -> Unit,
-    private val onDelete: (Product) -> Unit
-) : RecyclerView.Adapter<AdminProductsAdapter.ViewHolder>() {
+    private val onDelete: (Product) -> Unit,
+    private val canEdit: (Product) -> Boolean = { true },
+    private val onEditBlocked: (Product) -> Unit = {}
+) : ListAdapter<Product, AdminProductsAdapter.ViewHolder>(ProductDiffCallback()) {
+
+    init {
+        submitList(items.toList())
+    }
 
     fun updateItems(newItems: List<Product>) {
-        items = newItems.toMutableList()
-        notifyDataSetChanged()
+        submitList(newItems.toList())
     }
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -26,6 +31,8 @@ class AdminProductsAdapter(
         val title: TextView = view.findViewById(R.id.adminProductTitle)
         val subtitle: TextView = view.findViewById(R.id.adminProductSubtitle)
         val price: TextView = view.findViewById(R.id.adminProductPrice)
+        val priceOriginal: TextView = view.findViewById(R.id.adminProductPriceOriginal)
+        val discountBadge: TextView = view.findViewById(R.id.adminProductDiscountBadge)
         val stateChip: MaterialCardView = view.findViewById(R.id.adminProductStateChip)
         val stateText: TextView = view.findViewById(R.id.adminProductStateText)
         val edit: View = view.findViewById(R.id.adminProductBtnEdit)
@@ -39,15 +46,26 @@ class AdminProductsAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val product = items[position]
-        holder.image.loadCatalogImage(product.imageUrl, product.imageRes)
+        val product = getItem(position)
+        holder.image.loadCatalogImage(product.previewImageUrl(), product.catalogFallbackImageRes(), requestedSizePx = 160)
         holder.title.text = product.title
 
-        val originLabel = product.origin
-            .replace('_', ' ')
-            .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
-        holder.subtitle.text = "${product.category.uppercase()} - $originLabel - Stock ${product.stock}"
-        holder.price.text = formatDt(product.price)
+        holder.subtitle.text = "${product.category.uppercase()} - ${product.sellerDisplayName} - Stock ${product.stock}"
+        holder.price.text = formatDt(product.unitPrice)
+        if (product.hasDiscount) {
+            holder.priceOriginal.apply {
+                text = formatDt(product.effectivePrice)
+                paintFlags = paintFlags or android.graphics.Paint.STRIKE_THRU_TEXT_FLAG
+                visibility = View.VISIBLE
+            }
+            holder.discountBadge.apply {
+                text = context.getString(R.string.product_price_discount_badge, product.discountPercentClamped)
+                visibility = View.VISIBLE
+            }
+        } else {
+            holder.priceOriginal.visibility = View.GONE
+            holder.discountBadge.visibility = View.GONE
+        }
 
         val context = holder.itemView.context
         val (chipBg, chipLabel, chipColor) = when {
@@ -79,10 +97,15 @@ class AdminProductsAdapter(
         holder.stateText.text = chipLabel
         holder.stateText.setTextColor(chipColor)
 
-        holder.itemView.setOnClickListener { onEdit(product) }
-        holder.edit.setOnClickListener { onEdit(product) }
+        val editable = canEdit(product)
+        holder.edit.alpha = if (editable) 1f else 0.38f
+        holder.itemView.setOnClickListener {
+            if (editable) onEdit(product) else onEditBlocked(product)
+        }
+        holder.edit.setOnClickListener {
+            if (editable) onEdit(product) else onEditBlocked(product)
+        }
         holder.delete.setOnClickListener { onDelete(product) }
     }
 
-    override fun getItemCount(): Int = items.size
 }

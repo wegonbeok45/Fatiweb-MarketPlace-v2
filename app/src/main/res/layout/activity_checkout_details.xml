@@ -86,7 +86,7 @@
                 android:id="@+id/tvStep1"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:fontFamily="@font/plus_jakarta_sans_bold"
+                android:fontFamily="@font/manrope_semibold"
                 android:gravity="center"
                 android:text="@string/auto_1_c4ca"
                 android:textColor="?attr/colorOnSurface"
@@ -116,7 +116,7 @@
                 android:id="@+id/tvStep2"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:fontFamily="@font/plus_jakarta_sans_bold"
+                android:fontFamily="@font/manrope_semibold"
                 android:gravity="center"
                 android:text="@string/auto_2_c81e"
                 android:textColor="@color/profile_text_muted"
@@ -146,7 +146,7 @@
                 android:id="@+id/tvStep3"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:fontFamily="@font/plus_jakarta_sans_bold"
+                android:fontFamily="@font/manrope_semibold"
                 android:gravity="center"
                 android:text="@string/auto_3_eccb"
                 android:textColor="@color/profile_text_muted"
@@ -197,7 +197,7 @@
                         style="@style/AppText.Caption"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:fontFamily="@font/plus_jakarta_sans_bold"
+                        android:fontFamily="@font/manrope_semibold"
                         android:text="@string/auto_modifier_898c"
                         android:textColor="?attr/colorPrimary" />
                 </LinearLayout>
@@ -296,7 +296,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/space_8"
-                            tools:text="Votre compte permet de suivre la commande et de sécuriser la livraison." />
+                            tools:text="Votre compte permet de suivre la commande et de sÃ©curiser la livraison." />
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btnCheckoutAction"
@@ -485,7 +485,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/space_8"
-                    android:layout_marginBottom="@dimen/space_24"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
@@ -498,6 +497,86 @@
 
                     <TextView
                         android:id="@+id/tvCheckoutSubtotal"
+                        style="@style/AppText.FieldLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/auto_458000_dt_e6ae" />
+                </LinearLayout>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardPromoCode"
+                    style="@style/AppCard"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_12"
+                    app:strokeColor="@color/colorBorderLight"
+                    app:strokeWidth="1.5dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:padding="@dimen/space_12">
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_home_filter"
+                            android:contentDescription="@string/cd_promo"
+                            app:tint="@color/home_text_secondary" />
+
+                        <EditText
+                            android:id="@+id/etPromoCode"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="@dimen/space_12"
+                            android:background="@null"
+                            android:hint="@string/checkout_promo_hint"
+                            android:inputType="textCapCharacters"
+                            android:maxLines="1"
+                            android:textColor="@color/home_text_primary"
+                            android:textColorHint="@color/home_text_secondary" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnApplyPromo"
+                            style="@style/Widget.Material3.Button.TextButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/checkout_apply"
+                            android:textAllCaps="false" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <TextView
+                    android:id="@+id/tvPromoDiscount"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_8"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:textColor="@color/success_green"
+                    android:textSize="@dimen/text_size_caption"
+                    android:visibility="gone" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_12"
+                    android:layout_marginBottom="@dimen/space_24"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        style="@style/AppText.Body"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/checkout_total_label" />
+
+                    <TextView
+                        android:id="@+id/tvCheckoutTotalWithDiscount"
                         style="@style/AppText.FieldLabel"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -602,6 +681,8 @@
                     android:layout_width="136dp"
                     android:layout_height="136dp"
                     android:layout_marginBottom="@dimen/space_20"
+                    android:background="@android:color/transparent"
+                    android:scaleType="centerInside"
                     app:lottie_autoPlay="true"
                     app:lottie_loop="false"
                     app:lottie_rawRes="@raw/anim_checkout_success" />
@@ -831,6 +912,8 @@
             android:layout_width="160dp"
             android:layout_height="160dp"
             android:layout_gravity="center"
+            android:background="@android:color/transparent"
+            android:scaleType="centerInside"
             app:lottie_autoPlay="true"
             app:lottie_loop="true"
             app:lottie_rawRes="@raw/anim_checkout_loading" />

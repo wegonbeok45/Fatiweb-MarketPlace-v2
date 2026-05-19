@@ -1,43 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="@dimen/home_category_tile_width"
-    android:layout_height="wrap_content"
-    android:minHeight="@dimen/home_category_tile_height"
-    android:background="@drawable/bg_home_category_tile"
-    android:gravity="center_horizontal"
-    android:orientation="vertical"
-    android:paddingStart="@dimen/home_category_tile_padding"
-    android:paddingTop="@dimen/home_category_tile_padding"
-    android:paddingEnd="@dimen/home_category_tile_padding"
-    android:paddingBottom="@dimen/home_category_tile_padding">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="@dimen/home_ref_category_card_width"
+    android:layout_height="@dimen/home_ref_category_card_height"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground"
+    app:cardBackgroundColor="@color/home_ref_surface_alt"
+    app:cardCornerRadius="@dimen/home_ref_category_card_radius"
+    app:cardElevation="0dp"
+    app:strokeWidth="0dp">
 
-    <com.google.android.material.card.MaterialCardView
-        android:layout_width="@dimen/home_category_icon_tile_size"
-        android:layout_height="@dimen/home_category_icon_tile_size"
-        app:cardBackgroundColor="@color/home_category_bg"
-        app:cardCornerRadius="@dimen/home_category_icon_tile_radius"
-        app:cardElevation="0dp"
-        app:strokeWidth="0dp">
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
         <ImageView
             android:id="@+id/ivCategoryIcon"
-            android:layout_width="@dimen/home_category_icon_size"
-            android:layout_height="@dimen/home_category_icon_size"
-            android:layout_gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:contentDescription="@string/cd_category"
-            app:tint="@color/home_category_icon" />
-    </com.google.android.material.card.MaterialCardView>
+            android:scaleType="centerCrop"
+            tools:src="@drawable/curator_headphones" />
 
-    <TextView
-        android:id="@+id/tvCategoryLabel"
-        style="@style/HomeText.CategoryLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/home_category_label_margin_top"
-        android:ellipsize="end"
-        android:gravity="center"
-        android:maxLines="1"
-        android:textAlignment="center"
-        android:textColor="@color/home_text_primary" />
-</LinearLayout>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/bg_explore_category_overlay" />
+
+        <View
+            android:layout_width="6dp"
+            android:layout_height="6dp"
+            android:layout_gravity="top|end"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="12dp"
+            android:background="@drawable/bg_home_category_dot" />
+
+        <TextView
+            android:id="@+id/tvCategoryLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:ellipsize="end"
+            android:fontFamily="@font/manrope_semibold"
+            android:includeFontPadding="false"
+            android:lineSpacingExtra="1dp"
+            android:maxLines="2"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:paddingBottom="12dp"
+            android:shadowColor="#66000000"
+            android:shadowDx="0"
+            android:shadowDy="1"
+            android:shadowRadius="4"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp"
+            tools:text="Home &amp; Furniture" />
+    </FrameLayout>
+</com.google.android.material.card.MaterialCardView>

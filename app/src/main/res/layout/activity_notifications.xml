@@ -107,7 +107,9 @@
             android:id="@+id/ivNotificationsEmptyAnimation"
             android:layout_width="156dp"
             android:layout_height="156dp"
+            android:background="@android:color/transparent"
             android:contentDescription="@string/cd_back"
+            android:scaleType="centerInside"
             app:lottie_autoPlay="true"
             app:lottie_loop="true"
             app:lottie_rawRes="@raw/anim_empty_notifications" />
@@ -122,7 +124,7 @@
             android:text="@string/notifications_empty_title"
             android:textColor="@color/home_text_primary"
             android:textSize="@dimen/text_size_subtitle"
-            android:fontFamily="@font/plus_jakarta_sans_bold" />
+            android:fontFamily="@font/manrope_semibold" />
 
         <TextView
             android:id="@+id/tvNotificationsEmptySubtitle"
@@ -134,4 +136,44 @@
             android:text="@string/notifications_empty_state" />
     </LinearLayout>
 
+    <ImageView
+        android:id="@+id/ivNotificationSettings"
+        android:layout_width="1dp"
+        android:layout_height="1dp"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <HorizontalScrollView
+        android:id="@+id/scrollNotificationFilters"
+        android:layout_width="1dp"
+        android:layout_height="1dp"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chipGroupNotifications"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipFilterOrders"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/orders_history_filter_delivered" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipFilterOffers"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/notifications_title" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipFilterSystem"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/settings_title" />
+        </com.google.android.material.chip.ChipGroup>
+    </HorizontalScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

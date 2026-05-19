@@ -1,8 +1,8 @@
 package isim.ia2y.myapplication
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
-import androidx.core.widget.NestedScrollView
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.AutoCompleteTextView
@@ -16,10 +16,15 @@ import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.firebase.firestore.Source
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeout
 import java.util.Locale
 
-class AdminProduitsActivity : AppCompatActivity() {
+open class AdminProduitsActivity : AppCompatActivity() {
     private data class ProductFilterOption(val key: String, val label: String)
 
     private val allProducts = mutableListOf<Product>()
@@ -37,6 +42,12 @@ class AdminProduitsActivity : AppCompatActivity() {
     private val pageSize = 20L
     private var searchQuery = ""
     private var selectedFilter = "all"
+    private var productLoadErrorMessage: String? = null
+    private var hasRenderedCachePreview = false
+    private val isSellerDashboard: Boolean
+        get() = intent.getBooleanExtra(EXTRA_SELLER_MODE, false)
+    private var activeRole: String = UserRoles.CLIENT
+    private var activeSellerId: String? = null
 
     private val productEditorLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -52,11 +63,19 @@ class AdminProduitsActivity : AppCompatActivity() {
         setupAdminWindowInsets(R.id.adminProduitsAppBar)
         setupTopBar()
         setupAdminBottomNav(AdminNavTab.PRODUITS)
+        configureModeLabels()
         setupActions()
         setupFilters()
 
         val recycler = findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.adminProduitsList)
         recycler?.layoutManager = LinearLayoutManager(this)
+        recycler?.adapter = AdminProductsAdapter(
+            items = mutableListOf(),
+            onEdit = { openProductEditor(it) },
+            onDelete = { confirmDelete(it) },
+            canEdit = { canEditProduct(it) },
+            onEditBlocked = { showMotionSnackbar(getString(R.string.admin_product_edit_own_only)) }
+        )
         
         recycler?.addOnScrollListener(object : androidx.recyclerview.widget.RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: androidx.recyclerview.widget.RecyclerView, dx: Int, dy: Int) {
@@ -75,7 +94,14 @@ class AdminProduitsActivity : AppCompatActivity() {
         })
 
         lifecycleScope.launch {
-            if (!requireAdminRole()) return@launch
+            activeRole = if (isSellerDashboard) {
+                requireAdminOrVendeurRole() ?: return@launch
+            } else {
+                if (!requireAdminRole()) return@launch
+                UserRoles.ADMIN
+            }
+            activeSellerId = FirebaseAuthManager.currentUser?.uid
+                ?.takeIf { isSellerDashboard && activeRole == UserRoles.VENDEUR }
 
             if (savedInstanceState == null) {
                 revealViewsInOrder(
@@ -91,13 +117,31 @@ class AdminProduitsActivity : AppCompatActivity() {
             }
             loadNextPage()
             loadStats()
-            keepPrimaryActionsVisible()
         }
     }
 
     override fun onResume() {
         super.onResume()
-        refreshAdminBottomNav(AdminNavTab.PRODUITS)
+        if (isSellerDashboard) {
+            hideSellerBottomNav()
+        } else {
+            refreshAdminBottomNav(AdminNavTab.PRODUITS)
+        }
+    }
+
+    private fun configureModeLabels() {
+        if (!isSellerDashboard) return
+        hideSellerBottomNav()
+        findViewById<TextView>(R.id.adminProduitsTvTitle)?.text = getString(R.string.seller_dashboard_title)
+        findViewById<TextView>(R.id.adminProduitsTvHeader)?.text = getString(R.string.seller_dashboard_hero_title)
+        findViewById<TextView>(R.id.adminProduitsTvSubheader)?.text = getString(R.string.seller_dashboard_hero_subtitle)
+        findViewById<com.google.android.material.button.MaterialButton>(R.id.adminProduitsBtnAdd)?.text =
+            getString(R.string.seller_dashboard_add_action)
+    }
+
+    private fun hideSellerBottomNav() {
+        findViewById<View?>(R.id.adminBottomNav)?.visibility = View.GONE
+        findViewById<View?>(R.id.admin_nav_indicator)?.visibility = View.GONE
     }
 
     private fun setupActions() {
@@ -138,7 +182,10 @@ class AdminProduitsActivity : AppCompatActivity() {
         allProducts.clear()
         lastVisible = null
         isLastPage = false
-        keepPrimaryActionsVisible()
+        productLoadErrorMessage = null
+        hasRenderedCachePreview = false
+        renderProducts()
+        scrollProductsToTop()
         loadNextPage()
         loadStats()
     }
@@ -151,6 +198,10 @@ class AdminProduitsActivity : AppCompatActivity() {
     }
 
     private fun loadStats() {
+        if (isSellerDashboard) {
+            renderSellerStats()
+            return
+        }
         lifecycleScope.launch {
             runCatching { AdminService.fetchAdminStats() }
                 .onSuccess { stats ->
@@ -160,40 +211,130 @@ class AdminProduitsActivity : AppCompatActivity() {
         }
     }
 
+    private fun renderSellerStats() {
+        findViewById<TextView>(R.id.adminProduitsTvCount)?.text = allProducts.size.toString()
+        findViewById<TextView>(R.id.adminProduitsTvLowStock)?.text =
+            allProducts.count { it.isActive && it.stock in 1..5 }.toString()
+    }
+
     private fun loadNextPage() {
         if (isLoading || isLastPage) return
+        renderCachedProductsPreview()
         isLoading = true
+        productLoadErrorMessage = null
+        findViewById<TextView>(R.id.adminProduitsEmpty)?.visibility = View.GONE
         findViewById<ProgressBar>(R.id.adminProduitsProgress)?.visibility = View.VISIBLE
 
         lifecycleScope.launch {
-            runCatching { 
-                ProductService.fetchProductsPaginated(pageSize, lastVisible)
-            }.onSuccess { (newItems, lastDoc) ->
+            val result = runCatching {
+                withTimeout(PRODUCTS_PAGE_TIMEOUT_MS) {
+                    ProductService.fetchProductsPaginated(
+                        pageSize = pageSize,
+                        lastDoc = lastVisible,
+                        sellerIdFilter = activeSellerId
+                    )
+                }
+            }
+
+            result.onSuccess { (newItems, lastDoc) ->
                 isLoading = false
                 findViewById<ProgressBar>(R.id.adminProduitsProgress)?.visibility = View.GONE
+                productLoadErrorMessage = null
                 
                 if (newItems.isEmpty()) {
                     isLastPage = true
                 } else {
-                    allProducts.addAll(newItems)
+                    mergeProducts(newItems)
                     lastVisible = lastDoc
-                    if (newItems.size < pageSize.toInt()) isLastPage = true
+                    if (newItems.size < pageSize.toInt()) {
+                        isLastPage = true
+                    }
                 }
                 renderProducts()
-                keepPrimaryActionsVisible()
-            }.onFailure {
-                isLoading = false
-                findViewById<ProgressBar>(R.id.adminProduitsProgress)?.visibility = View.GONE
+                if (isSellerDashboard) renderSellerStats()
+                return@launch
+            }
+
+            val error = result.exceptionOrNull() ?: return@launch
+            Log.e(TAG, "Failed to load products for sellerId=$activeSellerId role=$activeRole", error)
+            isLoading = false
+            findViewById<ProgressBar>(R.id.adminProduitsProgress)?.visibility = View.GONE
+            if (error is TimeoutCancellationException && renderCachedProductsFallback()) {
+                scrollProductsToTop()
+            } else {
+                isLastPage = true
+                if (allProducts.isEmpty()) {
+                    productLoadErrorMessage = getString(R.string.admin_products_load_error)
+                }
+                renderProducts()
                 showMotionSnackbar(getString(R.string.admin_products_load_error))
             }
         }
     }
 
-    private fun keepPrimaryActionsVisible() {
-        val scrollView = findViewById<NestedScrollView>(R.id.adminProduitsScroll) ?: return
-        scrollView.post {
-            scrollView.scrollTo(0, 0)
-            findViewById<View>(R.id.adminProduitsBtnAdd)?.requestFocus()
+    private fun renderCachedProductsPreview() {
+        if (hasRenderedCachePreview || allProducts.isNotEmpty() || lastVisible != null) return
+        val cached = cachedProductPreview(pageSize.toInt())
+        if (cached.isEmpty()) return
+
+        hasRenderedCachePreview = true
+        mergeProducts(cached)
+        renderProducts()
+        if (isSellerDashboard) renderSellerStats()
+    }
+
+    private suspend fun renderCachedProductsFallback(): Boolean {
+        val firestoreCached = runCatching {
+            ProductService.fetchProductsPaginated(
+                pageSize = pageSize,
+                lastDoc = null,
+                sellerIdFilter = activeSellerId,
+                source = Source.CACHE
+            ).first
+        }.getOrDefault(emptyList())
+
+        val cached = firestoreCached.ifEmpty {
+            withContext(Dispatchers.Default) { cachedProductPreview(pageSize.toInt()) }
+        }
+
+        if (cached.isEmpty()) return false
+        mergeProducts(cached)
+        isLastPage = true
+        renderProducts()
+        if (isSellerDashboard) renderSellerStats()
+        return true
+    }
+
+    private fun cachedProductPreview(limit: Int): List<Product> {
+        return ProductCatalog.all(includeInactive = true)
+            .asSequence()
+            .filter { product ->
+                activeSellerId.isNullOrBlank() || product.sellerId == activeSellerId
+            }
+            .sortedWith(compareByDescending<Product> { it.updatedAtMillis }.thenBy { it.title.lowercase(Locale.getDefault()) })
+            .take(limit)
+            .toList()
+    }
+
+    private fun mergeProducts(newItems: List<Product>) {
+        if (newItems.isEmpty()) return
+        val merged = linkedMapOf<String, Product>()
+        allProducts.forEach { product -> merged[product.id] = product }
+        newItems.forEach { product -> merged[product.id] = product }
+        allProducts.clear()
+        allProducts.addAll(
+            merged.values.sortedWith(
+                compareByDescending<Product> { it.updatedAtMillis }
+                    .thenBy { it.title.lowercase(Locale.getDefault()) }
+            )
+        )
+    }
+
+    private fun scrollProductsToTop() {
+        val recycler = findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.adminProduitsList) ?: return
+        recycler.post {
+            recycler.stopScroll()
+            recycler.scrollToPosition(0)
         }
     }
 
@@ -202,16 +343,22 @@ class AdminProduitsActivity : AppCompatActivity() {
         val emptyView = findViewById<TextView>(R.id.adminProduitsEmpty)
         val filteredProducts = filteredProducts()
 
-        if (filteredProducts.isEmpty() && isLastPage) {
+        if (isLoading && allProducts.isEmpty()) {
+            emptyView?.visibility = View.GONE
+            (recycler.adapter as? AdminProductsAdapter)?.updateItems(emptyList())
+            return
+        }
+
+        if (filteredProducts.isEmpty() && (isLastPage || productLoadErrorMessage != null)) {
             emptyView?.visibility = View.VISIBLE
-            emptyView?.text = getString(
+            emptyView?.text = productLoadErrorMessage ?: getString(
                 if (searchQuery.isNotBlank() || selectedFilter != "all") {
                     R.string.admin_products_empty_filtered
                 } else {
                     R.string.auto_aucun_produit_disponible_2470
                 }
             )
-            recycler.adapter = AdminProductsAdapter(mutableListOf(), {}, {})
+            (recycler.adapter as? AdminProductsAdapter)?.updateItems(emptyList())
             return
         }
 
@@ -222,7 +369,9 @@ class AdminProduitsActivity : AppCompatActivity() {
             recycler.adapter = AdminProductsAdapter(
                 items = filteredProducts.toMutableList(),
                 onEdit = { openProductEditor(it) },
-                onDelete = { confirmDelete(it) }
+                onDelete = { confirmDelete(it) },
+                canEdit = { canEditProduct(it) },
+                onEditBlocked = { showMotionSnackbar(getString(R.string.admin_product_edit_own_only)) }
             )
         } else {
             adapter.updateItems(filteredProducts)
@@ -250,12 +399,22 @@ class AdminProduitsActivity : AppCompatActivity() {
     }
 
     private fun openProductEditor(existing: Product?) {
+        if (existing != null && !canEditProduct(existing)) {
+            showMotionSnackbar(getString(R.string.admin_product_edit_own_only))
+            return
+        }
         productEditorLauncher.launch(
             AdminProductEditorActivity.createIntent(
                 context = this,
-                productId = existing?.id
+                productId = existing?.id,
+                sellerMode = isSellerDashboard
             )
         )
+    }
+
+    private fun canEditProduct(product: Product): Boolean {
+        val uid = FirebaseAuthManager.currentUser?.uid ?: return false
+        return activeRole == UserRoles.ADMIN || product.sellerId == uid
     }
 
     private fun confirmDelete(product: Product) {
@@ -278,5 +437,11 @@ class AdminProduitsActivity : AppCompatActivity() {
                 }
             }
             .show()
+    }
+
+    companion object {
+        const val EXTRA_SELLER_MODE = "extra_seller_mode"
+        private const val PRODUCTS_PAGE_TIMEOUT_MS = 15_000L
+        private const val TAG = "AdminProduitsActivity"
     }
 }

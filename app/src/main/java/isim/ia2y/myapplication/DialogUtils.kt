@@ -66,7 +66,7 @@ fun AppCompatActivity.showToast(message: String) {
 }
 
 fun AppCompatActivity.bindComingSoon(vararg ids: Int) {
-    val message = getString(R.string.coming_soon)
+    val message = getString(R.string.action_unavailable)
     ids.forEach { viewId ->
         findViewById<View?>(viewId)?.setOnClickListener {
             showToast(message)
@@ -83,7 +83,7 @@ fun AppCompatActivity.bindAlertPopup(vararg ids: Int) {
 }
 
 fun AppCompatActivity.bindSearchComingSoon(vararg ids: Int) {
-    val message = getString(R.string.search_coming_soon)
+    val message = getString(R.string.main_tab_load_failed)
     ids.forEach { viewId ->
         findViewById<View?>(viewId)?.setOnClickListener {
             showToast(message)

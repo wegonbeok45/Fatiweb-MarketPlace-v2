@@ -7,6 +7,7 @@ import android.graphics.Rect
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.os.Parcelable
 import android.text.Editable
 import android.text.SpannableString
 import android.text.Spanned
@@ -51,7 +52,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlinx.coroutines.withTimeoutOrNull
+import java.text.Normalizer
 import java.util.Locale
 import isim.ia2y.myapplication.databinding.ActivitySearchBinding
 import kotlin.math.roundToInt
@@ -89,6 +90,8 @@ class SearchActivity : AppCompatActivity() {
     private val scrollResults get() = binding.scrollResults
     private val btnBrowseCategories get() = binding.btnBrowseCategories
     private val btnSaveSearch get() = binding.btnSaveSearch
+    private val activeFilterBadge get() = binding.tvActiveFilterBadge
+    private val activeFiltersGroup get() = binding.chipGroupActiveFilters
     private lateinit var resultsAdapter: SearchResultsAdapter
 
     private var currentQuery: String = ""
@@ -96,14 +99,20 @@ class SearchActivity : AppCompatActivity() {
     private val uiHandler = Handler(Looper.getMainLooper())
     private var skeletonAnimator: ValueAnimator? = null
     private var lastResults: List<Product> = emptyList()
-    private var fullSearchResults: List<Product> = emptyList()
     private var loadedSearchCount: Int = 0
+    private var nextSearchCursor: com.google.firebase.firestore.DocumentSnapshot? = null
     private var searchRequestToken: Int = 0
     private var isSearching: Boolean = false
     private var hasMoreResults: Boolean = true
     private var searchError: Throwable? = null
     private var lastCatalogSignature: Int = 0
     private var searchJob: Job? = null
+    private var pendingSearchRunnable: Runnable? = null
+    private val firstPageCache = object : LinkedHashMap<SearchCacheKey, ProductSearchPage>(8, 0.75f, true) {
+        override fun removeEldestEntry(eldest: MutableMap.MutableEntry<SearchCacheKey, ProductSearchPage>?): Boolean {
+            return size > SEARCH_CACHE_SIZE
+        }
+    }
 
     private var filterCategory: String = "all"
     private var filterLocation: String = "all"
@@ -112,6 +121,7 @@ class SearchActivity : AppCompatActivity() {
     private var filterBioNaturel: Boolean = false
     private var launchedIntoCollection: Boolean = false
     private var activeScreenState: ScreenState = ScreenState.DEFAULT
+    private var pendingResultsLayoutState: Parcelable? = null
 
     private val popularSearches = listOf(
         "Harissa",
@@ -119,19 +129,6 @@ class SearchActivity : AppCompatActivity() {
         "Chechia",
         "Bijoux Djerba",
         "Tapis Kairouan"
-    )
-
-    private val suggestionPool = listOf(
-        "Harissa Arbi",
-        "Harissa Bio",
-        "Harissa traditionnelle",
-        "Huile d'olive extra vierge",
-        "Chechia traditionnelle",
-        "Bijoux Djerba argent",
-        "Tapis Kairouan laine",
-        "Savon naturel",
-        "Poterie Nabeul",
-        "Fouta Hammamet"
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -151,8 +148,6 @@ class SearchActivity : AppCompatActivity() {
         bindSortDropdown()
         bindPopularChips()
         bindBrowseCategories()
-        bindSaveSearchAction()
-        renderSavedSearches()
         renderRecentSearches()
         showDefaultState(animated = false)
         focusAndOpenKeyboard()
@@ -165,6 +160,8 @@ class SearchActivity : AppCompatActivity() {
             filterMinPrice = savedInstanceState.getFloat(KEY_FILTER_MIN_PRICE, 0f)
             filterMaxPrice = savedInstanceState.getFloat(KEY_FILTER_MAX_PRICE, MAX_FILTER_PRICE)
             filterBioNaturel = savedInstanceState.getBoolean(KEY_FILTER_BIO, false)
+            @Suppress("DEPRECATION")
+            pendingResultsLayoutState = savedInstanceState.getParcelable(KEY_RESULTS_LAYOUT_STATE)
             sortDropdown.setText(getString(currentSort.labelRes), false)
             if (currentQuery.isNotBlank()) {
                 etSearch.setText(currentQuery)
@@ -180,16 +177,10 @@ class SearchActivity : AppCompatActivity() {
                     .hashCode()
                 if (signature == lastCatalogSignature) return@collect
                 lastCatalogSignature = signature
-                if (currentQuery.isNotBlank() || hasActiveFilters()) {
-                    performSearch(currentQuery)
+                firstPageCache.clear()
+                if (activeScreenState == ScreenState.RESULTS && (currentQuery.isNotBlank() || hasActiveFilters())) {
+                    scheduleSearch(currentQuery, recordRecent = false)
                 }
-            }
-        }
-        lifecycleScope.launch {
-            CatalogSyncManager.ensureSynced(force = false)
-            if (isFinishing || isDestroyed) return@launch
-            if (currentQuery.isNotBlank() || filterCategory != "all") {
-                performSearch(currentQuery)
             }
         }
         etSearch.hint = getString(R.string.search_hint_products)
@@ -199,7 +190,10 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun applyInitialSearchState() {
-        filterCategory = intent.getStringExtra(EXTRA_INITIAL_CATEGORY)?.ifBlank { "all" } ?: filterCategory
+        filterCategory = intent.getStringExtra(EXTRA_INITIAL_CATEGORY)
+            ?.ifBlank { "all" }
+            ?.let { if (it == "all") it else MarketplaceCategories.normalizeKey(it) }
+            ?: filterCategory
         val initialQuery = intent.getStringExtra(EXTRA_INITIAL_QUERY).orEmpty()
         launchedIntoCollection = initialQuery.isBlank() && filterCategory != "all"
         refreshSearchChrome()
@@ -213,6 +207,7 @@ class SearchActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
+        cancelScheduledSearch()
         searchJob?.cancel()
         skeletonAnimator?.cancel()
         uiHandler.removeCallbacksAndMessages(null)
@@ -283,15 +278,20 @@ class SearchActivity : AppCompatActivity() {
                 val query = s?.toString()?.trim().orEmpty()
                 toggleCancelButton(query.isNotEmpty())
                 refreshSearchChrome(query)
+                invalidateActiveSearch()
                 if (query.isEmpty()) {
                     if (hasActiveFilters()) {
-                        performSearch("")
+                        scheduleSearch("", delayMs = SEARCH_FILTER_DEBOUNCE_MS, recordRecent = false)
                     } else {
                         showDefaultState(animated = true)
                     }
                 } else {
-                    renderSuggestions(query)
-                    showSuggestionsState(animated = true)
+                    if (query.length >= MIN_TYPED_SEARCH_CHARS) {
+                        scheduleSearch(query, recordRecent = false)
+                    } else {
+                        cancelScheduledSearch()
+                        showDefaultState(animated = true)
+                    }
                 }
             }
             override fun afterTextChanged(s: Editable?) = Unit
@@ -303,7 +303,7 @@ class SearchActivity : AppCompatActivity() {
             if (!shouldSearch) return@setOnEditorActionListener false
             val query = etSearch.text?.toString()?.trim().orEmpty()
             if (query.isNotEmpty()) {
-                performSearch(query)
+                performSearch(query, recordRecent = true)
             }
             true
         }
@@ -318,34 +318,33 @@ class SearchActivity : AppCompatActivity() {
         sortDropdown.setOnItemClickListener { _, _, position, _ ->
             currentSort = SortOption.values()[position]
             if (resultsState.visibility == View.VISIBLE) {
-                val sorted = applySort(lastResults, currentSort)
-                renderSearchResults(currentQuery, sorted)
+                performSearch(currentQuery)
             }
         }
     }
 
     private fun bindPopularChips() {
         popularGroup.removeAllViews()
+        val chipBg = ContextCompat.getColor(this, R.color.chip_popular_bg)
         popularSearches.forEach { term ->
             val chip = Chip(this).apply {
                 text = term
                 isClickable = true
                 isCheckable = false
                 chipCornerRadius = 999f
-                setEnsureMinTouchTargetSize(true)
-                minHeight = 44.dp
-                chipMinHeight = 44f
-                chipStrokeWidth = 1.dp.toFloat()
-                chipStrokeColor = ContextCompat.getColorStateList(context, R.color.colorPrimary)
-                setTextColor(ContextCompat.getColor(context, R.color.colorOnSurface))
-                chipBackgroundColor = ContextCompat.getColorStateList(context, R.color.colorSurface)
+                setEnsureMinTouchTargetSize(false)
+                minHeight = 36.dp
+                chipMinHeight = 36f
+                chipStrokeWidth = 0f
+                chipBackgroundColor = ColorStateList.valueOf(chipBg)
+                setTextColor(ContextCompat.getColor(context, R.color.home_text_primary))
                 rippleColor = ContextCompat.getColorStateList(context, R.color.colorSurfaceVariant)
-                chipStartPadding = 10f
-                chipEndPadding = 10f
-                textStartPadding = 2f
-                textEndPadding = 2f
-                typeface = resources.getFont(R.font.plus_jakarta_sans_medium)
-                setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
+                chipStartPadding = 12f
+                chipEndPadding = 12f
+                textStartPadding = 0f
+                textEndPadding = 0f
+                typeface = resources.getFont(R.font.manrope_semibold)
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
                 setOnClickListener {
                     etSearch.setText(term)
                     etSearch.setSelection(term.length)
@@ -357,9 +356,7 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun bindBrowseCategories() {
-        btnBrowseCategories.setOnClickListener {
-            openMainTab(MainActivity.Tab.EXPLORE)
-        }
+        configureEmptyStateAction(hasBackendError = false)
     }
 
     private fun bindSaveSearchAction() {
@@ -376,7 +373,7 @@ class SearchActivity : AppCompatActivity() {
                 text = getString(R.string.search_saved_empty)
                 setTextColor(ContextCompat.getColor(context, R.color.home_text_secondary))
                 setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
-                typeface = resources.getFont(R.font.plus_jakarta_sans_regular)
+                typeface = resources.getFont(R.font.manrope_regular)
             }
             savedList.addView(empty)
             return
@@ -398,7 +395,7 @@ class SearchActivity : AppCompatActivity() {
                 text = getString(R.string.search_recent_empty)
                 setTextColor(ContextCompat.getColor(context, R.color.home_text_secondary))
                 setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
-                typeface = resources.getFont(R.font.plus_jakarta_sans_regular)
+                typeface = resources.getFont(R.font.manrope_regular)
             }
             recentList.addView(empty)
             return
@@ -425,7 +422,7 @@ class SearchActivity : AppCompatActivity() {
         }
 
         val clock = ImageView(this).apply {
-            setImageResource(android.R.drawable.ic_menu_recent_history)
+            setImageResource(R.drawable.ic_search_history_20)
             setColorFilter(ContextCompat.getColor(context, R.color.home_text_secondary))
             layoutParams = LinearLayout.LayoutParams(20.dp, 20.dp)
         }
@@ -434,7 +431,7 @@ class SearchActivity : AppCompatActivity() {
             this.text = term
             setTextColor(ContextCompat.getColor(context, R.color.home_text_primary))
             setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
-            typeface = resources.getFont(R.font.plus_jakarta_sans_medium)
+            typeface = resources.getFont(R.font.manrope_semibold)
             maxLines = 1
             ellipsize = TextUtils.TruncateAt.END
             layoutParams = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f)
@@ -447,7 +444,7 @@ class SearchActivity : AppCompatActivity() {
         }
 
         val remove = ImageView(this).apply {
-            setImageResource(android.R.drawable.ic_menu_close_clear_cancel)
+            setImageResource(R.drawable.ic_search_close_20)
             setColorFilter(ContextCompat.getColor(context, R.color.home_text_secondary))
             layoutParams = LinearLayout.LayoutParams(20.dp, 20.dp)
             setOnClickListener {
@@ -493,7 +490,7 @@ class SearchActivity : AppCompatActivity() {
             text = preset.title
             setTextColor(ContextCompat.getColor(context, R.color.home_text_primary))
             setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
-            typeface = resources.getFont(R.font.plus_jakarta_sans_bold)
+            typeface = resources.getFont(R.font.manrope_semibold)
             maxLines = 1
             ellipsize = TextUtils.TruncateAt.END
         }
@@ -502,13 +499,13 @@ class SearchActivity : AppCompatActivity() {
             text = buildSavedSearchSubtitle(preset)
             setTextColor(ContextCompat.getColor(context, R.color.home_text_secondary))
             setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
-            typeface = resources.getFont(R.font.plus_jakarta_sans_regular)
+            typeface = resources.getFont(R.font.manrope_regular)
             maxLines = 2
             ellipsize = TextUtils.TruncateAt.END
         }
 
         val remove = ImageView(this).apply {
-            setImageResource(android.R.drawable.ic_menu_close_clear_cancel)
+            setImageResource(R.drawable.ic_search_close_20)
             setColorFilter(ContextCompat.getColor(context, R.color.home_text_secondary))
             layoutParams = LinearLayout.LayoutParams(20.dp, 20.dp)
             setOnClickListener {
@@ -529,7 +526,7 @@ class SearchActivity : AppCompatActivity() {
     private fun renderSuggestions(query: String) {
         suggestionsList.removeAllViews()
         val normalized = query.lowercase(Locale.getDefault())
-        val hits = (suggestionPool + ProductCatalog.all().map { it.title })
+        val hits = dynamicSuggestionPool()
             .distinct()
             .filter { it.lowercase(Locale.getDefault()).contains(normalized) }
             .take(8)
@@ -541,6 +538,19 @@ class SearchActivity : AppCompatActivity() {
                 suggestionsList.addView(buildDivider())
             }
         }
+    }
+
+    private fun dynamicSuggestionPool(): List<String> {
+        val catalogSuggestions = ProductCatalog.all(includeInactive = false)
+            .flatMap { product ->
+                listOf(product.title, product.subtitle, product.category, product.origin) +
+                    product.tags +
+                    product.searchKeywords
+            }
+            .map { it.trim() }
+            .filter { it.length >= 3 }
+
+        return popularSearches + catalogSuggestions
     }
 
     private fun buildSuggestionRow(query: String, suggestion: String): View {
@@ -561,7 +571,7 @@ class SearchActivity : AppCompatActivity() {
         }
 
         val icon = ImageView(this).apply {
-            setImageResource(android.R.drawable.ic_menu_search)
+            setImageResource(R.drawable.ic_search_20)
             setColorFilter(ContextCompat.getColor(context, R.color.home_text_secondary))
             layoutParams = LinearLayout.LayoutParams(20.dp, 20.dp)
         }
@@ -570,7 +580,7 @@ class SearchActivity : AppCompatActivity() {
             layoutParams = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f)
                 .apply { marginStart = 12.dp }
             setTextSize(TypedValue.COMPLEX_UNIT_SP, 15f)
-            typeface = resources.getFont(R.font.plus_jakarta_sans_medium)
+            typeface = resources.getFont(R.font.manrope_semibold)
             maxLines = 1
             ellipsize = TextUtils.TruncateAt.END
             this.text = createSuggestionSpan(query, suggestion)
@@ -626,16 +636,47 @@ class SearchActivity : AppCompatActivity() {
         return span
     }
 
-    private fun performSearch(query: String, isLoadMore: Boolean = false) {
+    private fun scheduleSearch(
+        query: String,
+        delayMs: Long = SEARCH_DEBOUNCE_MS,
+        recordRecent: Boolean = false
+    ) {
+        cancelScheduledSearch()
+        val runnable = Runnable {
+            pendingSearchRunnable = null
+            performSearch(query, recordRecent = recordRecent)
+        }
+        pendingSearchRunnable = runnable
+        uiHandler.postDelayed(runnable, delayMs)
+    }
+
+    private fun cancelScheduledSearch() {
+        pendingSearchRunnable?.let(uiHandler::removeCallbacks)
+        pendingSearchRunnable = null
+    }
+
+    private fun invalidateActiveSearch() {
+        searchJob?.cancel()
+        searchJob = null
+        isSearching = false
+        searchRequestToken++
+    }
+
+    private fun performSearch(
+        query: String,
+        isLoadMore: Boolean = false,
+        recordRecent: Boolean = !isLoadMore
+    ) {
         if (!isLoadMore) {
+            cancelScheduledSearch()
             searchJob?.cancel()
             searchJob = null
             isSearching = false
             searchRequestToken++
             hasMoreResults = true
             searchError = null
-            fullSearchResults = emptyList()
             loadedSearchCount = 0
+            nextSearchCursor = null
             currentQuery = query
             refreshSearchChrome(query)
             if (etSearch.text?.toString() != query) {
@@ -643,8 +684,10 @@ class SearchActivity : AppCompatActivity() {
                 etSearch.setSelection(query.length)
             }
             hideKeyboard()
-            saveRecentSearch(query)
-            renderRecentSearches()
+            if (recordRecent) {
+                saveRecentSearch(query)
+                renderRecentSearches()
+            }
             showResultsState(animated = true)
             startSkeleton()
             lastResults = emptyList()
@@ -661,60 +704,108 @@ class SearchActivity : AppCompatActivity() {
         val minPriceAtRequestTime = filterMinPrice
         val maxPriceAtRequestTime = filterMaxPrice
         val bioAtRequestTime = filterBioNaturel
+        val cacheKey = if (!isLoadMore) {
+            SearchCacheKey(
+                query = query,
+                category = categoryAtRequestTime,
+                location = locationAtRequestTime,
+                minPrice = minPriceAtRequestTime,
+                maxPrice = maxPriceAtRequestTime,
+                bioOnly = bioAtRequestTime,
+                sort = sortAtRequestTime
+            )
+        } else {
+            null
+        }
 
+        var shouldAutoLoadMore = false
         val launchedJob = lifecycleScope.launch {
-            val sourceResult = runCatching {
-                val cached = ProductCatalog.all(includeInactive = true)
-                if (cached.isNotEmpty() || CatalogSyncManager.isFirstSyncCompleted) {
-                    cached
-                } else {
-                    withTimeoutOrNull(10_000L) {
-                        CatalogSyncManager.ensureSynced(force = false)
-                    } ?: ProductCatalog.all(includeInactive = true)
+            val cachedPage = cacheKey?.let { firstPageCache[it] }
+            val sourceResult = if (cachedPage != null) {
+                Result.success(cachedPage)
+            } else {
+                runCatching {
+                    ProductService.searchProductsPage(
+                        queryText = query,
+                        pageSize = SEARCH_PAGE_SIZE.toLong(),
+                        lastDoc = nextSearchCursor,
+                        categoryFilter = categoryAtRequestTime,
+                        locationFilter = locationAtRequestTime,
+                        minPrice = minPriceAtRequestTime.toDouble(),
+                        maxPrice = maxPriceAtRequestTime.toDouble(),
+                        bioOnly = bioAtRequestTime,
+                        sort = sortAtRequestTime.toProductSearchSort()
+                    )
+                }.onSuccess { page ->
+                    cacheKey?.let { firstPageCache[it] = page }
                 }
             }
-            val sourceProducts = sourceResult.getOrElse { ProductCatalog.all(includeInactive = true) }
-
-            val sorted = withContext(Dispatchers.Default) {
-                val filtered = applyFilters(
+            val sourcePage = sourceResult.getOrElse {
+                CrashlyticsHelper.recordNonFatal("SearchActivity", "Firestore search failed query=$query", it)
+                buildLocalFallbackSearchPage(
                     query = query,
-                    source = sourceProducts,
+                    startIndex = loadedSearchCount,
+                    sort = sortAtRequestTime,
                     category = categoryAtRequestTime,
                     location = locationAtRequestTime,
                     minPrice = minPriceAtRequestTime,
                     maxPrice = maxPriceAtRequestTime,
                     bioNaturel = bioAtRequestTime
                 )
-                applySort(filtered, sortAtRequestTime)
+            }
+            val page = if (!isLoadMore && sourceResult.isSuccess && sourcePage.products.isEmpty()) {
+                buildLocalFallbackSearchPage(
+                    query = query,
+                    startIndex = 0,
+                    sort = sortAtRequestTime,
+                    category = categoryAtRequestTime,
+                    location = locationAtRequestTime,
+                    minPrice = minPriceAtRequestTime,
+                    maxPrice = maxPriceAtRequestTime,
+                    bioNaturel = bioAtRequestTime
+                ).takeIf { it.products.isNotEmpty() } ?: sourcePage
+            } else {
+                sourcePage
             }
 
             if (isFinishing || isDestroyed || requestToken != searchRequestToken) {
                 return@launch
             }
 
-            fullSearchResults = sorted
-            val startIndex = if (isLoadMore) loadedSearchCount else 0
-            val nextChunk = fullSearchResults.drop(startIndex).take(SEARCH_PAGE_SIZE)
+            val nextChunk = page.products
             val combined = if (isLoadMore) lastResults + nextChunk else nextChunk
             loadedSearchCount = combined.size
-            hasMoreResults = fullSearchResults.size > loadedSearchCount
-            searchError = sourceResult.exceptionOrNull()?.takeIf { fullSearchResults.isEmpty() }
+            nextSearchCursor = page.nextCursor
+            hasMoreResults = !page.reachedEnd && (page.nextCursor != null || sourceResult.isFailure)
+            searchError = sourceResult.exceptionOrNull()?.takeIf { combined.isEmpty() }
             lastResults = combined
 
             renderSearchResults(query, combined)
+            if (!isLoadMore) {
+                AnalyticsTracker.search(
+                    query = query,
+                    resultCount = combined.size,
+                    source = if (sourceResult.isSuccess) "firestore" else "local_fallback"
+                )
+            }
             if (!isLoadMore) stopSkeleton()
 
             if (sourceResult.exceptionOrNull() != null && combined.isNotEmpty()) {
                 showSearchToast(getString(R.string.search_backend_error_toast))
             }
 
-            if (combined.size < 10 && hasMoreResults) {
-                performSearch(query, isLoadMore = true)
-            }
+            shouldAutoLoadMore = combined.size < 10 && hasMoreResults
         }.also { job ->
             job.invokeOnCompletion {
                 if (requestToken == searchRequestToken) {
                     isSearching = false
+                    if (shouldAutoLoadMore) {
+                        resultsRecycler.post {
+                            if (requestToken == searchRequestToken && hasMoreResults && !isSearching) {
+                                performSearch(query, isLoadMore = true, recordRecent = false)
+                            }
+                        }
+                    }
                 }
                 if (!isLoadMore && searchJob === job) {
                     searchJob = null
@@ -737,7 +828,7 @@ class SearchActivity : AppCompatActivity() {
             items.size,
             label
         )
-        btnSaveSearch.visibility = if (query.isNotBlank()) View.VISIBLE else View.GONE
+        btnSaveSearch.visibility = View.GONE
         val collectionMode = isCollectionMode(query)
         resultsContext.visibility = if (collectionMode) View.VISIBLE else View.GONE
         if (collectionMode) {
@@ -746,7 +837,13 @@ class SearchActivity : AppCompatActivity() {
             resultsContextTitle.text = getString(R.string.search_collection_title, categoryLabel)
             resultsContextSubtitle.text = getString(R.string.search_collection_subtitle)
         }
-        resultsAdapter.submitList(items)
+        val layoutStateToRestore = pendingResultsLayoutState
+        resultsAdapter.submitList(items) {
+            if (layoutStateToRestore != null && items.isNotEmpty()) {
+                resultsRecycler.layoutManager?.onRestoreInstanceState(layoutStateToRestore)
+                pendingResultsLayoutState = null
+            }
+        }
         if (items.isEmpty()) {
             val hasBackendError = searchError != null
             emptyTitle.text = if (hasBackendError) {
@@ -757,8 +854,14 @@ class SearchActivity : AppCompatActivity() {
             emptySubtitle.text = if (hasBackendError) {
                 getString(R.string.search_backend_error_subtitle)
             } else {
-                getString(R.string.search_empty_subtitle)
+                val fallback = dynamicSuggestionPool().take(3).joinToString(", ")
+                if (fallback.isBlank()) {
+                    getString(R.string.search_empty_subtitle)
+                } else {
+                    getString(R.string.search_empty_recovery_subtitle, fallback)
+                }
             }
+            configureEmptyStateAction(hasBackendError)
             emptyState.visibility = View.VISIBLE
             resultsRecycler.visibility = View.GONE
             emptyAnimation.playAnimation()
@@ -767,6 +870,19 @@ class SearchActivity : AppCompatActivity() {
         emptyState.visibility = View.GONE
         resultsRecycler.visibility = View.VISIBLE
         emptyAnimation.pauseAnimation()
+    }
+
+    private fun configureEmptyStateAction(hasBackendError: Boolean) {
+        btnBrowseCategories.text = getString(
+            if (hasBackendError) R.string.cart_sync_retry_action else R.string.search_browse_categories
+        )
+        btnBrowseCategories.setOnClickListener {
+            if (hasBackendError) {
+                performSearch(currentQuery, recordRecent = false)
+            } else {
+                openMainTab(MainActivity.Tab.EXPLORE)
+            }
+        }
     }
 
     private fun handleAddToCart(product: Product) {
@@ -780,6 +896,7 @@ class SearchActivity : AppCompatActivity() {
         if (afterCount == beforeCount) {
             showSearchToast(getString(R.string.product_stock_limit_reached))
         } else {
+            AnalyticsTracker.addToCart(product, afterCount - beforeCount)
             showSearchToast(getString(R.string.product_added_to_cart, product.title))
         }
     }
@@ -794,25 +911,87 @@ class SearchActivity : AppCompatActivity() {
         bioNaturel: Boolean = filterBioNaturel
     ): List<Product> {
         val locationKeyword = mapLocationToKeyword(location)
-        val normalizedQuery = query.lowercase(Locale.getDefault())
         return source.filter { product ->
-            val searchable = product.searchableText
-
-            val queryMatch = searchable.contains(normalizedQuery)
-            val categoryMatch = when (category) {
-                "craft" -> product.category == "craft"
-                "decor" -> product.category == "decor"
-                "food" -> product.category == "food"
-                "fashion" -> product.category == "fashion"
-                "beauty" -> product.category == "beauty"
-                else -> true
-            }
+            val queryMatch = product.matchesSearchQuery(query)
+            val categoryMatch = category == "all" || MarketplaceCategories.matches(product, category)
             val priceMatch = product.price in minPrice.toDouble()..maxPrice.toDouble()
             val locationMatch = locationKeyword == null || product.origin.contains(locationKeyword, ignoreCase = true)
             val bioMatch = !bioNaturel || product.isBio
             val visibilityMatch = product.isActive
             queryMatch && categoryMatch && priceMatch && locationMatch && bioMatch && visibilityMatch
         }
+    }
+
+    private fun Product.matchesSearchQuery(query: String): Boolean {
+        val normalizedQuery = normalizeSearchText(query)
+        if (normalizedQuery.isBlank()) return true
+        val queryTokens = normalizedSearchTokens(normalizedQuery)
+        if (queryTokens.isEmpty()) return true
+
+        val searchable = normalizeSearchText(
+            listOf(
+                title,
+                subtitle,
+                description,
+                category,
+                MarketplaceCategories.displayNameFor(category),
+                origin,
+                sellerName,
+                tags.joinToString(" "),
+                searchKeywords.joinToString(" ")
+            ).joinToString(" ")
+        )
+        if (searchable.contains(normalizedQuery)) return true
+
+        val productTokens = normalizedSearchTokens(searchable)
+        return queryTokens.all { queryToken ->
+            productTokens.any { productToken -> productToken.matchesQueryToken(queryToken) }
+        }
+    }
+
+    private fun String.matchesQueryToken(queryToken: String): Boolean {
+        return startsWith(queryToken) ||
+            contains(queryToken) ||
+            (queryToken.length >= 4 && this.length >= 4 && editDistanceAtMostOne(this, queryToken))
+    }
+
+    private fun normalizedSearchTokens(value: String): List<String> {
+        return normalizeSearchText(value)
+            .split(Regex("[^a-z0-9\\p{IsArabic}]+"))
+            .map { it.trim() }
+            .filter { it.length >= 2 }
+            .distinct()
+    }
+
+    private fun normalizeSearchText(value: String): String {
+        return Normalizer.normalize(value.lowercase(Locale.getDefault()).trim(), Normalizer.Form.NFD)
+            .replace("\\p{InCombiningDiacriticalMarks}+".toRegex(), "")
+            .replace("\\s+".toRegex(), " ")
+    }
+
+    private fun editDistanceAtMostOne(a: String, b: String): Boolean {
+        if (kotlin.math.abs(a.length - b.length) > 1) return false
+        var i = 0
+        var j = 0
+        var edits = 0
+        while (i < a.length && j < b.length) {
+            if (a[i] == b[j]) {
+                i++
+                j++
+            } else {
+                edits++
+                if (edits > 1) return false
+                when {
+                    a.length > b.length -> i++
+                    a.length < b.length -> j++
+                    else -> {
+                        i++
+                        j++
+                    }
+                }
+            }
+        }
+        return edits + (a.length - i) + (b.length - j) <= 1
     }
 
     private fun applySort(items: List<Product>, sort: SortOption): List<Product> = when (sort) {
@@ -822,6 +1001,40 @@ class SearchActivity : AppCompatActivity() {
         SortOption.NEWEST -> items.sortedByDescending { it.updatedAtMillis }
     }
 
+    private fun SortOption.toProductSearchSort(): ProductSearchSort = when (this) {
+        SortOption.PRICE_LOW -> ProductSearchSort.PRICE_LOW
+        SortOption.PRICE_HIGH -> ProductSearchSort.PRICE_HIGH
+        SortOption.POPULAR -> ProductSearchSort.POPULAR
+        SortOption.NEWEST -> ProductSearchSort.NEWEST
+    }
+
+    private suspend fun buildLocalFallbackSearchPage(
+        query: String,
+        startIndex: Int,
+        sort: SortOption,
+        category: String,
+        location: String,
+        minPrice: Float,
+        maxPrice: Float,
+        bioNaturel: Boolean
+    ): ProductSearchPage = withContext(Dispatchers.Default) {
+        val filtered = applyFilters(
+            query = query,
+            source = ProductCatalog.all(includeInactive = false),
+            category = category,
+            location = location,
+            minPrice = minPrice,
+            maxPrice = maxPrice,
+            bioNaturel = bioNaturel
+        )
+        val sorted = applySort(filtered, sort)
+        ProductSearchPage(
+            products = sorted.drop(startIndex).take(SEARCH_PAGE_SIZE),
+            nextCursor = null,
+            reachedEnd = sorted.size <= startIndex + SEARCH_PAGE_SIZE
+        )
+    }
+
     private fun mapLocationToKeyword(value: String): String? = when (value) {
         "medina" -> "medina"
         "djerba" -> "djerba"
@@ -829,14 +1042,9 @@ class SearchActivity : AppCompatActivity() {
         else -> null
     }
 
-    private fun currentFilterDescriptor(): String = when (filterCategory) {
-        "craft" -> getString(R.string.search_category_craft)
-        "decor" -> getString(R.string.search_category_decor)
-        "food" -> getString(R.string.search_category_food)
-        "fashion" -> getString(R.string.search_category_fashion)
-        "beauty" -> getString(R.string.search_category_beauty)
-        else -> getString(R.string.search_filter_all)
-    }
+    private fun currentFilterDescriptor(): String =
+        if (filterCategory == "all") getString(R.string.search_filter_all)
+        else MarketplaceCategories.displayNameFor(filterCategory)
 
     private fun showFilterSheet() {
         val dialog = BottomSheetDialog(this)
@@ -854,8 +1062,10 @@ class SearchActivity : AppCompatActivity() {
         val btnReset = sheet.findViewById<MaterialButton>(R.id.btnFilterReset)
         val btnApply = sheet.findViewById<MaterialButton>(R.id.btnFilterApply)
 
+        populateCategoryFilterChips(categoryGroup)
         styleFilterChipGroup(categoryGroup)
         styleFilterChipGroup(locationGroup)
+        styleFilterSlider(slider)
         styleFilterSwitch(swBio)
 
         fun syncRangeLabel(values: List<Float>) {
@@ -871,14 +1081,10 @@ class SearchActivity : AppCompatActivity() {
         slider.addOnChangeListener { _, _, _ -> syncRangeLabel(slider.values) }
         swBio.isChecked = filterBioNaturel
 
-        when (filterCategory) {
-            "craft" -> categoryGroup.check(R.id.chipCategoryCraft)
-            "decor" -> categoryGroup.check(R.id.chipCategoryDecor)
-            "food" -> categoryGroup.check(R.id.chipCategoryFood)
-            "fashion" -> categoryGroup.check(R.id.chipCategoryFashion)
-            "beauty" -> categoryGroup.check(R.id.chipCategoryBeauty)
-            else -> categoryGroup.check(R.id.chipCategoryAll)
-        }
+        categoryGroup.childrenAsChips()
+            .firstOrNull { it.tag == filterCategory }
+            ?.let { categoryGroup.check(it.id) }
+            ?: categoryGroup.childrenAsChips().firstOrNull { it.tag == "all" }?.let { categoryGroup.check(it.id) }
         when (filterLocation) {
             "medina" -> locationGroup.check(R.id.chipLocationMedina)
             "djerba" -> locationGroup.check(R.id.chipLocationDjerba)
@@ -897,14 +1103,10 @@ class SearchActivity : AppCompatActivity() {
         }
 
         btnApply.setOnClickListener {
-            filterCategory = when (categoryGroup.checkedChipId) {
-                R.id.chipCategoryCraft -> "craft"
-                R.id.chipCategoryDecor -> "decor"
-                R.id.chipCategoryFood -> "food"
-                R.id.chipCategoryFashion -> "fashion"
-                R.id.chipCategoryBeauty -> "beauty"
-                else -> "all"
-            }
+            filterCategory = categoryGroup.findViewById<Chip>(categoryGroup.checkedChipId)
+                ?.tag
+                ?.toString()
+                ?: "all"
             filterLocation = when (locationGroup.checkedChipId) {
                 R.id.chipLocationMedina -> "medina"
                 R.id.chipLocationDjerba -> "djerba"
@@ -928,37 +1130,63 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
+    private fun populateCategoryFilterChips(group: ChipGroup?) {
+        group ?: return
+        group.removeAllViews()
+        group.addView(buildFilterCategoryChip("all", getString(R.string.search_filter_all)))
+        MarketplaceCategories.items.forEach { category ->
+            group.addView(buildFilterCategoryChip(category.id, category.name))
+        }
+    }
+
+    private fun buildFilterCategoryChip(key: String, label: String): Chip =
+        Chip(this).apply {
+            id = View.generateViewId()
+            tag = key
+            text = label
+            isCheckable = true
+            isClickable = true
+        }
+
+    private fun ChipGroup.childrenAsChips(): List<Chip> =
+        (0 until childCount).mapNotNull { index -> getChildAt(index) as? Chip }
+
     private fun styleFilterChip(chip: Chip) {
         val checked = ContextCompat.getColor(this, R.color.colorPrimary)
-        val unchecked = ContextCompat.getColor(this, R.color.colorSurface)
-        val stroke = ContextCompat.getColor(this, R.color.colorBorderLight)
+        val unchecked = ContextCompat.getColor(this, R.color.surface_neutral)
         val bg = ColorStateList(
             arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()),
             intArrayOf(
-                ContextCompat.getColor(this, R.color.colorSurfaceVariant),
+                checked,
                 unchecked
             )
         )
         val text = ColorStateList(
             arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()),
             intArrayOf(
-                ContextCompat.getColor(this, R.color.colorOnSurface),
+                ContextCompat.getColor(this, R.color.colorOnPrimary),
                 ContextCompat.getColor(this, R.color.colorOnSurface)
             )
-        )
-        val strokes = ColorStateList(
-            arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()),
-            intArrayOf(checked, stroke)
         )
 
         chip.chipBackgroundColor = bg
         chip.setTextColor(text)
-        chip.chipStrokeColor = strokes
-        chip.chipStrokeWidth = 1.dp.toFloat()
+        chip.chipStrokeWidth = 0f
         chip.chipCornerRadius = 999f
         chip.isCheckedIconVisible = false
         chip.chipMinHeight = 44.dp.toFloat()
         chip.setEnsureMinTouchTargetSize(true)
+    }
+
+    private fun styleFilterSlider(slider: RangeSlider?) {
+        slider ?: return
+        val active = ContextCompat.getColor(this, R.color.colorPrimary)
+        val inactive = ContextCompat.getColor(this, R.color.surface_warm_muted)
+        val thumb = ContextCompat.getColor(this, R.color.colorOnPrimary)
+        slider.trackActiveTintList = ColorStateList.valueOf(active)
+        slider.trackInactiveTintList = ColorStateList.valueOf(inactive)
+        slider.thumbTintList = ColorStateList.valueOf(thumb)
+        slider.haloTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.overlay_white_20))
     }
 
     private fun styleFilterSwitch(toggle: SwitchMaterial?) {
@@ -974,7 +1202,7 @@ class SearchActivity : AppCompatActivity() {
             arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()),
             intArrayOf(
                 ContextCompat.getColor(this, R.color.colorPrimary),
-                ContextCompat.getColor(this, R.color.colorBorderLight)
+                ContextCompat.getColor(this, R.color.surface_warm_muted)
             )
         )
     }
@@ -985,6 +1213,15 @@ class SearchActivity : AppCompatActivity() {
             filterMinPrice > 0f ||
             filterMaxPrice < MAX_FILTER_PRICE ||
             filterBioNaturel
+    }
+
+    private fun activeFilterCount(): Int {
+        var count = 0
+        if (filterCategory != "all") count += 1
+        if (filterLocation != "all") count += 1
+        if (filterMinPrice > 0f || filterMaxPrice < MAX_FILTER_PRICE) count += 1
+        if (filterBioNaturel) count += 1
+        return count
     }
 
     private fun showDefaultState(animated: Boolean) = fadeTo(defaultState, animated)
@@ -1030,6 +1267,72 @@ class SearchActivity : AppCompatActivity() {
         } else {
             getString(R.string.search_hint_products)
         }
+        renderFilterBadge()
+        renderActiveFilterChips()
+    }
+
+    private fun renderFilterBadge() {
+        val count = activeFilterCount()
+        activeFilterBadge.visibility = if (count > 0) View.VISIBLE else View.GONE
+        activeFilterBadge.text = count.toString()
+    }
+
+    private fun renderActiveFilterChips() {
+        activeFiltersGroup.removeAllViews()
+        val chips = buildActiveFilterChips()
+        activeFiltersGroup.visibility = if (chips.isEmpty()) View.GONE else View.VISIBLE
+        chips.forEach { spec ->
+            activeFiltersGroup.addView(Chip(this).apply {
+                text = spec.label
+                isCheckable = false
+                isCloseIconVisible = true
+                chipCornerRadius = 999f
+                setEnsureMinTouchTargetSize(true)
+                chipMinHeight = 40f
+                chipBackgroundColor = ContextCompat.getColorStateList(context, R.color.home_surface_raised)
+                chipStrokeColor = ContextCompat.getColorStateList(context, R.color.colorPrimary)
+                chipStrokeWidth = 1.dp.toFloat()
+                setTextColor(ContextCompat.getColor(context, R.color.home_text_primary))
+                closeIconTint = ContextCompat.getColorStateList(context, R.color.home_text_secondary)
+                setOnCloseIconClickListener {
+                    spec.clear()
+                    performSearch(currentQuery)
+                }
+            })
+        }
+    }
+
+    private fun buildActiveFilterChips(): List<ActiveFilterChip> = buildList {
+        if (filterCategory != "all") {
+            add(ActiveFilterChip(currentFilterDescriptor()) { filterCategory = "all" })
+        }
+        if (filterLocation != "all") {
+            add(ActiveFilterChip(locationFilterLabel(filterLocation)) { filterLocation = "all" })
+        }
+        if (filterMinPrice > 0f || filterMaxPrice < MAX_FILTER_PRICE) {
+            add(
+                ActiveFilterChip(
+                    getString(
+                        R.string.search_filter_price_value,
+                        filterMinPrice.roundToInt(),
+                        filterMaxPrice.roundToInt()
+                    )
+                ) {
+                    filterMinPrice = 0f
+                    filterMaxPrice = MAX_FILTER_PRICE
+                }
+            )
+        }
+        if (filterBioNaturel) {
+            add(ActiveFilterChip(getString(R.string.search_filter_bio_naturel)) { filterBioNaturel = false })
+        }
+    }
+
+    private fun locationFilterLabel(value: String): String = when (value) {
+        "medina" -> getString(R.string.search_location_medina)
+        "djerba" -> getString(R.string.search_location_djerba)
+        "kairouan" -> getString(R.string.search_location_kairouan)
+        else -> getString(R.string.search_filter_all)
     }
 
     private fun isCollectionMode(queryOverride: String = currentQuery): Boolean {
@@ -1235,6 +1538,21 @@ class SearchActivity : AppCompatActivity() {
         NEWEST(R.string.search_sort_newest)
     }
 
+    private data class ActiveFilterChip(
+        val label: String,
+        val clear: () -> Unit
+    )
+
+    private data class SearchCacheKey(
+        val query: String,
+        val category: String,
+        val location: String,
+        val minPrice: Float,
+        val maxPrice: Float,
+        val bioOnly: Boolean,
+        val sort: SortOption
+    )
+
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putString(KEY_SEARCH_QUERY, currentQuery)
@@ -1244,6 +1562,9 @@ class SearchActivity : AppCompatActivity() {
         outState.putFloat(KEY_FILTER_MIN_PRICE, filterMinPrice)
         outState.putFloat(KEY_FILTER_MAX_PRICE, filterMaxPrice)
         outState.putBoolean(KEY_FILTER_BIO, filterBioNaturel)
+        resultsRecycler.layoutManager?.onSaveInstanceState()?.let { state ->
+            outState.putParcelable(KEY_RESULTS_LAYOUT_STATE, state)
+        }
     }
 
     companion object {
@@ -1253,6 +1574,10 @@ class SearchActivity : AppCompatActivity() {
         private const val MAX_FILTER_PRICE = 400f
         private const val MAX_RECENT_SEARCHES = 5
         private const val SEARCH_PAGE_SIZE = 24
+        private const val SEARCH_DEBOUNCE_MS = 400L
+        private const val SEARCH_FILTER_DEBOUNCE_MS = 200L
+        private const val MIN_TYPED_SEARCH_CHARS = 2
+        private const val SEARCH_CACHE_SIZE = 6
         const val EXTRA_INITIAL_QUERY = "extra_initial_query"
         const val EXTRA_INITIAL_CATEGORY = "extra_initial_category"
 
@@ -1263,6 +1588,7 @@ class SearchActivity : AppCompatActivity() {
         private const val KEY_FILTER_MIN_PRICE = "filter_min_price"
         private const val KEY_FILTER_MAX_PRICE = "filter_max_price"
         private const val KEY_FILTER_BIO = "filter_bio"
+        private const val KEY_RESULTS_LAYOUT_STATE = "results_layout_state"
 
         fun createIntent(
             context: Context,

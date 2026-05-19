@@ -1,0 +1,15 @@
+appId: isim.ia2y.myapplication
+---
+- tapOn:
+    id: "isim.ia2y.myapplication:id/adminNavNotifications"
+- tapOn:
+    id: "isim.ia2y.myapplication:id/adminNotifEtTitle"
+- eraseText
+- inputText: "Maestro QA test"
+- tapOn:
+    id: "isim.ia2y.myapplication:id/adminNotifEtMessage"
+- eraseText
+- inputText: "Testing in-app admin announcement after product create and delete."
+- tapOn:
+    id: "isim.ia2y.myapplication:id/adminNotifBtnSend"
+- takeScreenshot: admin-notifications-after-send

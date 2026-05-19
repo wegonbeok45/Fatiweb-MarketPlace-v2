@@ -9,35 +9,90 @@ service firebase.storage {
       return signedIn() && request.auth.uid == userId;
     }
 
-    function isAdmin() {
+    function userRoleIs(role) {
       return signedIn() &&
-        (
-          request.auth.token.admin == true ||
-          request.auth.token.role == 'admin' ||
-          (
-            firestore.exists(/databases/(default)/documents/users/$(request.auth.uid)) &&
-            firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role == 'admin'
-          )
-        );
+        firestore.exists(/databases/(default)/documents/users/$(request.auth.uid)) &&
+        firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role == role;
     }
 
-    function isImageUpload() {
+    function isAdmin() {
+      return signedIn() && (
+        request.auth.token.role == 'admin' ||
+        request.auth.token.admin == true ||
+        userRoleIs('admin')
+      );
+    }
+
+    function isVendeur() {
+      return signedIn() && (
+        request.auth.token.role == 'vendeur' ||
+        userRoleIs('vendeur')
+      );
+    }
+
+    function isAdminOrVendeur() {
+      return isAdmin() || isVendeur();
+    }
+
+    function canWriteOwnedProductImage(ownerId) {
+      return isAdmin() || (isVendeur() && isOwner(ownerId));
+    }
+
+    function isImageUpload(maxBytes) {
       return request.resource != null &&
-        request.resource.contentType.matches('image/.*');
+        request.resource.contentType.matches('image/.*') &&
+        request.resource.size < maxBytes;
+    }
+
+    function isConversationParticipant(conversationId) {
+      return signedIn() &&
+        firestore.exists(/databases/(default)/documents/conversations/$(conversationId)) &&
+        firestore.get(/databases/(default)/documents/conversations/$(conversationId)).data.participantIds
+          .hasAny([request.auth.uid]);
+    }
+
+    match /product_images/{ownerId}/{productId}/{fileName} {
+      allow read: if true;
+      allow create, update: if canWriteOwnedProductImage(ownerId) &&
+        isImageUpload(5 * 1024 * 1024);
+      allow delete: if canWriteOwnedProductImage(ownerId);
     }
 
     match /product_images/{productId}/{fileName} {
       allow read: if true;
-      allow write: if isAdmin() &&
-        isImageUpload() &&
-        request.resource.size < 10 * 1024 * 1024;
+      allow create, update: if isAdmin() &&
+        isImageUpload(5 * 1024 * 1024);
+      allow delete: if isAdmin();
+    }
+
+    match /product_images/{productId}/thumbnails/{fileName} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    match /category-images/{fileName} {
+      allow read: if true;
+      allow write: if isAdminOrVendeur() &&
+        isImageUpload(5 * 1024 * 1024);
     }
 
     match /user_avatars/{userId}/{fileName} {
-      allow read: if true;
+      allow read: if signedIn();
       allow write: if isOwner(userId) &&
-        isImageUpload() &&
-        request.resource.size < 5 * 1024 * 1024;
+        isImageUpload(5 * 1024 * 1024);
+    }
+
+    match /user_avatars/{userId}/thumbnails/{fileName} {
+      allow read: if signedIn();
+      allow write: if false;
+    }
+
+    match /chat_media/{conversationId}/{userId}/{clientMessageId}/{fileName} {
+      allow read: if isConversationParticipant(conversationId);
+      allow create: if isOwner(userId) &&
+        isConversationParticipant(conversationId) &&
+        isImageUpload(8 * 1024 * 1024);
+      allow update, delete: if false;
     }
 
     match /{allPaths=**} {

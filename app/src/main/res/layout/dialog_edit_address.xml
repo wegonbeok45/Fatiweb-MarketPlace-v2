@@ -31,7 +31,7 @@
             android:text="@string/auto_adresse_50d4"
             android:textColor="@color/colorOnSurface"
             android:textSize="@dimen/text_size_subtitle"
-            android:fontFamily="@font/plus_jakarta_sans_bold"
+            android:fontFamily="@font/manrope_semibold"
             android:textStyle="bold" />
 
         <com.google.android.material.textfield.TextInputLayout
@@ -202,3 +202,4 @@
         </LinearLayout>
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>
+

@@ -6,16 +6,20 @@ import com.google.firebase.firestore.Query
 import kotlinx.coroutines.tasks.await
 
 object NotificationService {
+    private const val NOTIFICATION_PAGE_LIMIT = 50L
     private val db: FirebaseFirestore get() = FirebaseFirestore.getInstance()
-    private val notificationsRef = db.collection(FirestoreCollections.IN_APP_NOTIFICATIONS)
+    private val notificationsRef get() = db.collection(FirestoreCollections.IN_APP_NOTIFICATIONS)
     private fun inboxRef(uid: String) = db.collection(FirestoreCollections.USERS)
         .document(uid)
         .collection(FirestoreCollections.INBOX)
+    private fun notificationReadsRef(uid: String) = db.collection(FirestoreCollections.USERS)
+        .document(uid)
+        .collection(FirestoreCollections.NOTIFICATION_READS)
 
     suspend fun fetchNotifications(): List<FirestoreService.InAppNotification> {
         val snapshot = notificationsRef
             .orderBy("createdAt", Query.Direction.DESCENDING)
-            .limit(50)
+            .limit(NOTIFICATION_PAGE_LIMIT)
             .get()
             .await()
         return snapshot.documents.mapNotNull { doc ->
@@ -31,10 +35,36 @@ object NotificationService {
         }
     }
 
+    suspend fun fetchPublicAnnouncementNotifications(): List<AppNotification> {
+        val snapshot = notificationsRef
+            .orderBy("createdAt", Query.Direction.DESCENDING)
+            .limit(NOTIFICATION_PAGE_LIMIT)
+            .get()
+            .await()
+        return snapshot.documents.mapNotNull { doc ->
+            val data = doc.data ?: return@mapNotNull null
+            val message = (data["body"] as? String)
+                ?.takeIf { it.isNotBlank() }
+                ?: (data["message"] as? String).orEmpty()
+            val audience = data["audience"] as? String ?: "all"
+            if (audience != "all" && audience != "clients") return@mapNotNull null
+
+            AppNotification(
+                id = doc.id,
+                title = data["title"] as? String ?: "",
+                message = message,
+                timestamp = data["createdAt"].toEpochMillis(),
+                isRead = false,
+                route = "notifications",
+                entityRef = doc.id
+            ).takeIf { isValidNotificationCopy(it.title, it.message) }
+        }
+    }
+
     suspend fun fetchUserInboxNotifications(uid: String): List<AppNotification> {
         val snapshot = inboxRef(uid)
             .orderBy("createdAt", Query.Direction.DESCENDING)
-            .limit(50)
+            .limit(NOTIFICATION_PAGE_LIMIT)
             .get()
             .await()
         return snapshot.documents.mapNotNull { doc ->
@@ -48,7 +78,10 @@ object NotificationService {
                 title = data["title"] as? String ?: "",
                 message = message,
                 timestamp = data["createdAt"].toEpochMillis(),
-                isRead = data["readAt"] != null
+                isRead = data["readAt"] != null,
+                route = data["route"] as? String ?: "",
+                entityRef = data["entityRef"] as? String ?: "",
+                orderId = data["orderId"] as? String ?: ""
             ).takeIf { isValidNotificationCopy(it.title, it.message) }
         }
     }
@@ -63,74 +96,56 @@ object NotificationService {
     ): FirestoreService.InAppNotification {
         check(createdBy.isNotBlank()) { "createdBy is required." }
         validateNotificationCopyOrThrow(title, message)
-        return runCatching {
-            BackendFunctionsService.sendAnnouncement(title, message, audience)
-        }.recoverCatching { error ->
-            if (TrustedMutationFallbackPolicy.allowDirectWriteFallback(error) && canWriteAnnouncementsDirectly()) {
-                directCreateAnnouncement(title, message, createdBy, audience)
-            } else {
-                throw error
-            }
-        }.getOrThrow()
+        check(canWriteAnnouncementsDirectly()) { "Admin privileges are required." }
+        return directCreateAnnouncement(title, message, createdBy, audience)
     }
 
     suspend fun markNotificationsRead(uid: String, notificationIds: Set<String>) {
         if (notificationIds.isEmpty()) return
 
-        val snapshot = inboxRef(uid).get().await()
-        val batch = db.batch()
         val now = System.currentTimeMillis()
-        var pendingWrites = 0
-
-        snapshot.documents.forEach { doc ->
-            if (doc.id !in notificationIds || doc.get("readAt") != null) return@forEach
-            batch.update(
-                doc.reference,
-                mapOf(
-                    "readAt" to now,
-                    "updatedAt" to now
-                )
-            )
-            pendingWrites += 1
-        }
-
-        if (pendingWrites > 0) {
-            batch.commit().await()
-        }
+        notificationIds
+            .filter { it.isNotBlank() }
+            .chunked(450)
+            .forEach { ids ->
+                val batch = db.batch()
+                ids.forEach { id ->
+                    batch.set(
+                        notificationReadsRef(uid).document(id),
+                        mapOf(
+                            "createdAt" to now,
+                            "readAt" to now,
+                            "updatedAt" to now
+                        ),
+                        com.google.firebase.firestore.SetOptions.merge()
+                    )
+                }
+                batch.commit().await()
+            }
     }
 
     suspend fun fetchNotificationReadIds(uid: String): Set<String> {
-        val snapshot = inboxRef(uid).get().await()
-        return snapshot.documents
+        val readSnapshot = notificationReadsRef(uid)
+            .orderBy("updatedAt", Query.Direction.DESCENDING)
+            .limit(NOTIFICATION_PAGE_LIMIT)
+            .get()
+            .await()
+        val explicitReads = readSnapshot.documents.map { it.id }.toSet()
+
+        val inboxSnapshot = inboxRef(uid)
+            .orderBy("createdAt", Query.Direction.DESCENDING)
+            .limit(NOTIFICATION_PAGE_LIMIT)
+            .get()
+            .await()
+        val legacyInboxReads = inboxSnapshot.documents
             .filter { it.get("readAt") != null }
             .map { it.id }
             .toSet()
+        return explicitReads + legacyInboxReads
     }
 
     suspend fun replaceNotificationReadIds(uid: String, readIds: Set<String>) {
-        val existing = inboxRef(uid).get().await()
-        val batch = db.batch()
-        val now = System.currentTimeMillis()
-
-        var pendingWrites = 0
-        existing.documents.forEach { doc ->
-            val shouldBeRead = doc.id in readIds
-            val isRead = doc.get("readAt") != null
-            if (shouldBeRead == isRead) return@forEach
-
-            batch.update(
-                doc.reference,
-                mapOf(
-                    "readAt" to if (shouldBeRead) now else null,
-                    "updatedAt" to now
-                )
-            )
-            pendingWrites += 1
-        }
-
-        if (pendingWrites > 0) {
-            batch.commit().await()
-        }
+        markNotificationsRead(uid, readIds)
     }
 
     suspend fun markNotificationRead(uid: String, notificationId: String) {
@@ -138,13 +153,15 @@ object NotificationService {
     }
 
     suspend fun isNotificationRead(uid: String, notificationId: String): Boolean {
+        val readDoc = notificationReadsRef(uid).document(notificationId).get().await()
+        if (readDoc.exists()) return true
         val snapshot = inboxRef(uid).document(notificationId).get().await()
         return snapshot.get("readAt") != null
     }
 
     private suspend fun canWriteAnnouncementsDirectly(): Boolean {
         val uid = FirebaseAuthManager.currentUser?.uid ?: return false
-        return AdminSession.isVerified(uid) || UserService.fetchUserRole(uid) == "admin"
+        return AdminSession.isVerified(uid) || UserService.fetchUserRole(uid) == UserRoles.ADMIN
     }
 
     private suspend fun directCreateAnnouncement(
@@ -156,39 +173,21 @@ object NotificationService {
         val notificationDoc = notificationsRef.document()
         val notificationId = notificationDoc.id
         val createdAt = System.currentTimeMillis()
-        val recipients = resolveAudienceUserIds(audience)
 
         notificationDoc.set(
             mapOf(
+                "id" to notificationId,
+                "type" to "announcement",
                 "title" to title,
                 "message" to message,
                 "body" to message,
                 "createdBy" to createdBy,
                 "audience" to audience,
                 "createdAt" to FieldValue.serverTimestamp(),
-                "updatedAt" to FieldValue.serverTimestamp()
+                "updatedAt" to FieldValue.serverTimestamp(),
+                "schemaVersion" to 2
             )
         ).await()
-
-        recipients.chunked(350).forEach { chunk ->
-            val batch = db.batch()
-            chunk.forEach { userId ->
-                batch.set(
-                    inboxRef(userId).document(notificationId),
-                    mapOf(
-                        "title" to title,
-                        "message" to message,
-                        "body" to message,
-                        "createdBy" to createdBy,
-                        "audience" to audience,
-                        "notificationId" to notificationId,
-                        "createdAt" to FieldValue.serverTimestamp(),
-                        "updatedAt" to FieldValue.serverTimestamp()
-                    )
-                )
-            }
-            batch.commit().await()
-        }
 
         return FirestoreService.InAppNotification(
             id = notificationId,
@@ -200,18 +199,6 @@ object NotificationService {
         )
     }
 
-    private suspend fun resolveAudienceUserIds(audience: String): List<String> {
-        val snapshot = db.collection(FirestoreCollections.USERS).get().await()
-        return snapshot.documents.mapNotNull { doc ->
-            val uid = (doc.getString("uid") ?: doc.id).takeIf { it.isNotBlank() } ?: return@mapNotNull null
-            val role = doc.getString("role") ?: "client"
-            when (audience) {
-                "admins" -> uid.takeIf { role == "admin" }
-                "clients" -> uid.takeIf { role != "admin" }
-                else -> uid
-            }
-        }.distinct()
-    }
 }
 
 private fun validateNotificationCopyOrThrow(title: String, message: String) {
@@ -228,23 +215,5 @@ private fun Any?.toEpochMillis(): Long = when (this) {
 }
 
 private fun isValidNotificationCopy(title: String, message: String): Boolean {
-    val normalizedTitle = title.trim().lowercase()
-    val normalizedMessage = message.trim().lowercase()
-    if (normalizedTitle.isBlank() || normalizedMessage.length < 8) return false
-
-    val blockedSamples = listOf("juuui", "rrrtzfh", "bienvznuz", "hello")
-    if (blockedSamples.any { it in normalizedTitle || it in normalizedMessage }) return false
-
-    return !looksLikeKeyboardMashing(normalizedTitle) && !looksLikeKeyboardMashing(normalizedMessage)
-}
-
-private fun looksLikeKeyboardMashing(text: String): Boolean {
-    val letters = text.count { it.isLetter() }
-    if (letters < 4) return false
-
-    val consecutiveConsonants = Regex("[bcdfghjklmnpqrstvwxz]{5,}")
-    if (consecutiveConsonants.containsMatchIn(text)) return true
-
-    val vowelCount = text.count { it in "aeiouy" }
-    return vowelCount == 0
+    return title.trim().length >= 3 && message.trim().length >= 5
 }

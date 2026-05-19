@@ -2,9 +2,12 @@ package isim.ia2y.myapplication
 
 import android.content.Intent
 import android.os.Bundle
+import android.text.InputFilter
+import android.text.InputType
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -16,17 +19,30 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
 import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
+import com.google.firebase.functions.FirebaseFunctionsException
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
-import kotlinx.coroutines.Dispatchers
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.util.Locale
 import isim.ia2y.myapplication.databinding.ActivityCheckoutDetailsBinding
 
 class CheckoutDetailsActivity : AppCompatActivity() {
     private companion object {
         const val TAG = "CheckoutDetails"
+        const val STATE_CONFIRMATION_ORDER_NUMBER = "confirmationOrderNumber"
+        const val STATE_CONFIRMATION_DELIVERY_ESTIMATE = "confirmationDeliveryEstimate"
+        const val STATE_STANDARD_SHIPPING_FEE = "standardShippingFee"
+        const val STATE_EXPRESS_SHIPPING_FEE = "expressShippingFee"
+        const val STATE_GUEST_CHOICE_SHOWN = "guestCheckoutChoiceShown"
+        const val STATE_LAST_SAVED_ORDER_ID = "lastSavedOrderId"
+        const val STATE_LAST_DRAFT_ORDER_ID = "lastDraftOrderId"
+        const val STATE_CURRENT_STEP = "currentStep"
+        const val STATE_IS_STANDARD_SHIPPING = "isStandardShipping"
+        const val MAX_NAME_LENGTH = 80
+        const val MAX_PHONE_LENGTH = 24
+        const val MAX_CITY_LENGTH = 80
+        const val MAX_ADDRESS_LENGTH = 180
+        const val MAX_NOTE_LENGTH = 240
     }
 
     private val viewModel: CheckoutViewModel by viewModels()
@@ -37,16 +53,19 @@ class CheckoutDetailsActivity : AppCompatActivity() {
     private var standardShippingFee = CartStore.LIVRAISON_FEE
     private var expressShippingFee = 12.500
     private var lastSavedOrder: AppOrder? = null
+    private var lastDraftOrder: AppOrder? = null
+    private var guestCheckoutChoiceShown = false
     private val btnContinue: MaterialButton
         get() = binding.btnCheckoutContinue
 
-    enum class PaymentMethod { CARD, EDINAR, CASH }
+    enum class PaymentMethod { CASH }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         binding = ActivityCheckoutDetailsBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        restoreCheckoutState(savedInstanceState)
         val scrollBaseBottomPadding = binding.scrollCheckoutContent.paddingBottom
         val bottomBarBaseBottomPadding = binding.layoutCheckoutBottomBar.paddingBottom
         val extraBottomSpacing = resources.getDimensionPixelSize(R.dimen.space_24)
@@ -66,11 +85,16 @@ class CheckoutDetailsActivity : AppCompatActivity() {
         setupActions()
         observeShippingSelection()
         observeOrderResult()
+        observeUserProfile()
         bindDynamicData()
         applyPaymentSelection()
         updateCheckoutChrome()
         renderStepState()
         loadCommerceConfig()
+
+        if (FirebaseAuthManager.currentUser == null) {
+            binding.root.post { showCheckoutContinuationChoice() }
+        }
 
         revealViewsInOrder(
             R.id.layoutCheckoutTopBar,
@@ -133,6 +157,10 @@ class CheckoutDetailsActivity : AppCompatActivity() {
         binding.btnCheckoutContinue.setOnClickListener {
             it.performLightHapticFeedback()
             Log.d(TAG, "Continue tapped on step=${viewModel.currentStep.value ?: 1}")
+            if (FirebaseAuthManager.currentUser == null) {
+                showCheckoutContinuationChoice(force = true)
+                return@setOnClickListener
+            }
             if ((viewModel.currentStep.value ?: 1) == 1) {
                 transitionToStep2()
             } else {
@@ -151,7 +179,15 @@ class CheckoutDetailsActivity : AppCompatActivity() {
             result.fold(
                 onSuccess = { order ->
                     lastSavedOrder = order
-                    LocalOrderStore.upsert(this, order)
+                    AnalyticsTracker.purchase(order)
+                    AnalyticsTracker.checkoutStepCompleted(3, "confirmation")
+                    val draftId = lastDraftOrder?.id
+                    if (!draftId.isNullOrBlank()) {
+                        LocalOrderStore.replaceTemp(this, draftId, order)
+                    } else {
+                        LocalOrderStore.upsert(this, order)
+                    }
+                    lastDraftOrder = null
                     btnContinue.isEnabled = true
                     binding.layoutLottieLoading.visibility = View.GONE
                     transitionToStep3()
@@ -159,10 +195,20 @@ class CheckoutDetailsActivity : AppCompatActivity() {
                 },
                 onFailure = { e ->
                     Log.e(TAG, "Order confirmation failed", e)
+                    CrashlyticsHelper.recordNonFatal(TAG, "Order confirmation failed", e)
+                    if (shouldKeepDraftForRetry(e)) {
+                        Log.w(TAG, "Keeping draft order id for retry-safe checkout.")
+                        lastDraftOrder?.let { LocalOrderStore.upsert(this, it) }
+                    } else {
+                        lastDraftOrder?.id?.let { draftId ->
+                            LocalOrderStore.remove(this, draftId)
+                        }
+                        lastDraftOrder = null
+                    }
                     btnContinue.isEnabled = true
-                    btnContinue.text = getString(R.string.checkout_confirm_order)
+                    btnContinue.text = getString(R.string.checkout_order_retry)
                     binding.layoutLottieLoading.visibility = View.GONE
-                    showMotionSnackbar(getString(R.string.checkout_order_failed))
+                    showMotionSnackbar(checkoutErrorMessage(e))
                     viewModel.resetOrderResult()
                 }
             )
@@ -183,24 +229,73 @@ class CheckoutDetailsActivity : AppCompatActivity() {
         }
     }
 
+    private fun observeUserProfile() {
+        viewModel.userProfile.observe(this) { profile ->
+            if (isFinishing || isDestroyed || profile == null) return@observe
+            if (profile.name.isNotBlank()) {
+                binding.tvCheckoutAddressName.text = profile.name
+            }
+        }
+    }
+
     private fun loadCommerceConfig() {
+        ConfigService.cachedCommerceConfig(this)?.let { cached ->
+            standardShippingFee = cached.standardShippingFee
+            expressShippingFee = cached.expressShippingFee
+            updateSummary()
+        }
         lifecycleScope.launch {
             runCatching { FirestoreService.fetchCommerceConfig() }
                 .onSuccess { config ->
+                    ConfigService.cacheCommerceConfig(this@CheckoutDetailsActivity, config)
                     standardShippingFee = config.standardShippingFee
                     expressShippingFee = config.expressShippingFee
                     updateSummary()
                 }
                 .onFailure {
+                    CrashlyticsHelper.recordNonFatal(TAG, "Commerce config load failed", it)
+                    if (ConfigService.cachedCommerceConfig(this@CheckoutDetailsActivity) != null) {
+                        showMotionSnackbar(getString(R.string.checkout_cached_config_notice))
+                    }
                     updateSummary()
                 }
         }
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString(STATE_CONFIRMATION_ORDER_NUMBER, confirmationOrderNumber)
+        outState.putString(STATE_CONFIRMATION_DELIVERY_ESTIMATE, confirmationDeliveryEstimate)
+        outState.putDouble(STATE_STANDARD_SHIPPING_FEE, standardShippingFee)
+        outState.putDouble(STATE_EXPRESS_SHIPPING_FEE, expressShippingFee)
+        outState.putBoolean(STATE_GUEST_CHOICE_SHOWN, guestCheckoutChoiceShown)
+        outState.putString(STATE_LAST_SAVED_ORDER_ID, lastSavedOrder?.id)
+        outState.putString(STATE_LAST_DRAFT_ORDER_ID, lastDraftOrder?.id)
+        outState.putInt(STATE_CURRENT_STEP, viewModel.currentStep.value ?: 1)
+        outState.putBoolean(STATE_IS_STANDARD_SHIPPING, viewModel.isStandardSelected.value != false)
+    }
+
+    private fun restoreCheckoutState(savedInstanceState: Bundle?) {
+        if (savedInstanceState == null) return
+        confirmationOrderNumber = savedInstanceState.getString(STATE_CONFIRMATION_ORDER_NUMBER).orEmpty()
+        confirmationDeliveryEstimate = savedInstanceState.getString(STATE_CONFIRMATION_DELIVERY_ESTIMATE).orEmpty()
+        standardShippingFee = savedInstanceState.getDouble(STATE_STANDARD_SHIPPING_FEE, CartStore.LIVRAISON_FEE)
+        expressShippingFee = savedInstanceState.getDouble(STATE_EXPRESS_SHIPPING_FEE, 12.500)
+        guestCheckoutChoiceShown = savedInstanceState.getBoolean(STATE_GUEST_CHOICE_SHOWN, false)
+        viewModel.setStep(savedInstanceState.getInt(STATE_CURRENT_STEP, 1))
+        viewModel.setShippingType(savedInstanceState.getBoolean(STATE_IS_STANDARD_SHIPPING, true))
+        savedInstanceState.getString(STATE_LAST_SAVED_ORDER_ID)
+            ?.takeIf { it.isNotBlank() }
+            ?.let { lastSavedOrder = LocalOrderStore.findById(this, it) }
+        savedInstanceState.getString(STATE_LAST_DRAFT_ORDER_ID)
+            ?.takeIf { it.isNotBlank() }
+            ?.let { lastDraftOrder = LocalOrderStore.findById(this, it) }
+    }
+
     private fun confirmOrder() {
+        if (viewModel.isProcessing.value == true) return
         if (FirebaseAuthManager.currentUser == null) {
-            Log.w(TAG, "Order confirmation blocked: no authenticated user")
-            updateCheckoutActionCard(requestFocus = true)
+            showPhoneCheckoutDialog()
             return
         }
         if (AddressBookStore.getCurrent(this) == null) {
@@ -218,45 +313,62 @@ class CheckoutDetailsActivity : AppCompatActivity() {
     }
 
     private fun saveOrderAndProceed() {
+        if (viewModel.isProcessing.value == true) return
         val cart = CartStore.getCart(this)
         if (cart.isEmpty()) {
             Log.w(TAG, "Order confirmation blocked: cart is empty")
             showMotionSnackbar(getString(R.string.checkout_cart_empty))
             return
         }
+        if (!validateCartStock(cart)) return
 
         val subtotal = CartStore.subtotal(this)
         val isStandard = viewModel.isStandardSelected.value ?: true
         val shippingFee = if (isStandard) standardShippingFee else expressShippingFee
+        val deliveryFeeMinor = toMinorUnits(shippingFee)
+        val subtotalMinor = CartStore.subtotalMinor(this)
+        val totalMinor = subtotalMinor + deliveryFeeMinor
         val deliveryAddress = AddressBookStore.getCurrent(this) ?: run {
             Log.w(TAG, "Order confirmation blocked during save: address missing")
             showMotionSnackbar(getString(R.string.checkout_add_address_first))
             return
         }
-        val estimatedDeliveryDate = buildEstimatedDeliveryTimestamp()
+        val addressSnapshot = deliveryAddress.toSnapshot()
 
         val orderItems = cart.map { (productId, quantity) ->
             val product = ProductCatalog.byId(productId)
             OrderItem(
                 productId = productId,
                 name = product?.title ?: productId.toString(),
-                priceAtPurchase = product?.price ?: 0.0,
+                priceAtPurchase = product?.effectivePrice ?: 0.0,
+                priceAtPurchaseMinor = product?.priceMinor ?: 0L,
                 quantity = quantity,
-                thumbnailUrl = product?.imageUrls?.firstOrNull() ?: product?.imageUrl ?: ""
+                thumbnailUrl = product?.previewImageUrl() ?: ""
             )
         }
 
         val uid = FirebaseAuthManager.currentUser?.uid ?: return
+        val draftId = reusableDraftOrderId(
+            uid = uid,
+            items = orderItems,
+            subtotalMinor = subtotalMinor,
+            deliveryFeeMinor = deliveryFeeMinor,
+            totalMinor = totalMinor,
+            addressSnapshot = addressSnapshot
+        ) ?: buildLocalOrderAttemptId()
         
         val order = AppOrder(
-            id = "local_${System.currentTimeMillis()}",
+            id = draftId,
             uid = uid,
             items = orderItems,
             subtotal = subtotal,
+            subtotalMinor = subtotalMinor,
             deliveryFee = shippingFee,
+            deliveryFeeMinor = deliveryFeeMinor,
             total = subtotal + shippingFee,
+            totalMinor = totalMinor,
             paymentMethod = "COD",
-            shippingAddress = deliveryAddress.toSnapshot(),
+            shippingAddress = addressSnapshot,
             createdAt = com.google.firebase.Timestamp.now()
         )
 
@@ -264,16 +376,75 @@ class CheckoutDetailsActivity : AppCompatActivity() {
             TAG,
             "Submitting order with ${orderItems.size} items, subtotal=$subtotal, shippingFee=$shippingFee"
         )
+        lastDraftOrder = order
+        LocalOrderStore.upsert(this, order)
         viewModel.submitOrder(uid, order, if (isStandard) "standard" else "express")
+    }
+
+    private fun buildLocalOrderAttemptId(): String {
+        return "local_${System.currentTimeMillis()}"
+    }
+
+    private fun reusableDraftOrderId(
+        uid: String,
+        items: List<OrderItem>,
+        subtotalMinor: Long,
+        deliveryFeeMinor: Long,
+        totalMinor: Long,
+        addressSnapshot: DeliveryAddressSnapshot
+    ): String? {
+        val draft = lastDraftOrder ?: return null
+        if (!draft.id.startsWith("local_")) return null
+        if (draft.uid != uid || draft.paymentMethod != "COD") return null
+        if (draft.subtotalMinor != subtotalMinor) return null
+        if (draft.deliveryFeeMinor != deliveryFeeMinor) return null
+        if (draft.totalMinor != totalMinor) return null
+        if (draft.shippingAddress != addressSnapshot) return null
+        if (!draft.items.sameCheckoutItems(items)) return null
+        return draft.id
+    }
+
+    private fun List<OrderItem>.sameCheckoutItems(other: List<OrderItem>): Boolean {
+        if (size != other.size) return false
+        val sortOrder = compareBy<OrderItem> { it.productId }
+            .thenBy { it.quantity }
+            .thenBy { it.priceAtPurchaseMinor }
+        val left = sortedWith(sortOrder)
+        val right = other.sortedWith(sortOrder)
+        return left.zip(right).all { (a, b) ->
+            a.productId == b.productId &&
+                a.quantity == b.quantity &&
+                a.priceAtPurchaseMinor == b.priceAtPurchaseMinor
+        }
+    }
+
+    private fun shouldKeepDraftForRetry(error: Throwable): Boolean {
+        val backendError = error as? BackendFunctionException ?: return true
+        return backendError.code in setOf(
+            FirebaseFunctionsException.Code.UNAVAILABLE,
+            FirebaseFunctionsException.Code.DEADLINE_EXCEEDED,
+            FirebaseFunctionsException.Code.INTERNAL,
+            FirebaseFunctionsException.Code.UNKNOWN,
+            FirebaseFunctionsException.Code.ABORTED
+        )
     }
 
     private fun transitionToStep2() {
         if (viewModel.currentStep.value == 2) return
-        if (FirebaseAuthManager.currentUser == null || AddressBookStore.getCurrent(this) == null) {
+        if (FirebaseAuthManager.currentUser == null) {
+            showCheckoutContinuationChoice(force = true)
+            return
+        }
+        if (AddressBookStore.getCurrent(this) == null) {
             updateCheckoutActionCard(requestFocus = true)
             return
         }
         viewModel.setStep(2)
+        AnalyticsTracker.checkoutStepCompleted(1, "delivery")
+        AnalyticsTracker.beginCheckout(
+            itemCount = CartStore.itemCount(this),
+            value = CartStore.total(this, selectedShippingFee())
+        )
 
         val layoutStep1 = binding.layoutStep1Content
         val layoutStep2 = binding.layoutStep2Content
@@ -293,7 +464,9 @@ class CheckoutDetailsActivity : AppCompatActivity() {
 
     private fun transitionToStep3() {
         if (viewModel.currentStep.value == 3) return
+        val previousStep = viewModel.currentStep.value ?: 1
         viewModel.setStep(3)
+        AnalyticsTracker.checkoutStepCompleted(2, "payment")
 
         val layoutStep2 = binding.layoutStep2Content
         val layoutStep3 = binding.layoutStep3Content
@@ -351,8 +524,9 @@ class CheckoutDetailsActivity : AppCompatActivity() {
             bottomBar.visibility = View.GONE
         }.start()
 
-        layoutStep2.animate().alpha(0f).setDuration(MotionTokens.EMPHASIS).withEndAction {
-            layoutStep2.visibility = View.GONE
+        val sourceLayout = if (previousStep == 2) layoutStep2 else binding.layoutStep1Content
+        sourceLayout.animate().alpha(0f).setDuration(MotionTokens.EMPHASIS).withEndAction {
+            sourceLayout.visibility = View.GONE
             layoutStep3.animate().alpha(1f).setDuration(MotionTokens.EMPHASIS).withStartAction {
                 playConfirmationAnimation()
             }.start()
@@ -377,19 +551,7 @@ class CheckoutDetailsActivity : AppCompatActivity() {
         tvPhone.visibility = if (address?.phone.isNullOrBlank()) View.GONE else View.VISIBLE
         binding.cardCheckoutAddress.alpha = if (address == null) 0.72f else 1f
 
-        firebaseUser?.uid?.let { uid ->
-            lifecycleScope.launch {
-                runCatching { FirestoreService.fetchUserProfile(uid) }
-                    .onSuccess { profile ->
-                        if (!isFinishing && !isDestroyed && profile != null) {
-                            tvName.text = profile.name.ifBlank { tvName.text }
-                        }
-                    }
-                    .onFailure {
-                        showMotionSnackbar(getString(R.string.profile_load_failed))
-                    }
-            }
-        }
+        firebaseUser?.uid?.let { uid -> viewModel.loadUserProfile(uid) } ?: viewModel.clearUserProfile()
 
         val tray = binding.layoutCheckoutArticles
         tray.removeAllViews()
@@ -401,7 +563,7 @@ class CheckoutDetailsActivity : AppCompatActivity() {
         items.take(4).forEach { product ->
             val card = inflater.inflate(R.layout.item_checkout_thumbnail, tray, false) as MaterialCardView
             card.findViewById<ImageView>(R.id.ivThumbnail)
-                ?.loadCatalogImage(product.imageUrl, product.imageRes)
+                ?.loadCatalogImage(product.previewImageUrl(), product.catalogFallbackImageRes())
             tray.addView(card)
         }
 
@@ -470,34 +632,17 @@ class CheckoutDetailsActivity : AppCompatActivity() {
     private fun updateCheckoutActionCard(requestFocus: Boolean = false) {
         val needsLogin = FirebaseAuthManager.currentUser == null
         val needsAddress = AddressBookStore.getCurrent(this) == null
-        val shouldShow = needsLogin || needsAddress
+        val shouldShow = if (needsLogin) viewModel.currentStep.value != 3 else needsAddress
 
         binding.cardCheckoutActionNeeded.visibility = if (shouldShow) View.VISIBLE else View.GONE
         if (!shouldShow) return
 
         if (needsLogin) {
-            binding.tvCheckoutActionTitle.text = getString(R.string.checkout_login_required_title)
-            binding.tvCheckoutActionMessage.text = getString(R.string.checkout_login_required_message)
-            binding.btnCheckoutAction.text = getString(R.string.checkout_login_action)
+            binding.tvCheckoutActionTitle.text = getString(R.string.checkout_choice_title)
+            binding.tvCheckoutActionMessage.text = getString(R.string.checkout_guest_choice_message)
+            binding.btnCheckoutAction.text = getString(R.string.checkout_continue_phone)
             binding.btnCheckoutAction.setOnClickListener {
-                showAuthChoiceDialog(
-                    onCreateAccount = {
-                        startActivity(
-                            RegisterActivity.createIntent(
-                                this,
-                                returnToRoute = AUTH_RETURN_ROUTE_CHECKOUT
-                            )
-                        )
-                    },
-                    onExistingClient = {
-                        startActivity(
-                            LoginActivity.createIntent(
-                                this,
-                                returnToRoute = AUTH_RETURN_ROUTE_CHECKOUT
-                            )
-                        )
-                    }
-                )
+                showCheckoutContinuationChoice(force = true)
             }
         } else {
             binding.tvCheckoutActionTitle.text = getString(R.string.checkout_address_required_title)
@@ -533,9 +678,321 @@ class CheckoutDetailsActivity : AppCompatActivity() {
         binding.tvPayCashSubtitle.text = getString(R.string.checkout_pay_cod_subtitle)
     }
 
+    private fun showCheckoutContinuationChoice(force: Boolean = false) {
+        if (!force && guestCheckoutChoiceShown) return
+        if (FirebaseAuthManager.currentUser != null) return
+        guestCheckoutChoiceShown = true
+
+        MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.checkout_choice_title)
+            .setMessage(R.string.checkout_guest_choice_message)
+            .setNegativeButton(R.string.checkout_create_account) { _, _ ->
+                showCreateAccountCheckoutDialog()
+            }
+            .setPositiveButton(R.string.checkout_continue_phone) { _, _ ->
+                showPhoneCheckoutDialog()
+            }
+            .show()
+    }
+
+    private fun showPhoneCheckoutDialog() {
+        val fullName = checkoutInput(R.string.checkout_phone_full_name, InputType.TYPE_CLASS_TEXT)
+        val phone = checkoutInput(R.string.checkout_phone_number, InputType.TYPE_CLASS_PHONE)
+        val address = checkoutInput(R.string.checkout_phone_address, InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE)
+        val city = checkoutInput(R.string.checkout_phone_city, InputType.TYPE_CLASS_TEXT)
+        val note = checkoutInput(R.string.checkout_phone_note_optional, InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE)
+        val content = checkoutForm(fullName, phone, address, city, note)
+        content.addView(TextView(this).apply {
+            text = getString(R.string.checkout_cod_only)
+            setTextAppearance(R.style.AppText_Caption)
+            setPadding(0, 10.dp, 0, 0)
+        })
+
+        val dialog = MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.checkout_continue_phone)
+            .setView(content)
+            .setNegativeButton(R.string.profile_edit_cancel, null)
+            .setPositiveButton(R.string.checkout_confirm_order, null)
+            .create()
+
+        dialog.setOnShowListener {
+            dialog.getButton(android.content.DialogInterface.BUTTON_POSITIVE).setOnClickListener {
+                val deliveryAddress = buildCheckoutAddress(
+                    fullName = fullName.text?.toString().orEmpty(),
+                    phone = phone.text?.toString().orEmpty(),
+                    address = address.text?.toString().orEmpty(),
+                    city = city.text?.toString().orEmpty(),
+                    note = note.text?.toString().orEmpty()
+                ) ?: return@setOnClickListener
+
+                dialog.dismiss()
+                AddressBookStore.upsert(this, deliveryAddress)
+                bindDynamicData()
+                saveGuestOrderAndProceed(deliveryAddress)
+            }
+        }
+        dialog.show()
+    }
+
+    private fun showCreateAccountCheckoutDialog() {
+        val fullName = checkoutInput(R.string.checkout_phone_full_name, InputType.TYPE_CLASS_TEXT)
+        val phone = checkoutInput(R.string.checkout_phone_number, InputType.TYPE_CLASS_PHONE)
+        val password = checkoutInput(
+            R.string.checkout_account_password,
+            InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+        )
+        val content = checkoutForm(fullName, phone, password)
+        val cartBeforeAccount = CartStore.getCart(this)
+
+        val dialog = MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.checkout_create_account)
+            .setView(content)
+            .setNegativeButton(R.string.profile_edit_cancel, null)
+            .setPositiveButton(R.string.checkout_create_account, null)
+            .create()
+
+        dialog.setOnShowListener {
+            dialog.getButton(android.content.DialogInterface.BUTTON_POSITIVE).setOnClickListener {
+                val nameValue = fullName.text?.toString().orEmpty().trim()
+                val phoneValue = DeliveryAddressValidator.normalizedPhone(phone.text?.toString().orEmpty())
+                val passwordValue = password.text?.toString().orEmpty()
+                when {
+                    nameValue.length < 3 -> fullName.error = getString(R.string.checkout_validation_name)
+                    phoneValue.length < 8 -> phone.error = getString(R.string.checkout_validation_phone)
+                    passwordValue.length < 6 -> password.error = getString(R.string.checkout_validation_password)
+                    else -> {
+                        dialog.dismiss()
+                        createPhoneAccountAndContinue(nameValue, phoneValue, passwordValue, cartBeforeAccount)
+                    }
+                }
+            }
+        }
+        dialog.show()
+    }
+
+    private fun createPhoneAccountAndContinue(
+        fullName: String,
+        phone: String,
+        password: String,
+        previousCart: Map<String, Int>
+    ) {
+        binding.layoutLottieLoading.visibility = View.VISIBLE
+        lifecycleScope.launch {
+            val generatedEmail = "phone_${phone.filter { it.isDigit() }}@internal.fatiweb.app"
+            val result = FirebaseAuthManager.register(generatedEmail, password, fullName)
+            binding.layoutLottieLoading.visibility = View.GONE
+            result.fold(
+                onSuccess = {
+                    lifecycleScope.launch {
+                        runCatching { UserService.markPhoneAccount(it.uid, phone) }
+                    }
+                    previousCart.forEach { (productId, quantity) ->
+                        CartStore.setQuantity(this@CheckoutDetailsActivity, productId, quantity)
+                    }
+                    showAccountDeliveryDialog(fullName, phone)
+                },
+                onFailure = { error ->
+                    showMotionSnackbar(FirebaseAuthManager.friendlyError(this@CheckoutDetailsActivity, error))
+                }
+            )
+        }
+    }
+
+    private fun showAccountDeliveryDialog(fullName: String, phone: String) {
+        val address = checkoutInput(R.string.checkout_phone_address, InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE)
+        val city = checkoutInput(R.string.checkout_phone_city, InputType.TYPE_CLASS_TEXT)
+        val note = checkoutInput(R.string.checkout_phone_note_optional, InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE)
+        val content = checkoutForm(address, city, note)
+
+        val dialog = MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.checkout_address_required_title)
+            .setView(content)
+            .setNegativeButton(R.string.profile_edit_cancel, null)
+            .setPositiveButton(R.string.checkout_step1_continue, null)
+            .create()
+
+        dialog.setOnShowListener {
+            dialog.getButton(android.content.DialogInterface.BUTTON_POSITIVE).setOnClickListener {
+                val deliveryAddress = buildCheckoutAddress(
+                    fullName = fullName,
+                    phone = phone,
+                    address = address.text?.toString().orEmpty(),
+                    city = city.text?.toString().orEmpty(),
+                    note = note.text?.toString().orEmpty()
+                ) ?: return@setOnClickListener
+
+                dialog.dismiss()
+                AddressBookStore.upsert(this, deliveryAddress)
+                bindDynamicData()
+                transitionToStep2()
+            }
+        }
+        dialog.show()
+    }
+
+    private fun buildCheckoutAddress(
+        fullName: String,
+        phone: String,
+        address: String,
+        city: String,
+        note: String
+    ): DeliveryAddress? {
+        val input = DeliveryAddressInput(
+            label = getString(R.string.checkout_guest_address_label),
+            recipientName = sanitizeCheckoutField(fullName, MAX_NAME_LENGTH),
+            phone = sanitizeCheckoutField(phone, MAX_PHONE_LENGTH),
+            governorate = sanitizeCheckoutField(city, MAX_CITY_LENGTH),
+            city = sanitizeCheckoutField(city, MAX_CITY_LENGTH),
+            addressLine1 = sanitizeCheckoutField(address, MAX_ADDRESS_LENGTH),
+            addressLine2 = "",
+            postalCode = "",
+            deliveryNotes = sanitizeCheckoutField(note, MAX_NOTE_LENGTH),
+            isDefault = true
+        )
+        val error = DeliveryAddressValidator.validate(input)
+        if (error != null) {
+            showMotionSnackbar(error)
+            return null
+        }
+        return DeliveryAddress(
+            label = input.label,
+            recipientName = input.recipientName,
+            phone = DeliveryAddressValidator.normalizedPhone(input.phone),
+            governorate = input.governorate,
+            city = input.city,
+            addressLine1 = input.addressLine1,
+            deliveryNotes = input.deliveryNotes.takeIf { it.isNotBlank() },
+            isDefault = true
+        )
+    }
+
+    private fun saveGuestOrderAndProceed(address: DeliveryAddress? = AddressBookStore.getCurrent(this)) {
+        val deliveryAddress = address ?: run {
+            showPhoneCheckoutDialog()
+            return
+        }
+        if (selectedPaymentMethod != PaymentMethod.CASH) {
+            showMotionSnackbar(getString(R.string.checkout_cod_only))
+            return
+        }
+        val cart = CartStore.getCart(this)
+        if (cart.isEmpty()) {
+            showMotionSnackbar(getString(R.string.checkout_cart_empty))
+            return
+        }
+        if (!validateCartStock(cart)) return
+
+        binding.layoutLottieLoading.visibility = View.VISIBLE
+        btnContinue.isEnabled = false
+        lifecycleScope.launch {
+            val userResult = if (FirebaseAuthManager.currentUser != null) {
+                Result.success(FirebaseAuthManager.currentUser!!)
+            } else {
+                FirebaseAuthManager.signInAnonymously()
+            }
+            userResult.fold(
+                onSuccess = { user ->
+                    runCatching {
+                        UserService.updateUserProfileName(user.uid, deliveryAddress.recipientName)
+                        UserService.markPhoneAccount(user.uid, deliveryAddress.phone)
+                    }
+                    AddressBookStore.upsert(this@CheckoutDetailsActivity, deliveryAddress)
+                    bindDynamicData()
+                    saveOrderAndProceed()
+                },
+                onFailure = { error ->
+                    binding.layoutLottieLoading.visibility = View.GONE
+                    btnContinue.isEnabled = true
+                    showMotionSnackbar(FirebaseAuthManager.friendlyError(this@CheckoutDetailsActivity, error))
+                }
+            )
+        }
+    }
+
+    private fun buildOrderFromCart(uid: String, deliveryAddress: DeliveryAddress, id: String): AppOrder? {
+        val cart = CartStore.getCart(this)
+        if (cart.isEmpty()) {
+            showMotionSnackbar(getString(R.string.checkout_cart_empty))
+            return null
+        }
+        if (!validateCartStock(cart)) return null
+        val orderItems = cart.map { (productId, quantity) ->
+            val product = ProductCatalog.byId(productId)
+            OrderItem(
+                productId = productId,
+                name = product?.title ?: productId,
+                priceAtPurchase = product?.effectivePrice ?: 0.0,
+                quantity = quantity,
+                thumbnailUrl = product?.previewImageUrl() ?: ""
+            )
+        }
+        val subtotal = orderItems.sumOf { it.priceAtPurchase * it.quantity }
+        val shippingFee = selectedShippingFee()
+        return AppOrder(
+            id = id,
+            uid = uid,
+            items = orderItems,
+            subtotal = subtotal,
+            deliveryFee = shippingFee,
+            total = subtotal + shippingFee,
+            paymentMethod = "COD",
+            shippingAddress = deliveryAddress.toSnapshot(),
+            createdAt = com.google.firebase.Timestamp.now()
+        )
+    }
+
+    private fun checkoutForm(vararg fields: EditText): LinearLayout {
+        return LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(4.dp, 8.dp, 4.dp, 0)
+            fields.forEach { field ->
+                addView(field, LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply { topMargin = 8.dp })
+            }
+        }
+    }
+
+    private fun checkoutInput(hintRes: Int, inputTypeValue: Int): EditText {
+        return EditText(this).apply {
+            hint = getString(hintRes)
+            inputType = inputTypeValue
+            minLines = if (inputTypeValue and InputType.TYPE_TEXT_FLAG_MULTI_LINE != 0) 2 else 1
+            maxLines = if (inputTypeValue and InputType.TYPE_TEXT_FLAG_MULTI_LINE != 0) 4 else 1
+            filters = arrayOf(InputFilter.LengthFilter(maxLengthForInput(inputTypeValue)))
+        }
+    }
+
+    private fun validateCartStock(cart: Map<String, Int>): Boolean {
+        val unavailable = cart.entries.firstOrNull { (productId, quantity) ->
+            val product = ProductCatalog.byId(productId)
+            product == null || !product.isActive || product.stock < quantity
+        } ?: return true
+        val productName = ProductCatalog.byId(unavailable.key)?.title ?: unavailable.key
+        showMotionSnackbar(getString(R.string.checkout_error_stock) + " $productName")
+        return false
+    }
+
+    private fun sanitizeCheckoutField(value: String, maxLength: Int): String {
+        return value
+            .replace(Regex("<[^>]*>"), " ")
+            .replace(Regex("\\s+"), " ")
+            .trim()
+            .take(maxLength)
+    }
+
+    private fun maxLengthForInput(inputTypeValue: Int): Int {
+        return if (inputTypeValue and InputType.TYPE_TEXT_FLAG_MULTI_LINE != 0) {
+            MAX_ADDRESS_LENGTH
+        } else {
+            MAX_CITY_LENGTH
+        }
+    }
+
     private fun handleBackNavigation() {
         when (viewModel.currentStep.value ?: 1) {
-            3 -> transitionBackToStep2()
+            3 -> Unit
             2 -> transitionBackToStep1()
             else -> finishWithMotion()
         }
@@ -557,32 +1014,6 @@ class CheckoutDetailsActivity : AppCompatActivity() {
             layoutStep2.visibility = View.GONE
             layoutStep1.animate().alpha(1f).setDuration(MotionTokens.EMPHASIS).start()
         }.start()
-    }
-
-    private fun transitionBackToStep2() {
-        if (viewModel.currentStep.value == 2) return
-        viewModel.setStep(2)
-
-        val layoutStep2 = binding.layoutStep2Content
-        val layoutStep3 = binding.layoutStep3Content
-        val bottomBar = binding.layoutCheckoutBottomBar
-        updateCheckoutChrome()
-        renderStepState()
-
-        bottomBar.visibility = View.VISIBLE
-        bottomBar.alpha = 0f
-        bottomBar.animate().alpha(1f).setDuration(MotionTokens.EMPHASIS).start()
-
-        layoutStep2.visibility = View.VISIBLE
-        layoutStep2.alpha = 0f
-
-        layoutStep3.animate().alpha(0f).setDuration(MotionTokens.EMPHASIS).withEndAction {
-            layoutStep3.visibility = View.GONE
-            layoutStep2.animate().alpha(1f).setDuration(MotionTokens.EMPHASIS).start()
-        }.start()
-
-        resetConfirmationAnimation()
-        applyPaymentSelection()
     }
 
     private fun playConfirmationAnimation() {
@@ -684,7 +1115,7 @@ class CheckoutDetailsActivity : AppCompatActivity() {
 
     private fun buildDeliveryEstimate(): String {
         val estimate = java.util.Date(buildEstimatedDeliveryTimestamp())
-        return java.text.SimpleDateFormat("dd MMM", Locale.FRENCH).format(estimate)
+        return java.text.SimpleDateFormat("dd MMM", resources.configuration.locales[0]).format(estimate)
     }
 
     private fun buildEstimatedDeliveryTimestamp(): Long {
@@ -693,7 +1124,44 @@ class CheckoutDetailsActivity : AppCompatActivity() {
         return System.currentTimeMillis() + daysToAdd * 24L * 60L * 60L * 1000L
     }
 
-    private fun String?.ifNullOrBlank(fallback: () -> String): String {
-        return if (this.isNullOrBlank()) fallback() else this
+    private fun selectedShippingFee(): Double {
+        val isStandard = viewModel.isStandardSelected.value != false
+        return if (isStandard) standardShippingFee else expressShippingFee
     }
+
+    private fun checkoutErrorMessage(error: Throwable): String {
+        val backendError = error as? BackendFunctionException
+        val backendMessage = backendError?.backendMessage ?: backendError?.message
+        val shouldPreferBackendMessage = backendError?.code !in setOf(
+            FirebaseFunctionsException.Code.UNAUTHENTICATED,
+            FirebaseFunctionsException.Code.UNAVAILABLE,
+            FirebaseFunctionsException.Code.DEADLINE_EXCEEDED
+        )
+        backendMessage
+            ?.let(::sanitizeBackendCheckoutMessage)
+            ?.takeIf { it.isNotBlank() }
+            ?.takeIf { shouldPreferBackendMessage }
+            ?.let { return it }
+        return when (backendError?.code) {
+            com.google.firebase.functions.FirebaseFunctionsException.Code.UNAUTHENTICATED ->
+                getString(R.string.checkout_error_auth)
+            com.google.firebase.functions.FirebaseFunctionsException.Code.INVALID_ARGUMENT ->
+                getString(R.string.checkout_error_invalid)
+            com.google.firebase.functions.FirebaseFunctionsException.Code.FAILED_PRECONDITION ->
+                getString(R.string.checkout_error_stock)
+            com.google.firebase.functions.FirebaseFunctionsException.Code.UNAVAILABLE,
+            com.google.firebase.functions.FirebaseFunctionsException.Code.DEADLINE_EXCEEDED ->
+                getString(R.string.checkout_error_network)
+            else -> getString(R.string.checkout_order_failed)
+        }
+    }
+
+    private fun sanitizeBackendCheckoutMessage(message: String): String {
+        return message
+            .replace(Regex("<[^>]*>"), " ")
+            .replace(Regex("\\s+"), " ")
+            .trim()
+            .take(180)
+    }
+
 }

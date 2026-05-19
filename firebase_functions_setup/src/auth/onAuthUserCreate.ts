@@ -2,8 +2,9 @@ import {logger} from "firebase-functions";
 import * as functionsV1 from "firebase-functions/v1";
 import {COLLECTIONS, SCHEMA_VERSION, USER_ROLES} from "../shared/constants";
 import {admin, db} from "../shared/firestore";
+import {FUNCTIONS_REGION} from "../shared/callableOptions";
 
-export const onAuthUserCreate = functionsV1.auth.user().onCreate(async (user) => {
+export const onAuthUserCreate = functionsV1.region(FUNCTIONS_REGION).auth.user().onCreate(async (user) => {
   if (!user?.uid) {
     return;
   }

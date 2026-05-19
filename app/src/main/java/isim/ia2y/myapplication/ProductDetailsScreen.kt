@@ -3,53 +3,72 @@ package isim.ia2y.myapplication
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.text.InputType
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.RatingBar
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.updateLayoutParams
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.card.MaterialCardView
 import androidx.lifecycle.lifecycleScope
+import androidx.viewpager2.widget.ViewPager2
+import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.Source
+import com.google.firebase.functions.FirebaseFunctionsException
+import isim.ia2y.myapplication.databinding.ActivityProductDetailsBinding
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
+import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.Locale
 
 class ProductDetailsScreen : AppCompatActivity() {
+    private lateinit var binding: ActivityProductDetailsBinding
     private var quantity: Int = 1
-    private lateinit var product: Product
+    private var product: Product? = null
+    private var galleryUrls: List<String> = emptyList()
+    private var galleryIndex: Int = 0
+    private lateinit var galleryAdapter: ProductImagePagerAdapter
+    private var reviewCursor: DocumentSnapshot? = null
+    private var reviewsReachedEnd: Boolean = true
+    private var productId: String = ""
+    private var isOpeningSellerConversation: Boolean = false
+    private var loadedReviews: List<ProductReview> = emptyList()
+    private var selectedRating: Int = 0
+    private val reviewStarIds = intArrayOf(
+        R.id.ivReviewStar1,
+        R.id.ivReviewStar2,
+        R.id.ivReviewStar3,
+        R.id.ivReviewStar4,
+        R.id.ivReviewStar5
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_product_details)
+        binding = ActivityProductDetailsBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        val topBar = findViewById<View>(R.id.layoutTopBar)
-        val bottomBar = findViewById<View>(R.id.layoutBottomBar)
-        val topBarBaseHeight = resources.getDimensionPixelSize(R.dimen.app_top_bar_height)
-        val topBarBasePaddingStart = topBar.paddingStart
-        val topBarBasePaddingEnd = topBar.paddingEnd
-        val topBarBasePaddingBottom = topBar.paddingBottom
+        val bottomBar = binding.layoutBottomBar
         val bottomBarBasePaddingLeft = bottomBar.paddingLeft
         val bottomBarBasePaddingTop = bottomBar.paddingTop
         val bottomBarBasePaddingRight = bottomBar.paddingRight
         val bottomBarBasePaddingBottom = bottomBar.paddingBottom
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(binding.main) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, 0, systemBars.right, 0)
-            topBar.updateLayoutParams<ViewGroup.LayoutParams> {
-                height = topBarBaseHeight + systemBars.top
-            }
-            topBar.setPadding(
-                topBarBasePaddingStart,
-                systemBars.top,
-                topBarBasePaddingEnd,
-                topBarBasePaddingBottom
-            )
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0)
             bottomBar.setPadding(
                 bottomBarBasePaddingLeft,
                 bottomBarBasePaddingTop,
@@ -59,79 +78,164 @@ class ProductDetailsScreen : AppCompatActivity() {
             insets
         }
 
-        val productId = intent.getStringExtra(EXTRA_PRODUCT_ID).orEmpty()
+        productId = intent.getStringExtra(EXTRA_PRODUCT_ID).orEmpty()
         val loadedProduct = ProductCatalog.byId(productId)
+        binding.ivBack.setOnClickListener { finishWithMotion() }
+        binding.btnDetailsRetry.setOnClickListener {
+            it.performLightHapticFeedback()
+            loadRemoteProduct(productId, isRetry = true)
+        }
         
-        if (loadedProduct == null) {
-            findViewById<View>(R.id.layoutContent)?.visibility = View.GONE
-            findViewById<View>(R.id.layoutBottomBar)?.visibility = View.GONE
-            findViewById<View>(R.id.loadingIndicator)?.visibility = View.VISIBLE
-            lifecycleScope.launch {
-                val remoteProduct = runCatching { ProductService.fetchProduct(productId) }.getOrNull()
-                if (remoteProduct == null) {
-                    findViewById<View>(R.id.loadingIndicator)?.visibility = View.GONE
-                    showToast(getString(R.string.details_product_not_found))
-                    finishWithMotion()
-                } else {
-                    ProductCatalog.upsert(remoteProduct)
-                    product = remoteProduct
-                    findViewById<View>(R.id.loadingIndicator)?.visibility = View.GONE
-                    findViewById<View>(R.id.layoutContent)?.visibility = View.VISIBLE
-                    findViewById<View>(R.id.layoutBottomBar)?.visibility = View.VISIBLE
-                    applyResponsiveLayout()
-                    bindUi()
-                    bindActions()
-                    animateEntry()
-                }
+        galleryAdapter = ProductImagePagerAdapter(R.drawable.placeholder)
+        binding.pagerProductImages.adapter = galleryAdapter
+        binding.pagerProductImages.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                galleryIndex = position
+                renderGalleryDots(galleryUrls.size)
             }
+        })
+
+        if (loadedProduct == null) {
+            loadRemoteProduct(productId)
             return
         }
-        product = loadedProduct
+        showLoadedProduct(loadedProduct)
+    }
 
-        findViewById<View>(R.id.loadingIndicator)?.visibility = View.GONE
+    private fun loadRemoteProduct(productId: String, isRetry: Boolean = false) {
+        showDetailsLoading()
+        lifecycleScope.launch {
+            val result = runCatching { ProductService.fetchProduct(productId) }
+            if (isFinishing || isDestroyed) return@launch
+            val remoteProduct = result.getOrNull()
+            when {
+                remoteProduct != null -> {
+                    ProductCatalog.upsert(remoteProduct)
+                    showLoadedProduct(remoteProduct)
+                }
+                result.isSuccess && isRetry -> {
+                    showToast(getString(R.string.details_product_not_found))
+                    finishWithMotion()
+                }
+                result.isSuccess -> {
+                    showDetailsError(
+                        title = getString(R.string.details_product_not_found),
+                        subtitle = getString(R.string.details_product_missing_retry_subtitle)
+                    )
+                }
+                else -> {
+                    val error = result.exceptionOrNull()
+                        ?: IllegalStateException("Product load failed.")
+                    CrashlyticsHelper.recordNonFatal(
+                        "ProductDetails",
+                        "Product load failed productId=$productId",
+                        error
+                    )
+                    showDetailsError(
+                        title = getString(R.string.details_load_error_title),
+                        subtitle = getString(R.string.details_load_error_subtitle)
+                    )
+                }
+            }
+        }
+    }
+
+    private fun showLoadedProduct(loadedProduct: Product) {
+        product = loadedProduct
+        RecentlyViewedStore.record(this, loadedProduct.id)
+        AnalyticsTracker.viewItem(loadedProduct)
+        binding.loadingIndicator.visibility = View.GONE
+        binding.layoutDetailsSkeleton.visibility = View.GONE
+        binding.layoutDetailsErrorState.visibility = View.GONE
+        binding.layoutContent.visibility = View.VISIBLE
+        binding.layoutBottomBar.visibility = View.VISIBLE
+        binding.actionCluster.visibility = View.VISIBLE
         applyResponsiveLayout()
         bindUi()
         bindActions()
+        loadReviews()
         animateEntry()
     }
 
+    private fun showDetailsLoading() {
+        binding.layoutContent.visibility = View.GONE
+        binding.layoutBottomBar.visibility = View.GONE
+        binding.layoutDetailsErrorState.visibility = View.GONE
+        binding.layoutDetailsSkeleton.visibility = View.VISIBLE
+        binding.loadingIndicator.visibility = View.GONE
+        binding.actionCluster.visibility = View.GONE
+    }
+
+    private fun showDetailsError(title: String, subtitle: String) {
+        binding.layoutDetailsSkeleton.visibility = View.GONE
+        binding.loadingIndicator.visibility = View.GONE
+        binding.layoutContent.visibility = View.GONE
+        binding.layoutBottomBar.visibility = View.GONE
+        binding.tvDetailsErrorTitle.text = title
+        binding.tvDetailsErrorSubtitle.text = subtitle
+        binding.layoutDetailsErrorState.visibility = View.VISIBLE
+        binding.actionCluster.visibility = View.GONE
+    }
+
     private fun bindUi() {
-        findViewById<TextView>(R.id.tvTopTitle)?.text = getString(R.string.details_top_title)
-        findViewById<ImageView>(R.id.ivProductImage)
-            ?.loadCatalogImage(product.imageUrl, product.imageRes)
-        findViewById<TextView>(R.id.tvTag1)?.text =
+        val product = product ?: return
+        binding.tvTopTitle.text = getString(R.string.details_top_title)
+        bindGallery()
+        binding.tvTag1.text =
             product.tags.getOrNull(0)?.takeIf { it.isNotBlank() } ?: getString(R.string.product_default_tag)
 
-        val tag2 = findViewById<TextView>(R.id.tvTag2)
+        val tag2 = binding.tvTag2
         val secondTag = product.tags.getOrNull(1)
         if (secondTag.isNullOrBlank()) {
-            tag2?.visibility = View.GONE
+            tag2.visibility = View.GONE
         } else {
-            tag2?.visibility = View.VISIBLE
-            tag2?.text = secondTag
+            tag2.visibility = View.VISIBLE
+            tag2.text = secondTag
             val backgroundRes = if (product.stock <= 0) {
                 R.drawable.bg_details_chip_premium
             } else {
                 R.drawable.bg_details_chip_success
             }
-            tag2?.setBackgroundResource(backgroundRes)
+            tag2.setBackgroundResource(backgroundRes)
             val textColor = if (product.stock <= 0) {
                 R.color.home_text_primary
             } else {
                 R.color.colorAccentDeep
             }
-            tag2?.setTextColor(ContextCompat.getColor(this, textColor))
+            tag2.setTextColor(ContextCompat.getColor(this, textColor))
         }
 
-        findViewById<TextView>(R.id.tvRating)?.text = String.format(Locale.US, "%.1f", product.rating)
-        findViewById<TextView>(R.id.tvReviews)?.apply {
+        binding.tvRating.text = if (product.reviewsCount > 0 && product.rating > 0.0) {
+            String.format(Locale.US, "%.1f", product.rating)
+        } else {
+            getString(R.string.details_no_rating_short)
+        }
+        binding.tvReviews.apply {
             text = getString(R.string.details_reviews_count, product.reviewsCount)
             visibility = if (product.reviewsCount > 0) View.VISIBLE else View.GONE
         }
-        findViewById<TextView>(R.id.tvTitle)?.text = product.title
-        findViewById<TextView>(R.id.tvPrice)?.text = formatDt(product.price)
-        findViewById<TextView>(R.id.tvDescription)?.text = product.description
-        findViewById<TextView>(R.id.tvStockHelper)?.apply {
+        binding.tvTitle.text = product.title
+        binding.tvPrice.text = formatDt(product.unitPrice)
+        if (product.hasDiscount) {
+            binding.tvPriceOriginal.apply {
+                text = formatDt(product.effectivePrice)
+                paintFlags = paintFlags or android.graphics.Paint.STRIKE_THRU_TEXT_FLAG
+                visibility = View.VISIBLE
+            }
+            binding.tvDiscountBadge.apply {
+                text = context.getString(R.string.product_price_discount_badge, product.discountPercentClamped)
+                visibility = View.VISIBLE
+            }
+        } else {
+            binding.tvPriceOriginal.visibility = View.GONE
+            binding.tvDiscountBadge.visibility = View.GONE
+        }
+        binding.tvSellerName.text = product.sellerDisplayName
+        bindSellerTrust(product)
+        binding.ivSellerAvatar.loadAvatarImage(product.sellerAvatarUrl.takeIf { it.isNotBlank() })
+        refreshSellerAvatarIfNeeded(product)
+        setupDescriptionCollapse(product.description)
+        binding.tvStockHelper.apply {
             text = when {
                 product.stock <= 0 -> getString(R.string.product_state_out_of_stock)
                 product.stock <= 5 -> getString(R.string.product_state_low_stock, product.stock)
@@ -146,11 +250,11 @@ class ProductDetailsScreen : AppCompatActivity() {
         }
 
         val bullets = product.bullets
-        bindBullet(R.id.tvBullet1, bullets.getOrNull(0))
-        bindBullet(R.id.tvBullet2, bullets.getOrNull(1))
-        bindBullet(R.id.tvBullet3, bullets.getOrNull(2))
+        bindBullet(binding.tvBullet1, bullets.getOrNull(0))
+        bindBullet(binding.tvBullet2, bullets.getOrNull(1))
+        bindBullet(binding.tvBullet3, bullets.getOrNull(2))
         val hasHighlights = bullets.any { it.isNotBlank() }
-        findViewById<View>(R.id.cardHighlights)?.visibility = if (hasHighlights) View.VISIBLE else View.GONE
+        binding.cardHighlights.visibility = if (hasHighlights) View.VISIBLE else View.GONE
 
         if (product.stock <= 0) {
             quantity = 0
@@ -160,7 +264,7 @@ class ProductDetailsScreen : AppCompatActivity() {
 
         updateQuantityUi()
 
-        findViewById<TextView>(R.id.btnAddToCart)?.apply {
+        binding.btnAddToCart.apply {
             isEnabled = product.stock > 0
             alpha = if (product.stock > 0) 1f else 0.6f
             text = context.getString(
@@ -169,44 +273,93 @@ class ProductDetailsScreen : AppCompatActivity() {
         }
         
         // Favorite state setup (Lottie Heart)
-        val lottieHeart = findViewById<com.airbnb.lottie.LottieAnimationView>(R.id.ivFavoriteLottie)
         val isFav = FavoritesStore.isFavorite(this, product.id)
         if (isFav) {
-            lottieHeart?.progress = 1f // Full heart
+            binding.ivFavoriteLottie.progress = 1f // Full heart
         } else {
-            lottieHeart?.progress = 0f // Empty heart
+            binding.ivFavoriteLottie.progress = 0f // Empty heart
         }
     }
 
     private fun bindActions() {
-        findViewById<View>(R.id.ivBack)?.setOnClickListener { finishWithMotion() }
+        val product = product ?: return
+        binding.ivBack.setOnClickListener { finishWithMotion() }
+        binding.btnGalleryPrev.setOnClickListener {
+            it.performLightHapticFeedback()
+            showGalleryImage(galleryIndex - 1)
+        }
+        binding.btnGalleryNext.setOnClickListener {
+            it.performLightHapticFeedback()
+            showGalleryImage(galleryIndex + 1)
+        }
+        binding.tvReviewCounter.text = getString(R.string.details_review_counter, 0, 280)
+        binding.etReviewComment.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                binding.tvReviewCounter.text = getString(R.string.details_review_counter, s?.length ?: 0, 280)
+            }
+            override fun afterTextChanged(s: Editable?) = Unit
+        })
+        setupReviewStars()
+        binding.btnWriteReview.setOnClickListener {
+            val rating = selectedRating
+            val comment = binding.etReviewComment.text?.toString()?.trim().orEmpty()
+            when {
+                rating < 1 -> {
+                    binding.tvReviewStarsError.text = getString(R.string.details_review_rating_required)
+                    binding.tvReviewStarsError.visibility = View.VISIBLE
+                }
+                comment.length < 3 -> {
+                    binding.tvReviewStarsError.visibility = View.GONE
+                    binding.etReviewComment.error = getString(R.string.details_review_comment_required)
+                }
+                else -> {
+                    binding.tvReviewStarsError.visibility = View.GONE
+                    submitReview(rating.coerceIn(1, 5), comment)
+                }
+            }
+        }
 
-        findViewById<View>(R.id.ivShare)?.setOnClickListener {
+        binding.ivShare.setOnClickListener {
+            val deepLink = "https://fatiweb.app/p/${product.id}"
             val shareIntent = Intent(Intent.ACTION_SEND).apply {
                 type = "text/plain"
                 putExtra(
                     Intent.EXTRA_TEXT,
-                    "${product.title}\n${formatDt(product.price)}\n${product.description}"
+                    "${product.title}\n${formatMinorDt(product.priceMinor)}\n$deepLink\n\n${product.description}"
                 )
             }
             startActivity(Intent.createChooser(shareIntent, getString(R.string.details_share)))
         }
 
-        findViewById<View>(R.id.btnMinus)?.setOnClickListener {
+        val canContactSeller = product.sellerId.isNotBlank() &&
+            FirebaseAuthManager.currentUser?.uid != product.sellerId
+        binding.btnContactSeller.apply {
+            visibility = if (canContactSeller) View.VISIBLE else View.GONE
+            setOnClickListener {
+                it.performLightHapticFeedback()
+                openSellerConversation(product)
+            }
+        }
+
+        binding.btnMinus.setOnClickListener {
             it.performLightHapticFeedback()
             quantity = (quantity - 1).coerceAtLeast(1)
             updateQuantityUi()
         }
 
-        findViewById<View>(R.id.btnPlus)?.setOnClickListener {
+        binding.btnPlus.setOnClickListener {
             it.performLightHapticFeedback()
             quantity = (quantity + 1).coerceAtMost(product.stock.coerceAtLeast(1))
             updateQuantityUi()
         }
 
-        findViewById<View>(R.id.btnAddToCart)?.setOnClickListener {
+        binding.btnAddToCart.setOnClickListener {
             it.performLightHapticFeedback()
             val addedQuantity = CartStore.add(this, product.id, quantity)
+            if (addedQuantity > 0) {
+                AnalyticsTracker.addToCart(product, addedQuantity)
+            }
             when {
                 addedQuantity == quantity -> {
                     showMotionSnackbar(getString(R.string.details_added_to_cart, quantity), R.id.layoutBottomBar)
@@ -223,43 +376,512 @@ class ProductDetailsScreen : AppCompatActivity() {
             }
         }
 
-        val lottieHeart = findViewById<com.airbnb.lottie.LottieAnimationView>(R.id.ivFavoriteLottie)
-        findViewById<View>(R.id.btnFavoriteDetails)?.setOnClickListener {
+        binding.btnFavoriteDetails.setOnClickListener {
             it.performLightHapticFeedback()
             val isNowFav = FavoritesStore.toggleFavorite(this, product.id)
             if (isNowFav) {
-                lottieHeart?.apply {
+                binding.ivFavoriteLottie.apply {
                     speed = 1f // Play forward
                     playAnimation()
                 }
             } else {
-                lottieHeart?.apply {
+                binding.ivFavoriteLottie.apply {
                     speed = -2f // Play backward quickly
                     playAnimation()
                 }
             }
         }
-
-        applyPressFeedback(R.id.ivBack, R.id.ivShare, R.id.btnFavoriteDetails, R.id.btnMinus, R.id.btnPlus, R.id.btnAddToCart)
+        applyPressFeedback(
+            R.id.ivBack,
+            R.id.ivShare,
+            R.id.btnGalleryPrev,
+            R.id.btnGalleryNext,
+            R.id.btnContactSeller,
+            R.id.btnFavoriteDetails,
+            R.id.btnMinus,
+            R.id.btnPlus,
+            R.id.btnAddToCart
+        )
     }
 
-    private fun bindBullet(viewId: Int, bullet: String?) {
-        findViewById<TextView>(viewId)?.apply {
+    private fun openSellerConversation(product: Product) {
+        if (isOpeningSellerConversation) return
+        if (FirebaseAuthManager.currentUser == null) {
+            showMotionSnackbar("Sign in to contact the seller", R.id.layoutBottomBar)
+            navigateNoShift(LoginActivity::class.java)
+            return
+        }
+        isOpeningSellerConversation = true
+        binding.btnContactSeller.apply {
+            isEnabled = false
+            alpha = 0.58f
+        }
+        lifecycleScope.launch {
+            val result = runCatching {
+                withTimeoutOrNull(12_000L) {
+                    MessagingRepository.openOrCreateProductConversation(product)
+                } ?: throw IllegalStateException("Opening seller chat timed out.")
+            }
+            if (isFinishing || isDestroyed) return@launch
+            isOpeningSellerConversation = false
+            binding.btnContactSeller.apply {
+                isEnabled = true
+                alpha = 1f
+            }
+            result
+                .onSuccess { conversationId ->
+                    startActivity(ConversationActivity.createIntent(this@ProductDetailsScreen, conversationId))
+                }
+                .onFailure {
+                    CrashlyticsHelper.recordNonFatal("ProductDetails", "Open seller conversation failed productId=${product.id}", it)
+                    showMotionSnackbar("Could not open seller chat", R.id.layoutBottomBar)
+                }
+        }
+    }
+
+    private fun bindGallery() {
+        val product = product ?: return
+        galleryUrls = product.imageUrls
+            .filter { it.isNotBlank() }
+            .distinct()
+            .take(5)
+            .ifEmpty { listOfNotNull(product.mainImageUrl()) }
+        galleryIndex = galleryIndex.coerceIn(0, galleryUrls.lastIndex.coerceAtLeast(0))
+        galleryAdapter = ProductImagePagerAdapter(product.catalogFallbackImageRes())
+        binding.pagerProductImages.adapter = galleryAdapter
+        galleryAdapter.submitList(galleryUrls.ifEmpty { listOf("") })
+        binding.pagerProductImages.setCurrentItem(galleryIndex, false)
+        showGalleryImage(galleryIndex)
+    }
+
+    private fun showGalleryImage(index: Int) {
+        val product = product ?: return
+        val count = galleryUrls.size
+        val hasGallery = count > 1
+        galleryIndex = when {
+            count <= 0 -> 0
+            index < 0 -> count - 1
+            index >= count -> 0
+            else -> index
+        }
+        if (binding.pagerProductImages.currentItem != galleryIndex) {
+            binding.pagerProductImages.setCurrentItem(galleryIndex, true)
+        }
+        binding.btnGalleryPrev.apply {
+            visibility = if (hasGallery) View.VISIBLE else View.GONE
+            isEnabled = hasGallery
+        }
+        binding.btnGalleryNext.apply {
+            visibility = if (hasGallery) View.VISIBLE else View.GONE
+            isEnabled = hasGallery
+        }
+        renderGalleryDots(count)
+    }
+
+    private fun bindSellerTrust(product: Product) {
+        binding.tvSellerVerifiedBadge.visibility = if (product.sellerVerifiedAt != null) View.VISIBLE else View.GONE
+        val parts = buildList {
+            if (product.sellerRating > 0.0) {
+                add(getString(R.string.details_seller_rating, product.sellerRating))
+            }
+            if (product.sellerTotalSold > 0) {
+                add(getString(R.string.details_seller_total_sold, product.sellerTotalSold))
+            }
+            if (product.sellerMemberSince != null) {
+                add(getString(R.string.details_seller_member_since))
+            }
+        }
+        binding.tvSellerTrustMeta.apply {
+            text = parts.joinToString(" - ")
+            visibility = if (parts.isEmpty()) View.GONE else View.VISIBLE
+        }
+    }
+
+    private fun renderGalleryDots(count: Int) {
+        val dots = binding.layoutGalleryDots
+        dots.removeAllViews()
+        dots.visibility = if (count > 1) View.VISIBLE else View.GONE
+        repeat(count) { index ->
+            dots.addView(View(this).apply {
+                setBackgroundResource(
+                    if (index == galleryIndex) {
+                        R.drawable.bg_home_banner_dot_active
+                    } else {
+                        R.drawable.bg_home_banner_dot_inactive
+                    }
+                )
+                layoutParams = LinearLayout.LayoutParams(8.dp, 8.dp).apply {
+                    marginStart = 4.dp
+                    marginEnd = 4.dp
+                }
+            })
+        }
+    }
+
+    private fun loadReviews() {
+        val product = product ?: return
+        val progress = binding.progressReviews
+        progress.visibility = View.VISIBLE
+        lifecycleScope.launch {
+            reviewCursor = null
+            reviewsReachedEnd = true
+            val cachedPage = runCatching {
+                ReviewService.fetchReviewsPage(product.id, pageSize = 10, source = Source.CACHE)
+            }.getOrNull()
+            if (isFinishing || isDestroyed) return@launch
+            if (cachedPage != null) {
+                progress.visibility = View.GONE
+                applyReviewsPage(cachedPage)
+            }
+
+            val result = withTimeoutOrNull(4_500L) {
+                runCatching {
+                    ReviewService.fetchReviewsPage(product.id, pageSize = 10, source = Source.SERVER)
+                }
+            }
+            if (isFinishing || isDestroyed) return@launch
+            progress.visibility = View.GONE
+            result?.getOrNull()?.let { page ->
+                applyReviewsPage(page)
+                return@launch
+            }
+            if (cachedPage == null) {
+                renderReviews(emptyList())
+            }
+            result?.exceptionOrNull()?.let { error ->
+                CrashlyticsHelper.recordNonFatal("ProductDetails", "Failed to refresh reviews productId=${product.id}", error)
+            }
+        }
+    }
+
+    private fun applyReviewsPage(page: ProductReviewPage) {
+        reviewCursor = page.nextCursor
+        reviewsReachedEnd = page.reachedEnd
+        loadedReviews = page.reviews
+        renderReviews(page.reviews)
+    }
+
+    private fun refreshSellerAvatarIfNeeded(product: Product) {
+        if (product.sellerId.isBlank()) return
+        lifecycleScope.launch {
+            val profile = runCatching { UserService.fetchUserProfile(product.sellerId) }.getOrNull()
+            if (isFinishing || isDestroyed) return@launch
+            profile?.avatarUrl?.takeIf { it.isNotBlank() }?.let { avatarUrl ->
+                binding.ivSellerAvatar.loadAvatarImage(avatarUrl)
+            }
+            if (!profile?.name.isNullOrBlank()) {
+                binding.tvSellerName.text = profile?.name.orEmpty()
+            }
+        }
+    }
+
+    private fun renderReviews(reviews: List<ProductReview>) {
+        loadedReviews = reviews
+        val summary = binding.tvReviewsSummary
+        val list = binding.layoutReviewsList
+        list.removeAllViews()
+        if (reviews.isEmpty()) {
+            summary.text = getString(R.string.details_reviews_empty)
+            return
+        }
+        val average = reviews.map { it.rating.coerceIn(1, 5) }.average()
+        summary.text = getString(R.string.details_reviews_summary, average, reviews.size)
+        reviews.take(3).forEachIndexed { index, review ->
+            list.addView(buildReviewRow(review))
+        }
+        if (reviews.size > 3 || !reviewsReachedEnd) {
+            list.addView(TextView(this).apply {
+                text = getString(R.string.details_reviews_see_all, product?.reviewsCount?.takeIf { it > 0 } ?: reviews.size)
+                setTextColor(ContextCompat.getColor(context, R.color.colorPrimary))
+                typeface = resources.getFont(R.font.manrope_semibold)
+                textSize = 13f
+                setPadding(0, 14.dp, 0, 0)
+                setOnClickListener { showAllReviewsSheet(reviews) }
+            })
+        }
+    }
+
+    private fun buildReviewRow(review: ProductReview): View {
+        val content = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            layoutParams = LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+            addView(TextView(context).apply {
+                text = "${"★".repeat(review.rating.coerceIn(1, 5))}  ${review.userName.ifBlank { "Client" }}"
+                setTextColor(ContextCompat.getColor(context, R.color.home_text_primary))
+                typeface = resources.getFont(R.font.manrope_semibold)
+                textSize = 13f
+            })
+            review.createdAt.toReviewDateLabel()?.let { label ->
+                addView(TextView(context).apply {
+                    text = label
+                    setTextColor(ContextCompat.getColor(context, R.color.home_text_secondary))
+                    typeface = resources.getFont(R.font.manrope_regular)
+                    textSize = 11f
+                    setPadding(0, 3.dp, 0, 0)
+                })
+            }
+            addView(TextView(context).apply {
+                text = review.comment
+                setTextColor(ContextCompat.getColor(context, R.color.home_text_secondary))
+                typeface = resources.getFont(R.font.manrope_regular)
+                textSize = 13f
+                setPadding(0, 8.dp, 0, 0)
+            })
+        }
+        return MaterialCardView(this).apply {
+            setCardBackgroundColor(ContextCompat.getColor(context, R.color.colorSurface))
+            radius = 12.dp.toFloat()
+            cardElevation = 0f
+            strokeWidth = 1.dp
+            setStrokeColor(ContextCompat.getColor(context, R.color.colorBorderLight))
+            layoutParams = LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            ).apply { topMargin = 8.dp }
+            addView(content.apply { setPadding(14.dp, 12.dp, 14.dp, 12.dp) })
+        }
+    }
+
+    private fun Any?.toReviewDateLabel(): String? {
+        val millis = when (this) {
+            is Long -> this
+            is Int -> toLong()
+            is com.google.firebase.Timestamp -> toDate().time
+            is Map<*, *> -> ((this["seconds"] ?: this["_seconds"]) as? Number)?.toLong()?.times(1000L)
+            else -> null
+        } ?: return null
+        if (millis <= 0L) return null
+        return SimpleDateFormat("MMM d, yyyy", Locale.getDefault()).format(Date(millis))
+    }
+
+    private fun showReviewDialog() {
+        if (FirebaseAuthManager.currentUser == null) {
+            showMotionSnackbar(getString(R.string.details_review_login_required), R.id.layoutBottomBar)
+            return
+        }
+        val dialog = BottomSheetDialog(this)
+        val container = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(24.dp, 20.dp, 24.dp, 24.dp)
+        }
+        container.addView(TextView(this).apply {
+            text = getString(R.string.details_review_dialog_title)
+            setTextColor(ContextCompat.getColor(context, R.color.home_text_primary))
+            typeface = resources.getFont(R.font.manrope_semibold)
+            textSize = 18f
+        })
+        val ratingBar = RatingBar(this, null, android.R.attr.ratingBarStyle).apply {
+            numStars = 5
+            stepSize = 1f
+            rating = 5f
+            setOnRatingBarChangeListener { _, _, fromUser ->
+                if (fromUser) performLightHapticFeedback()
+            }
+        }
+        val commentInput = EditText(this).apply {
+            hint = getString(R.string.details_review_comment_hint)
+            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE
+            minLines = 3
+            maxLines = 5
+        }
+        val counter = TextView(this).apply {
+            text = getString(R.string.details_review_counter, 0, 280)
+            setTextColor(ContextCompat.getColor(context, R.color.home_text_secondary))
+            textSize = 12f
+        }
+        commentInput.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                counter.text = getString(R.string.details_review_counter, s?.length ?: 0, 280)
+            }
+            override fun afterTextChanged(s: Editable?) = Unit
+        })
+        container.addView(ratingBar)
+        container.addView(commentInput)
+        container.addView(counter)
+        container.addView(TextView(this).apply {
+            text = getString(R.string.details_review_verified_hint)
+            setTextColor(ContextCompat.getColor(context, R.color.home_text_secondary))
+            textSize = 12f
+            setPadding(0, 10.dp, 0, 12.dp)
+        })
+        container.addView(com.google.android.material.button.MaterialButton(this).apply {
+            text = getString(R.string.details_review_submit)
+            isAllCaps = false
+            setOnClickListener {
+                val comment = commentInput.text?.toString()?.trim().orEmpty()
+                if (comment.length < 3) {
+                    commentInput.error = getString(R.string.details_review_comment_required)
+                    return@setOnClickListener
+                }
+                dialog.dismiss()
+                submitReview(ratingBar.rating.toInt().coerceIn(1, 5), comment)
+            }
+        })
+        dialog.setContentView(container)
+        dialog.show()
+    }
+
+    private fun showAllReviewsSheet(reviews: List<ProductReview>) {
+        val dialog = BottomSheetDialog(this)
+        val container = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(24.dp, 20.dp, 24.dp, 24.dp)
+        }
+        container.addView(TextView(this).apply {
+            text = getString(R.string.details_reviews_all_title)
+            setTextColor(ContextCompat.getColor(context, R.color.home_text_primary))
+            typeface = resources.getFont(R.font.manrope_semibold)
+            textSize = 18f
+        })
+        val loaded = reviews.toMutableList()
+        val rows = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+        }
+        fun renderRows() {
+            rows.removeAllViews()
+            loaded.forEach { review -> rows.addView(buildReviewRow(review)) }
+        }
+        renderRows()
+        container.addView(rows)
+        container.addView(com.google.android.material.button.MaterialButton(this).apply {
+            text = getString(R.string.details_reviews_load_more)
+            isAllCaps = false
+            visibility = if (reviewsReachedEnd) View.GONE else View.VISIBLE
+            setOnClickListener {
+                val currentProduct = product ?: return@setOnClickListener
+                isEnabled = false
+                lifecycleScope.launch {
+                    val page = runCatching {
+                        ReviewService.fetchReviewsPage(currentProduct.id, pageSize = 10, cursor = reviewCursor)
+                    }.getOrElse { error ->
+                        CrashlyticsHelper.recordNonFatal("ProductDetails", "Failed to page reviews productId=${currentProduct.id}", error)
+                        isEnabled = true
+                        return@launch
+                    }
+                    reviewCursor = page.nextCursor
+                    reviewsReachedEnd = page.reachedEnd
+                    loaded += page.reviews
+                    renderRows()
+                    visibility = if (reviewsReachedEnd) View.GONE else View.VISIBLE
+                    isEnabled = true
+                }
+            }
+        })
+        dialog.setContentView(container)
+        dialog.show()
+    }
+
+    private fun setupReviewStars() {
+        reviewStarIds.forEachIndexed { index, id ->
+            findViewById<ImageView>(id)?.setOnClickListener { star ->
+                star.performLightHapticFeedback()
+                selectedRating = index + 1
+                refreshReviewStars()
+                binding.tvReviewStarsError.visibility = View.GONE
+            }
+        }
+        refreshReviewStars()
+    }
+
+    private fun refreshReviewStars() {
+        val activeColor = ContextCompat.getColor(this, R.color.home_ref_gold)
+        val inactiveColor = ContextCompat.getColor(this, R.color.colorBorderLight)
+        reviewStarIds.forEachIndexed { index, id ->
+            val star = findViewById<ImageView>(id) ?: return@forEachIndexed
+            val isActive = index < selectedRating
+            star.setImageResource(if (isActive) R.drawable.ic_star_filled else R.drawable.ic_star_outline)
+            star.setColorFilter(if (isActive) activeColor else inactiveColor)
+        }
+    }
+
+    private fun submitReview(rating: Int, comment: String) {
+        val product = product ?: return
+        lifecycleScope.launch {
+            val review = ProductReview(productId = product.id, rating = rating, comment = comment)
+            runCatching { ReviewService.addReview(product.id, review) }
+                .onSuccess {
+                    showMotionSnackbar(getString(R.string.details_review_saved), R.id.layoutBottomBar)
+                    selectedRating = 0
+                    refreshReviewStars()
+                    binding.etReviewComment.text?.clear()
+                    loadReviews()
+                }
+                .onFailure { error ->
+                    val backendError = error as? BackendFunctionException
+                    if (backendError?.code != FirebaseFunctionsException.Code.FAILED_PRECONDITION) {
+                        CrashlyticsHelper.recordNonFatal(
+                            "ProductDetails",
+                            "Review submit failed productId=${product.id}",
+                            error
+                        )
+                    }
+                    showMotionSnackbar(
+                        backendError?.message ?: getString(R.string.details_review_failed),
+                        R.id.layoutBottomBar
+                    )
+                }
+        }
+    }
+
+    private fun bindBullet(textView: TextView, bullet: String?) {
+        textView.apply {
             val value = bullet?.trim().orEmpty()
             text = value
             visibility = if (value.isBlank()) View.GONE else View.VISIBLE
         }
     }
 
+    private fun setupDescriptionCollapse(description: String) {
+        val tvDescription = binding.tvDescription
+        val maxLines = 4
+        tvDescription.text = description
+
+        if (description.length > 150) {
+            tvDescription.post {
+                tvDescription.maxLines = maxLines
+            }
+
+            val readMoreText = getString(R.string.details_read_more)
+            val readMoreClickable = TextView(this).apply {
+                text = readMoreText
+                setTextColor(ContextCompat.getColor(context, R.color.colorPrimary))
+                typeface = resources.getFont(R.font.manrope_semibold)
+                textSize = 13f
+                setPadding(0, 8.dp, 0, 0)
+                setOnClickListener {
+                    if (tvDescription.maxLines == maxLines) {
+                        tvDescription.maxLines = Int.MAX_VALUE
+                        text = getString(R.string.details_read_less)
+                    } else {
+                        tvDescription.maxLines = maxLines
+                        text = getString(R.string.details_read_more)
+                    }
+                }
+            }
+
+            binding.layoutContent.findViewById<LinearLayout>(R.id.layoutContent)?.let { parent ->
+                val descriptionTitleIndex = parent.indexOfChild(binding.tvDescriptionTitle)
+                if (descriptionTitleIndex >= 0) {
+                    parent.addView(readMoreClickable, descriptionTitleIndex + 2)
+                }
+            }
+        }
+    }
+
     private fun updateQuantityUi() {
+        val product = product ?: return
         val inStock = product.stock > 0
-        findViewById<TextView>(R.id.tvQuantity)?.text = if (inStock) quantity.toString() else "0"
-        findViewById<TextView>(R.id.tvTotalValue)?.text = formatDt(product.price * quantity.coerceAtLeast(0))
-        findViewById<View>(R.id.btnMinus)?.apply {
+        binding.tvQuantity.text = if (inStock) quantity.toString() else "0"
+        binding.tvTotalValue.text = formatDt(product.unitPrice * quantity.coerceAtLeast(0))
+        binding.btnMinus.apply {
             isEnabled = inStock && quantity > 1
             alpha = if (isEnabled) 1f else 0.45f
         }
-        findViewById<View>(R.id.btnPlus)?.apply {
+        binding.btnPlus.apply {
             isEnabled = inStock && quantity < product.stock
             alpha = if (isEnabled) 1f else 0.45f
         }
@@ -268,7 +890,7 @@ class ProductDetailsScreen : AppCompatActivity() {
     private fun animateEntry() {
         if (isReducedMotionEnabled()) return
 
-        val content = findViewById<View>(R.id.layoutContent) ?: return
+        val content = binding.layoutContent
         content.alpha = 0f
         content.translationY = resources.getDimension(R.dimen.details_content_entry_translation_y)
         content.animate()
@@ -280,9 +902,9 @@ class ProductDetailsScreen : AppCompatActivity() {
     }
 
     private fun applyResponsiveLayout() {
-        val imageHeader = findViewById<View>(R.id.layoutImageHeader) ?: return
-        val imageCard = findViewById<MaterialCardView>(R.id.cardProductImage) ?: return
-        val quantitySelector = findViewById<View>(R.id.layoutQuantitySelector) ?: return
+        val imageHeader = binding.layoutImageHeader
+        val imageCard = binding.cardProductImage
+        val quantitySelector = binding.layoutQuantitySelector
 
         val res = resources
         val imageHeaderParams = imageHeader.layoutParams
@@ -321,4 +943,5 @@ class ProductDetailsScreen : AppCompatActivity() {
                 .putExtra(EXTRA_PRODUCT_ID, productId)
         }
     }
+
 }

@@ -35,8 +35,6 @@ class TabDataPrefetcher(context: Context) {
                     }
                     MainActivity.Tab.PROFILE -> {
                         FirebaseAuthManager.currentUser?.uid?.let { uid ->
-                            appContext.getSharedPreferences("profile_prefs", Context.MODE_PRIVATE)
-                                .getString("avatar_uri_$uid", null)
                             FirestoreService.fetchUserProfile(uid)
                             FirestoreService.fetchUserRole(uid)
                         }

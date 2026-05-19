@@ -11,7 +11,9 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class NotificationsAdapter :
+class NotificationsAdapter(
+    private val onNotificationClick: (AppNotification) -> Unit = {}
+) :
     ListAdapter<AppNotification, NotificationsAdapter.ViewHolder>(DiffCallback()) {
 
     companion object {
@@ -41,6 +43,9 @@ class NotificationsAdapter :
         holder.unreadDot.visibility = if (item.isRead) View.GONE else View.VISIBLE
         holder.title.alpha = if (item.isRead) 0.86f else 1f
         holder.message.alpha = if (item.isRead) 0.72f else 1f
+        holder.itemView.setOnClickListener {
+            onNotificationClick(item)
+        }
     }
 
     private fun sanitize(raw: String, fallback: String): String {

@@ -29,7 +29,7 @@
                 android:layout_weight="1"
                 android:textColor="@color/home_text_primary"
                 android:textSize="@dimen/text_size_caption"
-                android:fontFamily="@font/plus_jakarta_sans_bold" />
+                android:fontFamily="@font/manrope_semibold" />
 
             <TextView
                 android:id="@+id/tvAddressState"
@@ -42,7 +42,7 @@
                 android:paddingBottom="4dp"
                 android:textColor="@color/home_chip_text"
                 android:textSize="@dimen/text_size_overline"
-                android:fontFamily="@font/plus_jakarta_sans_medium" />
+                android:fontFamily="@font/manrope_medium" />
         </LinearLayout>
 
         <TextView
@@ -52,7 +52,7 @@
             android:layout_marginTop="8dp"
             android:textColor="@color/home_text_primary"
             android:textSize="@dimen/text_size_caption"
-            android:fontFamily="@font/plus_jakarta_sans_regular" />
+            android:fontFamily="@font/manrope_regular" />
 
         <TextView
             android:id="@+id/tvAddressDetails"
@@ -61,7 +61,7 @@
             android:layout_marginTop="6dp"
             android:textColor="@color/home_text_secondary"
             android:textSize="@dimen/text_size_overline"
-            android:fontFamily="@font/plus_jakarta_sans_regular" />
+            android:fontFamily="@font/manrope_regular" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -82,7 +82,7 @@
                 android:text="@string/auto_mettre_par_dfaut_49b3"
                 android:textColor="?attr/colorPrimary"
                 android:textSize="@dimen/text_size_overline"
-                android:fontFamily="@font/plus_jakarta_sans_medium" />
+                android:fontFamily="@font/manrope_medium" />
 
             <TextView
                 android:id="@+id/tvAddressEdit"
@@ -97,7 +97,7 @@
                 android:text="@string/auto_modifier_898c"
                 android:textColor="@color/home_text_primary"
                 android:textSize="@dimen/text_size_overline"
-                android:fontFamily="@font/plus_jakarta_sans_medium" />
+                android:fontFamily="@font/manrope_medium" />
 
             <TextView
                 android:id="@+id/tvAddressRemove"
@@ -112,7 +112,8 @@
                 android:text="@string/auto_supprimer_ccfd"
                 android:textColor="@color/profile_logout_text"
                 android:textSize="@dimen/text_size_overline"
-                android:fontFamily="@font/plus_jakarta_sans_medium" />
+                android:fontFamily="@font/manrope_medium" />
         </LinearLayout>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>
+

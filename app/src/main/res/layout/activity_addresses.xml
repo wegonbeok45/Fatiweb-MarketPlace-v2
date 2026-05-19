@@ -98,7 +98,7 @@
                         android:text="@string/address_current_label"
                         android:textColor="@color/home_text_secondary"
                         android:textSize="@dimen/text_size_overline"
-                        android:fontFamily="@font/plus_jakarta_sans_regular" />
+                        android:fontFamily="@font/manrope_regular" />
 
                     <TextView
                         android:id="@+id/tvCurrentAddressValue"
@@ -107,7 +107,7 @@
                         android:layout_marginTop="6dp"
                         android:textColor="@color/home_text_primary"
                         android:textSize="@dimen/text_size_body"
-                        android:fontFamily="@font/plus_jakarta_sans_bold" />
+                        android:fontFamily="@font/manrope_semibold" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -133,17 +133,18 @@
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="140dp"
                     android:layout_height="140dp"
-                    app:cardBackgroundColor="@color/home_surface_raised"
+                    app:cardBackgroundColor="@android:color/transparent"
                     app:cardCornerRadius="28dp"
                     app:cardElevation="0dp"
-                    app:strokeColor="@color/colorOutline"
-                    app:strokeWidth="1dp">
+                    app:strokeWidth="0dp">
 
                     <com.airbnb.lottie.LottieAnimationView
                         android:id="@+id/ivAddressesEmptyAnimation"
                         android:layout_width="100dp"
                         android:layout_height="100dp"
+                        android:background="@android:color/transparent"
                         android:layout_gravity="center"
+                        android:scaleType="centerInside"
                         app:lottie_autoPlay="true"
                         app:lottie_loop="true"
                         app:lottie_rawRes="@raw/anim_onboarding_delivery" />
@@ -157,7 +158,7 @@
                     android:text="@string/address_empty_title"
                     android:textColor="@color/home_text_primary"
                     android:textSize="@dimen/text_size_subtitle"
-                    android:fontFamily="@font/plus_jakarta_sans_bold" />
+                    android:fontFamily="@font/manrope_semibold" />
 
                 <TextView
                     android:layout_width="match_parent"
@@ -167,7 +168,7 @@
                     android:text="@string/address_empty_subtitle"
                     android:textColor="@color/home_text_secondary"
                     android:textSize="@dimen/text_size_caption"
-                    android:fontFamily="@font/plus_jakarta_sans_regular" />
+                    android:fontFamily="@font/manrope_regular" />
             </LinearLayout>
 
             <androidx.recyclerview.widget.RecyclerView

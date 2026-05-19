@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="@dimen/space_12"
+    app:cardBackgroundColor="@color/home_surface_raised"
+    app:cardCornerRadius="@dimen/corner_radius_large"
+    app:cardElevation="0dp"
+    app:strokeColor="@color/colorBorderLight"
+    app:strokeWidth="@dimen/stroke_width_default">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/space_16">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tvPaymentBrandBadge"
+                android:layout_width="40dp"
+                android:layout_height="28dp"
+                android:background="@drawable/bg_home_search"
+                android:fontFamily="@font/manrope_semibold"
+                android:gravity="center"
+                android:textColor="@color/profile_text_primary"
+                android:textSize="@dimen/text_size_caption"
+                tools:text="VISA" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/space_12"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tvPaymentLast4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/manrope_semibold"
+                    android:textColor="@color/profile_text_primary"
+                    android:textSize="@dimen/text_size_body"
+                    tools:text="â€¢â€¢â€¢â€¢ 4242" />
+
+                <TextView
+                    android:id="@+id/tvPaymentExpiry"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:textColor="@color/profile_text_secondary"
+                    android:textSize="@dimen/text_size_caption"
+                    tools:text="Expires 12/26" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tvPaymentDefaultChip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_home_loading_panel"
+                android:fontFamily="@font/manrope_semibold"
+                android:paddingStart="@dimen/space_10"
+                android:paddingTop="6dp"
+                android:paddingEnd="@dimen/space_10"
+                android:paddingBottom="6dp"
+                android:text="@string/payment_methods_default"
+                android:textColor="@color/colorPrimary"
+                android:textSize="@dimen/text_size_caption" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_12"
+            android:gravity="end"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/btnPaymentSetDefault"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/manrope_semibold"
+                android:text="@string/payment_methods_set_default"
+                android:textColor="@color/colorPrimary"
+                android:textSize="@dimen/text_size_caption" />
+
+            <TextView
+                android:id="@+id/btnPaymentEdit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/space_16"
+                android:fontFamily="@font/manrope_semibold"
+                android:text="@string/profile_edit_save"
+                android:textColor="@color/profile_text_secondary"
+                android:textSize="@dimen/text_size_caption" />
+
+            <TextView
+                android:id="@+id/btnPaymentRemove"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/space_16"
+                android:fontFamily="@font/manrope_semibold"
+                android:text="@string/payment_methods_remove"
+                android:textColor="@color/colorError"
+                android:textSize="@dimen/text_size_caption" />
+        </LinearLayout>
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>
+

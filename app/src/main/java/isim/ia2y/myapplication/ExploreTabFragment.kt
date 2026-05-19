@@ -1,106 +1,131 @@
 package isim.ia2y.myapplication
 
-import android.content.Intent
 import android.os.Bundle
+import android.graphics.Rect
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.View
+import android.widget.EditText
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isGone
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import kotlinx.coroutines.launch
 
 class ExploreTabFragment : Fragment(R.layout.fragment_explore_tab) {
+    private val featuredAdapter by lazy {
+        CategoryCardAdapter(CategoryCardAdapter.Mode.COMPACT, ::openCategory)
+    }
+    private val allAdapter by lazy {
+        CategoryCardAdapter(CategoryCardAdapter.Mode.GRID, ::openCategory)
+    }
+    private var searchQuery: String = ""
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        view.applyStatusBarInset()
         view.findViewById<View?>(R.id.layoutBottomNav)?.isGone = true
         view.findViewById<View?>(R.id.viewBottomDivider)?.isGone = true
-        setupHeaderAndExploreActions(view)
-        polishExploreUi()
-        setStaticSearchHint(view)
+        setupCategoryLists(view)
+        setupSearch(view)
+        renderCategories(view)
         CatalogSyncManager.refreshAsync(force = false)
+        refreshMarketplaceCategories(view)
     }
 
     override fun onResume() {
         super.onResume()
         (activity as? MainActivity)?.updateHostCartBadge()
-        updateNotificationBadge()
     }
 
-    private fun updateNotificationBadge() {
-        val badge = view?.findViewById<View>(R.id.notificationBadge) ?: return
-        badge.visibility = if (NotificationStore.hasUnread(requireContext())) View.VISIBLE else View.GONE
-    }
-
-    private fun setupHeaderAndExploreActions(root: View) {
-        root.findViewById<View>(R.id.ivHomeLogo)?.setOnClickListener {
-            (activity as? MainActivity)?.selectTab(MainActivity.Tab.HOME)
-        }
-        root.findViewById<View>(R.id.tvBrand)?.setOnClickListener {
-            (activity as? MainActivity)?.selectTab(MainActivity.Tab.HOME)
-        }
-        root.findViewById<View>(R.id.ivTopCart)?.setOnClickListener {
-            (activity as? MainActivity)?.selectTab(MainActivity.Tab.CART)
-        }
-
-        (activity as? AppCompatActivity)?.bindNotificationEntry(R.id.ivTopNotifications)
-        bindCategorySearch(root, R.id.cardCategoryArtisanat, "craft")
-        bindCategorySearch(root, R.id.cardCategoryCosmetiques, "beauty")
-        bindCategorySearch(root, R.id.cardCategoryEpices, "food")
-        bindCategorySearch(root, R.id.cardCategoryVetements, "fashion")
-        bindCategorySearch(root, R.id.cardCategoryDecoration, "decor")
-        bindCategorySearch(root, R.id.cardCategoryHuiles, "food")
-    }
-
-    private fun polishExploreUi() {
-        (activity as? AppCompatActivity)?.applyPressFeedback(
-            R.id.ivHomeLogo,
-            R.id.tvBrand,
-            R.id.ivTopCart,
-            R.id.ivTopNotifications,
-            R.id.cardCategoryArtisanat,
-            R.id.cardCategoryCosmetiques,
-            R.id.cardCategoryEpices,
-            R.id.cardCategoryVetements,
-            R.id.cardCategoryDecoration,
-            R.id.cardCategoryHuiles
-        )
-
-        (activity as? AppCompatActivity)?.window?.decorView?.post {
-            (activity as? AppCompatActivity)?.animateExploreEntrance(
-                topSectionId = R.id.layoutTopSection,
-                scrollId = R.id.scrollExploreContent,
-                bottomNavId = 0,
-                cardIds = intArrayOf(
-                    R.id.cardCategoryArtisanat,
-                    R.id.cardCategoryCosmetiques,
-                    R.id.cardCategoryEpices,
-                    R.id.cardCategoryVetements,
-                    R.id.cardCategoryDecoration,
-                    R.id.cardCategoryHuiles
-                )
-            )
-        }
-    }
-
-    private fun setStaticSearchHint(root: View) {
-        val searchHint = root.findViewById<TextView>(R.id.tvSearchPlaceholder) ?: return
-        searchHint.text = getString(R.string.auto_search_products_makers_or_3406)
-    }
-
-    private fun bindCategorySearch(root: View, viewId: Int, category: String) {
-        root.findViewById<View?>(viewId)?.setOnClickListener {
-            val host = activity as? AppCompatActivity ?: return@setOnClickListener
-            startActivity(Intent(requireContext(), SearchActivity::class.java).apply {
-                putExtra(SearchActivity.EXTRA_INITIAL_CATEGORY, category)
-            })
-            if (host.isReducedMotionEnabled()) {
-                host.overridePendingTransition(0, 0)
-            } else {
-                host.overridePendingTransition(
-                    R.anim.motion_activity_enter_from_top,
-                    R.anim.motion_activity_exit_stay
-                )
+    private fun setupCategoryLists(root: View) {
+        val ctx = requireContext()
+        val featuredGap = resources.getDimensionPixelSize(R.dimen.marketplace_category_featured_gap)
+        root.findViewById<RecyclerView>(R.id.rvFeaturedCategories)?.apply {
+            layoutManager = LinearLayoutManager(ctx, LinearLayoutManager.HORIZONTAL, false)
+            adapter = featuredAdapter
+            isNestedScrollingEnabled = false
+            clipToPadding = false
+            if (itemDecorationCount == 0) {
+                addItemDecoration(FeaturedSpacingDecoration(featuredGap))
             }
+        }
+        root.findViewById<RecyclerView>(R.id.rvAllCategories)?.setupGrid(allAdapter)
+    }
+
+    private fun RecyclerView.setupGrid(categoryAdapter: CategoryCardAdapter) {
+        layoutManager = GridLayoutManager(requireContext(), 2)
+        adapter = categoryAdapter
+        isNestedScrollingEnabled = false
+        clipToPadding = false
+        if (itemDecorationCount == 0) {
+            addItemDecoration(CategoryGridSpacingDecoration(resources.getDimensionPixelSize(R.dimen.home_products_column_gap)))
+        }
+    }
+
+    private fun setupSearch(root: View) {
+        root.findViewById<EditText>(R.id.etCategorySearch)?.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                searchQuery = s?.toString().orEmpty()
+                renderCategories(root)
+            }
+            override fun afterTextChanged(s: Editable?) = Unit
+        })
+    }
+
+    private fun refreshMarketplaceCategories(root: View) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            runCatching { MarketplaceCategories.refreshFromFirestore() }
+                .onSuccess { renderCategories(root) }
+        }
+    }
+
+    private fun renderCategories(root: View) {
+        val topCategories = MarketplaceCategories.items
+            .filter { MarketplaceCategories.searchMatches(it, searchQuery) }
+        val featured = topCategories.filter { it.featured }
+
+        featuredAdapter.submitList(featured)
+        allAdapter.submitList(topCategories)
+
+        val featuredVisible = featured.isNotEmpty()
+        root.findViewById<View>(R.id.layoutFeaturedHeader)?.visibility =
+            if (featuredVisible) View.VISIBLE else View.GONE
+        root.findViewById<RecyclerView>(R.id.rvFeaturedCategories)?.visibility =
+            if (featuredVisible) View.VISIBLE else View.GONE
+        root.findViewById<View>(R.id.layoutCategoriesEmpty)?.visibility =
+            if (topCategories.isEmpty()) View.VISIBLE else View.GONE
+    }
+
+    private fun openCategory(category: MarketplaceCategory) {
+        val host = requireActivity()
+        startActivity(CategoryProductsActivity.createIntent(host, category.id))
+        host.overridePendingTransition(R.anim.motion_activity_enter_forward, R.anim.motion_activity_exit_forward)
+    }
+
+    private class CategoryGridSpacingDecoration(
+        private val spacing: Int
+    ) : RecyclerView.ItemDecoration() {
+        override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
+            val position = parent.getChildAdapterPosition(view)
+            if (position == RecyclerView.NO_POSITION) return
+            val column = position % 2
+            outRect.left = if (column == 0) 0 else spacing / 2
+            outRect.right = if (column == 0) spacing / 2 else 0
+            if (position >= 2) outRect.top = spacing
+        }
+    }
+
+    private class FeaturedSpacingDecoration(
+        private val spacing: Int
+    ) : RecyclerView.ItemDecoration() {
+        override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
+            val position = parent.getChildAdapterPosition(view)
+            if (position == RecyclerView.NO_POSITION) return
+            if (position > 0) outRect.left = spacing
         }
     }
 }

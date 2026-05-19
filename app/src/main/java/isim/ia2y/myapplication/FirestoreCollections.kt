@@ -12,4 +12,5 @@ object FirestoreCollections {
     const val FAVORITES = "favorites"
     const val APP_CONFIG = "config"
     const val COMMERCE = "commerce"
+    const val CONVERSATIONS = "conversations"
 }

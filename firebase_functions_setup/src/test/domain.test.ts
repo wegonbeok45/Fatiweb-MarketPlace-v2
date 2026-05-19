@@ -13,9 +13,13 @@ test("minor-unit conversion stays stable for dinar amounts", () => {
   assert.equal(fromMinorUnits(12500), 12.5);
 });
 
-test("order transitions allow forward movement only", () => {
-  assert.equal(canTransitionOrderStatus("pending", "preparing"), true);
-  assert.equal(canTransitionOrderStatus("shipped", "pending"), false);
+test("order transitions follow the production order lifecycle", () => {
+  assert.equal(canTransitionOrderStatus("pending", "confirmed"), true);
+  assert.equal(canTransitionOrderStatus("confirmed", "preparing"), true);
+  assert.equal(canTransitionOrderStatus("preparing", "shipped"), true);
+  assert.equal(canTransitionOrderStatus("shipped", "delivered"), true);
+  assert.equal(canTransitionOrderStatus("delivered", "pending"), false);
+  assert.equal(canTransitionOrderStatus("cancelled", "confirmed"), false);
 });
 
 test("tracking events replace duplicate statuses and stay sorted", () => {
@@ -35,5 +39,19 @@ test("tracking events replace duplicate statuses and stay sorted", () => {
 
 test("keyword generation deduplicates repeated search terms", () => {
   const keywords = generateSearchKeywords("FatiWeb lamp", "Craft lamp", ["lamp", "decor"]);
-  assert.deepEqual(keywords, ["fatiweb", "lamp", "craft", "decor"]);
+  assert.deepEqual(keywords, [
+    "fatiweb",
+    "fat",
+    "fati",
+    "fatiw",
+    "fatiwe",
+    "lamp",
+    "lam",
+    "craft",
+    "cra",
+    "craf",
+    "decor",
+    "dec",
+    "deco",
+  ]);
 });

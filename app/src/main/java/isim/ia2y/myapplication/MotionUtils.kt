@@ -163,6 +163,15 @@ fun AppCompatActivity.revealViewsInOrder(
     val interpolator = FastOutSlowInInterpolator()
     ids.forEachIndexed { index, id ->
         val view = findViewById<View?>(id) ?: return@forEachIndexed
+        if (isStableChromeId(id)) {
+            view.alpha = 1f
+            view.translationX = 0f
+            view.translationY = 0f
+            view.scaleX = 1f
+            view.scaleY = 1f
+            view.visibility = View.VISIBLE
+            return@forEachIndexed
+        }
         view.alpha = 0f
         view.translationY = distance
         view.animate()
@@ -173,6 +182,12 @@ fun AppCompatActivity.revealViewsInOrder(
             .setInterpolator(interpolator)
             .start()
     }
+}
+
+private fun AppCompatActivity.isStableChromeId(@IdRes id: Int): Boolean {
+    val name = runCatching { resources.getResourceEntryName(id) }.getOrDefault("")
+    return name.contains("TopBar", ignoreCase = true) ||
+        name.contains("AppBar", ignoreCase = true)
 }
 
 fun AppCompatActivity.revealSingleView(
@@ -245,20 +260,36 @@ fun AppCompatActivity.emphasizeCta(@IdRes id: Int, delayMs: Long = 260L) {
     }, delayMs)
 }
 
+/**
+ * Routes generic snackbar calls to the typed feedback system, auto-classifying by message
+ * heuristic so legacy callers light up in red/green without per-site updates.
+ */
 fun AppCompatActivity.showMotionSnackbar(message: String, @IdRes anchorId: Int? = null) {
-    val root = findViewById<View>(android.R.id.content)
-    val snackbar = Snackbar.make(root, message, Snackbar.LENGTH_SHORT)
-    anchorId?.let { snackbar.anchorView = findViewById(it) }
-    snackbar.show()
-
-    if (!isReducedMotionEnabled()) {
-        snackbar.view.alpha = 0f
-        snackbar.view.translationY = 20f * resources.displayMetrics.density
-        snackbar.view.animate()
-            .alpha(1f)
-            .translationY(0f)
-            .setDuration(MotionTokens.EMPHASIS)
-            .setInterpolator(FastOutSlowInInterpolator())
-            .start()
-    }
+    showFeedback(message, classifyFeedback(message), anchorId)
 }
+
+private fun classifyFeedback(message: String): FeedbackType {
+    val m = message.lowercase()
+    val isError = ERROR_HINTS.any { m.contains(it) }
+    if (isError) return FeedbackType.ERROR
+    val isSuccess = SUCCESS_HINTS.any { m.contains(it) }
+    if (isSuccess) return FeedbackType.SUCCESS
+    return FeedbackType.INFO
+}
+
+private val ERROR_HINTS = listOf(
+    "impossible", "echec", "échec", "erreur", "invalide", "refus", "refuse",
+    "denied", "failed", "error", "unauthor", "interdit", "non autoris",
+    "indisponible", "introuvable", "expir", "incorrect", "manquant",
+    "permission", "perdu", "perdue",
+    // Negation phrases — force ERROR even if a success keyword appears later
+    "ne peut pas", "n a pas pu", "n'a pas pu", "n'avons pas", "n avons pas",
+    "pas pu", "couldn't", "can't", "cannot", "cant "
+)
+private val SUCCESS_HINTS = listOf(
+    "succes", "succès", "réussi", "reussi", "enregistr", "ajout",
+    "publi", "mis à jour", "mis a jour", "envoyé", "envoyée", "envoye",
+    "supprim", "saved", "added", "updated", "deleted", "published",
+    "sent", "applied", "confirmée", "confirmee", "confirmed", "validé",
+    "valide"
+)

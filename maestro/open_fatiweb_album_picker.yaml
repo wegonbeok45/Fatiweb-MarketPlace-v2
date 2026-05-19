@@ -1,0 +1,9 @@
+appId: isim.ia2y.myapplication
+---
+- tapOn:
+    id: "isim.ia2y.myapplication:id/adminProductEditorBtnPickImage"
+- extendedWaitUntil:
+    visible: "Albums"
+    timeout: 15000
+- tapOn: "Albums"
+- takeScreenshot: image-picker-albums

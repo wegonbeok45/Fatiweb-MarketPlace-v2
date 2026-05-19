@@ -3,9 +3,12 @@ import {HttpsError, onCall} from "firebase-functions/v2/https";
 import {COLLECTIONS, SCHEMA_VERSION} from "../shared/constants";
 import {assertAuthenticated} from "../shared/auth";
 import {admin, db} from "../shared/firestore";
+import {trustedCallableOptions} from "../shared/callableOptions";
 import {asMillis, asNumber, asRecord, asString} from "../shared/domain";
 
-export const submitReview = onCall(async (request) => {
+const MAX_REVIEW_COMMENT_LENGTH = 1000;
+
+export const submitReview = onCall(trustedCallableOptions, async (request) => {
   const authContext = assertAuthenticated(request);
   const payload = asRecord(request.data) || {};
   const productId = asString(payload.productId).trim();
@@ -13,12 +16,37 @@ export const submitReview = onCall(async (request) => {
   const rating = Math.max(1, Math.min(5, Math.floor(asNumber(reviewPayload.rating))));
   const comment = asString(reviewPayload.comment).trim();
 
-  if (!productId || comment.length < 3) {
+  if (!productId || comment.length < 3 || comment.length > MAX_REVIEW_COMMENT_LENGTH) {
     throw new HttpsError("invalid-argument", "A productId and review comment are required.");
   }
 
+  const orderSnapshot = await db.collection(COLLECTIONS.ORDERS)
+    .where("uid", "==", authContext.uid)
+    .orderBy("createdAt", "desc")
+    .limit(50)
+    .get();
+  const hasPurchased = orderSnapshot.docs.some((doc) => {
+    const status = asString(doc.get("status")).trim().toLowerCase();
+    if (status !== "delivered") {
+      return false;
+    }
+    const items = doc.get("items");
+    return Array.isArray(items) && items.some((item) => {
+      const record = asRecord(item);
+      return asString(record?.productId).trim() === productId;
+    });
+  });
+  if (!hasPurchased) {
+    throw new HttpsError("failed-precondition", "Only verified purchasers can review this product.");
+  }
+
   const productRef = db.collection(COLLECTIONS.PRODUCTS).doc(productId);
-  const reviewRef = productRef.collection("reviews").doc(authContext.uid);
+  const existingReviewSnapshot = await productRef.collection("reviews")
+    .where("userId", "==", authContext.uid)
+    .limit(1)
+    .get();
+  const reviewRef = existingReviewSnapshot.docs[0]?.ref ??
+    productRef.collection("reviews").doc(authContext.uid);
   const userRef = db.collection(COLLECTIONS.USERS).doc(authContext.uid);
   const nowMs = Date.now();
   let responseReview: Record<string, unknown> | null = null;
@@ -30,6 +58,9 @@ export const submitReview = onCall(async (request) => {
 
     if (!productDoc.exists) {
       throw new HttpsError("not-found", "Product not found.");
+    }
+    if (asString(productDoc.get("sellerId")).trim() === authContext.uid) {
+      throw new HttpsError("failed-precondition", "You cannot review your own product.");
     }
 
     const currentRating = asNumber(productDoc.get("rating"), 0);

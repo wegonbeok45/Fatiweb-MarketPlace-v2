@@ -11,48 +11,78 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layoutTopBar"
         android:layout_width="0dp"
-        android:layout_height="@dimen/app_top_bar_height"
+        android:layout_height="wrap_content"
         android:background="@color/profile_header_bg"
-        android:paddingStart="@dimen/app_top_bar_horizontal_padding"
-        android:paddingEnd="@dimen/app_top_bar_horizontal_padding"
+        android:paddingStart="@dimen/home_ref_horizontal_padding"
+        android:paddingTop="@dimen/home_ref_top_padding"
+        android:paddingEnd="@dimen/home_ref_horizontal_padding"
+        android:paddingBottom="12dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
             android:id="@+id/ivBack"
-            android:layout_width="@dimen/app_top_bar_side_slot_size"
-            android:layout_height="@dimen/app_top_bar_side_slot_size"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
             android:contentDescription="@string/cd_back"
-            android:padding="@dimen/surface_button_inner_padding"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:visibility="gone"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/back"
-            app:tint="@color/profile_text_primary" />
+            app:tint="@color/home_ref_text_primary" />
 
         <TextView
-            android:id="@+id/tvTitle"
-            style="@style/AppTopBar.Title.Profile"
+            android:id="@+id/tvTopBrand"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/nav_tab_profile"
+            android:text="@string/app_name"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <ImageView
-            android:id="@+id/ivNotifications"
-            android:layout_width="@dimen/app_top_bar_side_slot_size"
-            android:layout_height="@dimen/app_top_bar_side_slot_size"
-            android:contentDescription="@string/cd_notifications"
-            android:padding="@dimen/surface_button_inner_padding"
-            app:layout_constraintBottom_toBottomOf="parent"
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/manrope_semibold"
+            android:includeFontPadding="false"
+            android:text="@string/nav_tab_profile"
+            android:textColor="@color/home_ref_text_primary"
+            android:textSize="22sp"
+            app:layout_constraintBottom_toBottomOf="@id/notificationContainer"
+            app:layout_constraintEnd_toStartOf="@id/notificationContainer"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/notificationContainer" />
+
+        <FrameLayout
+            android:id="@+id/notificationContainer"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/notification"
-            app:tint="@color/profile_text_primary" />
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/ivNotifications"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center"
+                android:contentDescription="@string/cd_notifications"
+                app:srcCompat="@drawable/notification"
+                app:tint="@color/home_ref_nav_icon" />
+
+            <View
+                android:id="@+id/notificationBadge"
+                android:layout_width="8dp"
+                android:layout_height="8dp"
+                android:layout_gravity="end|top"
+                android:layout_marginTop="9dp"
+                android:layout_marginEnd="9dp"
+                android:background="@drawable/bg_notification_badge"
+                android:backgroundTint="@color/home_ref_gold"
+                android:visibility="gone" />
+        </FrameLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <View
@@ -68,7 +98,9 @@
         android:id="@+id/layoutHeader"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:paddingStart="@dimen/space_20"
         android:paddingTop="@dimen/profile_header_padding_top"
+        android:paddingEnd="@dimen/space_20"
         android:paddingBottom="@dimen/profile_header_padding_bottom"
         android:background="@color/profile_header_bg"
         app:layout_constraintEnd_toEndOf="parent"
@@ -77,9 +109,9 @@
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardAvatar"
-            android:layout_width="@dimen/profile_header_avatar_size"
-            android:layout_height="@dimen/profile_header_avatar_size"
-            app:cardCornerRadius="@dimen/profile_header_avatar_corner_radius"
+            android:layout_width="88dp"
+            android:layout_height="88dp"
+            app:cardCornerRadius="44dp"
             app:cardElevation="0dp"
             app:strokeWidth="0dp"
             app:layout_constraintEnd_toEndOf="parent"
@@ -92,30 +124,25 @@
                 android:layout_height="match_parent"
                 android:contentDescription="@string/cd_profile_avatar"
                 android:scaleType="centerCrop"
+                android:background="@color/profile_card_icon_bg"
                 app:srcCompat="@drawable/profile_avatar_art" />
+
         </com.google.android.material.card.MaterialCardView>
 
-        <com.google.android.material.card.MaterialCardView
+        <ImageView
             android:id="@+id/cardEdit"
-            android:layout_width="@dimen/profile_edit_button_size_exact"
-            android:layout_height="@dimen/profile_edit_button_size_exact"
-            android:layout_marginEnd="-4dp"
-            android:layout_marginBottom="-4dp"
-            app:cardBackgroundColor="?attr/colorPrimary"
-            app:cardCornerRadius="@dimen/profile_header_edit_corner_radius"
-            app:cardElevation="2dp"
-            app:strokeWidth="2dp"
-            app:strokeColor="@color/colorSurface"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="@drawable/bg_edit_avatar"
+            android:contentDescription="@string/cd_edit"
+            android:elevation="4dp"
+            android:padding="7dp"
+            android:translationX="2dp"
+            android:translationY="2dp"
             app:layout_constraintBottom_toBottomOf="@id/cardAvatar"
-            app:layout_constraintEnd_toEndOf="@id/cardAvatar">
-
-            <ImageView
-                android:layout_width="14dp"
-                android:layout_height="14dp"
-                android:layout_gravity="center"
-                app:srcCompat="@drawable/ic_profile_edit"
-                app:tint="@color/white"  android:contentDescription="@string/cd_edit" />
-        </com.google.android.material.card.MaterialCardView>
+            app:layout_constraintEnd_toEndOf="@id/cardAvatar"
+            app:srcCompat="@drawable/ic_profile_edit"
+            app:tint="@color/white" />
 
         <TextView
             android:id="@+id/tvUserName"
@@ -145,7 +172,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/layoutMeta"
-            tools:text="guest@fatiweb.tn • Email vérifié" />
+            tools:text="guest@fatiweb.tn â€¢ Email vÃ©rifiÃ©" />
 
         <LinearLayout
             android:id="@+id/layoutMeta"
@@ -171,7 +198,7 @@
                 android:textColor="@color/colorAccentDeep"
                 android:textSize="@dimen/text_size_caption"
                 android:textStyle="bold"
-                android:fontFamily="@font/plus_jakarta_sans_bold" />
+                android:fontFamily="@font/manrope_semibold" />
 
             <View
                 android:layout_width="4dp"
@@ -190,7 +217,7 @@
                 android:text="@string/profile_location_fallback"
                 android:textColor="@color/profile_text_secondary"
                 android:textSize="@dimen/text_size_caption"
-                android:fontFamily="@font/plus_jakarta_sans_regular" />
+                android:fontFamily="@font/manrope_regular" />
         </LinearLayout>
 
         <com.google.android.material.button.MaterialButton
@@ -200,6 +227,7 @@
             android:layout_marginTop="@dimen/space_12"
             android:insetTop="0dp"
             android:insetBottom="0dp"
+            android:letterSpacing="0"
             android:text="@string/profile_admin_dashboard_action"
             android:textAllCaps="false"
             android:visibility="gone"
@@ -215,6 +243,19 @@
             app:rippleColor="@color/profile_card_icon_bg"
             app:strokeColor="@color/colorBorderLight"
             app:strokeWidth="1dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnEditProfileHeader"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:letterSpacing="0"
+            android:text="@string/profile_edit_title"
+            android:textAllCaps="false"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/cardAdmin" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.core.widget.NestedScrollView
@@ -267,12 +308,12 @@
 
                         <ImageView
                             android:id="@+id/ivOrdersIcon"
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
-                            app:srcCompat="@drawable/ic_bottom_nav_cart"
+                            app:srcCompat="@drawable/ic_profile_orders_outline"
                             app:tint="@color/profile_text_primary"  android:contentDescription="@string/cd_nav_cart" />
 
                         <TextView
@@ -280,7 +321,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="16dp"
-                            android:fontFamily="@font/plus_jakarta_sans_bold"
+                            android:fontFamily="@font/manrope_semibold"
                             android:text="@string/auto_my_orders_f915"
                             android:textColor="@color/profile_text_primary"
                             android:textSize="@dimen/text_size_body"
@@ -292,8 +333,9 @@
 
                         <ImageView
                             android:id="@+id/ivOrdersChevron"
-                            android:layout_width="16dp"
-                            android:layout_height="16dp"
+                            android:layout_width="@dimen/profile_chevron_touch_target"
+                            android:layout_height="@dimen/profile_chevron_touch_target"
+                            android:padding="@dimen/space_14"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
@@ -320,12 +362,12 @@
 
                         <ImageView
                             android:id="@+id/ivAddressesIcon"
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
-                            app:srcCompat="@drawable/map"
+                            app:srcCompat="@drawable/ic_profile_map_outline"
                             app:tint="@color/profile_text_primary"  android:contentDescription="@string/cd_location" />
 
                         <TextView
@@ -333,7 +375,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="16dp"
-                            android:fontFamily="@font/plus_jakarta_sans_bold"
+                            android:fontFamily="@font/manrope_semibold"
                             android:text="@string/auto_shipping_addresses_0511"
                             android:textColor="@color/profile_text_primary"
                             android:textSize="@dimen/text_size_body"
@@ -345,8 +387,9 @@
 
                         <ImageView
                             android:id="@+id/ivAddressesChevron"
-                            android:layout_width="16dp"
-                            android:layout_height="16dp"
+                            android:layout_width="@dimen/profile_chevron_touch_target"
+                            android:layout_height="@dimen/profile_chevron_touch_target"
+                            android:padding="@dimen/space_14"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
@@ -372,20 +415,20 @@
 
                         <ImageView
                             android:id="@+id/ivAccountCenterIcon"
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
                             android:contentDescription="@string/cd_profile_avatar"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
-                            app:srcCompat="@drawable/ic_profile_nav_user"
+                            app:srcCompat="@drawable/ic_profile_user_outline"
                             app:tint="@color/profile_text_primary" />
 
                         <TextView
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="16dp"
-                            android:fontFamily="@font/plus_jakarta_sans_bold"
+                            android:fontFamily="@font/manrope_semibold"
                             android:text="@string/profile_account_center_title"
                             android:textColor="@color/profile_text_primary"
                             android:textSize="@dimen/text_size_body"
@@ -397,8 +440,9 @@
 
                         <ImageView
                             android:id="@+id/ivAccountCenterChevron"
-                            android:layout_width="16dp"
-                            android:layout_height="16dp"
+                            android:layout_width="@dimen/profile_chevron_touch_target"
+                            android:layout_height="@dimen/profile_chevron_touch_target"
+                            android:padding="@dimen/space_14"
                             android:importantForAccessibility="no"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
@@ -426,12 +470,12 @@
 
                         <ImageView
                             android:id="@+id/ivSettingsIcon"
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
-                            app:srcCompat="@drawable/settings"
+                            app:srcCompat="@drawable/ic_profile_settings_outline"
                             app:tint="@color/profile_text_primary"  android:contentDescription="@string/cd_settings" />
 
                         <TextView
@@ -439,7 +483,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="16dp"
-                            android:fontFamily="@font/plus_jakarta_sans_bold"
+                            android:fontFamily="@font/manrope_semibold"
                             android:text="@string/profile_settings_title"
                             android:textColor="@color/profile_text_primary"
                             android:textSize="@dimen/text_size_body"
@@ -451,8 +495,9 @@
 
                         <ImageView
                             android:id="@+id/ivSettingsChevron"
-                            android:layout_width="16dp"
-                            android:layout_height="16dp"
+                            android:layout_width="@dimen/profile_chevron_touch_target"
+                            android:layout_height="@dimen/profile_chevron_touch_target"
+                            android:padding="@dimen/space_14"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
@@ -478,20 +523,20 @@
 
                         <ImageView
                             android:id="@+id/ivPrivacyIcon"
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
                             android:contentDescription="@string/profile_privacy_title"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
-                            app:srcCompat="@drawable/ic_admin_shield"
+                            app:srcCompat="@drawable/ic_profile_shield_outline"
                             app:tint="@color/profile_text_primary" />
 
                         <TextView
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="16dp"
-                            android:fontFamily="@font/plus_jakarta_sans_bold"
+                            android:fontFamily="@font/manrope_semibold"
                             android:text="@string/profile_privacy_title"
                             android:textColor="@color/profile_text_primary"
                             android:textSize="@dimen/text_size_body"
@@ -503,8 +548,9 @@
 
                         <ImageView
                             android:id="@+id/ivPrivacyChevron"
-                            android:layout_width="16dp"
-                            android:layout_height="16dp"
+                            android:layout_width="@dimen/profile_chevron_touch_target"
+                            android:layout_height="@dimen/profile_chevron_touch_target"
+                            android:padding="@dimen/space_14"
                             android:importantForAccessibility="no"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
@@ -532,12 +578,12 @@
 
                         <ImageView
                             android:id="@+id/ivHelpIcon"
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
-                            app:srcCompat="@drawable/ic_profile_help"
+                            app:srcCompat="@drawable/ic_profile_help_outline"
                             app:tint="@color/profile_text_primary"  android:contentDescription="@string/cd_menu" />
 
                         <TextView
@@ -545,7 +591,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="16dp"
-                            android:fontFamily="@font/plus_jakarta_sans_bold"
+                            android:fontFamily="@font/manrope_semibold"
                             android:text="@string/auto_help_center_efda"
                             android:textColor="@color/profile_text_primary"
                             android:textSize="@dimen/text_size_body"
@@ -557,16 +603,176 @@
 
                         <ImageView
                             android:id="@+id/ivHelpChevron"
-                            android:layout_width="16dp"
-                            android:layout_height="16dp"
+                            android:layout_width="@dimen/profile_chevron_touch_target"
+                            android:layout_height="@dimen/profile_chevron_touch_target"
+                            android:padding="@dimen/space_14"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
                             app:srcCompat="@drawable/ic_profile_chevron_right"
                             app:tint="@color/profile_chevron"  android:importantForAccessibility="no" />
                     </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginStart="56dp"
+                        android:background="@color/profile_section_stroke" />
+
+                    <!-- About -->
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/cardAbout"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/profile_menu_item_height_compact"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?attr/selectableItemBackground"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp">
+
+                        <ImageView
+                            android:id="@+id/ivAboutIcon"
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:contentDescription="@string/settings_about_title"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:srcCompat="@drawable/ic_profile_help_outline"
+                            app:tint="@color/profile_text_primary" />
+
+                        <TextView
+                            android:id="@+id/tvAboutTitle"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="16dp"
+                            android:fontFamily="@font/manrope_semibold"
+                            android:text="@string/settings_about_title"
+                            android:textColor="@color/profile_text_primary"
+                            android:textSize="@dimen/text_size_body"
+                            android:textStyle="bold"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toStartOf="@id/ivAboutChevron"
+                            app:layout_constraintStart_toEndOf="@id/ivAboutIcon"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <ImageView
+                            android:id="@+id/ivAboutChevron"
+                            android:layout_width="@dimen/profile_chevron_touch_target"
+                            android:layout_height="@dimen/profile_chevron_touch_target"
+                            android:padding="@dimen/space_14"
+                            android:importantForAccessibility="no"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:srcCompat="@drawable/ic_profile_chevron_right"
+                            app:tint="@color/profile_chevron" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
+
+            <LinearLayout
+                android:id="@+id/layoutProfileQuickActions"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_12"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardWishlistQuick"
+                    android:layout_width="0dp"
+                    android:layout_height="56dp"
+                    android:layout_weight="1"
+                    android:clickable="true"
+                    android:focusable="true"
+                    app:cardBackgroundColor="@color/profile_section_bg"
+                    app:cardCornerRadius="@dimen/corner_radius_medium"
+                    app:cardElevation="0dp"
+                    app:strokeColor="@color/profile_section_stroke"
+                    app:strokeWidth="@dimen/stroke_width_default" />
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardQuickAddresses"
+                    android:layout_width="0dp"
+                    android:layout_height="56dp"
+                    android:layout_marginStart="@dimen/space_8"
+                    android:layout_weight="1"
+                    android:clickable="true"
+                    android:focusable="true"
+                    app:cardBackgroundColor="@color/profile_section_bg"
+                    app:cardCornerRadius="@dimen/corner_radius_medium"
+                    app:cardElevation="0dp"
+                    app:strokeColor="@color/profile_section_stroke"
+                    app:strokeWidth="@dimen/stroke_width_default" />
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardQuickSupport"
+                    android:layout_width="0dp"
+                    android:layout_height="56dp"
+                    android:layout_marginStart="@dimen/space_8"
+                    android:layout_weight="1"
+                    android:clickable="true"
+                    android:focusable="true"
+                    app:cardBackgroundColor="@color/profile_section_bg"
+                    app:cardCornerRadius="@dimen/corner_radius_medium"
+                    app:cardElevation="0dp"
+                    app:strokeColor="@color/profile_section_stroke"
+                    app:strokeWidth="@dimen/stroke_width_default" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/layoutProfileRecentlyViewedHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_16"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/manrope_semibold"
+                    android:text="@string/profile_recently_viewed_title"
+                    android:textColor="@color/profile_text_primary"
+                    android:textSize="@dimen/text_size_body"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/profileRecentSeeAll"
+                    android:layout_width="wrap_content"
+                    android:layout_height="44dp"
+                    android:gravity="center"
+                    android:text="@string/common_see_all"
+                    android:textColor="?attr/colorPrimary"
+                    android:textSize="@dimen/text_size_caption" />
+            </LinearLayout>
+
+            <HorizontalScrollView
+                android:id="@+id/profileRecentlyViewedScroll"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_8"
+                android:overScrollMode="never"
+                android:scrollbars="none">
+
+                <LinearLayout
+                    android:id="@+id/profileRecentlyViewedList"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal" />
+            </HorizontalScrollView>
+
+            <TextView
+                android:id="@+id/profileRecentlyViewedEmpty"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_8"
+                android:text="@string/details_reviews_empty"
+                android:textColor="@color/profile_text_secondary"
+                android:textSize="@dimen/text_size_caption"
+                android:visibility="gone" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/cardLogout"
@@ -574,17 +780,24 @@
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/profile_logout_height_exact"
                 android:layout_marginTop="@dimen/profile_logout_top_margin_compact"
+                android:fontFamily="@font/manrope_semibold"
+                android:gravity="center"
                 android:insetTop="0dp"
                 android:insetBottom="0dp"
+                android:letterSpacing="0.02"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
                 android:text="@string/auto_log_out_b0c2"
                 android:textAllCaps="false"
-                android:textSize="@dimen/text_size_body"
+                android:textSize="15sp"
                 app:backgroundTint="@color/profile_logout_bg"
-                app:cornerRadius="@dimen/corner_radius_medium"
+                app:cornerRadius="18dp"
                 app:icon="@drawable/ic_profile_logout"
                 app:iconGravity="textStart"
+                app:iconPadding="12dp"
+                app:iconSize="18dp"
                 app:iconTint="@color/profile_logout_text"
-                app:rippleColor="@color/profile_card_icon_bg"
+                app:rippleColor="@color/home_ref_gold_soft"
                 app:strokeColor="@color/profile_logout_border"
                 app:strokeWidth="@dimen/stroke_width_default" />
         </LinearLayout>

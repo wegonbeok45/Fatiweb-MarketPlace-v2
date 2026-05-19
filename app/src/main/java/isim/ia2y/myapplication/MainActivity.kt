@@ -4,12 +4,11 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.addCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
@@ -20,6 +19,7 @@ import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.lifecycle.lifecycleScope
 import androidx.transition.ChangeBounds
 import androidx.transition.TransitionManager
+import com.google.firebase.firestore.ListenerRegistration
 import kotlinx.coroutines.launch
 import isim.ia2y.myapplication.databinding.ActivityMainBinding
 
@@ -35,11 +35,17 @@ class MainActivity : AppCompatActivity() {
     private var pendingTabAnimate = true
     private var loadingErrorTab: Tab? = null
     private var tabLoadRequestToken = 0
+    private var unreadMessagesListener: ListenerRegistration? = null
     private lateinit var tabDataPrefetcher: TabDataPrefetcher
     private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        installSplashScreen()
         super.onCreate(savedInstanceState)
+        if (!isOnboardingCompleted()) {
+            launchOnboardingFromLoader()
+            return
+        }
         enableEdgeToEdge()
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -62,7 +68,8 @@ class MainActivity : AppCompatActivity() {
             )
             binding.hostLayoutBottomNav.apply {
                 updateLayoutParams<androidx.constraintlayout.widget.ConstraintLayout.LayoutParams> {
-                    bottomMargin = systemBars.bottom
+                    bottomMargin = systemBars.bottom +
+                        resources.getDimensionPixelSize(R.dimen.main_bottom_nav_outer_margin_bottom)
                 }
                 setPadding(paddingLeft, paddingTop, paddingRight, 0)
             }
@@ -72,11 +79,7 @@ class MainActivity : AppCompatActivity() {
 
         setupBottomNav()
         setupTabLoadingUi()
-        binding.root.findViewById<View?>(R.id.chatFab)?.visibility = View.GONE
-        binding.root.findViewById<View?>(R.id.chatFabDot)?.visibility = View.GONE
-        binding.main.post {
-            AppStartupCoordinator.startDeferred(this)
-        }
+        setupMessagingEntry()
 
         currentTab = savedInstanceState?.getString(KEY_SELECTED_TAB)
             ?.let { runCatching { Tab.valueOf(it) }.getOrNull() }
@@ -87,6 +90,7 @@ class MainActivity : AppCompatActivity() {
         } else {
             selectTab(currentTab, animate = false)
         }
+        handleNotificationIntent(intent)
         onBackPressedDispatcher.addCallback(this) {
             if (currentTab != Tab.HOME) {
                 selectTab(Tab.HOME, animate = true)
@@ -95,6 +99,7 @@ class MainActivity : AppCompatActivity() {
                 onBackPressedDispatcher.onBackPressed()
             }
         }
+        startDeferredWorkAfterFirstFrame()
     }
 
     override fun onResume() {
@@ -108,9 +113,24 @@ class MainActivity : AppCompatActivity() {
                 runCatching { NotificationStore.refreshFromCloud(this@MainActivity) }
             }
         }
+        if (FirebaseAuthManager.isLoggedIn) {
+            AppNotificationChannels.ensureCreated(this)
+            if (NotificationPreferencesStore.load(this).pushEnabled) {
+                maybeRequestNotificationPermissionForPush()
+            }
+            lifecycleScope.launch {
+                runCatching { FcmTokenService.syncCurrentUserToken(this@MainActivity) }
+            }
+            listenForUnreadMessages()
+        } else {
+            unreadMessagesListener?.remove()
+            unreadMessagesListener = null
+            binding.chatFabDot.visibility = View.GONE
+        }
     }
 
     override fun onDestroy() {
+        unreadMessagesListener?.remove()
         tabDataPrefetcher.shutdown()
         super.onDestroy()
     }
@@ -123,11 +143,29 @@ class MainActivity : AppCompatActivity() {
     override fun onNewIntent(intent: android.content.Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
+        if (handleNotificationIntent(intent)) return
         val requested = intent.getStringExtra(EXTRA_OPEN_TAB)
             ?.let { runCatching { Tab.valueOf(it) }.getOrNull() }
             ?: return
         selectTab(requested, animate = false)
         updateHostCartBadge()
+    }
+
+    private fun handleNotificationIntent(intent: android.content.Intent): Boolean {
+        val conversationId = intent.getStringExtra("conversationId").orEmpty()
+        if (conversationId.isNotBlank()) {
+            intent.removeExtra("conversationId")
+            startActivity(ConversationActivity.createIntent(this, conversationId))
+            return true
+        }
+
+        val orderId = intent.getStringExtra("orderId").orEmpty()
+        if (orderId.isNotBlank()) {
+            intent.removeExtra("orderId")
+            startActivity(OrderDetailsActivity.createIntent(this, orderId))
+            return true
+        }
+        return false
     }
 
     @Suppress("DEPRECATION")
@@ -156,7 +194,7 @@ class MainActivity : AppCompatActivity() {
                 openTabContentDirect(tab, animate)
                 return
             }
-            beginTabSelectionWithLoading(tab, animate)
+            openTabContentDirect(tab, animate)
         }.onFailure { error ->
             Log.e(TAG, "Failed to open tab: $tab", error)
             showToast(getString(R.string.main_tab_load_failed))
@@ -196,6 +234,26 @@ class MainActivity : AppCompatActivity() {
             if (isTabLoading) return@setOnClickListener
             beginTabSelectionWithLoading(retryTab, pendingTabAnimate, forcePrefetch = true)
         }
+    }
+
+    private fun setupMessagingEntry() {
+        binding.chatFab.visibility = View.GONE
+        binding.chatFab.setOnClickListener(null)
+        binding.chatFabDot.visibility = View.GONE
+    }
+
+    private fun startDeferredWorkAfterFirstFrame() {
+        binding.root.post {
+            binding.root.post {
+                if (!isFinishing && !isDestroyed) {
+                    AppStartupCoordinator.startDeferred(applicationContext)
+                }
+            }
+        }
+    }
+
+    private fun listenForUnreadMessages() {
+        binding.chatFabDot.visibility = View.GONE
     }
 
     private fun updateBottomNavSelection(selected: Tab) {
@@ -377,14 +435,14 @@ class MainActivity : AppCompatActivity() {
 
     private fun setNavItemState(
         icon: ImageView,
-        label: TextView?, 
+        label: TextView?,
         active: Boolean
     ) {
         val color = ContextCompat.getColor(
             this,
-            if (active) R.color.home_nav_active else R.color.home_nav_inactive
+            if (active) R.color.home_ref_text_primary else R.color.home_ref_nav_icon
         )
-        
+
         icon.animate().cancel()
         if (active) {
             icon.scaleX = 0.9f
@@ -412,6 +470,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         icon.setColorFilter(color)
+        icon.alpha = if (active) 1f else 0.92f
 
         if (label != null) {
             label.setTextColor(color)
@@ -438,7 +497,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateTabIndicator(tab: Tab, animate: Boolean) {
-        val navContainer = binding.hostLayoutBottomNav
+        val navContainer = binding.hostBottomNavConstraint
         val indicator = binding.navIndicator
         
         val targetViewId = getTabContainerId(tab)

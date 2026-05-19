@@ -10,12 +10,10 @@ class LoadingScreen : AppCompatActivity() {
         installSplashScreen()
         super.onCreate(savedInstanceState)
 
-        AppStartupCoordinator.startDeferred(applicationContext)
-
         if (isOnboardingCompleted()) {
             launchMainFromLoader(MainActivity.Tab.HOME)
         } else {
-            navigateNoShift(Onboard1::class.java)
+            launchOnboardingFromLoader()
         }
         finish()
         overridePendingTransition(0, 0)

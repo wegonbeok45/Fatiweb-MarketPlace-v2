@@ -9,8 +9,10 @@ import {
 } from "../shared/constants";
 import {admin, db} from "../shared/firestore";
 import {asNumber, asRecord, asString} from "../shared/domain";
+import {hotCallableOptions} from "../shared/callableOptions";
 
 const geminiApiKey = defineSecret("GEMINI_API_KEY");
+const GEMINI_MODELS = ["gemini-2.5-flash-lite", "gemini-2.0-flash-lite"];
 
 type ChatTurn = {
   role: "user" | "model";
@@ -149,7 +151,7 @@ function buildGeminiContents(
 }
 
 export const assistantSendMessage = onCall(
-  {secrets: [geminiApiKey], timeoutSeconds: 60},
+  {...hotCallableOptions, secrets: [geminiApiKey], timeoutSeconds: 60},
   async (request) => {
     const uid = request.auth?.uid || null;
     const payload = asRecord(request.data) || {};
@@ -160,35 +162,51 @@ export const assistantSendMessage = onCall(
 
     await enforceRateLimit(uid, request.rawRequest.ip);
     const context = await fetchAssistantContext(uid);
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${geminiApiKey.value()}`,
-      {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({
-          contents: buildGeminiContents(buildSystemPrompt(context), history),
-          generationConfig: {
-            temperature: 0.65,
-            maxOutputTokens: 512,
-            topP: 0.95,
-          },
-        }),
+    const requestBody = JSON.stringify({
+      contents: buildGeminiContents(buildSystemPrompt(context), history),
+      generationConfig: {
+        temperature: 0.65,
+        maxOutputTokens: 512,
+        topP: 0.95,
       },
-    );
+    });
 
-    const responseBody = await response.text();
-    if (!response.ok) {
-      logger.error("Assistant request failed", {
-        status: response.status,
-        body: responseBody.slice(0, 400),
-      });
-      throw new HttpsError("internal", "Assistant is temporarily unavailable.");
+    let reply = "";
+    for (const model of GEMINI_MODELS) {
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${geminiApiKey.value()}`,
+        {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: requestBody,
+        },
+      );
+
+      const responseBody = await response.text();
+      if (!response.ok) {
+        logger.error("Assistant request failed", {
+          model,
+          status: response.status,
+          body: responseBody.slice(0, 400),
+        });
+        if (response.status === 429) {
+          throw new HttpsError("resource-exhausted", "Gemini quota is exhausted for the current API key.");
+        }
+        if (response.status === 400 && responseBody.includes("API_KEY_INVALID")) {
+          throw new HttpsError("failed-precondition", "Gemini API key is invalid.");
+        }
+        if (response.status === 503) {
+          continue;
+        }
+        throw new HttpsError("internal", "Assistant is temporarily unavailable.");
+      }
+
+      const parsed = JSON.parse(responseBody) as {
+        candidates?: Array<{content?: {parts?: Array<{text?: string}>}}>;
+      };
+      reply = parsed.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || "";
+      if (reply) break;
     }
-
-    const parsed = JSON.parse(responseBody) as {
-      candidates?: Array<{content?: {parts?: Array<{text?: string}>}}>;
-    };
-    const reply = parsed.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
     if (!reply) {
       throw new HttpsError("internal", "Assistant returned an empty response.");
     }
