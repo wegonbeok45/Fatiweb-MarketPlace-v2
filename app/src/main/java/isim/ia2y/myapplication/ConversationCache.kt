@@ -42,7 +42,10 @@ object ConversationCache {
     /**
      * Persist [messages] for [conversationId]. Skips local-pending messages
      * (those are transient). Capped at [MAX_CACHED_MESSAGES] most-recent.
-     * Call on a background thread (IO dispatcher or similar).
+     *
+     * Writes to a temp file then atomically renames it over the target so a
+     * concurrent write or a mid-write process kill can never leave a corrupted
+     * file. Call on a background thread (IO dispatcher or similar).
      */
     fun save(context: Context, conversationId: String, messages: List<ConversationMessage>) {
         if (conversationId.isBlank()) return
@@ -52,9 +55,13 @@ object ConversationCache {
                 .takeLast(MAX_CACHED_MESSAGES)
             val arr = JSONArray()
             confirmed.forEach { arr.put(toJson(it)) }
-            val file = cacheFile(context, conversationId)
-            file.parentFile?.mkdirs()
-            file.writeText(arr.toString())
+            val target = cacheFile(context, conversationId)
+            target.parentFile?.mkdirs()
+            // Write to a sibling temp file first, then rename — atomic on most
+            // Android filesystems (ext4 / F2FS). Prevents partial-write corruption.
+            val tmp = File(target.parent, "${target.name}.tmp")
+            tmp.writeText(arr.toString())
+            tmp.renameTo(target)
         }.onFailure { Log.w(TAG, "save($conversationId) failed", it) }
     }
 

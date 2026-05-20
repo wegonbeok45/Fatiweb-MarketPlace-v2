@@ -26,6 +26,7 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.ListenerRegistration
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class ConversationActivity : AppCompatActivity() {
     private lateinit var adapter: ConversationMessagesAdapter
@@ -65,12 +66,19 @@ class ConversationActivity : AppCompatActivity() {
             finishWithMotion()
             return
         }
-        // Show cached messages immediately so the screen isn't blank while the
-        // Firestore listener loads (cold-start or offline).
-        val cached = ConversationCache.load(this, conversationId)
-        if (cached.isNotEmpty()) {
-            messages = cached
-            renderMessages(scroll = true)
+        // Load cache on IO thread to avoid blocking the main thread (file I/O +
+        // JSON parse for up to 200 messages). The guard `messages.isEmpty()` ensures
+        // that if the Firestore listener delivers its first snapshot before the IO
+        // coroutine finishes, we never overwrite fresh remote data with stale cache.
+        val appCtx = applicationContext
+        lifecycleScope.launch {
+            val cached = withContext(Dispatchers.IO) {
+                ConversationCache.load(appCtx, conversationId)
+            }
+            if (cached.isNotEmpty() && messages.isEmpty()) {
+                messages = cached
+                renderMessages(scroll = true)
+            }
         }
         loadConversation()
         listenMessages()
