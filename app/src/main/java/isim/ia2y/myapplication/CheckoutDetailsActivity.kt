@@ -885,8 +885,9 @@ class CheckoutDetailsActivity : AppCompatActivity() {
         binding.layoutLottieLoading.visibility = View.VISIBLE
         btnContinue.isEnabled = false
         lifecycleScope.launch {
-            val userResult = if (FirebaseAuthManager.currentUser != null) {
-                Result.success(FirebaseAuthManager.currentUser!!)
+            val existingUser = FirebaseAuthManager.currentUser
+            val userResult = if (existingUser != null) {
+                Result.success(existingUser)
             } else {
                 FirebaseAuthManager.signInAnonymously()
             }
