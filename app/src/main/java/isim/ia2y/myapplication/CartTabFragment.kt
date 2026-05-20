@@ -18,6 +18,12 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class CartTabFragment : Fragment(R.layout.fragment_cart_tab) {
+    private companion object {
+        // Process-global so navigating away and back to Cart in the same session
+        // doesn't re-trigger a cloud refresh on every visit.
+        @Volatile
+        var cartRefreshedThisProcess: Boolean = false
+    }
     private lateinit var emptyState: View
     private lateinit var loadingState: View
     private lateinit var emptyText: TextView
@@ -82,6 +88,19 @@ class CartTabFragment : Fragment(R.layout.fragment_cart_tab) {
         )
         renderCart()
         (activity as? MainActivity)?.updateHostCartBadge()
+        // First-visit cloud refresh — covers the case where the user taps Cart inside
+        // the 1.2s startup-deferred refresh window. Re-renders when fresh data lands.
+        if (!cartRefreshedThisProcess && FirebaseAuthManager.isLoggedIn) {
+            cartRefreshedThisProcess = true
+            val ctx = requireContext().applicationContext
+            viewLifecycleOwner.lifecycleScope.launch {
+                runCatching { CartStore.refreshFromCloud(ctx) }
+                if (isAdded && view != null) {
+                    renderCart()
+                    (activity as? MainActivity)?.updateHostCartBadge()
+                }
+            }
+        }
     }
 
     override fun onHiddenChanged(hidden: Boolean) {
