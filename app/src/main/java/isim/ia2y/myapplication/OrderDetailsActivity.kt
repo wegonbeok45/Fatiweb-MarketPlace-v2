@@ -170,10 +170,25 @@ class OrderDetailsActivity : AppCompatActivity() {
         val timelineContainer = findViewById<LinearLayout>(R.id.layoutOrderTimeline)
         timelineContainer?.removeAllViews()
         val formatter = SimpleDateFormat("dd MMM yyyy - HH:mm", Locale.FRANCE)
-        order.trackingEvents.sortedBy { it.changedAt }.forEach { entry ->
+        val sortedEvents = order.trackingEvents.sortedBy { it.changedAt }
+        sortedEvents.forEachIndexed { index, entry ->
+            val isFirst = index == 0
+            val isLast = index == sortedEvents.lastIndex
             val itemView = layoutInflater.inflate(R.layout.item_order_timeline_entry, timelineContainer, false)
             itemView.findViewById<TextView>(R.id.tvTimelineStatus)?.text = orderStatusLabel(this, entry.status)
             itemView.findViewById<TextView>(R.id.tvTimelineTime)?.text = formatter.format(Date(entry.changedAt))
+            // Connector lines: invisible (not GONE) so height stays consistent
+            itemView.findViewById<View>(R.id.viewTimelineTopLine)?.visibility =
+                if (isFirst) View.INVISIBLE else View.VISIBLE
+            itemView.findViewById<View>(R.id.viewTimelineBottomLine)?.visibility =
+                if (isLast) View.INVISIBLE else View.VISIBLE
+            // Highlight the most recent (last) dot with primary colour
+            if (isLast) {
+                itemView.findViewById<View>(R.id.viewTimelineDot)
+                    ?.backgroundTintList = android.content.res.ColorStateList.valueOf(
+                    androidx.core.content.ContextCompat.getColor(this, R.color.colorPrimary)
+                )
+            }
             timelineContainer?.addView(itemView)
         }
     }

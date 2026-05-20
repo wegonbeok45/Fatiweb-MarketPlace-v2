@@ -1,20 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+    Order tracking timeline step.
+    The left column shows: [top connector] → [dot] → [bottom connector].
+    Caller sets viewTimelineTopLine / viewTimelineBottomLine visibility
+    (INVISIBLE rather than GONE so items stay the same height).
+-->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="12dp"
+    android:minHeight="56dp"
     android:orientation="horizontal">
 
-    <View
-        android:layout_width="10dp"
-        android:layout_height="10dp"
-        android:layout_marginTop="4dp"
-        android:background="@drawable/bg_checkout_step_active" />
+    <!-- ── Left column: connector lines + dot ───────────────────────────── -->
+    <LinearLayout
+        android:layout_width="32dp"
+        android:layout_height="match_parent"
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
 
+        <!-- Top connector (hidden for the first step) -->
+        <View
+            android:id="@+id/viewTimelineTopLine"
+            android:layout_width="2dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@color/colorBorderLight"
+            android:minHeight="8dp"
+            android:visibility="invisible" />
+
+        <!-- Step dot -->
+        <View
+            android:id="@+id/viewTimelineDot"
+            android:layout_width="12dp"
+            android:layout_height="12dp"
+            android:background="@drawable/bg_checkout_step_active" />
+
+        <!-- Bottom connector (hidden for the last step) -->
+        <View
+            android:id="@+id/viewTimelineBottomLine"
+            android:layout_width="2dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@color/colorBorderLight"
+            android:minHeight="8dp"
+            android:visibility="invisible" />
+
+    </LinearLayout>
+
+    <!-- ── Right column: status label + timestamp ───────────────────────── -->
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
         android:layout_marginStart="12dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
         android:layout_weight="1"
         android:orientation="vertical">
 
@@ -24,7 +65,8 @@
             android:layout_height="wrap_content"
             android:textColor="@color/home_text_primary"
             android:textSize="@dimen/text_size_caption"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            tools:text="Commande expédiée" />
 
         <TextView
             android:id="@+id/tvTimelineTime"
@@ -32,6 +74,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
             android:textColor="@color/home_text_secondary"
-            android:textSize="@dimen/text_size_overline" />
+            android:textSize="@dimen/text_size_overline"
+            tools:text="12 mai 2025 - 14:30" />
+
     </LinearLayout>
 </LinearLayout>
