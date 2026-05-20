@@ -22,7 +22,8 @@ import java.io.ByteArrayOutputStream
 
 object ProductImageStorage {
     private const val TAG = "ProductImageStorage"
-    private const val MAX_UPLOAD_BYTES = 10 * 1024 * 1024
+    // Storage rules cap product/avatar uploads at 5 MB. Keep a small headroom for metadata bytes.
+    private const val MAX_UPLOAD_BYTES = 4 * 1024 * 1024 + 512 * 1024
     private const val MAX_SOURCE_IMAGE_BYTES = 30 * 1024 * 1024
     private const val MAX_IMAGE_DIMENSION = 1600
     private const val PRODUCT_IMAGES_ROOT = "product_images"

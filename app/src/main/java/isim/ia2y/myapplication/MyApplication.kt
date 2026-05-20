@@ -8,9 +8,11 @@ import coil.disk.DiskCache
 import coil.memory.MemoryCache
 import coil.request.CachePolicy
 import com.google.firebase.appcheck.FirebaseAppCheck
+import com.google.firebase.appcheck.debug.DebugAppCheckProviderFactory
 import com.google.firebase.appcheck.playintegrity.PlayIntegrityAppCheckProviderFactory
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreSettings
+import com.google.firebase.firestore.PersistentCacheSettings
 
 class MyApplication : Application(), ImageLoaderFactory {
     companion object {
@@ -32,34 +34,26 @@ class MyApplication : Application(), ImageLoaderFactory {
 
     private fun configureAppCheck() {
         val appCheck = firebaseAppCheck
-        if (BuildConfig.DEBUG) {
-            val debugProviderFactory = runCatching {
-                Class.forName("com.google.firebase.appcheck.debug.DebugAppCheckProviderFactory")
-                    .getMethod("getInstance")
-                    .invoke(null) as com.google.firebase.appcheck.AppCheckProviderFactory
-            }.onFailure { error ->
-                Log.w("MyApplication", "Firebase App Check debug provider is unavailable.", error)
-            }.getOrNull()
-
-            if (debugProviderFactory != null) {
-                appCheck.installAppCheckProviderFactory(debugProviderFactory)
-                appCheck.setTokenAutoRefreshEnabled(true)
-                Log.d("MyApplication", "Using Firebase App Check debug provider for Firebase Storage uploads.")
-            }
-            return
-        }
-
-        appCheck.installAppCheckProviderFactory(
+        val factory = if (BuildConfig.DEBUG) {
+            DebugAppCheckProviderFactory.getInstance()
+        } else {
             PlayIntegrityAppCheckProviderFactory.getInstance()
-        )
+        }
+        appCheck.installAppCheckProviderFactory(factory)
         appCheck.setTokenAutoRefreshEnabled(true)
+        if (BuildConfig.DEBUG) {
+            Log.d("MyApplication", "Firebase App Check: debug provider installed.")
+        }
     }
 
     private fun configureFirestoreOffline() {
         val db = FirebaseFirestore.getInstance()
         val settings = FirebaseFirestoreSettings.Builder()
-            .setCacheSizeBytes(FirebaseFirestoreSettings.CACHE_SIZE_UNLIMITED)
-            .setPersistenceEnabled(true)
+            .setLocalCacheSettings(
+                PersistentCacheSettings.newBuilder()
+                    .setSizeBytes(FirebaseFirestoreSettings.CACHE_SIZE_UNLIMITED)
+                    .build()
+            )
             .build()
         db.firestoreSettings = settings
     }
