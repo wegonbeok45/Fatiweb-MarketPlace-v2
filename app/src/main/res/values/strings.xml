@@ -460,6 +460,8 @@
     <string name="order_details_state_error_action">Reessayer</string>
     
     <string name="order_details_support_cta">Aide pour cette commande</string>
+    <string name="order_reorder_cta">Commander à nouveau</string>
+    <string name="order_reorder_added">Articles ajoutés au panier</string>
     <string name="order_details_eta_delivered">Commande livr&#233;e</string>
     <string name="order_details_eta_cancelled">Commande annul&#233;e</string>
 

@@ -42,7 +42,7 @@ class OrderDetailsActivity : AppCompatActivity() {
         findViewById<View>(R.id.ivBack)?.setOnClickListener { finishWithMotion(isForward = false) }
         findViewById<View>(R.id.btnOrderSupport)?.setOnClickListener { showSupportDialog() }
         findViewById<View>(R.id.btnOrderStateAction)?.setOnClickListener { loadOrder() }
-        applyPressFeedback(R.id.ivBack, R.id.btnOrderSupport)
+        applyPressFeedback(R.id.ivBack, R.id.btnOrderSupport, R.id.btnReorder)
         renderOrderState(loading = true)
         loadOrder()
     }
@@ -150,6 +150,21 @@ class OrderDetailsActivity : AppCompatActivity() {
             itemView.findViewById<TextView>(R.id.tvConfirmItemPrice)?.text =
                 formatDt(item.priceAtPurchase * item.quantity)
             itemsContainer?.addView(itemView)
+        }
+
+        // Re-order: add each item back to the cart then navigate to the cart tab
+        findViewById<View>(R.id.btnReorder)?.setOnClickListener {
+            order.items.forEach { item ->
+                if (item.productId.isNotBlank()) {
+                    CartStore.add(this, item.productId, item.quantity)
+                }
+            }
+            showMotionSnackbar(getString(R.string.order_reorder_added))
+            val intent = Intent(this, MainActivity::class.java).apply {
+                putExtra(MainActivity.EXTRA_OPEN_TAB, MainActivity.Tab.CART.name)
+                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            }
+            startActivity(intent)
         }
 
         val timelineContainer = findViewById<LinearLayout>(R.id.layoutOrderTimeline)

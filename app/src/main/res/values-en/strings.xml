@@ -365,6 +365,8 @@
     <string name="order_details_state_error_action">Try again</string>
     
     <string name="order_details_support_cta">Help with this order</string>
+    <string name="order_reorder_cta">Order again</string>
+    <string name="order_reorder_added">Items added to cart</string>
     <string name="order_details_eta_delivered">Order delivered</string>
     <string name="order_details_eta_cancelled">Order cancelled</string>
 

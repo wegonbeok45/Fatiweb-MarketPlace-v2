@@ -221,6 +221,19 @@
                 android:orientation="vertical" />
 
             <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnReorder"
+                style="@style/AppButton.Primary"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:gravity="center"
+                android:maxLines="2"
+                android:minHeight="56dp"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:text="@string/order_reorder_cta" />
+
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnOrderSupport"
                 style="@style/AppButton.Secondary"
                 android:layout_width="match_parent"
