@@ -180,6 +180,32 @@ class MainActivity : AppCompatActivity() {
             startActivity(OrderDetailsActivity.createIntent(this, orderId))
             return true
         }
+
+        // F-15: deep links to product, category, and promo screens via FCM data payload.
+        val productId = intent.getStringExtra("productId").orEmpty()
+        if (productId.isNotBlank()) {
+            intent.removeExtra("productId")
+            navigateToProductDetails(productId)
+            return true
+        }
+
+        val category = intent.getStringExtra("category").orEmpty()
+        if (category.isNotBlank()) {
+            intent.removeExtra("category")
+            startActivity(CategoryProductsActivity.createIntent(this, category))
+            return true
+        }
+
+        // Generic "open tab" payload — already implemented via EXTRA_OPEN_TAB but we
+        // also accept "tab" lower-case from server-side push payloads.
+        val tab = intent.getStringExtra("tab").orEmpty()
+        if (tab.isNotBlank()) {
+            intent.removeExtra("tab")
+            runCatching { Tab.valueOf(tab.uppercase(java.util.Locale.ROOT)) }
+                .getOrNull()
+                ?.let { selectTab(it, animate = false) }
+            return true
+        }
         return false
     }
 

@@ -1,6 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools"
     tools:ignore="MissingTranslation">
     <string name="app_name">FatiWeb Market</string>
+    <string name="admin_dashboard_stats_retry_hint">Échec du chargement — touchez pour réessayer</string>
     <!-- Account deletion (Play Store Data Safety) -->
     <string name="account_delete_action">Supprimer mon compte</string>
     <string name="account_delete_title">Supprimer définitivement votre compte ?</string>

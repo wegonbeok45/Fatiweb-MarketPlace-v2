@@ -135,6 +135,30 @@ class AdminDashboardActivity : AppCompatActivity() {
                 viewModel.clearError()
             }
         }
+
+        viewModel.statsLoadFailed.observe(this) { failed ->
+            // When the dashboard fetch fails, swap the "..." placeholder to a retry hint and
+            // make the stats row tappable to force-reload. On success, restore default state.
+            val statsRow = findViewById<View>(R.id.adminStatsRow1)
+            if (failed == true) {
+                val retryHint = getString(R.string.admin_dashboard_stats_retry_hint)
+                listOf(
+                    R.id.adminTvCommandesVal,
+                    R.id.adminTvRevenueVal,
+                    R.id.adminTvClientsVal,
+                    R.id.adminTvStockVal
+                ).forEach { id ->
+                    findViewById<TextView>(id)?.text = "↻"
+                }
+                findViewById<TextView>(R.id.adminTvWelcomeChipSync)?.text = retryHint
+                statsRow?.setOnClickListener {
+                    viewModel.loadDashboardData(force = true)
+                }
+            } else {
+                statsRow?.setOnClickListener(null)
+                statsRow?.isClickable = false
+            }
+        }
     }
 
     override fun onNewIntent(intent: android.content.Intent) {

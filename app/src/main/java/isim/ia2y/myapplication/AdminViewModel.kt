@@ -26,6 +26,10 @@ class AdminViewModel(application: Application) : AndroidViewModel(application) {
     private val _isVerified = MutableLiveData(false)
     val isVerified: LiveData<Boolean> = _isVerified
 
+    private val _statsLoadFailed = MutableLiveData(false)
+    /** True when the most recent dashboard fetch failed any of stats/orders/clients. */
+    val statsLoadFailed: LiveData<Boolean> = _statsLoadFailed
+
     private val _stats = MutableLiveData<FirestoreService.AdminStats>()
     val stats: LiveData<FirestoreService.AdminStats> = _stats
 
@@ -120,6 +124,7 @@ class AdminViewModel(application: Application) : AndroidViewModel(application) {
                     }
                 }
 
+            _statsLoadFailed.postValue(failed)
             if (failed) {
                 _error.postValue(appStr(R.string.admin_dashboard_data_error))
             }

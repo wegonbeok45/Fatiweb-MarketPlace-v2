@@ -67,18 +67,23 @@ class FatiFirebaseMessagingService : FirebaseMessagingService() {
         AppNotificationChannels.ensureCreated(this)
         val orderId = data["orderId"].orEmpty()
         val conversationId = data["conversationId"].orEmpty()
-        val intent = if (conversationId.isNotBlank()) {
-            ConversationActivity.createIntent(this, conversationId)
-        } else if (orderId.isNotBlank()) {
-            OrderDetailsActivity.createIntent(this, orderId)
-        } else {
-            Intent(this, NotificationsActivity::class.java)
+        val productId = data["productId"].orEmpty()
+        val category = data["category"].orEmpty()
+        val intent = when {
+            conversationId.isNotBlank() -> ConversationActivity.createIntent(this, conversationId)
+            orderId.isNotBlank() -> OrderDetailsActivity.createIntent(this, orderId)
+            productId.isNotBlank() -> ProductDetailsScreen.createIntent(this, productId)
+            category.isNotBlank() -> CategoryProductsActivity.createIntent(this, category)
+            else -> Intent(this, NotificationsActivity::class.java)
         }.apply {
             flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
         }
+        val tag = listOf(conversationId, orderId, productId, category)
+            .firstOrNull { it.isNotBlank() }
+            ?: (title + body)
         val pendingIntent = PendingIntent.getActivity(
             this,
-            conversationId.ifBlank { orderId.ifBlank { title + body } }.hashCode(),
+            tag.hashCode(),
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
@@ -98,10 +103,7 @@ class FatiFirebaseMessagingService : FirebaseMessagingService() {
             builder.setLargeIcon(avatar)
         }
 
-        NotificationManagerCompat.from(this).notify(
-            (conversationId.ifBlank { orderId.ifBlank { title + body } }).hashCode(),
-            builder.build()
-        )
+        NotificationManagerCompat.from(this).notify(tag.hashCode(), builder.build())
     }
 
     private fun loadNotificationAvatar(url: String?): Bitmap? {
