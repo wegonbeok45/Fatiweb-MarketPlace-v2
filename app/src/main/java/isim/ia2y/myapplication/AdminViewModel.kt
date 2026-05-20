@@ -68,6 +68,10 @@ class AdminViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun loadDashboardData(force: Boolean = false) {
+        // Gate dashboard fetches on verified admin status so we don't fire aggregate
+        // queries that will be denied (and silently swallowed) before role verification
+        // completes. Once verifyAdmin() flips _isVerified to true the caller may retry.
+        if (_isVerified.value != true) return
         val now = System.currentTimeMillis()
         if (!force && dashboardLoadJob?.isActive == true) return
         if (force) dashboardLoadJob?.cancel()

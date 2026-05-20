@@ -101,6 +101,10 @@ class AdminDashboardActivity : AppCompatActivity() {
         viewModel.isVerified.observe(this) { verified ->
             // Access denial is handled asynchronously by the viewModel.error observer.
             // Do not call finish() here to avoid premature immediate exit on initial false state.
+            if (verified == true) {
+                // Retry the gated dashboard load once verification flips to true.
+                viewModel.loadDashboardData()
+            }
         }
 
         viewModel.activeTab.observe(this) { tab ->
