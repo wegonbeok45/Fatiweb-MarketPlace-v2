@@ -140,12 +140,27 @@
             android:clipToPadding="false"
             android:paddingBottom="@dimen/space_8" />
 
-        <ProgressBar
-            android:id="@+id/loadingIndicator"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_gravity="center"
-            android:visibility="gone" />
+        <!-- Shimmer skeleton shown while orders are loading (replaces old ProgressBar) -->
+        <LinearLayout
+            android:id="@+id/layoutOrdersShimmer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="@dimen/space_14"
+            android:visibility="gone">
+
+            <include layout="@layout/item_order_history_shimmer" />
+
+            <include
+                layout="@layout/item_order_history_shimmer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <include
+                layout="@layout/item_order_history_shimmer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
     </FrameLayout>
     <com.google.android.material.chip.ChipGroup
         android:id="@+id/chipGroupOrders"

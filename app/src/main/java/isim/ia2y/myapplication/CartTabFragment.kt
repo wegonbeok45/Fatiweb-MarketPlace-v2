@@ -207,6 +207,7 @@ class CartTabFragment : Fragment(R.layout.fragment_cart_tab) {
     private fun renderCart() {
         (activity as? MainActivity)?.updateHostCartBadge()
         hasRenderedCartOnce = true
+        loadingState.stopShimmerPulse()
         loadingState.visibility = View.GONE
         itemsContainer.removeAllViews()
 
@@ -304,6 +305,7 @@ class CartTabFragment : Fragment(R.layout.fragment_cart_tab) {
     private fun showCartLoadingState() {
         if (!::loadingState.isInitialized || hasRenderedCartOnce) return
         loadingState.visibility = View.VISIBLE
+        loadingState.startShimmerPulse()
         emptyState.visibility = View.GONE
         itemsContainer.visibility = View.GONE
         summaryGap?.visibility = View.GONE

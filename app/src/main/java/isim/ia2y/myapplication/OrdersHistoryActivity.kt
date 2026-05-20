@@ -2,7 +2,6 @@ package isim.ia2y.myapplication
 
 import android.os.Bundle
 import android.view.View
-import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -90,13 +89,18 @@ class OrdersHistoryActivity : AppCompatActivity() {
         val recycler = findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.rvOrders) ?: return
         val emptyState = findViewById<View>(R.id.layoutEmptyOrdersState) ?: return
         val emptyAnimation = findViewById<com.airbnb.lottie.LottieAnimationView>(R.id.ivEmptyOrdersAnimation)
-        val loading = findViewById<ProgressBar>(R.id.loadingIndicator)
+        val shimmer = findViewById<View>(R.id.layoutOrdersShimmer)
+
+        fun hideShimmer() {
+            shimmer?.stopShimmerPulse()
+            shimmer?.visibility = View.GONE
+        }
 
         when (state) {
             is ScreenState.Content -> {
                 ordersErrorVisible = false
                 allOrders = state.data
-                loading?.visibility = View.GONE
+                hideShimmer()
                 resetEmptyAnimation(emptyAnimation)
                 if (recycler.adapter == null) {
                     recycler.adapter = ordersAdapter
@@ -106,7 +110,7 @@ class OrdersHistoryActivity : AppCompatActivity() {
             is ScreenState.Empty -> {
                 ordersErrorVisible = false
                 allOrders = emptyList()
-                loading?.visibility = View.GONE
+                hideShimmer()
                 recycler.visibility = View.GONE
                 emptyState.visibility = View.VISIBLE
                 configureEmptyState(
@@ -131,7 +135,7 @@ class OrdersHistoryActivity : AppCompatActivity() {
             is ScreenState.Error -> {
                 ordersErrorVisible = true
                 allOrders = emptyList()
-                loading?.visibility = View.GONE
+                hideShimmer()
                 recycler.visibility = View.GONE
                 emptyState.visibility = View.VISIBLE
                 configureEmptyState(
@@ -144,7 +148,8 @@ class OrdersHistoryActivity : AppCompatActivity() {
             ScreenState.Loading -> {
                 ordersErrorVisible = false
                 allOrders = emptyList()
-                loading?.visibility = View.VISIBLE
+                shimmer?.visibility = View.VISIBLE
+                shimmer?.startShimmerPulse()
                 recycler.visibility = View.GONE
                 emptyState.visibility = View.GONE
                 resetEmptyAnimation(emptyAnimation)

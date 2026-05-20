@@ -662,17 +662,20 @@ class HomeTabFragment : Fragment(R.layout.fragment_home_tab), TabReselectionHand
 
     private fun setShimmering(isShimmering: Boolean) {
         val root = view ?: return
-        val featuredShimmer = root.findViewById<View>(R.id.layoutFeaturedShimmer)
-        val latestShimmer = root.findViewById<View>(R.id.layoutLatestShimmer)
-        val discoverShimmer = root.findViewById<View>(R.id.layoutDiscoverShimmer)
-
-        featuredShimmer?.visibility = if (isShimmering) View.VISIBLE else View.GONE
-        latestShimmer?.visibility = if (isShimmering) View.VISIBLE else View.GONE
-        discoverShimmer?.visibility = if (isShimmering) View.VISIBLE else View.GONE
-        
-        featuredShimmer?.alpha = if (isShimmering) 0.82f else 1f
-        latestShimmer?.alpha = if (isShimmering) 0.82f else 1f
-        discoverShimmer?.alpha = if (isShimmering) 0.82f else 1f
+        val containers = listOfNotNull(
+            root.findViewById<View>(R.id.layoutFeaturedShimmer),
+            root.findViewById<View>(R.id.layoutLatestShimmer),
+            root.findViewById<View>(R.id.layoutDiscoverShimmer)
+        )
+        containers.forEach { container ->
+            if (isShimmering) {
+                container.visibility = View.VISIBLE
+                container.startShimmerPulse()
+            } else {
+                container.stopShimmerPulse()
+                container.visibility = View.GONE
+            }
+        }
     }
 
     private fun toggleFavorite(product: Product) {
