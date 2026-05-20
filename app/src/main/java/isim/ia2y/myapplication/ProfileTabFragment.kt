@@ -442,68 +442,18 @@ class ProfileTabFragment : Fragment() {
             val cachedRole = UserService.cachedRole(firebaseUser.uid)
             if (cachedRole != null) {
                 latestRole = normalizeRole(cachedRole)
-                updateAdminDashboardEntry(firebaseUser.uid, latestRole)
                 bind.tvRole.text = displayRoleLabel(latestRole)
-            } else {
-                updateAdminDashboardEntry(firebaseUser.uid, latestRole)
             }
+            updateAdminDashboardEntry(firebaseUser.uid, latestRole)
             bind.tvUserName.text =
                 firebaseUser.displayName?.ifEmpty { null } ?: getString(R.string.user_guest_name)
             bind.tvAccountHint.text = firebaseUser.email.orEmpty()
             bind.tvAccountHint.visibility = if (firebaseUser.email.isNullOrBlank()) View.GONE else View.VISIBLE
             updateProfileEditActions(isLoggedIn = true)
             updatePrimaryAccountAction(isLoggedIn = true)
-            profileViewModel.loadUserInfo(firebaseUser.uid, forceRefresh = cachedRole == null)
-            return
-            /*
-            lifecycleScope.launch {
-                runCatching {
-                    val profileDeferred = async(Dispatchers.IO) {
-                        runCatching { FirestoreService.fetchUserProfile(firebaseUser.uid) }.getOrNull()
-                    }
-                    val roleDeferred = async(Dispatchers.IO) {
-                        runCatching { FirestoreService.fetchUserRole(firebaseUser.uid) }.getOrNull()
-                    }
-                    val profile = profileDeferred.await()
-                    val role = roleDeferred.await()?.ifBlank { profile?.role ?: "client" } ?: profile?.role ?: "client"
-                    profile to role
-                }.onSuccess { (profile, role) ->
-                    latestProfile = profile
-                    latestRole = role
-                    if (!profile?.name.isNullOrBlank()) {
-                        _binding?.tvUserName?.text = profile?.name
-                    }
-                    _binding?.cardAdmin?.visibility = if (role == "admin") View.VISIBLE else View.GONE
-                    _binding?.tvRole?.text = role.uppercase(Locale.getDefault())
-                    _binding?.tvAccountHint?.text = buildString {
-                        append(firebaseUser.email.orEmpty())
-                        if (firebaseUser.email.isNullOrBlank()) return@buildString
-                        append(" • ")
-                        append(
-                            getString(
-                                if (firebaseUser.isEmailVerified) R.string.profile_email_verified
-                                else R.string.profile_email_unverified
-                            )
-                        )
-                    }.trim()
-                    _binding?.tvAccountHint?.visibility = View.VISIBLE
-                    val emailStatus = getString(
-                        if (firebaseUser.isEmailVerified) R.string.profile_email_verified
-                        else R.string.profile_email_unverified
-                    )
-                    val email = firebaseUser.email.orEmpty()
-                    if (email.isBlank()) {
-                        _binding?.tvAccountHint?.visibility = View.GONE
-                    } else {
-                        _binding?.tvAccountHint?.text =
-                            getString(R.string.profile_account_hint_format, email, emailStatus)
-                    }
-                }.onFailure { error ->
-                    Log.w(logTag, "Failed to refresh profile info", error)
-                    (activity as? AppCompatActivity)?.showMotionSnackbar(getString(R.string.profile_load_failed))
-                }
-            }
-            */
+            // Always force-refresh: cached role may be stale after a role promotion (client→vendeur/admin).
+            // The userInfo observer (observeProfileInfo) will update the admin entry when the fetch resolves.
+            profileViewModel.loadUserInfo(firebaseUser.uid, forceRefresh = true)
         } else {
             profileViewModel.clear()
             latestProfile = null
