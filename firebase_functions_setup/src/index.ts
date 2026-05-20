@@ -22,6 +22,7 @@ import {sellerFetchWorkspace} from "./seller/fetchSellerWorkspace";
 import {onImageThumbnailFinalized} from "./storage/onImageThumbnailFinalized";
 import {adminPromoteUserToVendeur} from "./users/adminPromoteUserToVendeur";
 import {adminRevokeVendeurAccess} from "./users/adminRevokeVendeurAccess";
+import {deleteUserAccount} from "./users/deleteUserAccount";
 import {onUserProfileUpdate} from "./users/onUserProfileUpdate";
 
 setGlobalOptions({
@@ -41,6 +42,7 @@ export {
   adminSendAnnouncement,
   adminPromoteUserToVendeur,
   adminRevokeVendeurAccess,
+  deleteUserAccount,
   onUserProfileUpdate,
   submitReview,
   onImageThumbnailFinalized,

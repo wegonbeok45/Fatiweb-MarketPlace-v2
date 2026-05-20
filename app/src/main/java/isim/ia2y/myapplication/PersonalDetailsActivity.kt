@@ -1,7 +1,9 @@
 package isim.ia2y.myapplication
 
 import android.app.DatePickerDialog
+import android.content.Intent
 import android.net.Uri
+import androidx.appcompat.app.AlertDialog
 import android.os.Bundle
 import android.text.InputType
 import android.view.View
@@ -109,6 +111,7 @@ class PersonalDetailsActivity : AppCompatActivity() {
         findViewById<View>(R.id.tvChangePhoto)?.setOnClickListener { avatarPicker.launch("image/*") }
         findViewById<View>(R.id.btnSaveChanges)?.setOnClickListener { saveDetails() }
         findViewById<View>(R.id.btnCancelChanges)?.setOnClickListener { finishWithMotion() }
+        findViewById<View>(R.id.btnDeleteAccount)?.setOnClickListener { confirmDeleteAccount() }
         inputBirthday.setOnClickListener { openDatePicker() }
         inputBirthday.setOnFocusChangeListener { _, hasFocus -> if (hasFocus) openDatePicker() }
 
@@ -245,6 +248,48 @@ class PersonalDetailsActivity : AppCompatActivity() {
             return
         }
         imageAvatar.setImageResource(R.drawable.profile_avatar_art)
+    }
+
+    private fun confirmDeleteAccount() {
+        if (FirebaseAuthManager.currentUser == null) {
+            showMotionSnackbar(getString(R.string.profile_avatar_login_required))
+            return
+        }
+        AlertDialog.Builder(this)
+            .setTitle(R.string.account_delete_title)
+            .setMessage(R.string.account_delete_message)
+            .setNegativeButton(R.string.account_delete_cancel, null)
+            .setPositiveButton(R.string.account_delete_confirm) { _, _ -> performDeleteAccount() }
+            .show()
+    }
+
+    private fun performDeleteAccount() {
+        val progress = AlertDialog.Builder(this)
+            .setMessage(R.string.account_delete_in_progress)
+            .setCancelable(false)
+            .show()
+        lifecycleScope.launch {
+            val result = runCatching { BackendFunctionsService.deleteUserAccount() }
+            runCatching { progress.dismiss() }
+            result
+                .onSuccess {
+                    runCatching { FirebaseAuthManager.signOut() }
+                    showSuccess(getString(R.string.account_delete_success))
+                    val intent = Intent(this@PersonalDetailsActivity, LoginActivity::class.java)
+                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                    startActivity(intent)
+                    finish()
+                }
+                .onFailure { error ->
+                    android.util.Log.e(TAG, "Account deletion failed", error)
+                    val msg = if (error.message?.contains("Admin", ignoreCase = true) == true) {
+                        getString(R.string.account_delete_admin_blocked)
+                    } else {
+                        getString(R.string.account_delete_failed)
+                    }
+                    showMotionSnackbar(msg)
+                }
+        }
     }
 
     private companion object {

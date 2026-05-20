@@ -1,6 +1,16 @@
 <resources xmlns:tools="http://schemas.android.com/tools"
     tools:ignore="MissingTranslation">
     <string name="app_name">FatiWeb Market</string>
+    <!-- Account deletion (Play Store Data Safety) -->
+    <string name="account_delete_action">Supprimer mon compte</string>
+    <string name="account_delete_title">Supprimer définitivement votre compte ?</string>
+    <string name="account_delete_message">Cette action est irréversible. Votre profil, vos adresses, vos favoris et votre panier seront supprimés. Vos commandes passées resteront visibles côté vendeur, mais vos informations personnelles seront effacées.</string>
+    <string name="account_delete_confirm">Supprimer</string>
+    <string name="account_delete_cancel">Annuler</string>
+    <string name="account_delete_in_progress">Suppression du compte…</string>
+    <string name="account_delete_success">Votre compte a été supprimé.</string>
+    <string name="account_delete_failed">Impossible de supprimer le compte. Réessayez plus tard.</string>
+    <string name="account_delete_admin_blocked">Les comptes administrateurs ne peuvent pas être supprimés. Contactez un autre administrateur.</string>
     <!-- Phone auth -->
     <string name="phone_login_cta">Continuer avec le téléphone</string>
     <string name="phone_login_title">Entrez votre numéro</string>

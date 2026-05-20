@@ -323,6 +323,17 @@
                     android:layout_marginTop="@dimen/space_8"
                     android:text="@string/personal_details_cancel"
                     android:textAllCaps="false" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnDeleteAccount"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_16"
+                    android:text="@string/account_delete_action"
+                    android:textAllCaps="false"
+                    android:textColor="@color/colorError"
+                    app:rippleColor="@color/colorError" />
             </LinearLayout>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

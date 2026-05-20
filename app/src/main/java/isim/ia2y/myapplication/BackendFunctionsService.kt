@@ -144,6 +144,11 @@ object BackendFunctionsService {
         )
     }
 
+    /** Self-service account deletion. Caller must be authenticated. */
+    suspend fun deleteUserAccount() {
+        call("deleteUserAccount", emptyMap<String, Any>())
+    }
+
     suspend fun submitReview(productId: String, review: ProductReview): ProductReview {
         val response = call(
             "submitReview",
