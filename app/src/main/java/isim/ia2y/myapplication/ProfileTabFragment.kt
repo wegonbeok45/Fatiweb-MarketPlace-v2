@@ -90,7 +90,10 @@ class ProfileTabFragment : Fragment() {
             binding.tvUserName.text = getString(R.string.user_guest_name)
             updatePrimaryAccountAction(FirebaseAuthManager.isLoggedIn)
             observeProfileInfo()
-            restoreAvatar()
+            // Avatar is restored by the userInfo observer (observeProfileInfo) which already
+            // reads profile.avatarUrl from the cache + cloud. The previous restoreAvatar() did
+            // a duplicate Firestore read on every profile tab open.
+            loadAvatarUrl(null)
             refreshProfileLocation()
             renderRecentlyViewedProducts()
             (activity as? AppCompatActivity)?.revealViewsInOrder(
@@ -411,27 +414,6 @@ class ProfileTabFragment : Fragment() {
             return
         }
         imageView.setImageResource(R.drawable.profile_avatar_art)
-    }
-
-    private fun restoreAvatar() {
-        val uid = FirebaseAuthManager.currentUser?.uid
-        if (uid != null) {
-            lifecycleScope.launch {
-                val profile = runCatching {
-                    withContext(Dispatchers.IO) { FirestoreService.fetchUserProfile(uid) }
-                }
-                    .onFailure { Log.w(logTag, "Failed to load avatar from Firestore", it) }
-                    .getOrNull()
-                
-                if (profile?.avatarUrl != null) {
-                    loadAvatarUrl(profile.avatarUrl)
-                    return@launch
-                }
-                loadAvatarUrl(null)
-            }
-        } else {
-            loadAvatarUrl(null)
-        }
     }
 
     /** Refresh the displayed user name/email from Firebase Auth. */

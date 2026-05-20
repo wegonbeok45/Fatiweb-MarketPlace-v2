@@ -102,32 +102,47 @@ class MainActivity : AppCompatActivity() {
         startDeferredWorkAfterFirstFrame()
     }
 
+    // Heavy resume work (cloud refresh + FCM token sync) only runs once per
+    // RESUME_HEAVY_WORK_INTERVAL_MS to avoid hammering Firestore every time the user
+    // returns from another screen. UI-only state always updates.
+    private var lastHeavyResumeAt: Long = 0L
+
     override fun onResume() {
         super.onResume()
         val selected = pendingTabSelection ?: currentTab
         updateBottomNavSelection(selected)
         updateTabIndicator(selected, animate = false)
         updateHostCartBadge()
-        if (NotificationStore.shouldRefreshFromCloud(this)) {
-            lifecycleScope.launch {
-                runCatching { NotificationStore.refreshFromCloud(this@MainActivity) }
-            }
+
+        val now = android.os.SystemClock.elapsedRealtime()
+        val runHeavyWork = now - lastHeavyResumeAt >= RESUME_HEAVY_WORK_INTERVAL_MS
+        if (runHeavyWork) {
+            lastHeavyResumeAt = now
         }
+
         if (FirebaseAuthManager.isLoggedIn) {
             AppNotificationChannels.ensureCreated(this)
             if (NotificationPreferencesStore.load(this).pushEnabled) {
                 maybeRequestNotificationPermissionForPush()
             }
-            lifecycleScope.launch {
-                runCatching { FcmTokenService.syncCurrentUserToken(this@MainActivity) }
-            }
             listenForUnreadMessages()
+            if (runHeavyWork) {
+                if (NotificationStore.shouldRefreshFromCloud(this)) {
+                    lifecycleScope.launch {
+                        runCatching { NotificationStore.refreshFromCloud(this@MainActivity) }
+                    }
+                }
+                lifecycleScope.launch {
+                    runCatching { FcmTokenService.syncCurrentUserToken(this@MainActivity) }
+                }
+            }
         } else {
             unreadMessagesListener?.remove()
             unreadMessagesListener = null
             binding.chatFabDot.visibility = View.GONE
         }
     }
+
 
     override fun onDestroy() {
         unreadMessagesListener?.remove()
@@ -530,5 +545,8 @@ class MainActivity : AppCompatActivity() {
         const val EXTRA_OPEN_TAB = "open_main_tab"
         private const val KEY_SELECTED_TAB = "selected_tab"
         private const val TAG = "MainActivity"
+        // 5 minutes — long enough to skip "return from product screen" bounces,
+        // short enough to refresh after a real backgrounded session.
+        private const val RESUME_HEAVY_WORK_INTERVAL_MS = 5L * 60L * 1000L
     }
 }
