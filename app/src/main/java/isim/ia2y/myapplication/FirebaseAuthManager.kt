@@ -275,6 +275,7 @@ object FirebaseAuthManager {
         if (!uid.isNullOrBlank()) {
             FcmTokenService.clearTokenForSignOut(MyApplication.instance, uid)
         }
+        ConversationCache.clearAll(MyApplication.instance)
         auth.signOut()
         clearCrashlyticsUser()
     }

@@ -24,6 +24,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.ListenerRegistration
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class ConversationActivity : AppCompatActivity() {
@@ -63,6 +64,13 @@ class ConversationActivity : AppCompatActivity() {
         if (!FirebaseAuthManager.isLoggedIn || conversationId.isBlank()) {
             finishWithMotion()
             return
+        }
+        // Show cached messages immediately so the screen isn't blank while the
+        // Firestore listener loads (cold-start or offline).
+        val cached = ConversationCache.load(this, conversationId)
+        if (cached.isNotEmpty()) {
+            messages = cached
+            renderMessages(scroll = true)
         }
         loadConversation()
         listenMessages()
@@ -291,6 +299,11 @@ class ConversationActivity : AppCompatActivity() {
                 offlineBanner.visibility = View.GONE
                 renderMessages(scroll = true)
                 markRead()
+                // Persist to disk so the next open shows history instantly
+                val ctx = applicationContext
+                lifecycleScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+                    ConversationCache.save(ctx, conversationId, remote)
+                }
             },
             onError = {
                 offlineBanner.visibility = View.VISIBLE
