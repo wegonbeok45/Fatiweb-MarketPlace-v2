@@ -14,28 +14,20 @@ service cloud.firestore {
         (request.auth.token.admin == true || request.auth.token.role == 'admin');
     }
 
-    function adminDocument() {
-      return signedIn() &&
-        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
-    }
-
+    // Role checks use JWT custom claims only — no cross-document reads.
+    // The syncUserRoleClaims Cloud Function keeps claims in sync with the
+    // users/{uid}.role field, so any admin action that changes a user's role
+    // will also update the claim within seconds.
     function isAdmin() {
-      return adminClaim() || adminDocument();
+      return adminClaim();
     }
 
     function vendeurClaim() {
       return signedIn() && request.auth.token.role == 'vendeur';
     }
 
-    function vendeurDocument() {
-      return signedIn() &&
-        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'vendeur';
-    }
-
     function isVendeur() {
-      return vendeurClaim() || vendeurDocument();
+      return vendeurClaim();
     }
 
     function isProductOwner() {
