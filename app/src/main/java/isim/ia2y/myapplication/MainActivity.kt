@@ -212,7 +212,7 @@ class MainActivity : AppCompatActivity() {
             openTabContentDirect(tab, animate)
         }.onFailure { error ->
             Log.e(TAG, "Failed to open tab: $tab", error)
-            showToast(getString(R.string.main_tab_load_failed))
+            showMotionSnackbar(getString(R.string.main_tab_load_failed))
             if (tab != Tab.HOME) {
                 runCatching { selectTab(Tab.HOME, animate = false) }
             }
@@ -422,7 +422,7 @@ class MainActivity : AppCompatActivity() {
             Log.e(TAG, "Failed to open existing tab content: $tab", error)
             showTabLoading(loading = false, errorMessage = null)
             setBottomNavEnabled(true)
-            showToast(getString(R.string.main_tab_load_failed))
+            showMotionSnackbar(getString(R.string.main_tab_load_failed))
         }
     }
 

@@ -85,7 +85,7 @@ private fun AppCompatActivity.animateBottomNavAndNavigate(
             navigateOverride?.invoke() ?: navigateNoShift(target)
         }.onFailure { error ->
             Log.e("UiActionsNav", "Bottom nav navigation failed for target=${target.simpleName}", error)
-            showToast(getString(R.string.main_tab_load_failed))
+            showMotionSnackbar(getString(R.string.main_tab_load_failed))
         }
     }, 90L)
 }

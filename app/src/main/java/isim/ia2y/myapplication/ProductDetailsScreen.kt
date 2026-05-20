@@ -114,7 +114,7 @@ class ProductDetailsScreen : AppCompatActivity() {
                     showLoadedProduct(remoteProduct)
                 }
                 result.isSuccess && isRetry -> {
-                    showToast(getString(R.string.details_product_not_found))
+                    showMotionSnackbar(getString(R.string.details_product_not_found))
                     finishWithMotion()
                 }
                 result.isSuccess -> {

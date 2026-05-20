@@ -92,7 +92,7 @@ fun AppCompatActivity.handleNotificationPermissionResult(
         syncFcmTokenIfAllowed()
     }
     if (!granted) {
-        showToast(getString(R.string.notifications_permission_denied_hint))
+        showMotionSnackbar(getString(R.string.notifications_permission_denied_hint))
     }
     return true
 }

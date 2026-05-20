@@ -80,7 +80,7 @@ fun AppCompatActivity.setupAdminTopBar(title: String) {
         }
     }
     findViewById<View?>(R.id.adminShieldBadge)?.setOnClickListener {
-        showToast(getString(R.string.admin_verify_failed))
+        showMotionSnackbar(getString(R.string.admin_verify_failed))
     }
 
     applyPressFeedback(
@@ -212,7 +212,7 @@ private fun AppCompatActivity.animateAdminNavAndNavigate(
     // Navigate after a small delay so the user can see the pill slide
     findViewById<View?>(targetId)?.postDelayed({
         runCatching { navigateToAdminTab(tab) }
-            .onFailure { showToast(getString(R.string.main_tab_load_failed)) }
+            .onFailure { showMotionSnackbar(getString(R.string.main_tab_load_failed)) }
     }, 120L)
 }
 

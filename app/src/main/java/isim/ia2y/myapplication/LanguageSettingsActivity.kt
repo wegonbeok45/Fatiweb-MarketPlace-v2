@@ -42,7 +42,7 @@ class LanguageSettingsActivity : AppCompatActivity() {
         updateLanguageButtons(languageCode)
         if (languageCode != LanguageManager.getSelectedLanguage(this)) {
             LanguageManager.setLanguage(this, languageCode)
-            showToast(getString(R.string.language_saved))
+            showMotionSnackbar(getString(R.string.language_saved))
         }
     }
 

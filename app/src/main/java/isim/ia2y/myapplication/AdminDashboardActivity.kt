@@ -92,7 +92,7 @@ class AdminDashboardActivity : AppCompatActivity() {
             viewModel.loadDashboardData()
         }.onFailure { e ->
             Log.e(logTag, "Failed to init admin dashboard", e)
-            showToast(getString(R.string.admin_dashboard_load_failed))
+            showMotionSnackbar(getString(R.string.admin_dashboard_load_failed))
             finish()
         }
     }

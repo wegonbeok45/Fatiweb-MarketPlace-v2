@@ -169,7 +169,7 @@ class PersonalDetailsActivity : AppCompatActivity() {
 
         val currentUser = FirebaseAuthManager.currentUser
         if (currentUser == null) {
-            showToast(getString(R.string.personal_details_saved))
+            showMotionSnackbar(getString(R.string.personal_details_saved))
             finishWithMotion()
             return
         }
@@ -184,7 +184,7 @@ class PersonalDetailsActivity : AppCompatActivity() {
 
             result.fold(
                 onSuccess = {
-                    showToast(getString(R.string.personal_details_saved))
+                    showMotionSnackbar(getString(R.string.personal_details_saved))
                     finishWithMotion()
                 },
                 onFailure = { error ->

@@ -428,7 +428,7 @@ open class AdminProduitsActivity : AppCompatActivity() {
                         .onSuccess {
                             allProducts.removeAll { it.id == product.id }
                             renderProducts()
-                            showToast(getString(R.string.admin_product_deleted))
+                            showMotionSnackbar(getString(R.string.admin_product_deleted))
                             loadStats()
                         }
                         .onFailure {

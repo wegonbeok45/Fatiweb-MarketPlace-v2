@@ -60,16 +60,11 @@ fun AppCompatActivity.showAuthChoiceDialog(
     dialog.show()
 }
 
-@Deprecated("Use showMotionSnackbar for consistent feedback", ReplaceWith("showMotionSnackbar(message)"))
-fun AppCompatActivity.showToast(message: String) {
-    showMotionSnackbar(message)
-}
-
 fun AppCompatActivity.bindComingSoon(vararg ids: Int) {
     val message = getString(R.string.action_unavailable)
     ids.forEach { viewId ->
         findViewById<View?>(viewId)?.setOnClickListener {
-            showToast(message)
+            showMotionSnackbar(message)
         }
     }
 }
@@ -86,7 +81,7 @@ fun AppCompatActivity.bindSearchComingSoon(vararg ids: Int) {
     val message = getString(R.string.main_tab_load_failed)
     ids.forEach { viewId ->
         findViewById<View?>(viewId)?.setOnClickListener {
-            showToast(message)
+            showMotionSnackbar(message)
         }
     }
 }

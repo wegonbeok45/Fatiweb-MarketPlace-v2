@@ -154,7 +154,7 @@ class AdminParametresActivity : AppCompatActivity() {
         btnSave?.setOnClickListener {
             val newPrice = etPrice?.text.toString().trim().replace(',', '.').toDoubleOrNull()
             if (newPrice == null || newPrice < 0.0) {
-                showToast(getString(R.string.admin_invalid_price))
+                showMotionSnackbar(getString(R.string.admin_invalid_price))
                 return@setOnClickListener
             }
             onSave(newPrice)
@@ -179,7 +179,7 @@ class AdminParametresActivity : AppCompatActivity() {
                     }
                 }.onSuccess {
                     btnSeed.text = getString(R.string.admin_settings_debug_seed_done)
-                    showToast(getString(R.string.admin_settings_debug_seed_success))
+                    showMotionSnackbar(getString(R.string.admin_settings_debug_seed_success))
                 }.onFailure {
                     btnSeed.isEnabled = true
                     btnSeed.text = getString(R.string.admin_settings_debug_seed)

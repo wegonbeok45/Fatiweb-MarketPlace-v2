@@ -110,7 +110,7 @@ class ProfileTabFragment : Fragment() {
             )
         }.onFailure { error ->
             Log.e(logTag, "Failed to initialize profile tab", error)
-            (activity as? AppCompatActivity)?.showToast(getString(R.string.profile_load_failed))
+            (activity as? AppCompatActivity)?.showMotionSnackbar(getString(R.string.profile_load_failed))
             (activity as? MainActivity)?.selectTab(MainActivity.Tab.HOME, animate = false)
         }
     }
@@ -590,7 +590,7 @@ class ProfileTabFragment : Fragment() {
                                 runCatching { FirestoreService.updateUserProfileName(currentUser.uid, nextName) }
                             }
                             dialog.dismiss()
-                            host.showToast(getString(R.string.profile_updated))
+                            host.showMotionSnackbar(getString(R.string.profile_updated))
                         },
                         onFailure = { error ->
                             host.showMotionSnackbar(FirebaseAuthManager.friendlyError(requireContext(), error))
