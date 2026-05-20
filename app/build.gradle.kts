@@ -103,6 +103,11 @@ dependencies {
     // Coroutines for Firebase .await() support
     implementation(libs.kotlinx.coroutines.play.services)
     implementation(libs.kotlinx.coroutines.android)
+    // Credential Manager — replaces legacy GoogleSignIn API
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play.services.auth)
+    implementation(libs.google.identity.googleid)
+    // play-services-auth kept for transitive deps (e.g. phone auth)
     implementation(libs.play.services.auth)
     implementation(libs.lottie)
     implementation(libs.coil)

@@ -8,22 +8,17 @@ import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.credentials.exceptions.GetCredentialCancellationException
 import androidx.lifecycle.lifecycleScope
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInClient
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.gms.common.api.ApiException
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.launch
 
 class RegisterActivity : AppCompatActivity() {
     private var passwordVisible = false
     private var isRegisterSubmitting = false
-    private lateinit var googleSignInClient: GoogleSignInClient
 
     companion object {
         private const val KEY_NAME = "name"
@@ -40,29 +35,6 @@ class RegisterActivity : AppCompatActivity() {
         }
     }
 
-    private val googleSignInLauncher = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        val data = result.data
-        if (data == null) {
-            showMotionSnackbar(getString(R.string.auth_google_sign_in_failed))
-            return@registerForActivityResult
-        }
-        try {
-            val account = GoogleSignIn.getSignedInAccountFromIntent(data)
-                .getResult(ApiException::class.java)
-            val idToken = account?.idToken
-            if (idToken == null) {
-                showMotionSnackbar(getString(R.string.auth_google_sign_in_failed))
-                return@registerForActivityResult
-            }
-            handleGoogleIdToken(idToken)
-        } catch (e: ApiException) {
-            Log.w("RegisterActivity", "Google sign-in failed: ${e.statusCode} ${e.message}", e)
-            showMotionSnackbar(getString(R.string.auth_google_sign_in_failed))
-        }
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -74,11 +46,6 @@ class RegisterActivity : AppCompatActivity() {
             v.setPadding(hPadding, systemBars.top + vPadding, hPadding, systemBars.bottom + vPadding)
             insets
         }
-        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(getString(R.string.google_web_client_id))
-            .requestEmail()
-            .build()
-        googleSignInClient = GoogleSignIn.getClient(this, gso)
         setupRegisterActions()
 
         if (savedInstanceState != null) {
@@ -203,8 +170,27 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     private fun setupGoogleLogin() {
-        findViewById<View>(R.id.btnGoogle)?.setOnClickListener {
-            googleSignInLauncher.launch(googleSignInClient.signInIntent)
+        findViewById<View>(R.id.btnGoogle)?.setOnClickListener { launchGoogleSignIn() }
+    }
+
+    private fun launchGoogleSignIn() {
+        lifecycleScope.launch {
+            try {
+                val idToken = GoogleCredentialHelper.fetchIdToken(
+                    this@RegisterActivity,
+                    getString(R.string.google_web_client_id)
+                )
+                if (idToken != null) {
+                    handleGoogleIdToken(idToken)
+                } else {
+                    showMotionSnackbar(getString(R.string.auth_google_sign_in_failed))
+                }
+            } catch (e: GetCredentialCancellationException) {
+                // User dismissed — no-op.
+            } catch (e: Exception) {
+                Log.w("RegisterActivity", "Google sign-in failed", e)
+                showMotionSnackbar(getString(R.string.auth_google_sign_in_failed))
+            }
         }
     }
 

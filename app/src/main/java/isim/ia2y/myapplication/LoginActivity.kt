@@ -8,23 +8,18 @@ import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.credentials.exceptions.GetCredentialCancellationException
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInClient
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.gms.common.api.ApiException
 import kotlinx.coroutines.launch
 import isim.ia2y.myapplication.databinding.ActivityLoginBinding
 
 class LoginActivity : AppCompatActivity() {
     private var passwordVisible = false
     private var isEmailLoginSubmitting = false
-    private lateinit var googleSignInClient: GoogleSignInClient
     private lateinit var binding: ActivityLoginBinding
 
     companion object {
@@ -45,29 +40,6 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    private val googleSignInLauncher = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        val data = result.data
-        if (data == null) {
-            showMotionSnackbar(getString(R.string.auth_google_sign_in_failed))
-            return@registerForActivityResult
-        }
-        try {
-            val account = GoogleSignIn.getSignedInAccountFromIntent(data)
-                .getResult(ApiException::class.java)
-            val idToken = account?.idToken
-            if (idToken == null) {
-                showMotionSnackbar(getString(R.string.auth_google_sign_in_failed))
-                return@registerForActivityResult
-            }
-            handleGoogleIdToken(idToken)
-        } catch (e: ApiException) {
-            Log.w("LoginActivity", "Google sign-in failed: ${e.statusCode} ${e.message}", e)
-            showMotionSnackbar(getString(R.string.auth_google_sign_in_failed))
-        }
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -80,11 +52,6 @@ class LoginActivity : AppCompatActivity() {
             v.setPadding(hPadding, systemBars.top + vPadding, hPadding, systemBars.bottom + vPadding)
             insets
         }
-        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(getString(R.string.google_web_client_id))
-            .requestEmail()
-            .build()
-        googleSignInClient = GoogleSignIn.getClient(this, gso)
         setupLoginActions()
 
         if (savedInstanceState != null) {
@@ -218,11 +185,30 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun setupGoogleLogin() {
-        binding.btnGoogle.setOnClickListener {
-            googleSignInLauncher.launch(googleSignInClient.signInIntent)
-        }
+        binding.btnGoogle.setOnClickListener { launchGoogleSignIn() }
         binding.btnPhone.setOnClickListener {
             startActivity(PhoneLoginActivity.createIntent(this).copyAuthReturnFrom(intent))
+        }
+    }
+
+    private fun launchGoogleSignIn() {
+        lifecycleScope.launch {
+            try {
+                val idToken = GoogleCredentialHelper.fetchIdToken(
+                    this@LoginActivity,
+                    getString(R.string.google_web_client_id)
+                )
+                if (idToken != null) {
+                    handleGoogleIdToken(idToken)
+                } else {
+                    showMotionSnackbar(getString(R.string.auth_google_sign_in_failed))
+                }
+            } catch (e: GetCredentialCancellationException) {
+                // User dismissed the sheet — no-op.
+            } catch (e: Exception) {
+                Log.w("LoginActivity", "Google sign-in failed", e)
+                showMotionSnackbar(getString(R.string.auth_google_sign_in_failed))
+            }
         }
     }
 
