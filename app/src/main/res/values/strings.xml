@@ -1,6 +1,27 @@
 <resources xmlns:tools="http://schemas.android.com/tools"
     tools:ignore="MissingTranslation">
     <string name="app_name">FatiWeb Market</string>
+    <!-- Phone auth -->
+    <string name="phone_login_cta">Continuer avec le téléphone</string>
+    <string name="phone_login_title">Entrez votre numéro</string>
+    <string name="phone_login_subtitle">Nous vous enverrons un code de vérification par SMS.</string>
+    <string name="phone_login_field_label">Numéro de téléphone</string>
+    <string name="phone_login_field_hint">12 345 678</string>
+    <string name="phone_login_country_code">+216</string>
+    <string name="phone_login_helper">Tarifs SMS standard appliqués par votre opérateur.</string>
+    <string name="phone_login_send_code">Envoyer le code</string>
+    <string name="phone_login_sending">Envoi en cours…</string>
+    <string name="phone_login_invalid">Numéro invalide. Entrez 8 chiffres.</string>
+    <string name="phone_verify_title">Vérifiez votre numéro</string>
+    <string name="phone_verify_subtitle">Nous avons envoyé un code à %1$s</string>
+    <string name="phone_verify_field_label">Code à 6 chiffres</string>
+    <string name="phone_verify_field_hint">······</string>
+    <string name="phone_verify_confirm">Vérifier</string>
+    <string name="phone_verify_verifying">Vérification…</string>
+    <string name="phone_verify_invalid">Code invalide. 6 chiffres requis.</string>
+    <string name="phone_verify_resend">Renvoyer le code</string>
+    <string name="phone_verify_resend_in">Renvoyer dans %1$d s</string>
+    <string name="phone_verify_resent">Nouveau code envoyé.</string>
     <string name="details_top_title">D&#233;tails du produit</string>
     <string name="details_back">Retour</string>
     <string name="details_share">Partager</string>
@@ -44,6 +65,13 @@
     <string name="auth_dialog_create_account">Creer compte</string>
     <string name="auth_dialog_existing_client">Deja un client</string>
     <string name="auth_verification_sent">Un e-mail de v&#233;rification a &#233;t&#233; envoy&#233; &#224; votre adresse.</string>
+    <string name="auth_verify_dialog_title">V&#233;rifiez votre adresse e-mail</string>
+    <string name="auth_verify_dialog_message">Un lien de v&#233;rification a &#233;t&#233; envoy&#233; &#224; %1$s.\nCliquez sur le lien dans l&#8217;e-mail puis revenez ici.</string>
+    <string name="auth_verify_dialog_confirmed">J&#8217;ai v&#233;rifi&#233;</string>
+    <string name="auth_verify_dialog_resend">Renvoyer l&#8217;e-mail</string>
+    <string name="auth_verify_dialog_cancel">Annuler l&#8217;inscription</string>
+    <string name="auth_verify_not_yet">Pas encore v&#233;rifi&#233;. V&#233;rifiez votre bo&#238;te mail.</string>
+    <string name="auth_verify_resent">E-mail de v&#233;rification renvoy&#233;.</string>
     <string name="profile_signup_chip">S&#8217;inscrire</string>
     <string name="search_hint_products">Rechercher des produits</string>
     <string name="product_added_to_favorites">%1$s ajoute aux favoris</string>
@@ -303,6 +331,9 @@
     <string name="admin_announcements_audience_all">Tous les utilisateurs</string>
     <string name="admin_announcements_audience_clients">Clients</string>
     <string name="admin_announcements_audience_admins">Admins</string>
+    <string name="admin_announcements_audience_vendeurs">Vendeurs</string>
+    <string name="notification_welcome_title">Bienvenue sur FatiWeb !</string>
+    <string name="notification_welcome_message">D&#233;couvrez l&#8217;artisanat tunisien premium. Explorez les cat&#233;gories, ajoutez vos favoris et profitez de la livraison rapide sur votre premi&#232;re commande.</string>
 
     <!-- Main navigation (labels + accessibility) -->
     <string name="nav_tab_home">Accueil</string>

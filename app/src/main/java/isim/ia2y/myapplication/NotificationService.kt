@@ -36,7 +36,21 @@ object NotificationService {
     }
 
     suspend fun fetchPublicAnnouncementNotifications(): List<AppNotification> {
+        val currentUser = FirebaseAuthManager.currentUser
+        val uid = currentUser?.uid
+        val accountCreatedAt = currentUser?.metadata?.creationTimestamp ?: 0L
+        val role = if (uid != null) {
+            runCatching { UserService.fetchUserRole(uid) }.getOrDefault(UserRoles.CLIENT)
+        } else UserRoles.CLIENT
+
+        val allowedAudiences = when (role) {
+            UserRoles.ADMIN -> listOf("all", "clients", "vendeurs", "admins")
+            UserRoles.VENDEUR -> listOf("all", "vendeurs")
+            else -> listOf("all", "clients")
+        }
+
         val snapshot = notificationsRef
+            .whereIn("audience", allowedAudiences)
             .orderBy("createdAt", Query.Direction.DESCENDING)
             .limit(NOTIFICATION_PAGE_LIMIT)
             .get()
@@ -46,14 +60,14 @@ object NotificationService {
             val message = (data["body"] as? String)
                 ?.takeIf { it.isNotBlank() }
                 ?: (data["message"] as? String).orEmpty()
-            val audience = data["audience"] as? String ?: "all"
-            if (audience != "all" && audience != "clients") return@mapNotNull null
+            val timestamp = data["createdAt"].toEpochMillis()
+            if (accountCreatedAt > 0L && timestamp > 0L && timestamp < accountCreatedAt) return@mapNotNull null
 
             AppNotification(
                 id = doc.id,
                 title = data["title"] as? String ?: "",
                 message = message,
-                timestamp = data["createdAt"].toEpochMillis(),
+                timestamp = timestamp,
                 isRead = false,
                 route = "notifications",
                 entityRef = doc.id
@@ -62,6 +76,9 @@ object NotificationService {
     }
 
     suspend fun fetchUserInboxNotifications(uid: String): List<AppNotification> {
+        val accountCreatedAt = FirebaseAuthManager.currentUser
+            ?.takeIf { it.uid == uid }
+            ?.metadata?.creationTimestamp ?: 0L
         val snapshot = inboxRef(uid)
             .orderBy("createdAt", Query.Direction.DESCENDING)
             .limit(NOTIFICATION_PAGE_LIMIT)
@@ -72,12 +89,14 @@ object NotificationService {
             val message = (data["body"] as? String)
                 ?.takeIf { it.isNotBlank() }
                 ?: (data["message"] as? String).orEmpty()
+            val timestamp = data["createdAt"].toEpochMillis()
+            if (accountCreatedAt > 0L && timestamp > 0L && timestamp < accountCreatedAt) return@mapNotNull null
 
             AppNotification(
                 id = doc.id,
                 title = data["title"] as? String ?: "",
                 message = message,
-                timestamp = data["createdAt"].toEpochMillis(),
+                timestamp = timestamp,
                 isRead = data["readAt"] != null,
                 route = data["route"] as? String ?: "",
                 entityRef = data["entityRef"] as? String ?: "",

@@ -1,4 +1,5 @@
 import org.gradle.api.tasks.compile.JavaCompile
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.application)
@@ -7,6 +8,13 @@ plugins {
     alias(libs.plugins.google.crashlytics)
     alias(libs.plugins.firebase.perf)
 }
+
+val keystoreProps = Properties().apply {
+    val f = rootProject.file("local.properties")
+    if (f.exists()) f.inputStream().use { load(it) }
+}
+fun secret(key: String): String? =
+    keystoreProps.getProperty(key) ?: System.getenv(key)
 
 android {
     namespace = "isim.ia2y.myapplication"
@@ -22,6 +30,21 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs {
+        create("release") {
+            val storePath = secret("RELEASE_STORE_FILE")
+            val storePw = secret("RELEASE_STORE_PASSWORD")
+            val alias = secret("RELEASE_KEY_ALIAS")
+            val keyPw = secret("RELEASE_KEY_PASSWORD")
+            if (storePath != null && storePw != null && alias != null && keyPw != null) {
+                storeFile = file(storePath)
+                storePassword = storePw
+                keyAlias = alias
+                keyPassword = keyPw
+            }
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = true
@@ -30,6 +53,10 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            val cfg = signingConfigs.getByName("release")
+            if (cfg.storeFile != null) {
+                signingConfig = cfg
+            }
         }
     }
 

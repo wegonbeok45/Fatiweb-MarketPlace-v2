@@ -278,7 +278,11 @@ service cloud.firestore {
         resource.data.type == 'announcement' &&
         resource.data.title is string &&
         resource.data.message is string &&
-        resource.data.audience in ['all', 'clients'];
+        (
+          resource.data.audience == 'all' ||
+          resource.data.audience == 'clients' ||
+          (resource.data.audience == 'vendeurs' && isVendeur())
+        );
     }
 
     function cartItemIsSafe(item) {

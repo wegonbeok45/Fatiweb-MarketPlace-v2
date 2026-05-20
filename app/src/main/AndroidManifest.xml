@@ -153,6 +153,14 @@
             android:name=".LoginActivity"
             android:exported="false" />
         <activity
+            android:name=".PhoneLoginActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".PhoneVerifyActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
             android:name=".Onboard3"
             android:exported="false" />
         <activity

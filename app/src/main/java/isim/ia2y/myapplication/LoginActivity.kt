@@ -221,6 +221,9 @@ class LoginActivity : AppCompatActivity() {
         binding.btnGoogle.setOnClickListener {
             googleSignInLauncher.launch(googleSignInClient.signInIntent)
         }
+        binding.btnPhone.setOnClickListener {
+            startActivity(PhoneLoginActivity.createIntent(this).copyAuthReturnFrom(intent))
+        }
     }
 
     private fun handleGoogleIdToken(idToken: String) {

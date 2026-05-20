@@ -17,6 +17,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.launch
 
 class RegisterActivity : AppCompatActivity() {
@@ -160,12 +161,11 @@ class RegisterActivity : AppCompatActivity() {
                         onSuccess = {
                             AnalyticsTracker.signUp("email")
                             GuestSessionMerger.mergeIntoCurrentUserInBackground(this@RegisterActivity)
-                            lifecycleScope.launch { runCatching { FirebaseAuthManager.sendEmailVerification() } }
+                            runCatching { FirebaseAuthManager.sendEmailVerification() }
                             markInputState(R.id.cardFullNameField, InputFieldState.SUCCESS)
                             markInputState(R.id.cardEmailField, InputFieldState.SUCCESS)
                             markInputState(R.id.cardPasswordField, InputFieldState.SUCCESS)
-                            showMotionSnackbar(getString(R.string.auth_verification_sent))
-                            completeAuthFlow()
+                            showEmailVerificationDialog(email)
                         },
                         onFailure = { e ->
                             showMotionSnackbar(FirebaseAuthManager.friendlyError(this@RegisterActivity, e))
@@ -242,6 +242,49 @@ class RegisterActivity : AppCompatActivity() {
         button.isEnabled = !isLoading
         button.text =
             getString(if (isLoading) R.string.register_submitting else R.string.register_btn_label)
+    }
+
+    private fun showEmailVerificationDialog(email: String) {
+        val dialog = MaterialAlertDialogBuilder(this)
+            .setTitle(getString(R.string.auth_verify_dialog_title))
+            .setMessage(getString(R.string.auth_verify_dialog_message, email))
+            .setCancelable(false)
+            .setPositiveButton(getString(R.string.auth_verify_dialog_confirmed), null)
+            .setNeutralButton(getString(R.string.auth_verify_dialog_resend), null)
+            .setNegativeButton(getString(R.string.auth_verify_dialog_cancel), null)
+            .create()
+
+        dialog.setOnShowListener {
+            dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE)?.setOnClickListener {
+                lifecycleScope.launch {
+                    val result = FirebaseAuthManager.reloadAndCheckEmailVerified()
+                    result.fold(
+                        onSuccess = { verified ->
+                            if (verified) {
+                                dialog.dismiss()
+                                completeAuthFlow()
+                            } else {
+                                showMotionSnackbar(getString(R.string.auth_verify_not_yet))
+                            }
+                        },
+                        onFailure = { e ->
+                            showMotionSnackbar(FirebaseAuthManager.friendlyError(this@RegisterActivity, e))
+                        }
+                    )
+                }
+            }
+            dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_NEUTRAL)?.setOnClickListener {
+                lifecycleScope.launch {
+                    runCatching { FirebaseAuthManager.sendEmailVerification() }
+                    showMotionSnackbar(getString(R.string.auth_verify_resent))
+                }
+            }
+            dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_NEGATIVE)?.setOnClickListener {
+                FirebaseAuthManager.signOut()
+                dialog.dismiss()
+            }
+        }
+        dialog.show()
     }
 
     private fun completeAuthFlow() {

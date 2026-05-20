@@ -26,6 +26,8 @@ object NotificationStore {
     private const val KEY_LAST_REFRESH_AT = "last_refresh_at"
     private const val GUEST_KEY = "guest"
     private const val DEFAULT_REFRESH_TTL_MS = 2 * 60 * 1000L
+    private const val WELCOME_GRACE_PERIOD_MS = 14L * 24 * 60 * 60 * 1000
+    private const val WELCOME_NOTIFICATION_PREFIX = "welcome_"
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     private fun getPrefsForAccount(context: Context, accountKey: String): SharedPreferences {
@@ -76,7 +78,8 @@ object NotificationStore {
                 .toSet() + runCatching { FirestoreService.fetchNotificationReadIds(uid) }.getOrDefault(emptySet())
             val inbox = runCatching { FirestoreService.fetchUserInboxNotifications(uid) }.getOrDefault(emptyList())
             val publicAnnouncements = FirestoreService.fetchPublicAnnouncementNotifications()
-            (inbox + publicAnnouncements)
+            val welcome = buildWelcomeNotification(context, uid)
+            (inbox + publicAnnouncements + listOfNotNull(welcome))
                 .distinctBy { it.id }
                 .map { notification ->
                     notification.apply {
@@ -90,6 +93,23 @@ object NotificationStore {
         }
         saveAll(context, remote)
         return remote
+    }
+
+    private fun buildWelcomeNotification(context: Context, uid: String): AppNotification? {
+        val createdAt = FirebaseAuthManager.currentUser
+            ?.takeIf { it.uid == uid }
+            ?.metadata?.creationTimestamp ?: return null
+        if (createdAt <= 0L) return null
+        if (System.currentTimeMillis() - createdAt > WELCOME_GRACE_PERIOD_MS) return null
+        return AppNotification(
+            id = "$WELCOME_NOTIFICATION_PREFIX$uid",
+            title = context.getString(R.string.notification_welcome_title),
+            message = context.getString(R.string.notification_welcome_message),
+            timestamp = createdAt,
+            isRead = false,
+            route = "",
+            entityRef = ""
+        )
     }
 
     fun hasUnread(context: Context): Boolean {

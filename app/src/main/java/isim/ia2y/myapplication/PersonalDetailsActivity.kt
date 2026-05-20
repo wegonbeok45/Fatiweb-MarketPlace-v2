@@ -44,12 +44,11 @@ class PersonalDetailsActivity : AppCompatActivity() {
         }
 
         lifecycleScope.launch {
-            showMotionSnackbar(getString(R.string.profile_avatar_uploading))
             runCatching { UserAvatarService.uploadAndSaveAvatar(this@PersonalDetailsActivity, uid, uri) }
                 .onSuccess { remoteUrl ->
                     if (isFinishing || isDestroyed) return@onSuccess
                     loadAvatarUrl(remoteUrl)
-                    showMotionSnackbar(getString(R.string.profile_avatar_updated))
+                    showSuccess(getString(R.string.profile_avatar_updated))
                 }
                 .onFailure { error ->
                     android.util.Log.e(TAG, "Avatar upload failed", error)

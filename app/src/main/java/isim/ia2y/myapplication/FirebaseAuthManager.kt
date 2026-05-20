@@ -9,7 +9,14 @@ import com.google.firebase.auth.FirebaseAuthRecentLoginRequiredException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.auth.PhoneAuthCredential
+import com.google.firebase.auth.PhoneAuthOptions
+import com.google.firebase.auth.PhoneAuthProvider
 import com.google.firebase.auth.userProfileChangeRequest
+import java.util.concurrent.TimeUnit
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlinx.coroutines.suspendCancellableCoroutine
 import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.FirebaseTooManyRequestsException
 import kotlinx.coroutines.CancellationException
@@ -121,6 +128,111 @@ object FirebaseAuthManager {
         }
     }
 
+    /**
+     * Result of starting phone verification.
+     * - [verificationId] is null when Play Services auto-retrieved the SMS and signed the user in.
+     * - When non-null, prompt the user for the 6-digit code and call [signInWithSmsCode].
+     */
+    data class PhoneVerificationStart(
+        val verificationId: String?,
+        val autoSignedInUser: FirebaseUser?,
+        val resendToken: PhoneAuthProvider.ForceResendingToken?
+    )
+
+    /**
+     * Start phone number verification. SMS is sent to [e164PhoneNumber] (must be E.164, e.g. +21612345678).
+     * The [activity] is required by Firebase to mount the reCAPTCHA / Play Integrity flow if needed.
+     */
+    suspend fun startPhoneVerification(
+        activity: android.app.Activity,
+        e164PhoneNumber: String,
+        resendToken: PhoneAuthProvider.ForceResendingToken? = null
+    ): Result<PhoneVerificationStart> = runAuthAction {
+        suspendCancellableCoroutine { cont ->
+            val callbacks = object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
+                override fun onVerificationCompleted(credential: PhoneAuthCredential) {
+                    backgroundScope.launch {
+                        val signInResult = runCatching {
+                            auth.signInWithCredential(credential).await()
+                        }
+                        if (cont.isActive) {
+                            signInResult.fold(
+                                onSuccess = { res ->
+                                    val user = res.user
+                                    if (user != null) {
+                                        setCrashlyticsUser(user)
+                                        syncUserProfileInBackground(
+                                            user = user,
+                                            fallbackName = user.displayName ?: user.phoneNumber ?: "User",
+                                            fallbackEmail = user.email.orEmpty()
+                                        )
+                                        warmUserRoleInBackground(user)
+                                    }
+                                    cont.resume(
+                                        PhoneVerificationStart(
+                                            verificationId = null,
+                                            autoSignedInUser = user,
+                                            resendToken = null
+                                        )
+                                    )
+                                },
+                                onFailure = { cont.resumeWithException(it) }
+                            )
+                        }
+                    }
+                }
+
+                override fun onVerificationFailed(e: com.google.firebase.FirebaseException) {
+                    Log.w(TAG, "Phone verification failed", e)
+                    if (cont.isActive) cont.resumeWithException(e)
+                }
+
+                override fun onCodeSent(
+                    verificationId: String,
+                    token: PhoneAuthProvider.ForceResendingToken
+                ) {
+                    if (cont.isActive) {
+                        cont.resume(
+                            PhoneVerificationStart(
+                                verificationId = verificationId,
+                                autoSignedInUser = null,
+                                resendToken = token
+                            )
+                        )
+                    }
+                }
+            }
+
+            val options = PhoneAuthOptions.newBuilder(auth)
+                .setPhoneNumber(e164PhoneNumber)
+                .setTimeout(60L, TimeUnit.SECONDS)
+                .setActivity(activity)
+                .setCallbacks(callbacks)
+                .apply { if (resendToken != null) setForceResendingToken(resendToken) }
+                .build()
+            PhoneAuthProvider.verifyPhoneNumber(options)
+        }
+    }
+
+    /**
+     * Complete phone sign-in with the SMS code the user typed in.
+     */
+    suspend fun signInWithSmsCode(verificationId: String, smsCode: String): Result<FirebaseUser> {
+        return runAuthAction {
+            val credential = PhoneAuthProvider.getCredential(verificationId, smsCode)
+            val result = awaitAuthRequest { auth.signInWithCredential(credential).await() }
+            val user = requireNotNull(result.user) { "Authenticated phone user missing" }
+            setCrashlyticsUser(user)
+            syncUserProfileInBackground(
+                user = user,
+                fallbackName = user.displayName ?: user.phoneNumber ?: "User",
+                fallbackEmail = user.email.orEmpty()
+            )
+            warmUserRoleInBackground(user)
+            user
+        }
+    }
+
     suspend fun sendPasswordReset(email: String): Result<Unit> {
         return runAuthAction {
             awaitAuthRequest { auth.sendPasswordResetEmail(email).await() }
@@ -185,6 +297,14 @@ object FirebaseAuthManager {
         val user = auth.currentUser ?: return Result.failure(IllegalStateException("No user logged in"))
         return runAuthAction {
             awaitAuthRequest { user.sendEmailVerification().await() }
+        }
+    }
+
+    suspend fun reloadAndCheckEmailVerified(): Result<Boolean> {
+        val user = auth.currentUser ?: return Result.failure(IllegalStateException("No user logged in"))
+        return runAuthAction {
+            awaitAuthRequest { user.reload().await() }
+            auth.currentUser?.isEmailVerified ?: false
         }
     }
 

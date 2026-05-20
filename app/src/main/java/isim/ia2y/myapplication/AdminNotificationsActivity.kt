@@ -63,6 +63,7 @@ class AdminNotificationsActivity : AppCompatActivity() {
         val audienceOptions = listOf(
             AudienceOption("all", getString(R.string.admin_announcements_audience_all)),
             AudienceOption("clients", getString(R.string.admin_announcements_audience_clients)),
+            AudienceOption("vendeurs", getString(R.string.admin_announcements_audience_vendeurs)),
             AudienceOption("admins", getString(R.string.admin_announcements_audience_admins))
         )
         audienceInput.setAdapter(
@@ -210,6 +211,7 @@ class AdminNotificationsActivity : AppCompatActivity() {
 
     private fun audienceLabel(audience: String): String = when (audience) {
         "clients" -> getString(R.string.admin_announcements_audience_clients)
+        "vendeurs" -> getString(R.string.admin_announcements_audience_vendeurs)
         "admins" -> getString(R.string.admin_announcements_audience_admins)
         else -> getString(R.string.admin_announcements_audience_all)
     }

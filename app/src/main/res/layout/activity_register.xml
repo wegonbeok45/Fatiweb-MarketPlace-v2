@@ -16,412 +16,11 @@
         android:id="@+id/ivBack"
         android:layout_width="@dimen/icon_size_large"
         android:layout_height="@dimen/icon_size_large"
-        android:layout_marginTop="0dp"
         android:importantForAccessibility="no"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/back"
         app:tint="?attr/colorOnSurface" />
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/layoutRegisterContent"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginTop="8dp"
-        app:layout_constraintBottom_toTopOf="@id/layoutLoginRow"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/ivBack">
-
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/cardRegisterPanel"
-            android:layout_width="0dp"
-            android:layout_height="120dp"
-            app:cardCornerRadius="@dimen/corner_radius_large"
-            app:cardElevation="0dp"
-            app:strokeColor="@color/overlay_white_8"
-            app:strokeWidth="1dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <ImageView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:importantForAccessibility="no"
-                    android:scaleType="centerCrop"
-                    app:srcCompat="@drawable/loginscreen1" />
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@drawable/bg_auth_hero_scrim" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:gravity="bottom"
-                    android:orientation="vertical"
-                    android:padding="18dp">
-
-                    <com.google.android.material.card.MaterialCardView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:cardBackgroundColor="@color/overlay_white_90"
-                        app:cardCornerRadius="999dp"
-                        app:cardElevation="0dp"
-                        app:strokeWidth="0dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:paddingStart="12dp"
-                            android:paddingTop="6dp"
-                            android:paddingEnd="12dp"
-                            android:paddingBottom="6dp"
-                            android:text="@string/auto_compte_premium_0868"
-                            android:textColor="?attr/colorOnSurface"
-                            android:textSize="@dimen/text_size_overline"
-                            android:fontFamily="@font/manrope_semibold" />
-                    </com.google.android.material.card.MaterialCardView>
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:text="@string/auto_creez_votre_profil_synchronisez_137e"
-                        android:textColor="@android:color/white"
-                        android:textSize="@dimen/text_size_title"
-                        android:fontFamily="@font/manrope_semibold"
-                        android:lineSpacingExtra="2dp"
-                        android:maxLines="2" />
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:orientation="horizontal">
-
-                        <com.google.android.material.card.MaterialCardView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            app:cardBackgroundColor="@color/overlay_white_15"
-                            app:cardCornerRadius="999dp"
-                            app:cardElevation="0dp"
-                            app:strokeColor="@color/overlay_white_20"
-                            app:strokeWidth="1dp">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:paddingStart="10dp"
-                                android:paddingTop="6dp"
-                                android:paddingEnd="10dp"
-                                android:paddingBottom="6dp"
-                                android:text="@string/auto_profil_sync_baff"
-                                android:textColor="@android:color/white"
-                                android:textSize="@dimen/text_size_overline"
-                                android:fontFamily="@font/manrope_medium" />
-                        </com.google.android.material.card.MaterialCardView>
-
-                        <com.google.android.material.card.MaterialCardView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="8dp"
-                            app:cardBackgroundColor="@color/overlay_white_15"
-                            app:cardCornerRadius="999dp"
-                            app:cardElevation="0dp"
-                            app:strokeColor="@color/overlay_white_20"
-                            app:strokeWidth="1dp">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:paddingStart="10dp"
-                                android:paddingTop="6dp"
-                                android:paddingEnd="10dp"
-                                android:paddingBottom="6dp"
-                                android:text="@string/auto_favoris_cloud_3c82"
-                                android:textColor="@android:color/white"
-                                android:textSize="@dimen/text_size_overline"
-                                android:fontFamily="@font/manrope_medium" />
-                        </com.google.android.material.card.MaterialCardView>
-                    </LinearLayout>
-                </LinearLayout>
-            </FrameLayout>
-        </com.google.android.material.card.MaterialCardView>
-
-        <TextView
-            android:id="@+id/tvHeadline"
-            style="@style/AppText.Title"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/space_12"
-            android:gravity="center"
-            android:text="@string/auto_text_104"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/cardRegisterPanel" />
-
-        <TextView
-            android:id="@+id/tvSubtitle"
-            style="@style/AppText.Body"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/space_8"
-            android:gravity="center"
-            android:text="@string/auto_text_105"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvHeadline" />
-
-        <TextView
-            android:id="@+id/tvFullNameLabel"
-            style="@style/AppText.FieldLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="@string/auto_text_106"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvSubtitle" />
-
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/cardFullNameField"
-            style="@style/AppInput.Layout"
-            android:layout_width="0dp"
-            android:layout_marginTop="@dimen/space_4"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvFullNameLabel">
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/layoutFullNameField"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <ImageView
-                    android:id="@+id/ivFullNameIcon"
-                    android:layout_width="@dimen/auth_icon_slot_size"
-                    android:layout_height="@dimen/auth_icon_slot_size"
-                    android:padding="@dimen/space_12"
-                    android:importantForAccessibility="no"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:srcCompat="@drawable/user" />
-
-                <EditText
-                    android:id="@+id/etFullName"
-                    style="@style/AppInput.EditText"
-                    android:layout_width="0dp"
-                    android:hint="@string/auto_text_107"
-                    android:inputType="textPersonName"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@id/ivFullNameIcon"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-        </com.google.android.material.card.MaterialCardView>
-
-        <TextView
-            android:id="@+id/tvEmailLabel"
-            style="@style/AppText.FieldLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:text="@string/auto_text_034"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/cardFullNameField" />
-
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/cardEmailField"
-            style="@style/AppInput.Layout"
-            android:layout_width="0dp"
-            android:layout_marginTop="@dimen/space_4"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvEmailLabel">
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/layoutEmailField"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <ImageView
-                    android:id="@+id/ivEmailIcon"
-                    android:layout_width="@dimen/auth_icon_slot_size"
-                    android:layout_height="@dimen/auth_icon_slot_size"
-                    android:padding="@dimen/space_12"
-                    android:importantForAccessibility="no"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:srcCompat="@drawable/envelope" />
-
-                <EditText
-                    android:id="@+id/etEmail"
-                    style="@style/AppInput.EditText"
-                    android:layout_width="0dp"
-                    android:ellipsize="end"
-                    android:gravity="start|center_vertical"
-                    android:hint="@string/auto_text_035"
-                    android:inputType="textEmailAddress"
-                    android:maxLines="1"
-                    android:scrollHorizontally="false"
-                    android:textAlignment="viewStart"
-                    android:textDirection="ltr"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@id/ivEmailIcon"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-        </com.google.android.material.card.MaterialCardView>
-
-        <TextView
-            android:id="@+id/tvPasswordLabel"
-            style="@style/AppText.FieldLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:text="@string/auto_text_036"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/cardEmailField" />
-
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/cardPasswordField"
-            style="@style/AppInput.Layout"
-            android:layout_width="0dp"
-            android:layout_marginTop="@dimen/space_4"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvPasswordLabel">
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/layoutPasswordField"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <ImageView
-                    android:id="@+id/ivPasswordIcon"
-                    android:layout_width="@dimen/auth_icon_slot_size"
-                    android:layout_height="@dimen/auth_icon_slot_size"
-                    android:padding="@dimen/space_12"
-                    android:importantForAccessibility="no"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:srcCompat="@drawable/lock" />
-
-                <ImageView
-                    android:id="@+id/ivPasswordToggle"
-                    android:layout_width="@dimen/auth_icon_slot_size"
-                    android:layout_height="@dimen/auth_icon_slot_size"
-                    android:padding="@dimen/space_12"
-                    android:importantForAccessibility="no"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:srcCompat="@drawable/ic_eye_off"
-                    app:tint="?attr/colorOnSurfaceVariant" />
-
-                <EditText
-                    android:id="@+id/etPassword"
-                    style="@style/AppInput.EditText"
-                    android:layout_width="0dp"
-                    android:hint="@string/auto_text_108"
-                    android:inputType="textPassword"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@id/ivPasswordToggle"
-                    app:layout_constraintStart_toEndOf="@id/ivPasswordIcon"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-        </com.google.android.material.card.MaterialCardView>
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnRegister"
-            style="@style/AppButton.Primary"
-            android:layout_width="0dp"
-            android:layout_marginTop="20dp"
-            android:text="@string/auto_text_043"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/cardPasswordField" />
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/layoutOrDivider"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/btnRegister">
-
-            <View
-                android:id="@+id/viewDividerLeft"
-                android:layout_width="0dp"
-                android:layout_height="@dimen/divider_height"
-                android:background="@color/colorOutline"
-                app:layout_constraintBottom_toBottomOf="@id/tvOrSignUpWith"
-                app:layout_constraintEnd_toStartOf="@id/tvOrSignUpWith"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@id/tvOrSignUpWith" />
-
-            <TextView
-                android:id="@+id/tvOrSignUpWith"
-                style="@style/AppText.Caption"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingStart="@dimen/space_16"
-                android:paddingEnd="@dimen/space_16"
-                android:text="@string/auto_text_109"
-                android:textStyle="bold"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <View
-                android:id="@+id/viewDividerRight"
-                android:layout_width="0dp"
-                android:layout_height="@dimen/divider_height"
-                android:background="@color/colorOutline"
-                app:layout_constraintBottom_toBottomOf="@id/tvOrSignUpWith"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/tvOrSignUpWith"
-                app:layout_constraintTop_toTopOf="@id/tvOrSignUpWith" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/layoutSocialButtons"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/layoutOrDivider">
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnGoogle"
-                style="@style/AppButton.Secondary"
-                android:layout_width="0dp"
-                android:text="@string/auto_text_040"
-                app:icon="@drawable/googlelogo"
-                app:iconGravity="textStart"
-                app:iconPadding="@dimen/space_8"
-                app:iconSize="@dimen/space_20"
-                app:iconTint="@null"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layoutLoginRow"
@@ -458,5 +57,362 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        android:fillViewport="true"
+        android:overScrollMode="never"
+        app:layout_constraintBottom_toTopOf="@id/layoutLoginRow"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ivBack">
 
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/layoutRegisterContent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardRegisterPanel"
+                android:layout_width="0dp"
+                android:layout_height="100dp"
+                app:cardCornerRadius="@dimen/corner_radius_large"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/overlay_white_8"
+                app:strokeWidth="1dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:importantForAccessibility="no"
+                        android:scaleType="centerCrop"
+                        app:srcCompat="@drawable/loginscreen1" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/bg_auth_hero_scrim" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="bottom"
+                        android:orientation="vertical"
+                        android:padding="14dp">
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            app:cardBackgroundColor="@color/overlay_white_90"
+                            app:cardCornerRadius="999dp"
+                            app:cardElevation="0dp"
+                            app:strokeWidth="0dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:paddingStart="10dp"
+                                android:paddingTop="4dp"
+                                android:paddingEnd="10dp"
+                                android:paddingBottom="4dp"
+                                android:text="@string/auto_compte_premium_0868"
+                                android:textColor="?attr/colorOnSurface"
+                                android:textSize="@dimen/text_size_overline"
+                                android:fontFamily="@font/manrope_semibold" />
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:text="@string/auto_creez_votre_profil_synchronisez_137e"
+                            android:textColor="@android:color/white"
+                            android:textSize="@dimen/text_size_title"
+                            android:fontFamily="@font/manrope_semibold"
+                            android:lineSpacingExtra="1dp"
+                            android:maxLines="2" />
+
+                    </LinearLayout>
+                </FrameLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <TextView
+                android:id="@+id/tvHeadline"
+                style="@style/AppText.Title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_8"
+                android:gravity="center"
+                android:text="@string/auto_text_104"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/cardRegisterPanel" />
+
+            <TextView
+                android:id="@+id/tvSubtitle"
+                style="@style/AppText.Body"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_4"
+                android:gravity="center"
+                android:text="@string/auto_text_105"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvHeadline" />
+
+            <TextView
+                android:id="@+id/tvFullNameLabel"
+                style="@style/AppText.FieldLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="@string/auto_text_106"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvSubtitle" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardFullNameField"
+                style="@style/AppInput.Layout"
+                android:layout_width="0dp"
+                android:layout_marginTop="@dimen/space_4"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvFullNameLabel">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/layoutFullNameField"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <ImageView
+                        android:id="@+id/ivFullNameIcon"
+                        android:layout_width="@dimen/auth_icon_slot_size"
+                        android:layout_height="@dimen/auth_icon_slot_size"
+                        android:padding="@dimen/space_12"
+                        android:importantForAccessibility="no"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:srcCompat="@drawable/user" />
+
+                    <EditText
+                        android:id="@+id/etFullName"
+                        style="@style/AppInput.EditText"
+                        android:layout_width="0dp"
+                        android:hint="@string/auto_text_107"
+                        android:inputType="textPersonName"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/ivFullNameIcon"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <TextView
+                android:id="@+id/tvEmailLabel"
+                style="@style/AppText.FieldLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="@string/auto_text_034"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/cardFullNameField" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardEmailField"
+                style="@style/AppInput.Layout"
+                android:layout_width="0dp"
+                android:layout_marginTop="@dimen/space_4"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvEmailLabel">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/layoutEmailField"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <ImageView
+                        android:id="@+id/ivEmailIcon"
+                        android:layout_width="@dimen/auth_icon_slot_size"
+                        android:layout_height="@dimen/auth_icon_slot_size"
+                        android:padding="@dimen/space_12"
+                        android:importantForAccessibility="no"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:srcCompat="@drawable/envelope" />
+
+                    <EditText
+                        android:id="@+id/etEmail"
+                        style="@style/AppInput.EditText"
+                        android:layout_width="0dp"
+                        android:ellipsize="end"
+                        android:gravity="start|center_vertical"
+                        android:hint="@string/auto_text_035"
+                        android:inputType="textEmailAddress"
+                        android:maxLines="1"
+                        android:scrollHorizontally="false"
+                        android:textAlignment="viewStart"
+                        android:textDirection="ltr"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/ivEmailIcon"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <TextView
+                android:id="@+id/tvPasswordLabel"
+                style="@style/AppText.FieldLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="@string/auto_text_036"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/cardEmailField" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardPasswordField"
+                style="@style/AppInput.Layout"
+                android:layout_width="0dp"
+                android:layout_marginTop="@dimen/space_4"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvPasswordLabel">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/layoutPasswordField"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <ImageView
+                        android:id="@+id/ivPasswordIcon"
+                        android:layout_width="@dimen/auth_icon_slot_size"
+                        android:layout_height="@dimen/auth_icon_slot_size"
+                        android:padding="@dimen/space_12"
+                        android:importantForAccessibility="no"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:srcCompat="@drawable/lock" />
+
+                    <ImageView
+                        android:id="@+id/ivPasswordToggle"
+                        android:layout_width="@dimen/auth_icon_slot_size"
+                        android:layout_height="@dimen/auth_icon_slot_size"
+                        android:padding="@dimen/space_12"
+                        android:importantForAccessibility="no"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:srcCompat="@drawable/ic_eye_off"
+                        app:tint="?attr/colorOnSurfaceVariant" />
+
+                    <EditText
+                        android:id="@+id/etPassword"
+                        style="@style/AppInput.EditText"
+                        android:layout_width="0dp"
+                        android:hint="@string/auto_text_108"
+                        android:inputType="textPassword"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@id/ivPasswordToggle"
+                        app:layout_constraintStart_toEndOf="@id/ivPasswordIcon"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnRegister"
+                style="@style/AppButton.Primary"
+                android:layout_width="0dp"
+                android:layout_marginTop="16dp"
+                android:text="@string/auto_text_043"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/cardPasswordField" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layoutOrDivider"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/btnRegister">
+
+                <View
+                    android:id="@+id/viewDividerLeft"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/divider_height"
+                    android:background="@color/colorOutline"
+                    app:layout_constraintBottom_toBottomOf="@id/tvOrSignUpWith"
+                    app:layout_constraintEnd_toStartOf="@id/tvOrSignUpWith"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/tvOrSignUpWith" />
+
+                <TextView
+                    android:id="@+id/tvOrSignUpWith"
+                    style="@style/AppText.Caption"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="@dimen/space_16"
+                    android:paddingEnd="@dimen/space_16"
+                    android:text="@string/auto_text_109"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <View
+                    android:id="@+id/viewDividerRight"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/divider_height"
+                    android:background="@color/colorOutline"
+                    app:layout_constraintBottom_toBottomOf="@id/tvOrSignUpWith"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/tvOrSignUpWith"
+                    app:layout_constraintTop_toTopOf="@id/tvOrSignUpWith" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layoutSocialButtons"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="8dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/layoutOrDivider">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnGoogle"
+                    style="@style/AppButton.Secondary"
+                    android:layout_width="0dp"
+                    android:text="@string/auto_text_040"
+                    app:icon="@drawable/googlelogo"
+                    app:iconGravity="textStart"
+                    app:iconPadding="@dimen/space_8"
+                    app:iconSize="@dimen/space_20"
+                    app:iconTint="@null"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

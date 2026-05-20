@@ -19,7 +19,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isGone
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.button.MaterialButton
@@ -65,13 +67,12 @@ class ProfileTabFragment : Fragment() {
         val appContext = context?.applicationContext ?: return@registerForActivityResult
         
         lifecycleScope.launch {
-            (activity as? AppCompatActivity)?.showMotionSnackbar(getString(R.string.profile_avatar_uploading))
             runCatching { UserAvatarService.uploadAndSaveAvatar(appContext, uid, uri) }
                 .onSuccess { remoteUrl ->
                     if (!isAdded) return@onSuccess
                     latestProfile = latestProfile?.copy(avatarUrl = remoteUrl)
                     loadAvatarUrl(remoteUrl)
-                    (activity as? AppCompatActivity)?.showMotionSnackbar(getString(R.string.profile_avatar_updated))
+                    (activity as? AppCompatActivity)?.showSuccess(getString(R.string.profile_avatar_updated))
                 }
                 .onFailure { error ->
                     Log.e(logTag, "Avatar upload failed", error)
@@ -159,6 +160,32 @@ class ProfileTabFragment : Fragment() {
             error ?: return@observe
             Log.w(logTag, "Failed to refresh profile info", error)
             (activity as? AppCompatActivity)?.showMotionSnackbar(getString(R.string.profile_load_failed))
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                UserService.roleFlow.collect { entry ->
+                    val firebaseUser = FirebaseAuthManager.currentUser ?: return@collect
+                    if (entry == null || entry.first != firebaseUser.uid) return@collect
+                    val normalized = normalizeRole(entry.second)
+                    if (latestRole != normalized) {
+                        latestRole = normalized
+                        _binding?.tvRole?.text = displayRoleLabel(normalized)
+                    }
+                    updateAdminDashboardEntry(firebaseUser.uid, normalized)
+                }
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                UserService.avatarUrlFlow.collect { entry ->
+                    val firebaseUser = FirebaseAuthManager.currentUser ?: return@collect
+                    if (entry == null || entry.first != firebaseUser.uid) return@collect
+                    loadAvatarUrl(entry.second)
+                    latestProfile = latestProfile?.copy(avatarUrl = entry.second)
+                }
+            }
         }
     }
 
@@ -426,7 +453,7 @@ class ProfileTabFragment : Fragment() {
             bind.tvAccountHint.visibility = if (firebaseUser.email.isNullOrBlank()) View.GONE else View.VISIBLE
             updateProfileEditActions(isLoggedIn = true)
             updatePrimaryAccountAction(isLoggedIn = true)
-            profileViewModel.loadUserInfo(firebaseUser.uid, forceRefresh = false)
+            profileViewModel.loadUserInfo(firebaseUser.uid, forceRefresh = cachedRole == null)
             return
             /*
             lifecycleScope.launch {

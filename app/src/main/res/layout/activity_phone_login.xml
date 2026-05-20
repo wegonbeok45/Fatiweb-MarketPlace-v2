@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_auth_screen"
+    android:paddingStart="@dimen/auth_screen_padding_compact"
+    android:paddingEnd="@dimen/auth_screen_padding_compact"
+    tools:context=".PhoneLoginActivity">
+
+    <ImageView
+        android:id="@+id/ivBack"
+        android:layout_width="@dimen/icon_size_large"
+        android:layout_height="@dimen/icon_size_large"
+        android:layout_marginTop="@dimen/space_4"
+        android:importantForAccessibility="no"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/back"
+        app:tint="?attr/colorOnSurface" />
+
+    <TextView
+        android:id="@+id/tvTitle"
+        style="@style/AppText.Subtitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_24"
+        android:gravity="start"
+        android:text="@string/phone_login_title"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ivBack" />
+
+    <TextView
+        android:id="@+id/tvSubtitle"
+        style="@style/AppText.Body"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_6"
+        android:gravity="start"
+        android:text="@string/phone_login_subtitle"
+        android:textSize="@dimen/text_size_caption"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvTitle" />
+
+    <TextView
+        android:id="@+id/tvFieldLabel"
+        style="@style/AppText.FieldLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_24"
+        android:text="@string/phone_login_field_label"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvSubtitle" />
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardPhoneField"
+        style="@style/AppInput.Layout"
+        android:layout_width="0dp"
+        android:layout_marginTop="@dimen/space_4"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvFieldLabel">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/tvCountryCode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/space_16"
+                android:paddingEnd="@dimen/space_12"
+                android:text="@string/phone_login_country_code"
+                android:textColor="?attr/colorOnSurface"
+                android:textSize="@dimen/text_size_body"
+                android:fontFamily="@font/manrope_semibold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <View
+                android:id="@+id/dividerCountry"
+                android:layout_width="1dp"
+                android:layout_height="0dp"
+                android:layout_marginTop="@dimen/space_12"
+                android:layout_marginBottom="@dimen/space_12"
+                android:background="@color/colorOutline"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@id/tvCountryCode"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <EditText
+                android:id="@+id/etPhone"
+                style="@style/AppInput.EditText"
+                android:layout_width="0dp"
+                android:hint="@string/phone_login_field_hint"
+                android:inputType="phone"
+                android:maxLength="9"
+                android:paddingStart="@dimen/space_12"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/dividerCountry"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <TextView
+        android:id="@+id/tvHelper"
+        style="@style/AppText.Caption"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_8"
+        android:text="@string/phone_login_helper"
+        android:textColor="@color/home_text_secondary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/cardPhoneField" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnSendCode"
+        style="@style/AppButton.Primary"
+        android:layout_width="0dp"
+        android:layout_marginTop="@dimen/space_24"
+        android:text="@string/phone_login_send_code"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvHelper" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

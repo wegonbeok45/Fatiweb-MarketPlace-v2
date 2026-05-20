@@ -5,6 +5,9 @@ import android.content.SharedPreferences
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.tasks.await
 import java.security.MessageDigest
 import java.util.Locale
@@ -30,6 +33,14 @@ object UserService {
 
     private var cachedUserRole: RoleCacheEntry? = null
     private var prefs: SharedPreferences? = null
+
+    private val _roleFlow = MutableStateFlow<Pair<String, String>?>(null)
+    /** Emits the current (uid, role) the moment a role becomes known or changes. */
+    val roleFlow: StateFlow<Pair<String, String>?> = _roleFlow.asStateFlow()
+
+    private val _avatarUrlFlow = MutableStateFlow<Pair<String, String?>?>(null)
+    /** Emits (uid, avatarUrl) whenever the user's avatar changes. */
+    val avatarUrlFlow: StateFlow<Pair<String, String?>?> = _avatarUrlFlow.asStateFlow()
 
     fun init(context: Context) {
         prefs = context.applicationContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -85,6 +96,7 @@ object UserService {
                 ),
                 SetOptions.merge()
             ).await()
+            _avatarUrlFlow.value = uid to avatarUrl
             return
         }
 
@@ -107,6 +119,7 @@ object UserService {
             ),
             SetOptions.merge()
         ).await()
+        _avatarUrlFlow.value = uid to avatarUrl
     }
 
     suspend fun updateUserProfileName(uid: String, name: String) {
@@ -176,6 +189,9 @@ object UserService {
         val cached = RoleCacheEntry(uid, role, cachedAt)
         if (cached.isExpired()) return null
         cachedUserRole = cached
+        if (_roleFlow.value?.first != uid || _roleFlow.value?.second != role) {
+            _roleFlow.value = uid to role
+        }
         return role
     }
 
@@ -227,6 +243,8 @@ object UserService {
     fun clearCache() {
         cachedUserRole = null
         prefs?.edit()?.clear()?.apply()
+        _roleFlow.value = null
+        _avatarUrlFlow.value = null
     }
 
     fun invalidateRole(uid: String) {
@@ -235,6 +253,7 @@ object UserService {
             ?.remove("$KEY_ROLE_PREFIX$uid")
             ?.remove("$KEY_CACHED_AT_PREFIX$uid")
             ?.apply()
+        if (_roleFlow.value?.first == uid) _roleFlow.value = null
     }
 
     fun cacheRole(uid: String, role: String) {
@@ -249,6 +268,7 @@ object UserService {
             ?.putString("$KEY_ROLE_PREFIX$uid", normalizedRole)
             ?.putLong("$KEY_CACHED_AT_PREFIX$uid", now)
             ?.apply()
+        _roleFlow.value = uid to normalizedRole
     }
 
     private fun defaultNotificationPreferences(): Map<String, Boolean> = mapOf(
