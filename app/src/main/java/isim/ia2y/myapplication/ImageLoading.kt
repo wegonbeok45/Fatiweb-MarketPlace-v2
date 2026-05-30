@@ -27,9 +27,13 @@ fun ImageView.loadCatalogImage(
     val value = imageUrl
         ?.trim()
         ?.takeIf { url ->
-            url.startsWith("https://", ignoreCase = true) ||
+            (url.startsWith("https://", ignoreCase = true) ||
                 url.startsWith("http://", ignoreCase = true) ||
-                (BuildConfig.DEBUG && url.startsWith("/"))
+                (BuildConfig.DEBUG && url.startsWith("/"))) &&
+                // Bundled fallback categories ship a placehold.co URL; ignore it so
+                // the local artwork (the fallback drawable) renders instead of a
+                // grey "text" placeholder.
+                !url.contains("placehold.co", ignoreCase = true)
         }
 
     val model = value ?: safeFallback
@@ -56,9 +60,13 @@ fun ImageView.loadCatalogImageFit(
     val value = imageUrl
         ?.trim()
         ?.takeIf { url ->
-            url.startsWith("https://", ignoreCase = true) ||
+            (url.startsWith("https://", ignoreCase = true) ||
                 url.startsWith("http://", ignoreCase = true) ||
-                (BuildConfig.DEBUG && url.startsWith("/"))
+                (BuildConfig.DEBUG && url.startsWith("/"))) &&
+                // Bundled fallback categories ship a placehold.co URL; ignore it so
+                // the local artwork (the fallback drawable) renders instead of a
+                // grey "text" placeholder.
+                !url.contains("placehold.co", ignoreCase = true)
         }
 
     load(value ?: safeFallback) {
