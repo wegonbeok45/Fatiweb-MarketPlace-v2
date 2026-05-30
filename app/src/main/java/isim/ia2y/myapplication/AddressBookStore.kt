@@ -43,6 +43,7 @@ object AddressBookStore {
     }
 
     suspend fun refreshFromCloud(context: Context): List<DeliveryAddress> {
+        if (FirebaseCostSafeMode.enabled) return getAll(context)
         val uid = currentUidOrNull() ?: return getAll(context)
         val remoteAddresses = runCatching { FirestoreService.fetchAddresses(uid) }.getOrDefault(getAll(context))
         saveAllLocal(context, uid, remoteAddresses)
@@ -61,6 +62,7 @@ object AddressBookStore {
     }
 
     private fun syncCurrentAddressesToCloud(context: Context, addresses: List<DeliveryAddress>) {
+        if (FirebaseCostSafeMode.enabled) return
         val uid = currentUidOrNull() ?: return
         scope.launch {
             runCatching { FirestoreService.replaceAddresses(uid, addresses) }
@@ -97,6 +99,7 @@ object AddressBookStore {
     }
 
     suspend fun mergeGuestAddressesIntoCurrent(context: Context) {
+        if (FirebaseCostSafeMode.enabled) return
         val uid = currentUidOrNull() ?: return
         val guestPrefs = prefsForAccount(context, GUEST_KEY)
         val guestRaw = guestPrefs.getString(KEY_ADDRESSES, "").orEmpty()

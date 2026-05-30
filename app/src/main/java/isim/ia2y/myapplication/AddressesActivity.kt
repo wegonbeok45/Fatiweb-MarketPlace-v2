@@ -24,12 +24,14 @@ class AddressesActivity : AppCompatActivity() {
     private val addressesAdapter = AddressesAdapter(
         onDefault = { address ->
             AddressBookStore.setCurrent(this, address.id)
+            lifecycleScope.launch { LocationProfileSync.saveManualAddress(this@AddressesActivity, address.copy(isDefault = true)) }
             loadAddresses()
         },
         onEdit = { address -> showAddressDialog(address) },
         onDelete = { address -> confirmDelete(address) },
         onSelect = { address ->
             AddressBookStore.setCurrent(this, address.id)
+            lifecycleScope.launch { LocationProfileSync.saveManualAddress(this@AddressesActivity, address.copy(isDefault = true)) }
             loadAddresses()
         }
     )
@@ -195,6 +197,10 @@ class AddressesActivity : AppCompatActivity() {
         dialog.setContentView(dialogView)
         dialog.behavior.state = BottomSheetBehavior.STATE_EXPANDED
         dialog.behavior.skipCollapsed = true
+        dialog.setOnShowListener {
+            dialog.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
+                ?.setBackgroundResource(R.drawable.bg_address_sheet)
+        }
 
         btnCancel.setOnClickListener { dialog.dismiss() }
         btnSave.setOnClickListener {
@@ -232,6 +238,7 @@ class AddressesActivity : AppCompatActivity() {
             AddressBookStore.upsert(this, address)
             if (address.isDefault) {
                 AddressBookStore.setCurrent(this, address.id)
+                lifecycleScope.launch { LocationProfileSync.saveManualAddress(this@AddressesActivity, address) }
             }
             dialog.dismiss()
             loadAddresses()

@@ -7,6 +7,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.text.InputType
 import android.util.Log
 import android.view.View
 import android.widget.EditText
@@ -26,6 +27,8 @@ import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
+import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -106,6 +109,7 @@ class ProfileTabFragment : Fragment() {
                 R.id.cardSettings,
                 R.id.cardHelp,
                 R.id.cardAbout,
+                R.id.btnBecomeSeller,
                 R.id.cardLogout
             )
         }.onFailure { error ->
@@ -143,7 +147,9 @@ class ProfileTabFragment : Fragment() {
             } else {
                 loadAvatarUrl(null)
             }
+            refreshProfileLocation()
             updateAdminDashboardEntry(firebaseUser.uid, role)
+            updateBecomeSellerAction()
             _binding?.tvRole?.text = displayRoleLabel(role)
             val email = firebaseUser.email.orEmpty()
             if (email.isBlank()) {
@@ -176,6 +182,7 @@ class ProfileTabFragment : Fragment() {
                         _binding?.tvRole?.text = displayRoleLabel(normalized)
                     }
                     updateAdminDashboardEntry(firebaseUser.uid, normalized)
+                    updateBecomeSellerAction()
                 }
             }
         }
@@ -204,9 +211,9 @@ class ProfileTabFragment : Fragment() {
         cardAdmin.visibility = View.GONE
         cardAdmin.setOnClickListener {
             val destination = if (latestRole == UserRoles.VENDEUR) {
-                SellerDashboardActivity::class.java
+                VendorHomeActivity::class.java
             } else {
-                AdminDashboardActivity::class.java
+                AdminHomeActivity::class.java
             }
             (activity as? AppCompatActivity)?.navigateNoShift(destination)
         }
@@ -282,7 +289,10 @@ class ProfileTabFragment : Fragment() {
             val context = context ?: return@setOnClickListener
             if (LocationHelper.hasPermission(context)) {
                 refreshProfileLocation(forceResolve = true)
+            } else if (LocationPermissionStore.isPermanentlyDenied(context) || LocationHelper.isPermanentlyDenied(requireActivity())) {
+                showLocationSettingsDialog()
             } else {
+                Log.d("LocationFlow", "Location permission requested")
                 requestLocationLauncher.launch(
                     arrayOf(
                         Manifest.permission.ACCESS_FINE_LOCATION,
@@ -300,6 +310,9 @@ class ProfileTabFragment : Fragment() {
         root.findViewById<View>(R.id.profileRecentSeeAll)?.setOnClickListener {
             (activity as? MainActivity)?.selectTab(MainActivity.Tab.EXPLORE)
         }
+        binding.btnBecomeSeller.setOnClickListener {
+            handleBecomeSeller()
+        }
         binding.cardLogout.setOnClickListener {
             if (FirebaseAuthManager.isLoggedIn) {
                 FirebaseAuthManager.signOut()
@@ -309,6 +322,7 @@ class ProfileTabFragment : Fragment() {
             }
         }
         updatePrimaryAccountAction(FirebaseAuthManager.isLoggedIn)
+        updateBecomeSellerAction()
         (activity as? AppCompatActivity)?.applyPressFeedback(
             R.id.ivBack,
             R.id.tvTopBrand,
@@ -331,6 +345,7 @@ class ProfileTabFragment : Fragment() {
             R.id.cardHelp,
             R.id.cardAbout,
             R.id.profileRecentSeeAll,
+            R.id.btnBecomeSeller,
             R.id.cardLogout
         )
     }
@@ -433,6 +448,7 @@ class ProfileTabFragment : Fragment() {
             bind.tvAccountHint.visibility = if (firebaseUser.email.isNullOrBlank()) View.GONE else View.VISIBLE
             updateProfileEditActions(isLoggedIn = true)
             updatePrimaryAccountAction(isLoggedIn = true)
+            updateBecomeSellerAction()
             // Always force-refresh: cached role may be stale after a role promotion (client→vendeur/admin).
             // The userInfo observer (observeProfileInfo) will update the admin entry when the fetch resolves.
             profileViewModel.loadUserInfo(firebaseUser.uid, forceRefresh = true)
@@ -449,6 +465,7 @@ class ProfileTabFragment : Fragment() {
             loadAvatarUrl(null)
             updateProfileEditActions(isLoggedIn = false)
             updatePrimaryAccountAction(isLoggedIn = false)
+            updateBecomeSellerAction()
         }
     }
 
@@ -469,6 +486,24 @@ class ProfileTabFragment : Fragment() {
             else R.string.profile_admin_dashboard_action
         )
         resetAdminCardState(button)
+    }
+
+    private fun updateBecomeSellerAction() {
+        val row = _binding?.btnBecomeSeller ?: return
+        val title = _binding?.root?.findViewById<TextView>(R.id.tvBecomeSellerTitle)
+        val normalizedRole = normalizeRole(latestRole)
+        val vendorStatus = latestProfile?.vendorStatus?.trim()?.lowercase(Locale.getDefault()).orEmpty()
+        val pending = vendorStatus == VendorStatus.PENDING.wireValue
+        val hidden = normalizedRole == UserRoles.ADMIN || normalizedRole == UserRoles.VENDEUR
+
+        row.visibility = if (hidden) View.GONE else View.VISIBLE
+        row.isEnabled = !pending
+        row.isClickable = !pending
+        row.alpha = if (pending) 0.72f else 1f
+        title?.text = getString(
+            if (pending) R.string.profile_seller_request_pending
+            else R.string.profile_become_seller
+        )
     }
 
     private fun resetAdminCardState(button: View) {
@@ -507,7 +542,7 @@ class ProfileTabFragment : Fragment() {
             requireContext(),
             if (isLoggedIn) R.color.profile_logout_text else R.color.white
         )
-        button.text = getString(if (isLoggedIn) R.string.auto_text_121 else R.string.auto_text_031)
+        button.text = getString(if (isLoggedIn) R.string.profile_logout else R.string.login_btn_label)
         button.icon = ContextCompat.getDrawable(
             requireContext(),
             if (isLoggedIn) R.drawable.ic_profile_logout else R.drawable.ic_profile_nav_user
@@ -546,6 +581,149 @@ class ProfileTabFragment : Fragment() {
                 )
             }
         )
+    }
+
+    private fun handleBecomeSeller() {
+        val user = FirebaseAuthManager.currentUser
+        if (user == null) {
+            showAuthGate(returnToTab = MainActivity.Tab.PROFILE)
+            return
+        }
+        if (normalizeRole(latestRole) == UserRoles.VENDEUR) {
+            (activity as? AppCompatActivity)?.showMotionSnackbar(getString(R.string.profile_seller_already_active))
+            return
+        }
+        if (latestProfile?.vendorStatus == VendorStatus.PENDING.wireValue) {
+            (activity as? AppCompatActivity)?.showMotionSnackbar(getString(R.string.profile_seller_request_pending))
+            return
+        }
+        showSellerApplicationDialog(user.uid)
+    }
+
+    private fun showSellerApplicationDialog(uid: String) {
+        val content = LinearLayout(requireContext()).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(4.dp, 8.dp, 4.dp, 0)
+        }
+        content.addView(TextView(requireContext()).apply {
+            text = getString(R.string.profile_seller_request_body)
+            setTextAppearance(R.style.AppText_Body)
+            setTextColor(ContextCompat.getColor(requireContext(), R.color.details_text_primary))
+        })
+
+        val (shopLayout, shopInput) = content.addSellerInput(
+            hintRes = R.string.profile_seller_field_shop_name,
+            initialValue = latestProfile?.shopName.orEmpty().ifBlank { latestProfile?.name.orEmpty() }
+        )
+        val (phoneLayout, phoneInput) = content.addSellerInput(
+            hintRes = R.string.profile_seller_field_phone,
+            initialValue = latestProfile?.phone.orEmpty()
+                .ifBlank { AddressBookStore.getCurrent(requireContext())?.phone.orEmpty() },
+            inputType = InputType.TYPE_CLASS_PHONE
+        )
+        val (_, noteInput) = content.addSellerInput(
+            hintRes = R.string.profile_seller_field_note,
+            initialValue = latestProfile?.shopBio.orEmpty(),
+            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE,
+            maxLines = 3
+        )
+
+        val dialog = MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.profile_seller_request_title)
+            .setView(content)
+            .setNegativeButton(R.string.profile_edit_cancel, null)
+            .setPositiveButton(R.string.profile_seller_request_submit, null)
+            .create()
+
+        dialog.setOnShowListener {
+            val submit = dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE)
+            submit.setOnClickListener {
+                val shopName = shopInput.text?.toString().orEmpty().trim()
+                val phone = phoneInput.text?.toString().orEmpty().trim()
+                shopLayout.error = null
+                phoneLayout.error = null
+
+                var valid = true
+                if (shopName.length < 2) {
+                    shopLayout.error = getString(R.string.profile_seller_shop_invalid)
+                    valid = false
+                }
+                if (DeliveryAddressValidator.normalizedPhone(phone).length < 8) {
+                    phoneLayout.error = getString(R.string.profile_seller_phone_invalid)
+                    valid = false
+                }
+                if (!valid) return@setOnClickListener
+
+                submit.isEnabled = false
+                lifecycleScope.launch {
+                    runCatching {
+                        FirestoreService.submitVendorApplication(
+                            uid = uid,
+                            shopName = shopName,
+                            phone = phone,
+                            note = noteInput.text?.toString().orEmpty()
+                        )
+                    }.onSuccess {
+                        val currentUser = FirebaseAuthManager.currentUser
+                        latestProfile = (latestProfile ?: FirestoreService.UserProfile(
+                            uid = uid,
+                            name = currentUser?.displayName.orEmpty(),
+                            email = currentUser?.email.orEmpty(),
+                            role = UserRoles.CLIENT
+                        )).copy(
+                            vendorStatus = VendorStatus.PENDING.wireValue,
+                            shopName = shopName,
+                            phone = DeliveryAddressValidator.normalizedPhone(phone),
+                            shopBio = noteInput.text?.toString().orEmpty().trim()
+                        )
+                        updateBecomeSellerAction()
+                        profileViewModel.loadUserInfo(uid, forceRefresh = true)
+                        (activity as? AppCompatActivity)?.showMotionSnackbar(
+                            getString(R.string.profile_seller_request_success)
+                        )
+                        dialog.dismiss()
+                    }.onFailure { error ->
+                        Log.w(logTag, "Seller request failed", error)
+                        submit.isEnabled = true
+                        (activity as? AppCompatActivity)?.showMotionSnackbar(
+                            getString(R.string.profile_seller_request_failed)
+                        )
+                    }
+                }
+            }
+        }
+        dialog.show()
+    }
+
+    private fun LinearLayout.addSellerInput(
+        hintRes: Int,
+        initialValue: String,
+        inputType: Int = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_WORDS,
+        maxLines: Int = 1
+    ): Pair<TextInputLayout, TextInputEditText> {
+        val inputLayout = TextInputLayout(context).apply {
+            hint = getString(hintRes)
+        }
+        val input = TextInputEditText(inputLayout.context).apply {
+            setText(initialValue)
+            this.inputType = inputType
+            this.maxLines = maxLines
+        }
+        inputLayout.addView(
+            input,
+            LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+        )
+        addView(
+            inputLayout,
+            LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply { topMargin = 12.dp }
+        )
+        return inputLayout to input
     }
 
     private fun showEditProfileDialog() {
@@ -703,10 +881,15 @@ class ProfileTabFragment : Fragment() {
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
         val granted = permissions.values.any { it }
+        val context = context ?: return@registerForActivityResult
+        val permanentlyDenied = LocationHelper.isPermanentlyDenied(requireActivity())
+        LocationPermissionStore.markPermissionResult(context, granted, permanentlyDenied)
         if (granted) {
+            Log.d("LocationFlow", "Permission accepted")
             refreshProfileLocation(forceResolve = true)
         } else {
-            Log.w(logTag, "Location permissions denied")
+            Log.d("LocationFlow", "Permission rejected")
+            if (permanentlyDenied) showLocationSettingsDialog()
         }
     }
 
@@ -714,33 +897,41 @@ class ProfileTabFragment : Fragment() {
         runCatching {
             val context = context ?: return
             val locationText = _binding?.tvLocation ?: return
-            val savedAddress = AddressBookStore.getCurrent(context)?.summaryLine.orEmpty()
-            if (savedAddress.isNotBlank()) {
-                locationText.text = savedAddress
-            }
-            preferredHeaderLocation(AddressBookStore.getCurrent(context))?.let { compactLocation ->
-                locationText.text = compactLocation
-            } ?: run {
-                if (savedAddress.isBlank()) {
-                    locationText.text = getString(R.string.profile_location_fallback)
-                }
-            }
-            if (!LocationHelper.hasPermission(context)) {
-                return
-            }
+            val address = AddressBookStore.getCurrent(context)
+            val display = latestProfile?.location?.displayText
+                ?: UserLocationStore.load(context)?.displayText
+                ?: preferredHeaderLocation(address)
+                ?: address?.summaryLine
+                ?: getString(R.string.profile_location_fallback)
+            locationText.text = display
+            if (!forceResolve || !LocationHelper.hasPermission(context)) return
 
-            if (!forceResolve) {
-                return
-            }
-
-            LocationHelper.resolveCurrentLocation(context) { resolved ->
-                activity?.runOnUiThread {
-                    locationText.text = resolved
-                }
+            viewLifecycleOwner.lifecycleScope.launch {
+                LocationHelper.fetchCurrentLocation(context)
+                    .onSuccess { location ->
+                        LocationProfileSync.saveLocation(context, location)
+                        latestProfile = latestProfile?.copy(location = location)
+                        _binding?.tvLocation?.text = location.displayText
+                    }
+                    .onFailure { error ->
+                        Log.w(logTag, "Failed to fetch profile location", error)
+                    }
             }
         }.onFailure { error ->
             Log.w(logTag, "Failed to refresh profile location", error)
         }
+    }
+
+    private fun showLocationSettingsDialog() {
+        if (!isAdded) return
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.location_settings_title)
+            .setMessage(R.string.location_settings_message)
+            .setPositiveButton(R.string.location_settings_action) { _, _ ->
+                LocationHelper.openAppSettings(requireContext())
+            }
+            .setNegativeButton(R.string.profile_edit_cancel, null)
+            .show()
     }
 
     private fun preferredHeaderLocation(address: DeliveryAddress?): String? {
@@ -769,4 +960,7 @@ class ProfileTabFragment : Fragment() {
 
         return value
     }
+
+    private val Int.dp: Int
+        get() = (this * resources.displayMetrics.density).toInt()
 }

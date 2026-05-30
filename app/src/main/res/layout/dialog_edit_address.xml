@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@drawable/bg_address_sheet"
     android:fillViewport="true"
     android:clipToPadding="false">
 
@@ -28,50 +29,61 @@
             android:id="@+id/tvAddressDialogTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/auto_adresse_50d4"
+            android:text="@string/addresses_title"
             android:textColor="@color/colorOnSurface"
             android:textSize="@dimen/text_size_subtitle"
             android:fontFamily="@font/manrope_semibold"
             android:textStyle="bold" />
 
         <com.google.android.material.textfield.TextInputLayout
+            style="@style/AppInput.TextInputLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+            app:startIconDrawable="@drawable/ic_profile_map_outline">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etAddressLabel"
+                style="@style/AppInput.TextInputEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/auto_libell_maison_bureau_96e8"/>
+                android:hint="@string/address_label_hint"
+                android:imeOptions="actionNext"
+                android:inputType="textCapWords" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
+            style="@style/AppInput.TextInputLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+            app:startIconDrawable="@drawable/user">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etAddressRecipient"
+                style="@style/AppInput.TextInputEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/auto_nom_du_destinataire_a599"/>
+                android:hint="@string/address_recipient_name_hint"
+                android:imeOptions="actionNext"
+                android:inputType="textPersonName|textCapWords" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
+            style="@style/AppInput.TextInputLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+            app:startIconDrawable="@drawable/ic_home_category_phone">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etAddressPhone"
+                style="@style/AppInput.TextInputEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/auto_tlphone_301d"
-                android:inputType="phone"/>
+                android:hint="@string/address_phone_hint"
+                android:imeOptions="actionNext"
+                android:inputType="phone" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <LinearLayout
@@ -81,87 +93,109 @@
             android:orientation="horizontal">
 
             <com.google.android.material.textfield.TextInputLayout
+                style="@style/AppInput.TextInputLayout"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+                app:startIconDrawable="@drawable/location">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etAddressGovernorate"
+                    style="@style/AppInput.TextInputEditText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/auto_gouvernorat_9478"/>
+                    android:hint="@string/address_governorate_hint"
+                    android:imeOptions="actionNext"
+                    android:inputType="textCapWords" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
+                style="@style/AppInput.TextInputLayout"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
                 android:layout_weight="1"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+                app:startIconDrawable="@drawable/ic_checkout_pin">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etAddressCity"
+                    style="@style/AppInput.TextInputEditText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/auto_ville_92e2"/>
+                    android:hint="@string/address_city_hint"
+                    android:imeOptions="actionNext"
+                    android:inputType="textCapWords" />
             </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
 
         <com.google.android.material.textfield.TextInputLayout
+            style="@style/AppInput.TextInputLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+            app:startIconDrawable="@drawable/map">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etAddressLine1"
+                style="@style/AppInput.TextInputEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/auto_adresse_principale_896f"/>
+                android:hint="@string/address_main_line_hint"
+                android:imeOptions="actionNext"
+                android:inputType="textPostalAddress|textCapSentences" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
+            style="@style/AppInput.TextInputLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+            app:startIconDrawable="@drawable/ic_checkout_pin">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etAddressLine2"
+                style="@style/AppInput.TextInputEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/auto_complment_dadresse_optionnel_9ca7"/>
+                android:hint="@string/address_complement_hint"
+                android:imeOptions="actionNext"
+                android:inputType="textPostalAddress|textCapSentences" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
+            style="@style/AppInput.TextInputLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+            app:startIconDrawable="@drawable/ic_checkout_pin">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etAddressPostalCode"
+                style="@style/AppInput.TextInputEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/auto_code_postal_optionnel_7e3a"
-                android:inputType="number"/>
+                android:hint="@string/address_postal_hint"
+                android:imeOptions="actionNext"
+                android:inputType="number" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
+            style="@style/AppInput.TextInputLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+            app:startIconDrawable="@drawable/ic_profile_edit">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etAddressNotes"
+                style="@style/AppInput.TextInputEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="top"
-                android:hint="@string/auto_instructions_de_livraison_optionnel_009f"
+                android:hint="@string/address_instructions_hint"
+                android:imeOptions="actionDone"
                 android:inputType="textMultiLine"
-                android:minLines="2"/>
+                android:minLines="2" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.switchmaterial.SwitchMaterial
@@ -169,14 +203,15 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="@string/auto_dfinir_comme_adresse_par_8e8d" />
+            android:fontFamily="@font/manrope_medium"
+            android:text="@string/address_set_default_label" />
 
         <View
             android:layout_width="match_parent"
             android:layout_height="@dimen/divider_height"
             android:layout_marginTop="@dimen/space_20"
             android:layout_marginBottom="@dimen/space_16"
-            android:background="@color/colorBorderLight" />
+            android:background="@color/ms_border_default" />
 
         <LinearLayout
             android:layout_width="match_parent"

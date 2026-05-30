@@ -83,7 +83,7 @@
                 app:cardBackgroundColor="@color/profile_card_bg"
                 app:cardCornerRadius="@dimen/profile_menu_card_radius"
                 app:cardElevation="1dp"
-                app:strokeColor="@color/colorBorderLight"
+                app:strokeColor="@color/ms_border_default"
                 app:strokeWidth="@dimen/stroke_width_default">
 
                 <LinearLayout
@@ -130,25 +130,15 @@
                 android:padding="24dp"
                 android:visibility="gone">
 
-                <com.google.android.material.card.MaterialCardView
+                <com.airbnb.lottie.LottieAnimationView
+                    android:id="@+id/ivAddressesEmptyAnimation"
                     android:layout_width="140dp"
                     android:layout_height="140dp"
-                    app:cardBackgroundColor="@android:color/transparent"
-                    app:cardCornerRadius="28dp"
-                    app:cardElevation="0dp"
-                    app:strokeWidth="0dp">
-
-                    <com.airbnb.lottie.LottieAnimationView
-                        android:id="@+id/ivAddressesEmptyAnimation"
-                        android:layout_width="100dp"
-                        android:layout_height="100dp"
-                        android:background="@android:color/transparent"
-                        android:layout_gravity="center"
-                        android:scaleType="centerInside"
-                        app:lottie_autoPlay="true"
-                        app:lottie_loop="true"
-                        app:lottie_rawRes="@raw/anim_onboarding_delivery" />
-                </com.google.android.material.card.MaterialCardView>
+                    android:background="@android:color/transparent"
+                    android:scaleType="centerInside"
+                    app:lottie_autoPlay="true"
+                    app:lottie_loop="true"
+                    app:lottie_rawRes="@raw/anim_onboarding_delivery" />
 
                 <TextView
                     android:layout_width="match_parent"

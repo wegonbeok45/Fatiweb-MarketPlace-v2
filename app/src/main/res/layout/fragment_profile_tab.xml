@@ -5,14 +5,14 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/profile_body_bg"
+    android:background="@color/ms_surface_canvas"
     tools:context=".user">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layoutTopBar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="@color/profile_header_bg"
+        android:background="@color/ms_surface_canvas"
         android:paddingStart="@dimen/home_ref_horizontal_padding"
         android:paddingTop="@dimen/home_ref_top_padding"
         android:paddingEnd="@dimen/home_ref_horizontal_padding"
@@ -30,7 +30,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/back"
-            app:tint="@color/home_ref_text_primary" />
+            app:tint="@color/ms_text_primary" />
 
         <TextView
             android:id="@+id/tvTopBrand"
@@ -49,8 +49,8 @@
             android:fontFamily="@font/manrope_semibold"
             android:includeFontPadding="false"
             android:text="@string/nav_tab_profile"
-            android:textColor="@color/home_ref_text_primary"
-            android:textSize="22sp"
+            android:textColor="@color/ms_text_primary"
+            android:textSize="@dimen/ms_text_title"
             app:layout_constraintBottom_toBottomOf="@id/notificationContainer"
             app:layout_constraintEnd_toStartOf="@id/notificationContainer"
             app:layout_constraintStart_toStartOf="parent"
@@ -70,7 +70,7 @@
                 android:layout_gravity="center"
                 android:contentDescription="@string/cd_notifications"
                 app:srcCompat="@drawable/notification"
-                app:tint="@color/home_ref_nav_icon" />
+                app:tint="@color/ms_text_secondary" />
 
             <View
                 android:id="@+id/notificationBadge"
@@ -80,7 +80,7 @@
                 android:layout_marginTop="9dp"
                 android:layout_marginEnd="9dp"
                 android:background="@drawable/bg_notification_badge"
-                android:backgroundTint="@color/home_ref_gold"
+                android:backgroundTint="@color/ms_accent_gold"
                 android:visibility="gone" />
         </FrameLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -89,7 +89,7 @@
         android:id="@+id/viewTopDivider"
         android:layout_width="0dp"
         android:layout_height="@dimen/divider_height"
-        android:background="@color/profile_divider"
+        android:background="@color/ms_border_subtle"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/layoutTopBar" />
@@ -102,7 +102,7 @@
         android:paddingTop="@dimen/profile_header_padding_top"
         android:paddingEnd="@dimen/space_20"
         android:paddingBottom="@dimen/profile_header_padding_bottom"
-        android:background="@color/profile_header_bg"
+        android:background="@color/ms_surface_canvas"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/viewTopDivider">
@@ -124,7 +124,7 @@
                 android:layout_height="match_parent"
                 android:contentDescription="@string/cd_profile_avatar"
                 android:scaleType="centerCrop"
-                android:background="@color/profile_card_icon_bg"
+                android:background="@color/ms_surface_sunken"
                 app:srcCompat="@drawable/profile_avatar_art" />
 
         </com.google.android.material.card.MaterialCardView>
@@ -135,7 +135,7 @@
             android:layout_height="32dp"
             android:background="@drawable/bg_edit_avatar"
             android:contentDescription="@string/cd_edit"
-            android:elevation="4dp"
+            android:elevation="@dimen/ms_elev_1"
             android:padding="7dp"
             android:translationX="2dp"
             android:translationY="2dp"
@@ -154,8 +154,8 @@
             android:gravity="center"
             android:maxLines="2"
             android:text="@string/user_guest_name"
-            android:textColor="@color/profile_text_primary"
-            android:textSize="@dimen/text_size_title"
+            android:textColor="@color/ms_text_primary"
+            android:textSize="@dimen/ms_text_title"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/cardAvatar" />
@@ -167,7 +167,7 @@
             android:layout_marginTop="@dimen/space_8"
             android:gravity="center"
             android:maxLines="2"
-            android:textColor="@color/profile_text_secondary"
+            android:textColor="@color/ms_text_secondary"
             android:textSize="@dimen/text_size_caption"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -206,7 +206,7 @@
                 android:layout_marginStart="8dp"
                 android:layout_marginEnd="8dp"
                 android:background="@drawable/bg_notification_badge"
-                android:backgroundTint="@color/profile_text_muted" />
+                android:backgroundTint="@color/ms_text_tertiary" />
 
             <TextView
                 android:id="@+id/tvLocation"
@@ -215,7 +215,7 @@
                 android:ellipsize="end"
                 android:maxLines="1"
                 android:text="@string/profile_location_fallback"
-                android:textColor="@color/profile_text_secondary"
+                android:textColor="@color/ms_text_secondary"
                 android:textSize="@dimen/text_size_caption"
                 android:fontFamily="@font/manrope_regular" />
         </LinearLayout>
@@ -231,17 +231,17 @@
             android:text="@string/profile_admin_dashboard_action"
             android:textAllCaps="false"
             android:visibility="gone"
-            app:backgroundTint="@color/profile_edit_bg"
+            app:backgroundTint="@color/ms_surface_inverse"
             app:cornerRadius="14dp"
             app:icon="@drawable/ic_admin_shield"
             app:iconGravity="textStart"
             app:iconPadding="8dp"
-            app:iconTint="@color/profile_edit_icon"
+            app:iconTint="@color/ms_text_inverse"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tvAccountHint"
-            app:rippleColor="@color/profile_card_icon_bg"
-            app:strokeColor="@color/colorBorderLight"
+            app:rippleColor="@color/ms_surface_sunken"
+            app:strokeColor="@color/ms_border_default"
             app:strokeWidth="1dp" />
 
         <com.google.android.material.button.MaterialButton
@@ -284,10 +284,10 @@
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardBackgroundColor="@color/profile_section_bg"
+                app:cardBackgroundColor="@color/ms_surface_card"
                 app:cardCornerRadius="@dimen/profile_menu_group_radius"
                 app:cardElevation="0dp"
-                app:strokeColor="@color/profile_section_stroke"
+                app:strokeColor="@color/ms_border_subtle"
                 app:strokeWidth="@dimen/stroke_width_default">
 
                 <LinearLayout
@@ -314,7 +314,7 @@
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
                             app:srcCompat="@drawable/ic_profile_orders_outline"
-                            app:tint="@color/profile_text_primary"  android:contentDescription="@string/cd_nav_cart" />
+                            app:tint="@color/ms_text_primary"  android:contentDescription="@string/cd_nav_cart" />
 
                         <TextView
                             android:id="@+id/tvOrdersTitle"
@@ -322,8 +322,8 @@
                             android:layout_height="wrap_content"
                             android:layout_marginStart="16dp"
                             android:fontFamily="@font/manrope_semibold"
-                            android:text="@string/auto_my_orders_f915"
-                            android:textColor="@color/profile_text_primary"
+                            android:text="@string/profile_orders_label"
+                            android:textColor="@color/ms_text_primary"
                             android:textSize="@dimen/text_size_body"
                             android:textStyle="bold"
                             app:layout_constraintBottom_toBottomOf="parent"
@@ -340,14 +340,14 @@
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
                             app:srcCompat="@drawable/ic_profile_chevron_right"
-                            app:tint="@color/profile_chevron"  android:importantForAccessibility="no" />
+                            app:tint="@color/ms_text_tertiary"  android:importantForAccessibility="no" />
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:layout_marginStart="56dp"
-                        android:background="@color/profile_section_stroke" />
+                        android:background="@color/ms_border_subtle" />
 
                     <!-- Addresses -->
                     <androidx.constraintlayout.widget.ConstraintLayout
@@ -368,7 +368,7 @@
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
                             app:srcCompat="@drawable/ic_profile_map_outline"
-                            app:tint="@color/profile_text_primary"  android:contentDescription="@string/cd_location" />
+                            app:tint="@color/ms_text_primary"  android:contentDescription="@string/cd_location" />
 
                         <TextView
                             android:id="@+id/tvAddressesTitle"
@@ -376,8 +376,8 @@
                             android:layout_height="wrap_content"
                             android:layout_marginStart="16dp"
                             android:fontFamily="@font/manrope_semibold"
-                            android:text="@string/auto_shipping_addresses_0511"
-                            android:textColor="@color/profile_text_primary"
+                            android:text="@string/addresses_title"
+                            android:textColor="@color/ms_text_primary"
                             android:textSize="@dimen/text_size_body"
                             android:textStyle="bold"
                             app:layout_constraintBottom_toBottomOf="parent"
@@ -394,14 +394,14 @@
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
                             app:srcCompat="@drawable/ic_profile_chevron_right"
-                            app:tint="@color/profile_chevron"  android:importantForAccessibility="no" />
+                            app:tint="@color/ms_text_tertiary"  android:importantForAccessibility="no" />
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:layout_marginStart="56dp"
-                        android:background="@color/profile_section_stroke" />
+                        android:background="@color/ms_border_subtle" />
 
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:id="@+id/cardAccountCenter"
@@ -422,7 +422,7 @@
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
                             app:srcCompat="@drawable/ic_profile_user_outline"
-                            app:tint="@color/profile_text_primary" />
+                            app:tint="@color/ms_text_primary" />
 
                         <TextView
                             android:layout_width="0dp"
@@ -430,7 +430,7 @@
                             android:layout_marginStart="16dp"
                             android:fontFamily="@font/manrope_semibold"
                             android:text="@string/profile_account_center_title"
-                            android:textColor="@color/profile_text_primary"
+                            android:textColor="@color/ms_text_primary"
                             android:textSize="@dimen/text_size_body"
                             android:textStyle="bold"
                             app:layout_constraintBottom_toBottomOf="parent"
@@ -448,14 +448,69 @@
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
                             app:srcCompat="@drawable/ic_profile_chevron_right"
-                            app:tint="@color/profile_chevron" />
+                            app:tint="@color/ms_text_tertiary" />
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:layout_marginStart="56dp"
-                        android:background="@color/profile_section_stroke" />
+                        android:background="@color/ms_border_subtle" />
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/btnBecomeSeller"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/profile_menu_item_height_compact"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?attr/selectableItemBackground"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp">
+
+                        <ImageView
+                            android:id="@+id/ivBecomeSellerIcon"
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:contentDescription="@string/profile_become_seller"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:srcCompat="@drawable/shoppingbag"
+                            app:tint="@color/ms_text_primary" />
+
+                        <TextView
+                            android:id="@+id/tvBecomeSellerTitle"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="16dp"
+                            android:fontFamily="@font/manrope_semibold"
+                            android:text="@string/profile_become_seller"
+                            android:textColor="@color/ms_text_primary"
+                            android:textSize="@dimen/text_size_body"
+                            android:textStyle="bold"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toStartOf="@id/ivBecomeSellerChevron"
+                            app:layout_constraintStart_toEndOf="@id/ivBecomeSellerIcon"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <ImageView
+                            android:id="@+id/ivBecomeSellerChevron"
+                            android:layout_width="@dimen/profile_chevron_touch_target"
+                            android:layout_height="@dimen/profile_chevron_touch_target"
+                            android:importantForAccessibility="no"
+                            android:padding="@dimen/space_14"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:srcCompat="@drawable/ic_profile_chevron_right"
+                            app:tint="@color/ms_text_tertiary" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginStart="56dp"
+                        android:background="@color/ms_border_subtle" />
 
                     <!-- Settings -->
                     <androidx.constraintlayout.widget.ConstraintLayout
@@ -476,7 +531,7 @@
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
                             app:srcCompat="@drawable/ic_profile_settings_outline"
-                            app:tint="@color/profile_text_primary"  android:contentDescription="@string/cd_settings" />
+                            app:tint="@color/ms_text_primary"  android:contentDescription="@string/cd_settings" />
 
                         <TextView
                             android:id="@+id/tvSettingsTitle"
@@ -485,7 +540,7 @@
                             android:layout_marginStart="16dp"
                             android:fontFamily="@font/manrope_semibold"
                             android:text="@string/profile_settings_title"
-                            android:textColor="@color/profile_text_primary"
+                            android:textColor="@color/ms_text_primary"
                             android:textSize="@dimen/text_size_body"
                             android:textStyle="bold"
                             app:layout_constraintBottom_toBottomOf="parent"
@@ -502,14 +557,14 @@
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
                             app:srcCompat="@drawable/ic_profile_chevron_right"
-                            app:tint="@color/profile_chevron"  android:importantForAccessibility="no" />
+                            app:tint="@color/ms_text_tertiary"  android:importantForAccessibility="no" />
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:layout_marginStart="56dp"
-                        android:background="@color/profile_section_stroke" />
+                        android:background="@color/ms_border_subtle" />
 
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:id="@+id/cardPrivacy"
@@ -530,7 +585,7 @@
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
                             app:srcCompat="@drawable/ic_profile_shield_outline"
-                            app:tint="@color/profile_text_primary" />
+                            app:tint="@color/ms_text_primary" />
 
                         <TextView
                             android:layout_width="0dp"
@@ -538,7 +593,7 @@
                             android:layout_marginStart="16dp"
                             android:fontFamily="@font/manrope_semibold"
                             android:text="@string/profile_privacy_title"
-                            android:textColor="@color/profile_text_primary"
+                            android:textColor="@color/ms_text_primary"
                             android:textSize="@dimen/text_size_body"
                             android:textStyle="bold"
                             app:layout_constraintBottom_toBottomOf="parent"
@@ -556,14 +611,14 @@
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
                             app:srcCompat="@drawable/ic_profile_chevron_right"
-                            app:tint="@color/profile_chevron" />
+                            app:tint="@color/ms_text_tertiary" />
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:layout_marginStart="56dp"
-                        android:background="@color/profile_section_stroke" />
+                        android:background="@color/ms_border_subtle" />
 
                     <!-- Help -->
                     <androidx.constraintlayout.widget.ConstraintLayout
@@ -584,7 +639,7 @@
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
                             app:srcCompat="@drawable/ic_profile_help_outline"
-                            app:tint="@color/profile_text_primary"  android:contentDescription="@string/cd_menu" />
+                            app:tint="@color/ms_text_primary"  android:contentDescription="@string/cd_menu" />
 
                         <TextView
                             android:id="@+id/tvHelpTitle"
@@ -592,8 +647,8 @@
                             android:layout_height="wrap_content"
                             android:layout_marginStart="16dp"
                             android:fontFamily="@font/manrope_semibold"
-                            android:text="@string/auto_help_center_efda"
-                            android:textColor="@color/profile_text_primary"
+                            android:text="@string/help_center_title"
+                            android:textColor="@color/ms_text_primary"
                             android:textSize="@dimen/text_size_body"
                             android:textStyle="bold"
                             app:layout_constraintBottom_toBottomOf="parent"
@@ -610,14 +665,14 @@
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
                             app:srcCompat="@drawable/ic_profile_chevron_right"
-                            app:tint="@color/profile_chevron"  android:importantForAccessibility="no" />
+                            app:tint="@color/ms_text_tertiary"  android:importantForAccessibility="no" />
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:layout_marginStart="56dp"
-                        android:background="@color/profile_section_stroke" />
+                        android:background="@color/ms_border_subtle" />
 
                     <!-- About -->
                     <androidx.constraintlayout.widget.ConstraintLayout
@@ -639,7 +694,7 @@
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
                             app:srcCompat="@drawable/ic_profile_help_outline"
-                            app:tint="@color/profile_text_primary" />
+                            app:tint="@color/ms_text_primary" />
 
                         <TextView
                             android:id="@+id/tvAboutTitle"
@@ -648,7 +703,7 @@
                             android:layout_marginStart="16dp"
                             android:fontFamily="@font/manrope_semibold"
                             android:text="@string/settings_about_title"
-                            android:textColor="@color/profile_text_primary"
+                            android:textColor="@color/ms_text_primary"
                             android:textSize="@dimen/text_size_body"
                             android:textStyle="bold"
                             app:layout_constraintBottom_toBottomOf="parent"
@@ -666,7 +721,7 @@
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
                             app:srcCompat="@drawable/ic_profile_chevron_right"
-                            app:tint="@color/profile_chevron" />
+                            app:tint="@color/ms_text_tertiary" />
                     </androidx.constraintlayout.widget.ConstraintLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -686,10 +741,10 @@
                     android:layout_weight="1"
                     android:clickable="true"
                     android:focusable="true"
-                    app:cardBackgroundColor="@color/profile_section_bg"
+                    app:cardBackgroundColor="@color/ms_surface_card"
                     app:cardCornerRadius="@dimen/corner_radius_medium"
                     app:cardElevation="0dp"
-                    app:strokeColor="@color/profile_section_stroke"
+                    app:strokeColor="@color/ms_border_subtle"
                     app:strokeWidth="@dimen/stroke_width_default" />
 
                 <com.google.android.material.card.MaterialCardView
@@ -700,10 +755,10 @@
                     android:layout_weight="1"
                     android:clickable="true"
                     android:focusable="true"
-                    app:cardBackgroundColor="@color/profile_section_bg"
+                    app:cardBackgroundColor="@color/ms_surface_card"
                     app:cardCornerRadius="@dimen/corner_radius_medium"
                     app:cardElevation="0dp"
-                    app:strokeColor="@color/profile_section_stroke"
+                    app:strokeColor="@color/ms_border_subtle"
                     app:strokeWidth="@dimen/stroke_width_default" />
 
                 <com.google.android.material.card.MaterialCardView
@@ -714,10 +769,10 @@
                     android:layout_weight="1"
                     android:clickable="true"
                     android:focusable="true"
-                    app:cardBackgroundColor="@color/profile_section_bg"
+                    app:cardBackgroundColor="@color/ms_surface_card"
                     app:cardCornerRadius="@dimen/corner_radius_medium"
                     app:cardElevation="0dp"
-                    app:strokeColor="@color/profile_section_stroke"
+                    app:strokeColor="@color/ms_border_subtle"
                     app:strokeWidth="@dimen/stroke_width_default" />
             </LinearLayout>
 
@@ -735,7 +790,7 @@
                     android:layout_weight="1"
                     android:fontFamily="@font/manrope_semibold"
                     android:text="@string/profile_recently_viewed_title"
-                    android:textColor="@color/profile_text_primary"
+                    android:textColor="@color/ms_text_primary"
                     android:textSize="@dimen/text_size_body"
                     android:textStyle="bold" />
 
@@ -745,7 +800,7 @@
                     android:layout_height="44dp"
                     android:gravity="center"
                     android:text="@string/common_see_all"
-                    android:textColor="?attr/colorPrimary"
+                    android:textColor="@color/ms_text_primary"
                     android:textSize="@dimen/text_size_caption" />
             </LinearLayout>
 
@@ -770,7 +825,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_8"
                 android:text="@string/details_reviews_empty"
-                android:textColor="@color/profile_text_secondary"
+                android:textColor="@color/ms_text_secondary"
                 android:textSize="@dimen/text_size_caption"
                 android:visibility="gone" />
 
@@ -787,18 +842,18 @@
                 android:letterSpacing="0.02"
                 android:paddingStart="20dp"
                 android:paddingEnd="20dp"
-                android:text="@string/auto_log_out_b0c2"
+                android:text="@string/profile_logout"
                 android:textAllCaps="false"
-                android:textSize="15sp"
-                app:backgroundTint="@color/profile_logout_bg"
+                android:textSize="@dimen/profile_text_size_logout"
+                app:backgroundTint="@color/ms_surface_card"
                 app:cornerRadius="18dp"
                 app:icon="@drawable/ic_profile_logout"
                 app:iconGravity="textStart"
                 app:iconPadding="12dp"
                 app:iconSize="18dp"
-                app:iconTint="@color/profile_logout_text"
-                app:rippleColor="@color/home_ref_gold_soft"
-                app:strokeColor="@color/profile_logout_border"
+                app:iconTint="@color/ms_text_primary"
+                app:rippleColor="@color/ms_accent_gold_soft"
+                app:strokeColor="@color/ms_border_default"
                 app:strokeWidth="@dimen/stroke_width_default" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
@@ -807,7 +862,7 @@
         android:layout_width="0dp"
         android:layout_height="@dimen/divider_height"
         android:visibility="gone"
-        android:background="@color/profile_divider"
+        android:background="@color/ms_border_subtle"
         app:layout_constraintBottom_toTopOf="@id/layoutBottomNav"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

@@ -2,9 +2,13 @@ package isim.ia2y.myapplication
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.util.Log
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
+import com.google.firebase.firestore.Source
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -19,8 +23,8 @@ object UserService {
         val cachedAtMillis: Long
     )
 
-    private const val ROLE_CACHE_TTL_MS = 60_000L
-    private const val CLIENT_ROLE_CACHE_TTL_MS = 5_000L
+    private const val ROLE_CACHE_TTL_MS = 30 * 60 * 1000L
+    private const val CLIENT_ROLE_CACHE_TTL_MS = 30 * 60 * 1000L
     private const val PREFS_NAME = "user_role_cache"
     private const val KEY_ROLE_PREFIX = "role_"
     private const val KEY_CACHED_AT_PREFIX = "role_cached_at_"
@@ -54,6 +58,7 @@ object UserService {
         roleOverride: String? = null
     ) {
         val existing = userRef(uid).get().await()
+        FirebaseCostTracker.read("UserService.saveUserProfile", "users/$uid", if (existing.exists()) 1 else 0)
         val existingRole = normalizeRole(existing.getString("role"))
         val requestedRole = normalizeRole(roleOverride)
         val nextRole = when {
@@ -79,11 +84,13 @@ object UserService {
             "schemaVersion" to 2
         )
         userRef(uid).set(data, SetOptions.merge()).await()
+        FirebaseCostTracker.write("UserService.saveUserProfile", "users/$uid")
         rememberRole(uid, nextRole)
     }
 
     suspend fun updateUserAvatarUrl(uid: String, avatarUrl: String) {
         val current = userRef(uid).get().await()
+        FirebaseCostTracker.read("UserService.updateUserAvatarUrl", "users/$uid", if (current.exists()) 1 else 0)
         val serverNow = com.google.firebase.firestore.FieldValue.serverTimestamp()
         if (current.exists()) {
             userRef(uid).set(
@@ -96,6 +103,7 @@ object UserService {
                 ),
                 SetOptions.merge()
             ).await()
+            FirebaseCostTracker.write("UserService.updateUserAvatarUrl", "users/$uid")
             _avatarUrlFlow.value = uid to avatarUrl
             return
         }
@@ -119,6 +127,7 @@ object UserService {
             ),
             SetOptions.merge()
         ).await()
+        FirebaseCostTracker.write("UserService.updateUserAvatarUrl", "users/$uid")
         _avatarUrlFlow.value = uid to avatarUrl
     }
 
@@ -131,6 +140,94 @@ object UserService {
             ),
             SetOptions.merge()
         ).await()
+        FirebaseCostTracker.write("UserService.updateUserProfileName", "users/$uid")
+    }
+
+    suspend fun submitVendorApplication(uid: String, shopName: String, phone: String, note: String) {
+        if (uid.isBlank()) throw IllegalStateException("Authentication is required.")
+        val cleanShopName = shopName.trim()
+        val cleanPhone = DeliveryAddressValidator.normalizedPhone(phone)
+        val cleanNote = note.trim()
+        if (cleanShopName.length < 2) throw IllegalArgumentException("Shop name is required.")
+        if (cleanPhone.length < 8) throw IllegalArgumentException("Phone number is required.")
+
+        val existing = userRef(uid).get().await()
+        FirebaseCostTracker.read("UserService.submitVendorApplication", "users/$uid", if (existing.exists()) 1 else 0)
+        val existingRole = normalizeRole(existing.getString("role"))
+        if (existingRole == UserRoles.ADMIN || existingRole == UserRoles.VENDEUR) {
+            throw IllegalStateException("This account already has elevated access.")
+        }
+
+        val authUser = FirebaseAuthManager.currentUser
+        val serverNow = FieldValue.serverTimestamp()
+        val data = mutableMapOf<String, Any?>(
+            "uid" to uid,
+            VendorFields.STATUS to VendorStatus.PENDING.wireValue,
+            VendorFields.APPLICATION_SUBMITTED_AT to serverNow,
+            VendorFields.SHOP_NAME to cleanShopName,
+            VendorFields.SHOP_BIO to cleanNote,
+            "phone" to cleanPhone,
+            "updatedAt" to serverNow,
+            "schemaVersion" to 2
+        )
+
+        val email = existing.getString("email") ?: authUser?.email.orEmpty()
+        if (email.isNotBlank()) data["email"] = email
+
+        if (!existing.exists()) {
+            val fallbackName = authUser.profileNameFallback()
+            data += mapOf(
+                "name" to fallbackName,
+                "displayName" to fallbackName,
+                "role" to UserRoles.CLIENT,
+                "status" to "active",
+                "notificationPreferences" to defaultNotificationPreferences(),
+                "createdAt" to serverNow
+            )
+        }
+
+        userRef(uid).set(data, SetOptions.merge()).await()
+        FirebaseCostTracker.write("UserService.submitVendorApplication", "users/$uid")
+    }
+
+    suspend fun updateUserLocationIfChanged(uid: String, location: UserLocation): Boolean {
+        if (uid.isBlank() || location.displayText.isBlank()) return false
+        val cachedDoc = runCatching { userRef(uid).get(Source.CACHE).await() }.getOrNull()
+        val doc = cachedDoc ?: userRef(uid).get().await().also {
+            FirebaseCostTracker.read("UserService.updateUserLocationIfChanged", "users/$uid", if (it.exists()) 1 else 0)
+        }
+        val existing = UserLocation.fromAny(doc.get("location"))
+        if (location.isMeaningfullySame(existing)) {
+            Log.d("LocationFlow", "Location saved/skipped because unchanged")
+            return false
+        }
+
+        val serverNow = FieldValue.serverTimestamp()
+        val data = if (doc.exists()) {
+            mapOf(
+                "location" to location.toMap(),
+                "updatedAt" to serverNow
+            )
+        } else {
+            val authUser = FirebaseAuthManager.currentUser
+            mapOf(
+                "uid" to uid,
+                "name" to authUser.profileNameFallback(),
+                "displayName" to authUser.profileNameFallback(),
+                "email" to authUser?.email.orEmpty(),
+                "role" to UserRoles.CLIENT,
+                "status" to "active",
+                "notificationPreferences" to defaultNotificationPreferences(),
+                "createdAt" to serverNow,
+                "updatedAt" to serverNow,
+                "schemaVersion" to 2,
+                "location" to location.toMap()
+            )
+        }
+        userRef(uid).set(data, SetOptions.merge()).await()
+        FirebaseCostTracker.write("UserService.updateUserLocationIfChanged", "users/$uid")
+        Log.d("LocationFlow", "Location saved")
+        return true
     }
 
     suspend fun markPhoneAccount(uid: String, phone: String) {
@@ -142,10 +239,14 @@ object UserService {
             ),
             SetOptions.merge()
         ).await()
+        FirebaseCostTracker.write("UserService.markPhoneAccount", "users/$uid")
     }
 
     suspend fun fetchUserProfile(uid: String): FirestoreService.UserProfile? {
-        val doc = userRef(uid).get().await()
+        val cachedDoc = runCatching { userRef(uid).get(Source.CACHE).await() }.getOrNull()
+        val doc = cachedDoc ?: userRef(uid).get().await().also {
+            FirebaseCostTracker.read("UserService.fetchUserProfile", "users/$uid", if (it.exists()) 1 else 0)
+        }
         val data = doc.data ?: return null
         return FirestoreService.UserProfile(
             uid = uid,
@@ -153,8 +254,13 @@ object UserService {
             email = data["email"] as? String ?: "",
             role = normalizeRole(data["role"] as? String),
             avatarUrl = data["avatarUrl"] as? String ?: data["avatar"] as? String ?: data["photoUrl"] as? String,
+            location = UserLocation.fromAny(data["location"]),
             createdAt = data["createdAt"],
-            updatedAt = data["updatedAt"]
+            updatedAt = data["updatedAt"],
+            phone = data["phone"] as? String ?: "",
+            vendorStatus = data[VendorFields.STATUS] as? String ?: "",
+            shopName = data[VendorFields.SHOP_NAME] as? String ?: "",
+            shopBio = data[VendorFields.SHOP_BIO] as? String ?: ""
         )
     }
 
@@ -168,8 +274,11 @@ object UserService {
             return claimedRole
         }
 
-        val role = normalizeRole(userRef(uid).get().await().getString("role"))
+        val roleDoc = userRef(uid).get().await()
+        FirebaseCostTracker.read("UserService.fetchUserRole", "users/$uid", if (roleDoc.exists()) 1 else 0)
+        val role = normalizeRole(roleDoc.getString("role"))
         if (role == UserRoles.ADMIN || role == UserRoles.VENDEUR) {
+            ensureCurrentUserRoleClaim(uid, role)
             rememberRole(uid, role)
             return role
         }
@@ -210,6 +319,7 @@ object UserService {
             ),
             SetOptions.merge()
         ).await()
+        FirebaseCostTracker.write("FcmTokenService", "users/$uid/fcmTokens")
     }
 
     suspend fun deleteFcmToken(uid: String, token: String) {
@@ -238,6 +348,34 @@ object UserService {
             claims["role"] is String -> normalizeRole(claims["role"] as? String)
             else -> null
         }
+    }
+
+    suspend fun hasCurrentUserRoleClaim(
+        uid: String,
+        role: String,
+        forceRefresh: Boolean = true
+    ): Boolean {
+        val claimedRole = currentUserRoleFromClaims(uid, forceRefresh)
+        return claimedRole == normalizeRole(role)
+    }
+
+    private suspend fun ensureCurrentUserRoleClaim(uid: String, role: String): Boolean {
+        val normalizedRole = normalizeRole(role)
+        if (normalizedRole != UserRoles.ADMIN && normalizedRole != UserRoles.VENDEUR) return false
+        if (hasCurrentUserRoleClaim(uid, normalizedRole, forceRefresh = true)) return true
+
+        runCatching {
+            userRef(uid).set(
+                mapOf("updatedAt" to FieldValue.serverTimestamp()),
+                SetOptions.merge()
+            ).await()
+        }
+
+        repeat(5) { attempt ->
+            delay(700L * (attempt + 1))
+            if (hasCurrentUserRoleClaim(uid, normalizedRole, forceRefresh = true)) return true
+        }
+        return false
     }
 
     fun clearCache() {
@@ -308,6 +446,7 @@ object UserService {
 
     suspend fun fetchAddresses(uid: String): List<DeliveryAddress> {
         val snapshot = addressesRef(uid).get().await()
+        FirebaseCostTracker.read("UserService.fetchAddresses", "users/$uid/addresses", snapshot.size())
         return snapshot.documents.mapNotNull { doc ->
             DeliveryAddress.fromAny(doc.data)?.copy(id = doc.id)
         }
@@ -315,29 +454,44 @@ object UserService {
 
     suspend fun replaceAddresses(uid: String, addresses: List<DeliveryAddress>) {
         val existing = addressesRef(uid).get().await()
+        FirebaseCostTracker.read("UserService.replaceAddresses", "users/$uid/addresses", existing.size())
         val batch = db.batch()
-        existing.documents.forEach { batch.delete(it.reference) }
+        val nextById = addresses.associateBy { it.id }
+        existing.documents
+            .filter { it.id !in nextById }
+            .forEach { batch.delete(it.reference) }
         addresses.forEach { address ->
             batch.set(addressesRef(uid).document(address.id), address.toMap())
         }
         batch.commit().await()
+        FirebaseCostTracker.write("UserService.replaceAddresses", "users/$uid/addresses", existing.count { it.id !in nextById } + addresses.size)
     }
 
     suspend fun fetchFavorites(uid: String): Set<String> {
         val snapshot = favoritesRef(uid).get().await()
+        FirebaseCostTracker.read("UserService.fetchFavorites", "users/$uid/favorites", snapshot.size())
         return snapshot.documents.map { it.id }.toSet()
     }
 
     suspend fun replaceFavorites(uid: String, favorites: Set<String>) {
         val existing = favoritesRef(uid).get().await()
+        FirebaseCostTracker.read("UserService.replaceFavorites", "users/$uid/favorites", existing.size())
+        val existingIds = existing.documents.map { it.id }.toSet()
+        val nextIds = favorites.filter { it.isNotBlank() }.toSet()
+        val idsToDelete = existingIds - nextIds
+        val idsToSet = nextIds - existingIds
+        if (idsToDelete.isEmpty() && idsToSet.isEmpty()) return
         val batch = db.batch()
-        existing.documents.forEach { batch.delete(it.reference) }
-        favorites.filter { it.isNotBlank() }.forEach { productId ->
+        existing.documents
+            .filter { it.id in idsToDelete }
+            .forEach { batch.delete(it.reference) }
+        idsToSet.forEach { productId ->
             batch.set(
                 favoritesRef(uid).document(productId),
                 mapOf("updatedAt" to System.currentTimeMillis())
             )
         }
         batch.commit().await()
+        FirebaseCostTracker.write("UserService.replaceFavorites", "users/$uid/favorites", idsToDelete.size + idsToSet.size)
     }
 }

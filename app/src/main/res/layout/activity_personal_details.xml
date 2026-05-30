@@ -4,13 +4,13 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/profile_body_bg">
+    android:background="@color/ms_surface_canvas">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layoutTopBar"
         android:layout_width="0dp"
         android:layout_height="@dimen/app_top_bar_height"
-        android:background="@color/profile_header_bg"
+        android:background="@color/ms_surface_canvas"
         android:paddingStart="@dimen/app_top_bar_horizontal_padding"
         android:paddingEnd="@dimen/app_top_bar_horizontal_padding"
         app:layout_constraintEnd_toEndOf="parent"
@@ -27,7 +27,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/back"
-            app:tint="@color/profile_text_primary" />
+            app:tint="@color/ms_text_primary" />
 
         <TextView
             style="@style/AppTopBar.Title.Profile"
@@ -74,7 +74,7 @@
                     <com.google.android.material.card.MaterialCardView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        app:cardBackgroundColor="@color/home_surface_raised"
+                        app:cardBackgroundColor="@color/ms_surface_card"
                         app:cardCornerRadius="48dp"
                         app:cardElevation="0dp"
                         app:strokeColor="@color/profile_avatar_ring"
@@ -93,7 +93,7 @@
                         android:layout_width="28dp"
                         android:layout_height="28dp"
                         android:layout_gravity="end|bottom"
-                        app:cardBackgroundColor="@color/colorPrimary"
+                        app:cardBackgroundColor="@color/ms_surface_inverse"
                         app:cardCornerRadius="14dp"
                         app:cardElevation="0dp">
 
@@ -103,7 +103,7 @@
                             android:contentDescription="@string/cd_edit"
                             android:padding="6dp"
                             app:srcCompat="@drawable/ic_profile_edit"
-                            app:tint="@color/colorOnPrimary" />
+                            app:tint="@color/ms_text_inverse" />
                     </com.google.android.material.card.MaterialCardView>
                 </FrameLayout>
 
@@ -114,7 +114,7 @@
                     android:layout_marginTop="@dimen/space_12"
                     android:fontFamily="@font/manrope_medium"
                     android:text="@string/personal_details_change_photo"
-                    android:textColor="@color/profile_text_secondary"
+                    android:textColor="@color/ms_text_secondary"
                     android:textSize="@dimen/text_size_caption" />
             </LinearLayout>
 
@@ -123,10 +123,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_20"
-                app:cardBackgroundColor="@color/home_surface_raised"
+                app:cardBackgroundColor="@color/ms_surface_card"
                 app:cardCornerRadius="@dimen/corner_radius_large"
                 app:cardElevation="0dp"
-                app:strokeColor="@color/colorBorderLight"
+                app:strokeColor="@color/ms_border_default"
                 app:strokeWidth="@dimen/stroke_width_default">
 
                 <LinearLayout
@@ -152,8 +152,8 @@
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/manrope_medium"
                             android:inputType="textCapWords"
-                            android:textColor="@color/profile_text_primary"
-                            android:textColorHint="@color/profile_text_secondary" />
+                            android:textColor="@color/ms_text_primary"
+                            android:textColorHint="@color/ms_text_secondary" />
                     </com.google.android.material.textfield.TextInputLayout>
 
                     <com.google.android.material.textfield.TextInputLayout
@@ -174,7 +174,7 @@
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/manrope_medium"
                             android:inputType="textCapWords"
-                            android:textColor="@color/profile_text_primary" />
+                            android:textColor="@color/ms_text_primary" />
                     </com.google.android.material.textfield.TextInputLayout>
 
                     <com.google.android.material.textfield.TextInputLayout
@@ -195,7 +195,7 @@
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/manrope_medium"
                             android:inputType="textEmailAddress"
-                            android:textColor="@color/profile_text_primary" />
+                            android:textColor="@color/ms_text_primary" />
                     </com.google.android.material.textfield.TextInputLayout>
 
                     <com.google.android.material.textfield.TextInputLayout
@@ -216,7 +216,7 @@
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/manrope_medium"
                             android:inputType="phone"
-                            android:textColor="@color/profile_text_primary" />
+                            android:textColor="@color/ms_text_primary" />
                     </com.google.android.material.textfield.TextInputLayout>
 
                     <LinearLayout
@@ -243,7 +243,7 @@
                                 android:layout_height="wrap_content"
                                 android:focusable="false"
                                 android:fontFamily="@font/manrope_medium"
-                                android:textColor="@color/profile_text_primary" />
+                                android:textColor="@color/ms_text_primary" />
                         </com.google.android.material.textfield.TextInputLayout>
 
                         <Space
@@ -269,7 +269,7 @@
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/manrope_medium"
                                 android:inputType="none"
-                                android:textColor="@color/profile_text_primary" />
+                                android:textColor="@color/ms_text_primary" />
                         </com.google.android.material.textfield.TextInputLayout>
                     </LinearLayout>
 
@@ -294,7 +294,7 @@
                             android:inputType="textCapSentences|textMultiLine"
                             android:lines="4"
                             android:maxLines="5"
-                            android:textColor="@color/profile_text_primary" />
+                            android:textColor="@color/ms_text_primary" />
                     </com.google.android.material.textfield.TextInputLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>

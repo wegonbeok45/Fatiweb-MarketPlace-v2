@@ -5,9 +5,9 @@
     android:viewportWidth="24"
     android:viewportHeight="24">
     <path
-        android:fillColor="#FF11141D"
+        android:fillColor="@color/ms_surface_inverse"
         android:pathData="M12,2a10,10 0,1 0,0 20a10,10 0,1 0,0 -20z" />
     <path
-        android:fillColor="#FFFFFFFF"
+        android:fillColor="@color/ms_text_inverse"
         android:pathData="M11,17h2v2h-2zM12,6a4,4 0,0 0,-4 4h2a2,2 0,1 1,4 0c0,2 -3,1.75 -3,5h2c0,-2.5 3,-2.75 3,-5a4,4 0,0 0,-4 -4z" />
 </vector>
