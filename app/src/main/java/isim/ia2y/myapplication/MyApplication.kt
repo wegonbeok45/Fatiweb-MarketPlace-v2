@@ -2,6 +2,7 @@ package isim.ia2y.myapplication
 
 import android.app.Application
 import android.util.Log
+import androidx.appcompat.app.AppCompatDelegate
 import coil.ImageLoader
 import coil.ImageLoaderFactory
 import coil.disk.DiskCache
@@ -21,6 +22,7 @@ class MyApplication : Application(), ImageLoaderFactory {
     }
 
     override fun onCreate() {
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         super.onCreate()
         instance = this
         configureAppCheck()
