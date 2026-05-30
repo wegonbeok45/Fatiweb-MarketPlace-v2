@@ -4,16 +4,22 @@ import java.io.IOException
 
 /**
  * AI chat service.
- * AI requests go through Firebase Functions so API keys and private context stay off-device.
+ *
+ * Vendor-agnostic wrapper around the marketplace assistant. Requests are
+ * routed through Firebase Functions ([BackendFunctionsService.assistantSendMessage])
+ * so the AI provider key and private context stay off-device.
+ *
+ * Currently backed by xAI Grok (migrated from Google Gemini). Swapping the
+ * provider is a backend-only change — this file does not need to know.
  */
-object GeminiChatService {
+object AssistantChatService {
 
     private var lastRequestTime = 0L
     private const val COOLDOWN_MS = 3000L
 
     suspend fun sendMessage(
         history: List<ChatMessage>,
-        userId: String? = null
+        userId: String? = null,
     ): String {
         val now = System.currentTimeMillis()
         if (now - lastRequestTime < COOLDOWN_MS) {
@@ -37,7 +43,7 @@ object GeminiChatService {
         if (lastUserText.isBlank()) return null
 
         val normalized = lastUserText.lowercase()
-        val wantsFrench = listOf("livraison", "commande", "produit", "paiement", "delai", "d\u00e9lai")
+        val wantsFrench = listOf("livraison", "commande", "produit", "paiement", "delai", "délai")
             .any { normalized.contains(it) }
 
         return when {
@@ -45,7 +51,7 @@ object GeminiChatService {
                 normalized.contains("shipping") ||
                 normalized.contains("livraison") ||
                 normalized.contains("delai") ||
-                normalized.contains("d\u00e9lai") -> {
+                normalized.contains("délai") -> {
                 if (wantsFrench) {
                     "La livraison standard coute 7 DT et la livraison express coute 12.5 DT. Le delai indique dans l'application est generalement de 3 a 5 jours apres confirmation. Pour un colis precis, ouvrez Profil > Commandes."
                 } else {

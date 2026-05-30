@@ -39,7 +39,7 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
 
         viewModelScope.launch {
             try {
-                val reply = GeminiChatService.sendMessage(
+                val reply = AssistantChatService.sendMessage(
                     history = historyWithUser,
                     userId = userId
                 )

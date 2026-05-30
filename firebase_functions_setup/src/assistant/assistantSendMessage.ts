@@ -10,12 +10,17 @@ import {
 import {admin, db} from "../shared/firestore";
 import {asNumber, asRecord, asString} from "../shared/domain";
 import {hotCallableOptions} from "../shared/callableOptions";
+import {chatCompletion, GroqMessage} from "../shared/groqClient";
 
-const geminiApiKey = defineSecret("GEMINI_API_KEY");
-const GEMINI_MODELS = ["gemini-2.5-flash-lite", "gemini-2.0-flash-lite"];
+const groqApiKey = defineSecret("GROQ_API_KEY");
+
+// Primary model: Llama 3.3 70B (fast, high quality). Fallback: Llama 3.1 8B (instant).
+const PRIMARY_MODEL = "llama-3.3-70b-versatile";
+const FALLBACK_MODELS = ["llama-3.1-8b-instant"];
+const ASSISTANT_CONTEXT_CACHE_TTL_MS = 5 * 60 * 1000;
 
 type ChatTurn = {
-  role: "user" | "model";
+  role: "user" | "assistant";
   text: string;
 };
 
@@ -28,9 +33,14 @@ function parseHistory(value: unknown): ChatTurn[] {
     .map((entry) => asRecord(entry))
     .filter((entry): entry is Record<string, unknown> => entry !== null)
     .map((entry) => {
-      const role = asString(entry.role).trim().toUpperCase() === "BOT" ? "model" : "user";
+      // Map legacy "BOT" role to OpenAI-style "assistant"
+      const rawRole = asString(entry.role).trim().toUpperCase();
+      const role: "user" | "assistant" =
+        rawRole === "BOT" || rawRole === "ASSISTANT" || rawRole === "MODEL" ?
+          "assistant" :
+          "user";
       return {
-        role: role as "user" | "model",
+        role,
         text: asString(entry.text).trim(),
       };
     })
@@ -63,6 +73,18 @@ async function fetchAssistantContext(uid: string | null): Promise<{
   products: string[];
   orders: string[];
 }> {
+  const nowMs = Date.now();
+  const cacheRef = uid ? db.collection(COLLECTIONS.ASSISTANT_CONTEXT_CACHE).doc(uid) : null;
+  if (cacheRef) {
+    const cacheDoc = await cacheRef.get();
+    const updatedAtMs = asNumber(cacheDoc.get("updatedAtMs"), 0);
+    const products = stringList(cacheDoc.get("products"));
+    const orders = stringList(cacheDoc.get("orders"));
+    if (products.length > 0 && nowMs - updatedAtMs < ASSISTANT_CONTEXT_CACHE_TTL_MS) {
+      return {products, orders};
+    }
+  }
+
   const productsSnapshot = await db.collection(COLLECTIONS.PRODUCTS)
     .where("isActive", "==", true)
     .orderBy("updatedAt", "desc")
@@ -95,7 +117,25 @@ async function fetchAssistantContext(uid: string | null): Promise<{
     const data = doc.data();
     return `${asString(data.id || doc.id)} - ${asString(data.status, "pending")} - ${asNumber(data.total)} DT`;
   });
-  return {products, orders};
+  const context = {products, orders};
+  if (cacheRef) {
+    await cacheRef.set({
+      uid,
+      ...context,
+      updatedAtMs: nowMs,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    }, {merge: true});
+  }
+  return context;
+}
+
+function stringList(value: unknown): string[] {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+  return value
+    .map((item) => asString(item).trim())
+    .filter((item) => item.length > 0);
 }
 
 function buildSystemPrompt(context: {products: string[]; orders: string[]}): string {
@@ -126,32 +166,18 @@ Store facts:
   `.trim();
 }
 
-function buildGeminiContents(
-  systemPrompt: string,
-  history: ChatTurn[],
-): Array<{role: "user" | "model"; parts: Array<{text: string}>}> {
-  const contents: Array<{role: "user" | "model"; parts: Array<{text: string}>}> = [
-    {
-      role: "user",
-      parts: [{text: `[SYSTEM CONTEXT - DO NOT EXPOSE]\n${systemPrompt}`}],
-    },
-    {
-      role: "model",
-      parts: [{text: "Understood. I will answer as FatiBot using only grounded marketplace information."}],
-    },
+function buildGroqMessages(systemPrompt: string, history: ChatTurn[]): GroqMessage[] {
+  const messages: GroqMessage[] = [
+    {role: "system", content: systemPrompt},
   ];
-
-  for (const entry of history) {
-    contents.push({
-      role: entry.role,
-      parts: [{text: entry.text}],
-    });
+  for (const turn of history) {
+    messages.push({role: turn.role, content: turn.text});
   }
-  return contents;
+  return messages;
 }
 
 export const assistantSendMessage = onCall(
-  {...hotCallableOptions, secrets: [geminiApiKey], timeoutSeconds: 60},
+  {...hotCallableOptions, secrets: [groqApiKey], timeoutSeconds: 60},
   async (request) => {
     const uid = request.auth?.uid || null;
     const payload = asRecord(request.data) || {};
@@ -162,54 +188,17 @@ export const assistantSendMessage = onCall(
 
     await enforceRateLimit(uid, request.rawRequest.ip);
     const context = await fetchAssistantContext(uid);
-    const requestBody = JSON.stringify({
-      contents: buildGeminiContents(buildSystemPrompt(context), history),
-      generationConfig: {
-        temperature: 0.65,
-        maxOutputTokens: 512,
-        topP: 0.95,
-      },
+
+    const reply = await chatCompletion({
+      apiKey: groqApiKey.value(),
+      model: PRIMARY_MODEL,
+      fallbackModels: FALLBACK_MODELS,
+      messages: buildGroqMessages(buildSystemPrompt(context), history),
+      temperature: 0.65,
+      maxTokens: 512,
+      topP: 0.95,
+      logTag: "assistant",
     });
-
-    let reply = "";
-    for (const model of GEMINI_MODELS) {
-      const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${geminiApiKey.value()}`,
-        {
-          method: "POST",
-          headers: {"Content-Type": "application/json"},
-          body: requestBody,
-        },
-      );
-
-      const responseBody = await response.text();
-      if (!response.ok) {
-        logger.error("Assistant request failed", {
-          model,
-          status: response.status,
-          body: responseBody.slice(0, 400),
-        });
-        if (response.status === 429) {
-          throw new HttpsError("resource-exhausted", "Gemini quota is exhausted for the current API key.");
-        }
-        if (response.status === 400 && responseBody.includes("API_KEY_INVALID")) {
-          throw new HttpsError("failed-precondition", "Gemini API key is invalid.");
-        }
-        if (response.status === 503) {
-          continue;
-        }
-        throw new HttpsError("internal", "Assistant is temporarily unavailable.");
-      }
-
-      const parsed = JSON.parse(responseBody) as {
-        candidates?: Array<{content?: {parts?: Array<{text?: string}>}}>;
-      };
-      reply = parsed.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || "";
-      if (reply) break;
-    }
-    if (!reply) {
-      throw new HttpsError("internal", "Assistant returned an empty response.");
-    }
 
     logger.info("Assistant reply generated", {
       uid,

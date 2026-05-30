@@ -5,42 +5,42 @@
     android:viewportWidth="96"
     android:viewportHeight="96">
     <path
-        android:fillColor="#F3E5C9"
+        android:fillColor="@color/ms_accent_gold_bg"
         android:pathData="M48,48m-48,0a48,48 0,1 0,96 0a48,48 0,1 0,-96 0" />
     <path
-        android:strokeColor="#B7904F"
+        android:strokeColor="@color/market_gold_gradient_mid"
         android:strokeWidth="3"
         android:strokeLineCap="round"
         android:fillColor="@android:color/transparent"
         android:pathData="M48,24 L48,16" />
     <path
-        android:fillColor="#B7904F"
+        android:fillColor="@color/market_gold_gradient_mid"
         android:pathData="M48,14m-5,0a5,5 0,1 0,10 0a5,5 0,1 0,-10 0" />
     <path
-        android:fillColor="#2C4A42"
+        android:fillColor="@color/illustration_ai_green"
         android:pathData="M30,31h36a9,9 0,0 1,9 9v20a9,9 0,0 1,-9 9H30a9,9 0,0 1,-9 -9V40a9,9 0,0 1,9 -9z" />
     <path
-        android:fillColor="#142D28"
+        android:fillColor="@color/illustration_ai_green_dark"
         android:pathData="M34,36h28a7,7 0,0 1,7 7v14a7,7 0,0 1,-7 7H34a7,7 0,0 1,-7 -7V43a7,7 0,0 1,7 -7z" />
     <path
-        android:fillColor="#32D6A4"
+        android:fillColor="@color/illustration_ai_mint"
         android:pathData="M37,47m-4,0a4,4 0,1 0,8 0a4,4 0,1 0,-8 0" />
     <path
-        android:fillColor="#32D6A4"
+        android:fillColor="@color/illustration_ai_mint"
         android:pathData="M59,47m-4,0a4,4 0,1 0,8 0a4,4 0,1 0,-8 0" />
     <path
-        android:strokeColor="#32D6A4"
+        android:strokeColor="@color/illustration_ai_mint"
         android:strokeWidth="2"
         android:strokeLineCap="round"
         android:fillColor="@android:color/transparent"
         android:pathData="M43,57 H53" />
     <path
-        android:fillColor="#2C4A42"
+        android:fillColor="@color/illustration_ai_green"
         android:pathData="M16,43h7v14h-7a5,5 0,0 1,-5 -5v-4a5,5 0,0 1,5 -5z" />
     <path
-        android:fillColor="#2C4A42"
+        android:fillColor="@color/illustration_ai_green"
         android:pathData="M80,43h-7v14h7a5,5 0,0 0,5 -5v-4a5,5 0,0 0,-5 -5z" />
     <path
-        android:fillColor="#D3B073"
+        android:fillColor="@color/illustration_ai_gold"
         android:pathData="M39,69h18v7a4,4 0,0 1,-4 4H43a4,4 0,0 1,-4 -4z" />
 </vector>
