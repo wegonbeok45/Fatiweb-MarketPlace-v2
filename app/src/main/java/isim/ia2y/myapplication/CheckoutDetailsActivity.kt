@@ -1,5 +1,6 @@
 package isim.ia2y.myapplication
 
+import android.Manifest
 import android.content.Intent
 import android.os.Bundle
 import android.text.InputFilter
@@ -12,6 +13,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
@@ -57,6 +59,20 @@ class CheckoutDetailsActivity : AppCompatActivity() {
     private var guestCheckoutChoiceShown = false
     private val btnContinue: MaterialButton
         get() = binding.btnCheckoutContinue
+
+    private val requestLocationLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        val granted = permissions.values.any { it }
+        val permanentlyDenied = LocationHelper.isPermanentlyDenied(this)
+        LocationPermissionStore.markPermissionResult(this, granted, permanentlyDenied)
+        Log.d("LocationFlow", if (granted) "Permission accepted" else "Permission rejected")
+        if (granted) {
+            fetchAndUseCheckoutLocation()
+        } else if (permanentlyDenied) {
+            updateCheckoutActionCard(requestFocus = true)
+        }
+    }
 
     enum class PaymentMethod { CASH }
 
@@ -161,9 +177,9 @@ class CheckoutDetailsActivity : AppCompatActivity() {
                 showCheckoutContinuationChoice(force = true)
                 return@setOnClickListener
             }
-            if ((viewModel.currentStep.value ?: 1) == 1) {
-                transitionToStep2()
-            } else {
+        if ((viewModel.currentStep.value ?: 1) == 1) {
+            transitionToStep2()
+        } else {
                 confirmOrder()
             }
         }
@@ -235,6 +251,7 @@ class CheckoutDetailsActivity : AppCompatActivity() {
             if (profile.name.isNotBlank()) {
                 binding.tvCheckoutAddressName.text = profile.name
             }
+            applyProfileLocation(profile)
         }
     }
 
@@ -303,6 +320,7 @@ class CheckoutDetailsActivity : AppCompatActivity() {
             updateCheckoutActionCard(requestFocus = true)
             return
         }
+        if (!requireCompleteCheckoutAddress { confirmOrder() }) return
         if (selectedPaymentMethod != PaymentMethod.CASH) {
             Log.w(TAG, "Order confirmation blocked: unsupported payment=$selectedPaymentMethod")
             showMotionSnackbar(getString(R.string.checkout_cod_only))
@@ -333,17 +351,31 @@ class CheckoutDetailsActivity : AppCompatActivity() {
             showMotionSnackbar(getString(R.string.checkout_add_address_first))
             return
         }
+        if (!deliveryAddress.isCompleteForBackend()) {
+            Log.w(TAG, "Order confirmation blocked during save: address incomplete")
+            showCompleteDeliveryAddressDialog(deliveryAddress) { saveOrderAndProceed() }
+            return
+        }
         val addressSnapshot = deliveryAddress.toSnapshot()
 
-        val orderItems = cart.map { (productId, quantity) ->
+        val orderItems = cart.map { (key, quantity) ->
+            val productId = CartKey.productId(key)
+            val variantId = CartKey.variantId(key)
             val product = ProductCatalog.byId(productId)
+            val variant = product?.variantById(variantId)
+            val unitPrice = product?.unitPriceForVariant(variant) ?: 0.0
             OrderItem(
                 productId = productId,
-                name = product?.title ?: productId.toString(),
-                priceAtPurchase = product?.effectivePrice ?: 0.0,
-                priceAtPurchaseMinor = product?.priceMinor ?: 0L,
+                variantId = variantId ?: "",
+                selectedColor = variant?.colorName ?: "",
+                selectedSize = variant?.size ?: "",
+                variantLabel = variant?.label ?: "",
+                name = product?.title ?: productId,
+                priceAtPurchase = unitPrice,
+                priceAtPurchaseMinor = toMinorUnits(unitPrice),
                 quantity = quantity,
-                thumbnailUrl = product?.previewImageUrl() ?: ""
+                thumbnailUrl = variant?.imageUrl?.takeIf { it.isNotBlank() }
+                    ?: product?.previewImageUrl() ?: ""
             )
         }
 
@@ -439,6 +471,7 @@ class CheckoutDetailsActivity : AppCompatActivity() {
             updateCheckoutActionCard(requestFocus = true)
             return
         }
+        if (!requireCompleteCheckoutAddress { transitionToStep2() }) return
         viewModel.setStep(2)
         AnalyticsTracker.checkoutStepCompleted(1, "delivery")
         AnalyticsTracker.beginCheckout(
@@ -486,8 +519,18 @@ class CheckoutDetailsActivity : AppCompatActivity() {
                 itemView.findViewById<ImageView>(R.id.ivConfirmItemImage)
                     ?.loadCatalogImage(item.thumbnailUrl, R.drawable.placeholder)
                 itemView.findViewById<TextView>(R.id.tvConfirmItemName)?.text = item.name
-                itemView.findViewById<TextView>(R.id.tvConfirmItemDetails)?.text =
-                    getString(R.string.order_details_item_qty, item.quantity)
+                itemView.findViewById<TextView>(R.id.tvConfirmItemDetails)?.apply {
+                    val variantPart = item.variantLabel.ifBlank {
+                        listOf(item.selectedColor, item.selectedSize)
+                            .filter { it.isNotBlank() }
+                            .joinToString(" · ")
+                    }
+                    text = if (variantPart.isBlank()) {
+                        getString(R.string.order_details_item_qty, item.quantity)
+                    } else {
+                        "${getString(R.string.order_details_item_qty, item.quantity)} · $variantPart"
+                    }
+                }
                 itemView.findViewById<TextView>(R.id.tvConfirmItemPrice)?.text = formatDt(item.priceAtPurchase * item.quantity)
 
                 container.addView(itemView)
@@ -534,6 +577,7 @@ class CheckoutDetailsActivity : AppCompatActivity() {
     }
 
     private fun bindDynamicData() {
+        ensureCheckoutAddressFromCachedLocation()
         val address = AddressBookStore.getCurrent(this)
         val tvName = binding.tvCheckoutAddressName
         val tvLine1 = binding.tvCheckoutAddressLine1
@@ -556,7 +600,8 @@ class CheckoutDetailsActivity : AppCompatActivity() {
         val tray = binding.layoutCheckoutArticles
         tray.removeAllViews()
         val cart = CartStore.getCart(this)
-        val items = ProductCatalog.orderedFavorites(cart.keys)
+        val productIds = cart.keys.mapTo(linkedSetOf()) { CartKey.productId(it) }
+        val items = ProductCatalog.orderedFavorites(productIds)
         tray.visibility = if (items.isEmpty()) View.GONE else View.VISIBLE
 
         val inflater = LayoutInflater.from(this)
@@ -646,10 +691,28 @@ class CheckoutDetailsActivity : AppCompatActivity() {
             }
         } else {
             binding.tvCheckoutActionTitle.text = getString(R.string.checkout_address_required_title)
-            binding.tvCheckoutActionMessage.text = getString(R.string.checkout_add_address_first)
-            binding.btnCheckoutAction.text = getString(R.string.checkout_address_action)
+            binding.tvCheckoutActionMessage.text = getString(R.string.checkout_location_or_manual)
+            binding.btnCheckoutAction.text = getString(
+                if (LocationPermissionStore.isPermanentlyDenied(this) || LocationHelper.isPermanentlyDenied(this)) {
+                    R.string.checkout_open_location_settings
+                } else {
+                    R.string.checkout_use_current_location
+                }
+            )
             binding.btnCheckoutAction.setOnClickListener {
-                navigateNoShift(AddressesActivity::class.java)
+                if (LocationPermissionStore.isPermanentlyDenied(this) || LocationHelper.isPermanentlyDenied(this)) {
+                    LocationHelper.openAppSettings(this)
+                } else if (LocationHelper.hasPermission(this)) {
+                    fetchAndUseCheckoutLocation()
+                } else {
+                    Log.d("LocationFlow", "Location permission requested")
+                    requestLocationLauncher.launch(
+                        arrayOf(
+                            Manifest.permission.ACCESS_FINE_LOCATION,
+                            Manifest.permission.ACCESS_COARSE_LOCATION
+                        )
+                    )
+                }
             }
         }
 
@@ -659,6 +722,107 @@ class CheckoutDetailsActivity : AppCompatActivity() {
             }
             showMotionSnackbar(binding.tvCheckoutActionMessage.text.toString())
         }
+    }
+
+    private fun applyProfileLocation(profile: FirestoreService.UserProfile) {
+        val location = profile.location ?: return
+        if (AddressBookStore.getCurrent(this) != null) return
+        val address = location.toDeliveryAddress(
+            name = profile.name.ifBlank { FirebaseAuthManager.currentUser?.displayName.orEmpty() },
+            phone = AddressBookStore.getCurrent(this)?.phone.orEmpty()
+        )
+        AddressBookStore.upsert(this, address)
+        UserLocationStore.save(this, location)
+        Log.d("LocationFlow", "Checkout used saved location")
+        bindDynamicData()
+    }
+
+    private fun ensureCheckoutAddressFromCachedLocation() {
+        if (AddressBookStore.getCurrent(this) != null) return
+        val location = UserLocationStore.load(this) ?: return
+        val address = location.toDeliveryAddress(
+            name = FirebaseAuthManager.currentUser?.displayName.orEmpty(),
+            phone = ""
+        )
+        AddressBookStore.upsert(this, address)
+        Log.d("LocationFlow", "Checkout used saved location")
+    }
+
+    private fun fetchAndUseCheckoutLocation() {
+        lifecycleScope.launch {
+            LocationHelper.fetchCurrentLocation(this@CheckoutDetailsActivity)
+                .onSuccess { location ->
+                    val address = location.toDeliveryAddress(
+                        name = FirebaseAuthManager.currentUser?.displayName.orEmpty(),
+                        phone = AddressBookStore.getCurrent(this@CheckoutDetailsActivity)?.phone.orEmpty()
+                    )
+                    AddressBookStore.upsert(this@CheckoutDetailsActivity, address)
+                    LocationProfileSync.saveLocation(this@CheckoutDetailsActivity, location)
+                    Log.d("LocationFlow", "Checkout used saved location")
+                    bindDynamicData()
+                    updateCheckoutActionCard()
+                }
+                .onFailure { error ->
+                    Log.w(TAG, "Checkout location fetch failed", error)
+                    showMotionSnackbar(getString(R.string.checkout_add_address_first))
+                }
+        }
+    }
+
+    private fun requireCompleteCheckoutAddress(onReady: () -> Unit): Boolean {
+        val address = AddressBookStore.getCurrent(this) ?: return false
+        if (address.isCompleteForBackend()) return true
+        showCompleteDeliveryAddressDialog(address, onReady)
+        return false
+    }
+
+    private fun showCompleteDeliveryAddressDialog(
+        existing: DeliveryAddress,
+        onReady: () -> Unit
+    ) {
+        val fullName = checkoutInput(R.string.checkout_phone_full_name, InputType.TYPE_CLASS_TEXT)
+        val phone = checkoutInput(R.string.checkout_phone_number, InputType.TYPE_CLASS_PHONE)
+        val address = checkoutInput(R.string.checkout_phone_address, InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE)
+        val city = checkoutInput(R.string.checkout_phone_city, InputType.TYPE_CLASS_TEXT)
+        val note = checkoutInput(R.string.checkout_phone_note_optional, InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE)
+
+        fullName.setText(
+            existing.recipientName
+                .ifBlank { viewModel.userProfile.value?.name.orEmpty() }
+                .ifBlank { FirebaseAuthManager.currentUser?.displayName.orEmpty() }
+        )
+        phone.setText(existing.phone)
+        address.setText(existing.addressLine1.ifBlank { existing.summaryLine })
+        city.setText(existing.city.ifBlank { existing.governorate })
+        note.setText(existing.deliveryNotes.orEmpty())
+
+        val dialog = MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.checkout_address_required_title)
+            .setView(checkoutForm(fullName, phone, address, city, note))
+            .setNegativeButton(R.string.profile_edit_cancel, null)
+            .setPositiveButton(R.string.checkout_step1_continue, null)
+            .create()
+
+        dialog.setOnShowListener {
+            dialog.getButton(android.content.DialogInterface.BUTTON_POSITIVE).setOnClickListener {
+                val completed = buildCheckoutAddress(
+                    fullName = fullName.text?.toString().orEmpty(),
+                    phone = phone.text?.toString().orEmpty(),
+                    address = address.text?.toString().orEmpty(),
+                    city = city.text?.toString().orEmpty(),
+                    note = note.text?.toString().orEmpty()
+                )?.copy(id = existing.id, label = existing.label.ifBlank { getString(R.string.checkout_guest_address_label) })
+                    ?: return@setOnClickListener
+
+                AddressBookStore.upsert(this, completed)
+                lifecycleScope.launch { LocationProfileSync.saveManualAddress(this@CheckoutDetailsActivity, completed) }
+                Log.d("LocationFlow", "Checkout used manual location")
+                dialog.dismiss()
+                bindDynamicData()
+                onReady()
+            }
+        }
+        dialog.show()
     }
 
     private fun applyPaymentSelection() {
@@ -727,6 +891,7 @@ class CheckoutDetailsActivity : AppCompatActivity() {
 
                 dialog.dismiss()
                 AddressBookStore.upsert(this, deliveryAddress)
+                lifecycleScope.launch { LocationProfileSync.saveManualAddress(this@CheckoutDetailsActivity, deliveryAddress) }
                 bindDynamicData()
                 saveGuestOrderAndProceed(deliveryAddress)
             }
@@ -786,8 +951,8 @@ class CheckoutDetailsActivity : AppCompatActivity() {
                     lifecycleScope.launch {
                         runCatching { UserService.markPhoneAccount(it.uid, phone) }
                     }
-                    previousCart.forEach { (productId, quantity) ->
-                        CartStore.setQuantity(this@CheckoutDetailsActivity, productId, quantity)
+                    previousCart.forEach { (key, quantity) ->
+                        CartStore.setQuantity(this@CheckoutDetailsActivity, key, quantity)
                     }
                     showAccountDeliveryDialog(fullName, phone)
                 },
@@ -823,6 +988,7 @@ class CheckoutDetailsActivity : AppCompatActivity() {
 
                 dialog.dismiss()
                 AddressBookStore.upsert(this, deliveryAddress)
+                lifecycleScope.launch { LocationProfileSync.saveManualAddress(this@CheckoutDetailsActivity, deliveryAddress) }
                 bindDynamicData()
                 transitionToStep2()
             }
@@ -898,6 +1064,7 @@ class CheckoutDetailsActivity : AppCompatActivity() {
                         UserService.markPhoneAccount(user.uid, deliveryAddress.phone)
                     }
                     AddressBookStore.upsert(this@CheckoutDetailsActivity, deliveryAddress)
+                    LocationProfileSync.saveManualAddress(this@CheckoutDetailsActivity, deliveryAddress)
                     bindDynamicData()
                     saveOrderAndProceed()
                 },
@@ -917,14 +1084,24 @@ class CheckoutDetailsActivity : AppCompatActivity() {
             return null
         }
         if (!validateCartStock(cart)) return null
-        val orderItems = cart.map { (productId, quantity) ->
+        val orderItems = cart.map { (key, quantity) ->
+            val productId = CartKey.productId(key)
+            val variantId = CartKey.variantId(key)
             val product = ProductCatalog.byId(productId)
+            val variant = product?.variantById(variantId)
+            val unitPrice = product?.unitPriceForVariant(variant) ?: 0.0
             OrderItem(
                 productId = productId,
+                variantId = variantId ?: "",
+                selectedColor = variant?.colorName ?: "",
+                selectedSize = variant?.size ?: "",
+                variantLabel = variant?.label ?: "",
                 name = product?.title ?: productId,
-                priceAtPurchase = product?.effectivePrice ?: 0.0,
+                priceAtPurchase = unitPrice,
+                priceAtPurchaseMinor = toMinorUnits(unitPrice),
                 quantity = quantity,
-                thumbnailUrl = product?.previewImageUrl() ?: ""
+                thumbnailUrl = variant?.imageUrl?.takeIf { it.isNotBlank() }
+                    ?: product?.previewImageUrl() ?: ""
             )
         }
         val subtotal = orderItems.sumOf { it.priceAtPurchase * it.quantity }
@@ -966,11 +1143,19 @@ class CheckoutDetailsActivity : AppCompatActivity() {
     }
 
     private fun validateCartStock(cart: Map<String, Int>): Boolean {
-        val unavailable = cart.entries.firstOrNull { (productId, quantity) ->
+        val unavailable = cart.entries.firstOrNull { (key, quantity) ->
+            val productId = CartKey.productId(key)
+            val variantId = CartKey.variantId(key)
             val product = ProductCatalog.byId(productId)
-            product == null || !product.isActive || product.stock < quantity
+            if (product == null || !product.isActive) return@firstOrNull true
+            val availableStock = if (variantId != null) {
+                product.variantById(variantId)?.stock ?: product.stock
+            } else {
+                product.effectiveStock
+            }
+            availableStock < quantity
         } ?: return true
-        val productName = ProductCatalog.byId(unavailable.key)?.title ?: unavailable.key
+        val productName = ProductCatalog.byId(CartKey.productId(unavailable.key))?.title ?: unavailable.key
         showMotionSnackbar(getString(R.string.checkout_error_stock) + " $productName")
         return false
     }
@@ -1057,10 +1242,10 @@ class CheckoutDetailsActivity : AppCompatActivity() {
         updateStepIndicator(stepNumber = 3, isActive = step == 3, isComplete = false)
 
         binding.lineStep1to2.setBackgroundColor(
-            ContextCompat.getColor(this, if (step >= 2) R.color.colorPrimary else R.color.colorBorderLight)
+            ContextCompat.getColor(this, if (step >= 2) R.color.ms_surface_inverse else R.color.ms_border_default)
         )
         binding.lineStep2to3.setBackgroundColor(
-            ContextCompat.getColor(this, if (step >= 3) R.color.colorPrimary else R.color.colorBorderLight)
+            ContextCompat.getColor(this, if (step >= 3) R.color.ms_surface_inverse else R.color.ms_border_default)
         )
     }
 
@@ -1088,9 +1273,8 @@ class CheckoutDetailsActivity : AppCompatActivity() {
                 ContextCompat.getColor(
                     this@CheckoutDetailsActivity,
                     when {
-                        isActive -> R.color.colorOnSurface
-                        isComplete -> R.color.colorPrimary
-                        else -> R.color.profile_text_muted
+                        isActive || isComplete -> R.color.ms_text_inverse
+                        else -> R.color.ms_text_tertiary
                     }
                 )
             )
@@ -1164,5 +1348,12 @@ class CheckoutDetailsActivity : AppCompatActivity() {
             .trim()
             .take(180)
     }
+
+    private fun DeliveryAddress.isCompleteForBackend(): Boolean =
+        recipientName.trim().length >= 3 &&
+            phone.trim().length >= 8 &&
+            governorate.trim().length >= 2 &&
+            city.trim().length >= 2 &&
+            addressLine1.trim().length >= 5
 
 }

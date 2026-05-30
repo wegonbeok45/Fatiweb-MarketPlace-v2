@@ -12,7 +12,7 @@
     app:cardBackgroundColor="@color/profile_card_bg"
     app:cardCornerRadius="@dimen/corner_radius_large"
     app:cardElevation="0dp"
-    app:strokeColor="@color/colorBorderLight"
+    app:strokeColor="@color/ms_border_default"
     app:strokeWidth="@dimen/stroke_width_default">
 
     <LinearLayout

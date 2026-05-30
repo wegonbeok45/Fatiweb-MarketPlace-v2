@@ -45,19 +45,28 @@ data class OrderItem(
     val thumbnailUrl: String = "",
     val sellerId: String = "",
     val sellerName: String = "",
-    val sellerAvatarUrl: String = ""
+    val sellerAvatarUrl: String = "",
+    // Variant fields — blank for plain products (backward-compatible)
+    val variantId: String = "",
+    val selectedColor: String = "",
+    val selectedSize: String = "",
+    val variantLabel: String = ""
 ) {
-    fun toMap() = mapOf(
-        "productId" to productId,
-        "name" to name,
-        "priceAtPurchase" to priceAtPurchase,
-        "priceAtPurchaseMinor" to priceAtPurchaseMinor,
-        "quantity" to quantity,
-        "thumbnailUrl" to thumbnailUrl,
-        "sellerId" to sellerId,
-        "sellerName" to sellerName,
-        "sellerAvatarUrl" to sellerAvatarUrl
-    )
+    fun toMap() = buildMap<String, Any?> {
+        put("productId", productId)
+        put("name", name)
+        put("priceAtPurchase", priceAtPurchase)
+        put("priceAtPurchaseMinor", priceAtPurchaseMinor)
+        put("quantity", quantity)
+        put("thumbnailUrl", thumbnailUrl)
+        put("sellerId", sellerId)
+        put("sellerName", sellerName)
+        put("sellerAvatarUrl", sellerAvatarUrl)
+        if (variantId.isNotBlank()) put("variantId", variantId)
+        if (selectedColor.isNotBlank()) put("selectedColor", selectedColor)
+        if (selectedSize.isNotBlank()) put("selectedSize", selectedSize)
+        if (variantLabel.isNotBlank()) put("variantLabel", variantLabel)
+    }
 
     companion object {
         fun fromMap(map: Map<String, Any?>): OrderItem = OrderItem(
@@ -70,7 +79,11 @@ data class OrderItem(
             thumbnailUrl = map["thumbnailUrl"] as? String ?: "",
             sellerId = map["sellerId"] as? String ?: "",
             sellerName = map["sellerName"] as? String ?: "",
-            sellerAvatarUrl = map["sellerAvatarUrl"] as? String ?: ""
+            sellerAvatarUrl = map["sellerAvatarUrl"] as? String ?: "",
+            variantId = map["variantId"] as? String ?: "",
+            selectedColor = map["selectedColor"] as? String ?: "",
+            selectedSize = map["selectedSize"] as? String ?: "",
+            variantLabel = map["variantLabel"] as? String ?: ""
         )
     }
 }

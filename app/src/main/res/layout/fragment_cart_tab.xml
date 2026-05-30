@@ -33,9 +33,9 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/manrope_semibold"
                 android:includeFontPadding="false"
-                android:text="@string/auto_text_096"
-                android:textColor="@color/home_ref_text_primary"
-                android:textSize="22sp"
+                android:text="@string/cart_title"
+                android:textColor="@color/ms_text_primary"
+                android:textSize="@dimen/ms_text_title"
                 app:layout_constraintBottom_toBottomOf="@id/layoutTopActions"
                 app:layout_constraintEnd_toStartOf="@id/layoutTopActions"
                 app:layout_constraintStart_toStartOf="parent"
@@ -62,7 +62,7 @@
                         android:layout_gravity="center"
                         android:contentDescription="@string/notifications_title"
                         app:srcCompat="@drawable/notification"
-                        app:tint="@color/home_ref_nav_icon" />
+                        app:tint="@color/ms_text_secondary" />
 
                     <View
                         android:id="@+id/notificationBadge"
@@ -72,7 +72,7 @@
                         android:layout_marginTop="9dp"
                         android:layout_marginEnd="9dp"
                         android:background="@drawable/bg_notification_badge"
-                        android:backgroundTint="@color/home_ref_gold"
+                        android:backgroundTint="@color/ms_accent_gold"
                         android:visibility="gone" />
                 </FrameLayout>
             </LinearLayout>
@@ -127,7 +127,7 @@
                 android:textColor="@color/home_ref_text_secondary"
                 android:textSize="@dimen/text_size_caption"
                 android:ellipsize="end"
-                android:maxLines="1"
+                android:maxLines="2"
                 app:layout_constraintBottom_toBottomOf="@id/tvCartCountChip"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/tvCartCountChip"
@@ -205,10 +205,10 @@
                     android:paddingEnd="@dimen/space_14"
                     android:text="@string/cart_sync_retry_action"
                     android:textAllCaps="false"
-                    android:textColor="@color/colorOnPrimary"
+                    android:textColor="@color/ms_text_inverse"
                     android:textSize="@dimen/text_size_caption"
-                    app:backgroundTint="?attr/colorPrimary"
-                    app:cornerRadius="@dimen/corner_radius_medium"
+                    app:backgroundTint="@color/ms_surface_inverse"
+                    app:cornerRadius="@dimen/ms_radius_md"
                     app:elevation="0dp" />
             </LinearLayout>
 
@@ -219,10 +219,10 @@
                 android:orientation="vertical"
                 android:visibility="gone">
 
-                <include layout="@layout/item_product_card_shimmer" />
+                <include layout="@layout/item_panier_product_shimmer" />
 
                 <include
-                    layout="@layout/item_product_card_shimmer"
+                    layout="@layout/item_panier_product_shimmer"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/panier_product_card_spacing" />
@@ -238,26 +238,16 @@
                 android:paddingBottom="@dimen/space_12"
                 android:visibility="gone">
 
-                <com.google.android.material.card.MaterialCardView
+                <com.airbnb.lottie.LottieAnimationView
+                    android:id="@+id/ivEmptyCartAnimation"
                     android:layout_width="96dp"
                     android:layout_height="96dp"
-                    app:cardBackgroundColor="@android:color/transparent"
-                    app:cardCornerRadius="@dimen/corner_radius_large"
-                    app:cardElevation="0dp"
-                    app:strokeWidth="0dp">
-
-                    <com.airbnb.lottie.LottieAnimationView
-                        android:id="@+id/ivEmptyCartAnimation"
-                        android:layout_width="72dp"
-                        android:layout_height="72dp"
-                        android:layout_gravity="center"
-                        android:background="@android:color/transparent"
-                        android:contentDescription="@string/auto_text_097"
-                        android:scaleType="centerInside"
-                        app:lottie_autoPlay="true"
-                        app:lottie_loop="true"
-                        app:lottie_rawRes="@raw/anim_empty_cart" />
-                </com.google.android.material.card.MaterialCardView>
+                    android:background="@android:color/transparent"
+                    android:contentDescription="@string/cart_empty_title"
+                    android:scaleType="centerInside"
+                    app:lottie_autoPlay="true"
+                    app:lottie_loop="true"
+                    app:lottie_rawRes="@raw/anim_empty_cart" />
 
                 <TextView
                     android:id="@+id/tvEmptyCart"
@@ -266,7 +256,7 @@
                     android:layout_marginTop="@dimen/space_14"
                     android:fontFamily="@font/manrope_semibold"
                     android:gravity="center"
-                    android:text="@string/auto_text_097"
+                    android:text="@string/cart_empty_title"
                     android:textColor="@color/home_text_primary"
                     android:textSize="@dimen/text_size_subtitle"
                     android:textStyle="bold" />
@@ -295,8 +285,8 @@
                     android:textColor="@android:color/white"
                     android:maxLines="1"
                     android:paddingHorizontal="@dimen/space_24"
-                    app:backgroundTint="?attr/colorPrimary"
-                    app:cornerRadius="@dimen/corner_radius_large"
+                    app:backgroundTint="@color/ms_surface_inverse"
+                    app:cornerRadius="@dimen/ms_radius_md"
                     app:elevation="0dp" />
             </LinearLayout>
 
@@ -317,11 +307,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="gone"
-                app:cardBackgroundColor="@color/home_surface_raised"
-                app:cardCornerRadius="@dimen/corner_radius_large"
+                app:cardBackgroundColor="@color/ms_surface_card"
+                app:cardCornerRadius="@dimen/ms_radius_lg"
                 app:cardElevation="0dp"
-                app:strokeColor="@color/colorOutline"
-                app:strokeWidth="1dp">
+                app:strokeColor="@color/ms_border_subtle"
+                app:strokeWidth="@dimen/ms_stroke_hairline">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -367,7 +357,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/manrope_medium"
-                            android:text="@string/auto_text_098"
+                            android:text="@string/cart_subtotal_label"
                             android:textColor="@color/home_text_secondary"
                             android:textSize="@dimen/text_size_caption"
                             app:layout_constraintStart_toStartOf="parent"
@@ -378,7 +368,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/manrope_semibold"
-                            android:text="@string/auto_text_099"
+                            android:text="@string/cart_price_placeholder"
                             android:textColor="@color/home_text_primary"
                             android:textSize="@dimen/text_size_body"
                             app:layout_constraintEnd_toEndOf="parent"
@@ -395,7 +385,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/manrope_medium"
-                            android:text="@string/auto_text_100"
+                            android:text="@string/cart_shipping_label"
                             android:textColor="@color/home_text_secondary"
                             android:textSize="@dimen/text_size_caption"
                             app:layout_constraintStart_toStartOf="parent"
@@ -406,7 +396,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/manrope_semibold"
-                            android:text="@string/auto_text_099"
+                            android:text="@string/cart_price_placeholder"
                             android:textColor="@color/home_text_primary"
                             android:textSize="@dimen/text_size_body"
                             app:layout_constraintEnd_toEndOf="parent"
@@ -441,8 +431,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/manrope_semibold"
-                            android:text="@string/auto_text_099"
-                            android:textColor="?attr/colorPrimary"
+                            android:text="@string/cart_price_placeholder"
+                        android:textColor="@color/ms_text_primary"
                             android:textSize="@dimen/text_size_subtitle"
                             android:textStyle="bold"
                             app:layout_constraintEnd_toEndOf="parent"
@@ -451,18 +441,15 @@
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnCheckout"
+                        style="@style/Ms.Button.Primary"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:minHeight="52dp"
                         android:layout_marginTop="@dimen/space_20"
                         android:text="@string/cart_checkout_action"
                         android:textAllCaps="false"
-                        android:textColor="@android:color/white"
                         android:textSize="@dimen/text_size_body"
-                        android:paddingVertical="@dimen/space_14"
-                        app:backgroundTint="?attr/colorPrimary"
-                        app:cornerRadius="@dimen/corner_radius_large"
-                        app:elevation="0dp" />
+                        android:paddingVertical="@dimen/space_14" />
 
                     <TextView
                         android:id="@+id/tvSummaryHelper"

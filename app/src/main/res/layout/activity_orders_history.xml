@@ -73,26 +73,16 @@
             android:paddingBottom="@dimen/space_20"
             android:visibility="gone">
 
-                <com.google.android.material.card.MaterialCardView
+                <com.airbnb.lottie.LottieAnimationView
+                    android:id="@+id/ivEmptyOrdersAnimation"
                     android:layout_width="132dp"
                     android:layout_height="132dp"
-                    app:cardBackgroundColor="@android:color/transparent"
-                    app:cardCornerRadius="@dimen/corner_radius_large"
-                    app:cardElevation="0dp"
-                    app:strokeWidth="0dp">
-
-                    <com.airbnb.lottie.LottieAnimationView
-                        android:id="@+id/ivEmptyOrdersAnimation"
-                        android:layout_width="104dp"
-                        android:layout_height="104dp"
-                        android:layout_gravity="center"
-                        android:background="@android:color/transparent"
-                        android:contentDescription="@string/cd_back"
-                        android:scaleType="centerInside"
-                        app:lottie_autoPlay="true"
-                        app:lottie_loop="true"
-                        app:lottie_rawRes="@raw/anim_empty_orders" />
-                </com.google.android.material.card.MaterialCardView>
+                    android:background="@android:color/transparent"
+                    android:contentDescription="@string/cd_back"
+                    android:scaleType="centerInside"
+                    app:lottie_autoPlay="true"
+                    app:lottie_loop="true"
+                    app:lottie_rawRes="@raw/anim_empty_orders" />
 
                 <TextView
                     android:id="@+id/tvEmptyOrders"
@@ -120,17 +110,14 @@
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnOrdersBrowseHome"
+                    style="@style/AppButton.Primary"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:minHeight="48dp"
                     android:layout_marginTop="@dimen/space_16"
                     android:text="@string/orders_history_empty_action"
                     android:textAllCaps="false"
-                    android:textColor="@android:color/white"
-                    android:paddingHorizontal="@dimen/space_24"
-                    app:backgroundTint="?attr/colorPrimary"
-                    app:cornerRadius="@dimen/corner_radius_large"
-                    app:elevation="0dp" />
+                    android:paddingHorizontal="@dimen/space_24" />
             </LinearLayout>
 
         <androidx.recyclerview.widget.RecyclerView

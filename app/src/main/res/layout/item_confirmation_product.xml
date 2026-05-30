@@ -11,10 +11,10 @@
         android:layout_width="56dp"
         android:layout_height="72dp"
         android:layout_marginEnd="14dp"
-        app:cardBackgroundColor="@color/colorSurfaceVariant"
+        app:cardBackgroundColor="@color/ms_surface_sunken"
         app:cardCornerRadius="@dimen/corner_radius_medium"
         app:cardElevation="0dp"
-        app:strokeColor="@color/colorBorderLight"
+        app:strokeColor="@color/ms_border_default"
         app:strokeWidth="1dp">
         <ImageView
             android:id="@+id/ivConfirmItemImage"
@@ -36,9 +36,9 @@
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:maxLines="2"
-            android:text="@string/auto_produit_e30e"
+            android:text="@string/order_item_product_label"
             android:textSize="@dimen/text_size_caption"
-            android:textColor="?attr/colorOnSurface"
+            android:textColor="@color/ms_text_primary"
             android:textStyle="bold"
             android:fontFamily="@font/manrope" />
         <TextView
@@ -50,7 +50,7 @@
             android:maxLines="1"
             android:text="@string/auto_taille_m_couleur_standard_d6cb"
             android:textSize="@dimen/text_size_overline"
-            android:textColor="@color/profile_text_muted"
+            android:textColor="@color/ms_text_tertiary"
             android:fontFamily="@font/manrope" />
     </LinearLayout>
 
@@ -64,7 +64,7 @@
         android:maxLines="1"
         android:text="@string/auto_000_dt_6f0d"
         android:textSize="@dimen/text_size_overline"
-        android:textColor="?attr/colorOnSurface"
+        android:textColor="@color/ms_text_primary"
         android:textStyle="bold"
         android:fontFamily="@font/manrope" />
 </LinearLayout>

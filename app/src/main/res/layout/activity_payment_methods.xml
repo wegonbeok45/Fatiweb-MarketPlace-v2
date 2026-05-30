@@ -5,13 +5,13 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/profile_body_bg">
+    android:background="@color/ms_surface_canvas">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layoutTopBar"
         android:layout_width="0dp"
         android:layout_height="@dimen/app_top_bar_height"
-        android:background="@color/profile_header_bg"
+        android:background="@color/ms_surface_canvas"
         android:paddingStart="@dimen/app_top_bar_horizontal_padding"
         android:paddingEnd="@dimen/app_top_bar_horizontal_padding"
         app:layout_constraintEnd_toEndOf="parent"
@@ -28,7 +28,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/back"
-            app:tint="@color/profile_text_primary" />
+            app:tint="@color/ms_text_primary" />
 
         <TextView
             style="@style/AppTopBar.Title.Profile"
@@ -65,7 +65,7 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/manrope_semibold"
                 android:text="@string/payment_methods_saved_cards"
-                android:textColor="@color/profile_text_primary"
+                android:textColor="@color/ms_text_primary"
                 android:textSize="@dimen/text_size_subtitle" />
 
             <com.google.android.material.card.MaterialCardView
@@ -74,10 +74,10 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_12"
                 android:visibility="gone"
-                app:cardBackgroundColor="@color/home_surface_raised"
+                app:cardBackgroundColor="@color/ms_surface_card"
                 app:cardCornerRadius="@dimen/corner_radius_large"
                 app:cardElevation="0dp"
-                app:strokeColor="@color/colorBorderLight"
+                app:strokeColor="@color/ms_border_default"
                 app:strokeWidth="@dimen/stroke_width_default">
 
                 <TextView
@@ -85,7 +85,7 @@
                     android:layout_height="wrap_content"
                     android:padding="@dimen/space_16"
                     android:text="@string/payment_methods_empty"
-                    android:textColor="@color/profile_text_secondary"
+                    android:textColor="@color/ms_text_secondary"
                     android:textSize="@dimen/text_size_body" />
             </com.google.android.material.card.MaterialCardView>
 
@@ -114,7 +114,7 @@
                 android:layout_marginTop="@dimen/space_20"
                 android:fontFamily="@font/manrope_semibold"
                 android:text="@string/payment_methods_billing_address"
-                android:textColor="@color/profile_text_primary"
+                android:textColor="@color/ms_text_primary"
                 android:textSize="@dimen/text_size_subtitle" />
 
             <com.google.android.material.card.MaterialCardView
@@ -122,10 +122,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_12"
-                app:cardBackgroundColor="@color/home_surface_raised"
+                app:cardBackgroundColor="@color/ms_surface_card"
                 app:cardCornerRadius="@dimen/corner_radius_large"
                 app:cardElevation="0dp"
-                app:strokeColor="@color/colorBorderLight"
+                app:strokeColor="@color/ms_border_default"
                 app:strokeWidth="@dimen/stroke_width_default">
 
                 <LinearLayout
@@ -140,7 +140,7 @@
                         android:layout_height="24dp"
                         android:contentDescription="@string/cd_location"
                         app:srcCompat="@drawable/map"
-                        app:tint="@color/profile_text_secondary" />
+                        app:tint="@color/ms_text_secondary" />
 
                     <LinearLayout
                         android:layout_width="0dp"
@@ -154,7 +154,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/manrope_semibold"
-                            android:textColor="@color/profile_text_primary"
+                            android:textColor="@color/ms_text_primary"
                             android:textSize="@dimen/text_size_body"
                             tools:text="123 Design Avenue, Apt 4B" />
 
@@ -163,7 +163,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:textColor="@color/profile_text_secondary"
+                            android:textColor="@color/ms_text_secondary"
                             android:textSize="@dimen/text_size_caption"
                             tools:text="San Francisco, CA 94107&#10;United States" />
 
@@ -172,7 +172,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="@string/payment_methods_address_empty"
-                            android:textColor="@color/profile_text_secondary"
+                            android:textColor="@color/ms_text_secondary"
                             android:textSize="@dimen/text_size_body"
                             android:visibility="gone" />
                     </LinearLayout>
@@ -183,7 +183,7 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/manrope_semibold"
                         android:text="@string/payment_methods_edit_address"
-                        android:textColor="@color/colorPrimary"
+                        android:textColor="@color/ms_surface_inverse"
                         android:textSize="@dimen/text_size_caption" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>

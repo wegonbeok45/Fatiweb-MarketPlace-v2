@@ -7,7 +7,7 @@
     app:cardBackgroundColor="@color/profile_card_bg"
     app:cardCornerRadius="@dimen/corner_radius_large"
     app:cardElevation="0dp"
-    app:strokeColor="@color/colorBorderLight"
+    app:strokeColor="@color/ms_border_default"
     app:strokeWidth="@dimen/stroke_width_default">
 
     <LinearLayout
@@ -98,7 +98,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnOrderSecondary"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                style="@style/Ms.Button.Secondary"
                 android:layout_width="wrap_content"
                 android:layout_height="40dp"
                 android:textAllCaps="false"

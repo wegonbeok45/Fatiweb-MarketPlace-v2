@@ -5,7 +5,7 @@
     android:id="@+id/layoutCheckoutRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/details_background">
+    android:background="@color/ms_surface_canvas">
 
     <LinearLayout
         android:id="@+id/layoutCheckoutTopBar"
@@ -41,8 +41,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="@string/auto_d233tails_de_la_commande_e15a"
-            android:textColor="?attr/colorOnSurface" />
+            android:text="@string/checkout_section_title"
+            android:textColor="@color/ms_text_primary" />
 
         <View
             android:layout_width="@dimen/surface_button_size"
@@ -53,7 +53,7 @@
         android:id="@+id/viewCheckoutTopDivider"
         android:layout_width="0dp"
         android:layout_height="1dp"
-        android:background="@color/colorBorderLight"
+        android:background="@color/ms_border_default"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/layoutCheckoutTopBar" />
@@ -88,8 +88,8 @@
                 android:layout_height="match_parent"
                 android:fontFamily="@font/manrope_semibold"
                 android:gravity="center"
-                android:text="@string/auto_1_c4ca"
-                android:textColor="?attr/colorOnSurface"
+                android:text="@string/checkout_step_number_1"
+                android:textColor="@color/ms_text_primary"
                 android:textSize="@dimen/text_size_caption" />
         </FrameLayout>
 
@@ -98,7 +98,7 @@
             android:layout_width="24dp"
             android:layout_height="1dp"
             android:layout_marginHorizontal="@dimen/space_6"
-            android:background="@color/colorBorderLight" />
+            android:background="@color/ms_border_default" />
 
         <FrameLayout
             android:id="@+id/btnStep2"
@@ -118,8 +118,8 @@
                 android:layout_height="match_parent"
                 android:fontFamily="@font/manrope_semibold"
                 android:gravity="center"
-                android:text="@string/auto_2_c81e"
-                android:textColor="@color/profile_text_muted"
+                android:text="@string/checkout_step_number_2"
+                android:textColor="@color/ms_text_tertiary"
                 android:textSize="@dimen/text_size_caption" />
         </FrameLayout>
 
@@ -128,7 +128,7 @@
             android:layout_width="24dp"
             android:layout_height="1dp"
             android:layout_marginHorizontal="@dimen/space_6"
-            android:background="@color/colorBorderLight" />
+            android:background="@color/ms_border_default" />
 
         <FrameLayout
             android:id="@+id/btnStep3"
@@ -148,8 +148,8 @@
                 android:layout_height="match_parent"
                 android:fontFamily="@font/manrope_semibold"
                 android:gravity="center"
-                android:text="@string/auto_3_eccb"
-                android:textColor="@color/profile_text_muted"
+                android:text="@string/checkout_step_number_3"
+                android:textColor="@color/ms_text_tertiary"
                 android:textSize="@dimen/text_size_caption" />
         </FrameLayout>
     </LinearLayout>
@@ -189,8 +189,8 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="@string/auto_adresse_de_livraison_46e1"
-                        android:textColor="?attr/colorPrimary" />
+                        android:text="@string/checkout_address_label"
+                        android:textColor="@color/ms_text_primary" />
 
                     <TextView
                         android:id="@+id/tvCheckoutModifyAddress"
@@ -198,8 +198,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/manrope_semibold"
-                        android:text="@string/auto_modifier_898c"
-                        android:textColor="?attr/colorPrimary" />
+                        android:text="@string/ms_action_edit"
+                        android:textColor="@color/ms_text_primary" />
                 </LinearLayout>
 
                 <com.google.android.material.card.MaterialCardView
@@ -274,7 +274,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/space_12"
                     android:visibility="gone"
-                    app:strokeColor="?attr/colorPrimary"
+                    app:strokeColor="@color/ms_surface_inverse"
                     app:strokeWidth="1dp">
 
                     <LinearLayout
@@ -304,7 +304,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/space_16"
                             android:textAllCaps="false"
-                            app:backgroundTint="?attr/colorPrimary"
+                            app:backgroundTint="@color/ms_surface_inverse"
                             app:cornerRadius="22dp"
                             tools:text="Se connecter" />
                     </LinearLayout>
@@ -315,8 +315,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/space_24"
-                    android:text="@string/auto_m201thode_de_livraison_9d30"
-                    android:textColor="?attr/colorPrimary" />
+                    android:text="@string/checkout_shipping_method_label"
+                    android:textColor="@color/ms_text_primary" />
 
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/cardDeliveryStandard"
@@ -324,7 +324,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/space_12"
-                    app:strokeColor="?attr/colorPrimary"
+                    app:strokeColor="@color/ms_surface_inverse"
                     app:strokeWidth="2dp">
 
                     <LinearLayout
@@ -339,7 +339,7 @@
                             android:layout_width="44dp"
                             android:layout_height="44dp"
                             android:layout_marginEnd="@dimen/space_16"
-                            app:cardBackgroundColor="@color/colorSecondary">
+                            app:cardBackgroundColor="@color/ms_accent_gold">
 
                             <ImageView
                                 android:layout_width="match_parent"
@@ -358,13 +358,13 @@
                                 style="@style/AppText.Subtitle"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@string/auto_standard_eb6d" />
+                                android:text="@string/checkout_shipping_standard" />
 
                             <TextView
                                 style="@style/AppText.Caption"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@string/auto_livraison_sous_3_224_361f" />
+                                android:text="@string/checkout_shipping_standard_eta" />
                         </LinearLayout>
 
                         <LinearLayout
@@ -378,8 +378,8 @@
                                 style="@style/AppText.Overline"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@string/auto_gratuite_6aa0"
-                                android:textColor="?attr/colorPrimary" />
+                                android:text="@string/checkout_shipping_free"
+                                android:textColor="@color/ms_text_primary" />
 
                             <ImageView
                                 android:id="@+id/ivStandardCheck"
@@ -427,13 +427,13 @@
                                 style="@style/AppText.Subtitle"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@string/auto_express_b144" />
+                                android:text="@string/checkout_shipping_express" />
 
                             <TextView
                                 style="@style/AppText.Caption"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@string/auto_demain_avant_13h00_d9d2" />
+                                android:text="@string/checkout_shipping_express_eta" />
                         </LinearLayout>
 
                         <LinearLayout
@@ -463,8 +463,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/space_24"
-                    android:text="@string/auto_articles_39a1"
-                    android:textColor="?attr/colorPrimary" />
+                    android:text="@string/checkout_section_items"
+                    android:textColor="@color/ms_text_primary" />
 
                 <LinearLayout
                     android:id="@+id/layoutCheckoutArticles"
@@ -478,8 +478,8 @@
                     style="@style/AppText.SectionLabel"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/auto_r201sum201_88af"
-                    android:textColor="?attr/colorPrimary" />
+                    android:text="@string/checkout_section_summary"
+                    android:textColor="@color/ms_text_primary" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -509,7 +509,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/space_12"
-                    app:strokeColor="@color/colorBorderLight"
+                    app:strokeColor="@color/ms_border_default"
                     app:strokeWidth="1.5dp">
 
                     <LinearLayout
@@ -598,8 +598,8 @@
                     style="@style/AppText.SectionLabel"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/auto_m201thode_de_paiement_2fe9"
-                    android:textColor="?attr/colorPrimary" />
+                    android:text="@string/checkout_payment_method_label"
+                    android:textColor="@color/ms_text_primary" />
 
 
 
@@ -609,7 +609,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/space_12"
-                    app:strokeColor="?attr/colorPrimary"
+                    app:strokeColor="@color/ms_surface_inverse"
                     app:strokeWidth="2dp">
 
                     <LinearLayout
@@ -643,14 +643,14 @@
                                 style="@style/AppText.Subtitle"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@string/auto_paiement_224_la_livraison_03c3" />
+                                android:text="@string/checkout_pay_cod_title" />
 
                             <TextView
                                 android:id="@+id/tvPayCashSubtitle"
                                 style="@style/AppText.Caption"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@string/auto_esp232ces_ou_ch232que_au_8693" />
+                                android:text="@string/checkout_cod_subtitle" />
                         </LinearLayout>
 
                         <ImageView
@@ -692,7 +692,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="@string/auto_commande_confirm233e_e20b" />
+                    android:text="@string/checkout_order_confirmed_title" />
 
                 <TextView
                     style="@style/AppText.Body"
@@ -700,7 +700,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/space_8"
                     android:gravity="center"
-                    android:text="@string/auto_merci_pour_votre_achat_4d4b" />
+                    android:text="@string/checkout_order_confirmed_subtitle" />
 
                 <com.google.android.material.card.MaterialCardView
                     style="@style/AppCard"
@@ -723,7 +723,7 @@
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:text="@string/auto_num201ro_de_commande_5078" />
+                                android:text="@string/checkout_order_number_label" />
                             <TextView
                                 android:id="@+id/tvConfirmationOrderNumber"
                                 style="@style/AppText.FieldLabel"
@@ -755,7 +755,7 @@
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:text="@string/auto_estimation_de_livraison_0286" />
+                                android:text="@string/checkout_eta_label" />
                             <TextView
                                 android:id="@+id/tvConfirmationEta"
                                 style="@style/AppText.FieldLabel"
@@ -774,7 +774,7 @@
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:text="@string/auto_total_pay233_0e5e" />
+                                android:text="@string/checkout_total_paid_label" />
                             <TextView
                                 android:id="@+id/tvConfirmationTotal"
                                 style="@style/AppText.FieldLabel"
@@ -791,7 +791,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/space_24"
-                    android:text="@string/auto_suivre_ma_commande_7473" />
+                    android:text="@string/checkout_track_order_cta" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnBackHome"
@@ -799,7 +799,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/space_12"
-                    android:text="@string/auto_retour_224_laccueil_f63e" />
+                    android:text="@string/checkout_back_home_cta" />
             </LinearLayout>
         </FrameLayout>
     </androidx.core.widget.NestedScrollView>
@@ -808,7 +808,7 @@
         android:id="@+id/layoutCheckoutBottomBar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="@color/details_background"
+        android:background="@color/ms_surface_canvas"
         android:elevation="0dp"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -831,15 +831,15 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="@string/auto_livraison_standard_c598" />
+                android:text="@string/checkout_shipping_standard" />
 
             <TextView
                 android:id="@+id/tvCheckoutShippingValue"
                 style="@style/AppText.Overline"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/auto_gratuite_6aa0"
-                android:textColor="?attr/colorPrimary" />
+                android:text="@string/checkout_shipping_free"
+                android:textColor="@color/ms_text_primary" />
         </LinearLayout>
 
         <View
@@ -862,7 +862,7 @@
                 style="@style/AppText.SectionLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/auto_total_192_payer_2c61" />
+                android:text="@string/checkout_total_to_pay_label" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -884,7 +884,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingBottom="6dp"
-                    android:text="@string/auto_tva_incluse_df75" />
+                    android:text="@string/checkout_vat_included" />
             </LinearLayout>
         </LinearLayout>
 
@@ -895,7 +895,7 @@
                 android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/screen_padding_horizontal"
             android:layout_marginBottom="@dimen/space_12"
-            android:text="@string/auto_continuer_vers_le_paiement_361d" />
+            android:text="@string/checkout_step1_continue" />
     </LinearLayout>
 
     <FrameLayout

@@ -145,18 +145,33 @@ class OrderDetailsActivity : AppCompatActivity() {
             itemView.findViewById<ImageView>(R.id.ivConfirmItemImage)
                 ?.loadCatalogImage(item.thumbnailUrl, R.drawable.placeholder)
             itemView.findViewById<TextView>(R.id.tvConfirmItemName)?.text = item.name
-            itemView.findViewById<TextView>(R.id.tvConfirmItemDetails)?.text =
-                getString(R.string.order_details_item_qty, item.quantity)
+            itemView.findViewById<TextView>(R.id.tvConfirmItemDetails)?.apply {
+                val variantPart = item.variantLabel.ifBlank {
+                    listOf(item.selectedColor, item.selectedSize)
+                        .filter { it.isNotBlank() }
+                        .joinToString(" · ")
+                }
+                text = if (variantPart.isBlank()) {
+                    getString(R.string.order_details_item_qty, item.quantity)
+                } else {
+                    "${getString(R.string.order_details_item_qty, item.quantity)} · $variantPart"
+                }
+            }
             itemView.findViewById<TextView>(R.id.tvConfirmItemPrice)?.text =
                 formatDt(item.priceAtPurchase * item.quantity)
             itemsContainer?.addView(itemView)
         }
 
-        // Re-order: add each item back to the cart then navigate to the cart tab
+        // Re-order: add each item back to the cart (preserving variant) then navigate to cart
         findViewById<View>(R.id.btnReorder)?.setOnClickListener {
             order.items.forEach { item ->
                 if (item.productId.isNotBlank()) {
-                    CartStore.add(this, item.productId, item.quantity)
+                    CartStore.add(
+                        this,
+                        item.productId,
+                        item.quantity,
+                        variantId = item.variantId.takeIf { it.isNotBlank() }
+                    )
                 }
             }
             showMotionSnackbar(getString(R.string.order_reorder_added))

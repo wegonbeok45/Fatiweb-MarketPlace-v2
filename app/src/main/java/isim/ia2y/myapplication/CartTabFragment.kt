@@ -211,17 +211,30 @@ class CartTabFragment : Fragment(R.layout.fragment_cart_tab) {
         loadingState.visibility = View.GONE
         itemsContainer.removeAllViews()
 
-        var cart = CartStore.getCart(requireContext())
-        val knownProductIds = ProductCatalog.orderedFavorites(cart.keys).mapTo(linkedSetOf()) { it.id }
-        val staleProductIds = cart.keys.filterNot { it in knownProductIds }
-        if (staleProductIds.isNotEmpty()) {
-            staleProductIds.forEach { CartStore.remove(requireContext(), it) }
-            cart = CartStore.getCart(requireContext())
+        val rawCart = CartStore.getCart(requireContext())
+
+        // Remove stale keys whose product is no longer in the catalog
+        val staleKeys = rawCart.keys.filter { ProductCatalog.byId(CartKey.productId(it)) == null }
+        if (staleKeys.isNotEmpty()) {
+            staleKeys.forEach { CartStore.remove(requireContext(), it) }
         }
-        val lines = ProductCatalog.orderedFavorites(cart.keys).mapNotNull { product ->
-            val qty = cart[product.id] ?: 0
-            if (qty <= 0) null else product to qty
-        }
+        val cart = if (staleKeys.isNotEmpty()) CartStore.getCart(requireContext()) else rawCart
+
+        // Build one display line per cart key (each variant is its own line)
+        class CartLine(
+            val key: String,
+            val product: Product,
+            val variant: ProductVariant?,
+            val qty: Int
+        )
+        val lines: List<CartLine> = cart.entries
+            .mapNotNull { (key, qty) ->
+                if (qty <= 0) return@mapNotNull null
+                val product = ProductCatalog.byId(CartKey.productId(key)) ?: return@mapNotNull null
+                val variant = product.variantById(CartKey.variantId(key))
+                CartLine(key, product, variant, qty)
+            }
+            .sortedBy { it.product.title }
 
         val hasItems = lines.isNotEmpty()
         val itemCount = cart.values.sum()
@@ -238,7 +251,7 @@ class CartTabFragment : Fragment(R.layout.fragment_cart_tab) {
         checkoutButton?.alpha = if (hasItems) 1f else 0.52f
 
         if (!hasItems) {
-            emptyText.text = getString(R.string.auto_text_097)
+            emptyText.text = getString(R.string.cart_empty_title)
             emptyAnimation.playAnimation()
             return
         }
@@ -246,7 +259,7 @@ class CartTabFragment : Fragment(R.layout.fragment_cart_tab) {
         emptyAnimation.pauseAnimation()
 
         val inflater = LayoutInflater.from(requireContext())
-        lines.forEachIndexed { index, (product, qty) ->
+        lines.forEachIndexed { index, line ->
             val row = inflater.inflate(R.layout.item_panier_product_dynamic, itemsContainer, false)
             val params = (row.layoutParams as? LinearLayout.LayoutParams)
                 ?: LinearLayout.LayoutParams(
@@ -256,33 +269,43 @@ class CartTabFragment : Fragment(R.layout.fragment_cart_tab) {
             params.topMargin = if (index == 0) 0 else resources.getDimensionPixelSize(R.dimen.panier_product_card_spacing)
             row.layoutParams = params
 
+            // Image: prefer variant-specific image when set
+            val imageUrl = line.variant?.imageUrl?.takeIf { it.isNotBlank() }
+                ?: line.product.previewImageUrl()
             row.findViewById<ImageView>(R.id.ivCartItemImage)
-                ?.loadCatalogImage(product.previewImageUrl(), product.catalogFallbackImageRes())
-            row.findViewById<TextView>(R.id.tvCartItemTitle)?.text = product.title
+                ?.loadCatalogImage(imageUrl, line.product.catalogFallbackImageRes())
+
+            row.findViewById<TextView>(R.id.tvCartItemTitle)?.text = line.product.title
+
+            // Subtitle: variant label (e.g. "Bleu · M") or product subtitle
             row.findViewById<TextView>(R.id.tvCartItemSubtitle)?.apply {
-                text = product.subtitle
-                visibility = if (product.subtitle.isBlank()) View.GONE else View.VISIBLE
+                val subtitleText = line.variant?.label?.takeIf { it.isNotBlank() }
+                    ?: line.product.subtitle
+                text = subtitleText
+                visibility = if (subtitleText.isBlank()) View.GONE else View.VISIBLE
             }
-            row.findViewById<TextView>(R.id.tvCartItemPrice)?.text = formatDt(product.unitPrice * qty)
-            row.findViewById<TextView>(R.id.tvQtyValue)?.text = qty.toString()
+
+            val unitPrice = line.product.unitPriceForVariant(line.variant)
+            row.findViewById<TextView>(R.id.tvCartItemPrice)?.text = formatDt(unitPrice * line.qty)
+            row.findViewById<TextView>(R.id.tvQtyValue)?.text = line.qty.toString()
 
             row.findViewById<View>(R.id.btnRemoveItem)?.setOnClickListener {
-                CartStore.remove(requireContext(), product.id)
+                CartStore.remove(requireContext(), line.key)
                 shouldAnimateListOnNextRender = false
                 renderCart()
             }
             row.findViewById<View>(R.id.btnQtyMinus)?.setOnClickListener {
-                CartStore.decrement(requireContext(), product.id)
+                CartStore.decrement(requireContext(), line.key)
                 shouldAnimateListOnNextRender = false
                 renderCart()
             }
             row.findViewById<View>(R.id.btnQtyPlus)?.setOnClickListener {
-                CartStore.increment(requireContext(), product.id)
+                CartStore.increment(requireContext(), line.key)
                 shouldAnimateListOnNextRender = false
                 renderCart()
             }
             row.setOnClickListener {
-                (activity as? AppCompatActivity)?.navigateToProductDetails(product.id)
+                (activity as? AppCompatActivity)?.navigateToProductDetails(line.product.id)
             }
 
             itemsContainer.addView(row)
@@ -291,7 +314,9 @@ class CartTabFragment : Fragment(R.layout.fragment_cart_tab) {
             }
         }
 
-        val subtotal = lines.sumOf { (product, qty) -> product.unitPrice * qty }
+        val subtotal = lines.sumOf { line ->
+            line.product.unitPriceForVariant(line.variant) * line.qty
+        }
         val livraison = displayedShippingFee
         subtotalValue.text = formatDt(subtotal)
         livraisonValue.text = formatDt(livraison)

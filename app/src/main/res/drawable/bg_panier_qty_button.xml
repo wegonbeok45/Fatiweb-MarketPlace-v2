@@ -5,5 +5,5 @@
     <corners android:radius="@dimen/panier_qty_button_radius" />
     <stroke
         android:width="@dimen/stroke_width_default"
-        android:color="@color/colorBorderLight" />
+        android:color="@color/ms_border_default" />
 </shape>

@@ -5,10 +5,10 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="@dimen/space_12"
-    app:cardBackgroundColor="@color/home_surface_raised"
+    app:cardBackgroundColor="@color/ms_surface_card"
     app:cardCornerRadius="@dimen/corner_radius_large"
     app:cardElevation="0dp"
-    app:strokeColor="@color/colorBorderLight"
+    app:strokeColor="@color/ms_border_default"
     app:strokeWidth="@dimen/stroke_width_default">
 
     <LinearLayout
@@ -30,7 +30,7 @@
                 android:background="@drawable/bg_home_search"
                 android:fontFamily="@font/manrope_semibold"
                 android:gravity="center"
-                android:textColor="@color/profile_text_primary"
+                android:textColor="@color/ms_text_primary"
                 android:textSize="@dimen/text_size_caption"
                 tools:text="VISA" />
 
@@ -46,7 +46,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/manrope_semibold"
-                    android:textColor="@color/profile_text_primary"
+                    android:textColor="@color/ms_text_primary"
                     android:textSize="@dimen/text_size_body"
                     tools:text="â€¢â€¢â€¢â€¢ 4242" />
 
@@ -55,7 +55,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
-                    android:textColor="@color/profile_text_secondary"
+                    android:textColor="@color/ms_text_secondary"
                     android:textSize="@dimen/text_size_caption"
                     tools:text="Expires 12/26" />
             </LinearLayout>
@@ -71,7 +71,7 @@
                 android:paddingEnd="@dimen/space_10"
                 android:paddingBottom="6dp"
                 android:text="@string/payment_methods_default"
-                android:textColor="@color/colorPrimary"
+                android:textColor="@color/ms_surface_inverse"
                 android:textSize="@dimen/text_size_caption" />
         </LinearLayout>
 
@@ -88,7 +88,7 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/manrope_semibold"
                 android:text="@string/payment_methods_set_default"
-                android:textColor="@color/colorPrimary"
+                android:textColor="@color/ms_surface_inverse"
                 android:textSize="@dimen/text_size_caption" />
 
             <TextView
@@ -98,7 +98,7 @@
                 android:layout_marginStart="@dimen/space_16"
                 android:fontFamily="@font/manrope_semibold"
                 android:text="@string/profile_edit_save"
-                android:textColor="@color/profile_text_secondary"
+                android:textColor="@color/ms_text_secondary"
                 android:textSize="@dimen/text_size_caption" />
 
             <TextView

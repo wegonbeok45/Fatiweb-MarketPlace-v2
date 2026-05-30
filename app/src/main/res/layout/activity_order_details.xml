@@ -34,7 +34,7 @@
             style="@style/AppTopBar.Title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/auto_dtail_de_la_commande_d45e"
+            android:text="@string/order_details_title"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -123,7 +123,7 @@
                 app:cardBackgroundColor="@color/profile_card_bg"
                 app:cardCornerRadius="18dp"
                 app:cardElevation="1dp"
-                app:strokeColor="@color/colorBorderLight"
+                app:strokeColor="@color/ms_border_default"
                 app:strokeWidth="1dp">
 
                 <LinearLayout
@@ -182,7 +182,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="12dp"
-                        android:textColor="?attr/colorPrimary"
+                        android:textColor="@color/ms_text_primary"
                         android:textSize="@dimen/text_size_subtitle"
                         android:textStyle="bold" />
                 </LinearLayout>
@@ -192,7 +192,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="18dp"
-                android:text="@string/auto_articles_7978"
+                android:text="@string/order_section_items_label"
                 android:textColor="@color/home_text_primary"
                 android:textSize="@dimen/text_size_body"
                 android:textStyle="bold" />
@@ -208,7 +208,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="18dp"
-                android:text="@string/auto_suivi_c749"
+                android:text="@string/order_details_tracking_label"
                 android:textColor="@color/home_text_primary"
                 android:textSize="@dimen/text_size_body"
                 android:textStyle="bold" />

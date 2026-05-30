@@ -32,6 +32,7 @@ object OrderService {
             .limit(safeLimit)
             .get(source)
             .await()
+        FirebaseCostTracker.read("OrderService.fetchOrders", "orders", snapshot.size(), source.name)
 
         val newOrders = snapshot.documents.mapNotNull { doc ->
             doc.data?.let { AppOrder.fromMap(it).copy(id = doc.id) }
@@ -44,6 +45,7 @@ object OrderService {
             .limit(safeLimit)
             .get(source)
             .await()
+        FirebaseCostTracker.read("OrderService.fetchOrders", "users/$uid/orders", legacySnapshot.size(), source.name)
 
         return legacySnapshot.documents.mapNotNull { doc ->
             doc.data?.let { AppOrder.fromMap(it).copy(id = doc.id) }
@@ -51,13 +53,20 @@ object OrderService {
     }
 
     suspend fun fetchOrder(uid: String, orderId: String): AppOrder? {
-        val doc = ordersRef.document(orderId).get().await()
+        val cachedDoc = runCatching { ordersRef.document(orderId).get(Source.CACHE).await() }.getOrNull()
+        if (cachedDoc?.exists() == true) {
+            FirebaseCostTracker.read("OrderService.fetchOrder", "orders/$orderId", 1, Source.CACHE.name)
+            return cachedDoc.data?.let { AppOrder.fromMap(it).copy(id = cachedDoc.id) }
+        }
+        val doc = ordersRef.document(orderId).get(Source.SERVER).await()
+        FirebaseCostTracker.read("OrderService.fetchOrder", "orders/$orderId", if (doc.exists()) 1 else 0, Source.SERVER.name)
         if (doc.exists()) return doc.data?.let { AppOrder.fromMap(it).copy(id = doc.id) }
 
         if (uid.isBlank()) return null
         val legacyDoc = runCatching {
-            userOrdersRef(uid).document(orderId).get().await()
+            userOrdersRef(uid).document(orderId).get(Source.SERVER).await()
         }.getOrNull() ?: return null
+        FirebaseCostTracker.read("OrderService.fetchOrder", "users/$uid/orders/$orderId", if (legacyDoc.exists()) 1 else 0, Source.SERVER.name)
         return legacyDoc.data?.let { AppOrder.fromMap(it).copy(id = legacyDoc.id) }
     }
 

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Order detail product row.
+    Used by AdminOrderDetailsActivity and VendorOrdersActivity (future).
+    Click navigates to product details if productId is non-blank.
+-->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="@dimen/space_12"
+    android:background="?selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingTop="@dimen/space_4"
+    android:paddingBottom="@dimen/space_4">
+
+    <!-- Thumbnail -->
+    <ImageView
+        android:id="@+id/orderDetailProductImage"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:background="@drawable/ms_bg_icon_chip_dark"
+        android:scaleType="centerCrop"
+        android:src="@drawable/placeholder"
+        android:contentDescription="@null" />
+
+    <!-- Text column -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/space_14"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/orderDetailProductName"
+            style="@style/Ms.Text.Label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="2"
+            tools:text="Savon naturel à l'huile d'olive" />
+
+        <TextView
+            android:id="@+id/orderDetailProductMeta"
+            style="@style/Ms.Text.Caption"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_4"
+            tools:text="Qté 2 × 27.000 DT" />
+
+        <!-- Variant tag: shown only when color/size was selected (e.g. "Bleu · M") -->
+        <TextView
+            android:id="@+id/orderDetailProductVariant"
+            style="@style/Ms.Text.Caption"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_2"
+            android:background="@drawable/bg_product_category_chip"
+            android:paddingHorizontal="@dimen/space_8"
+            android:paddingVertical="@dimen/space_2"
+            android:textColor="@color/ms_text_secondary"
+            android:textStyle="bold"
+            android:visibility="gone"
+            tools:text="Bleu · M"
+            tools:visibility="visible" />
+
+        <TextView
+            android:id="@+id/orderDetailProductTotal"
+            style="@style/Ms.Text.Caption"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_4"
+            android:textColor="@color/ms_accent_gold"
+            android:textStyle="bold"
+            tools:text="54.000 DT" />
+
+        <TextView
+            android:id="@+id/orderDetailProductSeller"
+            style="@style/Ms.Text.Caption"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_4"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="@color/ms_text_tertiary"
+            tools:text="Vendeur FatiWeb" />
+    </LinearLayout>
+
+    <!-- Chevron (visible only when clickable) -->
+    <ImageView
+        android:id="@+id/orderDetailProductChevron"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginStart="@dimen/space_8"
+        android:contentDescription="@null"
+        android:visibility="gone"
+        app:srcCompat="@drawable/ic_profile_chevron_right"
+        app:tint="@color/ms_text_tertiary" />
+
+</LinearLayout>

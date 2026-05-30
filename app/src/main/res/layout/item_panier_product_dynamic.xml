@@ -4,10 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:cardBackgroundColor="@color/home_surface_raised"
+    app:cardBackgroundColor="@color/ms_surface_card"
     app:cardCornerRadius="@dimen/product_card_corner_radius"
     app:cardElevation="0dp"
-    app:strokeColor="@color/colorBorderLight"
+    app:strokeColor="@color/ms_border_default"
     app:strokeWidth="1dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -25,7 +25,7 @@
             app:cardBackgroundColor="@color/home_surface_soft"
             app:cardCornerRadius="@dimen/corner_radius_medium"
             app:cardElevation="0dp"
-            app:strokeColor="@color/colorBorderLight"
+            app:strokeColor="@color/ms_border_default"
             app:strokeWidth="1dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
@@ -46,7 +46,7 @@
             app:cardBackgroundColor="@color/home_surface_soft"
             app:cardCornerRadius="8dp"
             app:cardElevation="0dp"
-            app:strokeColor="@color/colorBorderLight"
+            app:strokeColor="@color/ms_border_default"
             app:strokeWidth="1dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent">
@@ -57,7 +57,7 @@
                 android:layout_gravity="center"
                 android:contentDescription="@string/cd_delete"
                 app:srcCompat="@drawable/ic_panier_delete"
-                app:tint="?attr/colorPrimary" />
+                app:tint="@color/ms_text_primary" />
         </com.google.android.material.card.MaterialCardView>
 
         <TextView
@@ -102,7 +102,7 @@
             android:ellipsize="end"
             android:fontFamily="@font/manrope_semibold"
             android:maxLines="1"
-            android:textColor="?attr/colorPrimary"
+            android:textColor="@color/ms_text_primary"
             android:textSize="@dimen/text_size_body"
             android:textStyle="bold"
             app:layout_constraintEnd_toStartOf="@id/layoutQty"
@@ -131,7 +131,7 @@
                 android:contentDescription="@string/cd_decrease_qty"
                 android:gravity="center"
                 android:includeFontPadding="false"
-                android:text="@string/auto_text_102"
+                android:text="@string/common_minus"
                 android:textColor="@color/panier_qty_symbol"
                 android:textSize="@dimen/panier_text_size_qty"
                 android:textStyle="bold" />
@@ -143,7 +143,7 @@
                 android:fontFamily="@font/manrope_semibold"
                 android:gravity="center"
                 android:includeFontPadding="false"
-                android:text="@string/auto_text_123"
+                android:text="@string/checkout_step_number_1"
                 android:textColor="@color/home_text_primary"
                 android:textSize="@dimen/text_size_caption"
                 android:textStyle="bold" />
@@ -156,7 +156,7 @@
                 android:contentDescription="@string/cd_increase_qty"
                 android:gravity="center"
                 android:includeFontPadding="false"
-                android:text="@string/auto_text_103"
+                android:text="@string/common_plus"
                 android:textColor="@color/panier_qty_symbol"
                 android:textSize="@dimen/panier_text_size_qty"
                 android:textStyle="bold" />

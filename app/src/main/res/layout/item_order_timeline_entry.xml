@@ -25,7 +25,7 @@
             android:layout_width="2dp"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:background="@color/colorBorderLight"
+            android:background="@color/ms_border_default"
             android:minHeight="8dp"
             android:visibility="invisible" />
 
@@ -42,7 +42,7 @@
             android:layout_width="2dp"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:background="@color/colorBorderLight"
+            android:background="@color/ms_border_default"
             android:minHeight="8dp"
             android:visibility="invisible" />
 

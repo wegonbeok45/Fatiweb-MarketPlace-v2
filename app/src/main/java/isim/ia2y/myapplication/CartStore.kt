@@ -12,6 +12,23 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
+/**
+ * Cart entries are keyed by product id, or `productId|variantId` when a specific variant was
+ * chosen. Legacy keys (no separator) keep behaving exactly as before. Selected color/size are
+ * not stored separately — they are re-derived from the product's variant by id.
+ */
+object CartKey {
+    private const val SEP = "|"
+
+    fun of(productId: String, variantId: String?): String =
+        if (variantId.isNullOrBlank()) productId else "$productId$SEP$variantId"
+
+    fun productId(key: String): String = key.substringBefore(SEP)
+
+    fun variantId(key: String): String? =
+        if (key.contains(SEP)) key.substringAfter(SEP).takeIf { it.isNotBlank() } else null
+}
+
 object CartStore {
     private const val PREFS_NAME = "cart_store"
     private const val KEY_QTY = "cart_qty"
@@ -93,6 +110,7 @@ object CartStore {
     }
 
     private fun syncCurrentCartToCloud(context: Context, cart: Map<String, Int>) {
+        if (FirebaseCostSafeMode.enabled) return
         val shouldStartWorker = synchronized(this) {
             pendingSyncCart = cart.toMap()
             pendingSyncContext = context
@@ -219,27 +237,39 @@ object CartStore {
         pendingSyncToken = ++_syncToken
     }
 
+    /** Stock ceiling for a cart key: variant stock when the key carries a variant, else product stock. */
+    private fun stockForKey(key: String): Int {
+        val product = ProductCatalog.byId(CartKey.productId(key)) ?: return Int.MAX_VALUE
+        return product.variantById(CartKey.variantId(key))?.stock ?: product.stock
+    }
+
+    /** Unit price for a cart key, honoring a variant price override when present. */
+    private fun unitPriceForKey(key: String): Double {
+        val product = ProductCatalog.byId(CartKey.productId(key)) ?: return 0.0
+        return product.unitPriceForVariant(product.variantById(CartKey.variantId(key)))
+    }
+
     fun getCart(context: Context): Map<String, Int> {
         val raw = decode(prefs(context).getStringSet(KEY_QTY, emptySet()))
         if (!CatalogSyncManager.isFirstSyncCompleted) return raw
 
-        val filtered = raw.filterKeys { ProductCatalog.byId(it) != null }
+        val filtered = raw.filterKeys { ProductCatalog.byId(CartKey.productId(it)) != null }
         if (filtered.size != raw.size) {
             saveLocalCart(context, currentAccountKey(), filtered)
         }
         return filtered
     }
 
-    fun setQuantity(context: Context, productId: String, qty: Int) {
+    fun setQuantity(context: Context, key: String, qty: Int) {
         val cartToSync = synchronized(this) {
             val currentAccountKey = currentAccountKey()
             val cart = getCart(context).toMutableMap()
-            val stock = ProductCatalog.byId(productId)?.stock ?: Int.MAX_VALUE
+            val stock = stockForKey(key)
             val safeQty = qty.coerceAtMost(stock).coerceAtLeast(0)
             if (safeQty <= 0) {
-                cart.remove(productId)
+                cart.remove(key)
             } else {
-                cart[productId] = safeQty
+                cart[key] = safeQty
             }
             saveLocalCart(context, currentAccountKey, cart)
             cart
@@ -247,19 +277,27 @@ object CartStore {
         syncCurrentCartToCloud(context, cartToSync)
     }
 
-    fun add(context: Context, productId: String, quantity: Int = 1): Int {
+    fun add(
+        context: Context,
+        productId: String,
+        quantity: Int = 1,
+        variantId: String? = null,
+        selectedColor: String? = null,
+        selectedSize: String? = null
+    ): Int {
         if (quantity <= 0) return 0
+        val key = CartKey.of(productId, variantId)
 
         var addedQuantity = 0
         val cartToSync = synchronized(this) {
             val cart = getCart(context).toMutableMap()
-            val current = cart[productId] ?: 0
-            val stock = ProductCatalog.byId(productId)?.stock ?: Int.MAX_VALUE
+            val current = cart[key] ?: 0
+            val stock = stockForKey(key)
             val next = (current + quantity).coerceAtMost(stock)
             addedQuantity = (next - current).coerceAtLeast(0)
 
             if (addedQuantity > 0) {
-                cart[productId] = next
+                cart[key] = next
                 saveLocalCart(context, currentAccountKey(), cart)
                 cart
             } else null
@@ -269,21 +307,18 @@ object CartStore {
         return addedQuantity
     }
 
-    fun addOne(context: Context, productId: String) {
-        add(context, productId, quantity = 1)
+    fun addOne(context: Context, key: String) {
+        increment(context, key)
     }
 
-    fun increment(context: Context, productId: String) {
-        add(context, productId, quantity = 1)
-    }
-
-    fun decrement(context: Context, productId: String) {
+    fun increment(context: Context, key: String) {
         val cartToSync = synchronized(this) {
             val cart = getCart(context).toMutableMap()
-            val current = cart[productId] ?: 0
-            if (current > 0) {
-                val next = current - 1
-                if (next <= 0) cart.remove(productId) else cart[productId] = next
+            val current = cart[key] ?: 0
+            val stock = stockForKey(key)
+            val next = (current + 1).coerceAtMost(stock)
+            if (next > current) {
+                cart[key] = next
                 saveLocalCart(context, currentAccountKey(), cart)
                 cart
             } else null
@@ -291,8 +326,22 @@ object CartStore {
         cartToSync?.let { syncCurrentCartToCloud(context, it) }
     }
 
-    fun remove(context: Context, productId: String) {
-        setQuantity(context, productId, 0)
+    fun decrement(context: Context, key: String) {
+        val cartToSync = synchronized(this) {
+            val cart = getCart(context).toMutableMap()
+            val current = cart[key] ?: 0
+            if (current > 0) {
+                val next = current - 1
+                if (next <= 0) cart.remove(key) else cart[key] = next
+                saveLocalCart(context, currentAccountKey(), cart)
+                cart
+            } else null
+        }
+        cartToSync?.let { syncCurrentCartToCloud(context, it) }
+    }
+
+    fun remove(context: Context, key: String) {
+        setQuantity(context, key, 0)
     }
 
     fun clear(context: Context) {
@@ -302,7 +351,7 @@ object CartStore {
         }
         cancelPendingSync()
         val uid = currentUidOrNull()
-        if (uid != null) {
+        if (uid != null && !FirebaseCostSafeMode.enabled) {
             scope.launch { runCatching { CartFirestoreService.replaceCart(uid, emptyMap()) } }
         }
     }
@@ -313,10 +362,7 @@ object CartStore {
 
     fun subtotal(context: Context): Double {
         val cart = getCart(context)
-        return cart.entries.sumOf { (id, qty) ->
-            val product = ProductCatalog.byId(id)
-            (product?.unitPrice ?: 0.0) * qty
-        }
+        return cart.entries.sumOf { (key, qty) -> unitPriceForKey(key) * qty }
     }
 
     fun total(context: Context, extraShippingFee: Double = 0.0): Double {
@@ -326,6 +372,7 @@ object CartStore {
     }
 
     suspend fun refreshFromCloud(context: Context): Map<String, Int> {
+        if (FirebaseCostSafeMode.enabled) return getCart(context)
         val uid = currentUidOrNull() ?: return getCart(context)
         if (hasPendingCloudSync()) return getCart(context)
         val remoteCart = runCatching { CartFirestoreService.fetchCart(uid) }.getOrDefault(getCart(context))
@@ -336,6 +383,7 @@ object CartStore {
     }
 
     suspend fun mergeGuestCartIntoCurrent(context: Context) {
+        if (FirebaseCostSafeMode.enabled) return
         val uid = currentUidOrNull() ?: return
         cancelPendingSync()
         val guestPrefs = prefsForAccount(context, GUEST_KEY)
@@ -346,10 +394,10 @@ object CartStore {
 
         val mergedCart = synchronized(this) {
             val merged = remoteCart.toMutableMap()
-            guestCart.forEach { (productId, guestQty) ->
-                val stock = ProductCatalog.byId(productId)?.stock ?: Int.MAX_VALUE
-                val existingQty = merged[productId] ?: 0
-                merged[productId] = (existingQty + guestQty).coerceAtMost(stock)
+            guestCart.forEach { (key, guestQty) ->
+                val stock = stockForKey(key)
+                val existingQty = merged[key] ?: 0
+                merged[key] = (existingQty + guestQty).coerceAtMost(stock)
             }
             saveLocalCart(context, uid, merged)
             guestPrefs.edit().remove(KEY_QTY).apply()
