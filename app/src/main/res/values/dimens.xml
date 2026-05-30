@@ -342,6 +342,9 @@
     <dimen name="ms_stroke_focus">2dp</dimen>
 
     <!-- Component heights -->
+    <dimen name="ms_component_height_sm">40dp</dimen>
+    <dimen name="ms_component_height_md">52dp</dimen>
+    <dimen name="ms_component_height_lg">64dp</dimen>
     <dimen name="ms_button_height">48dp</dimen>
     <dimen name="ms_button_height_compact">40dp</dimen>
     <dimen name="ms_input_height">52dp</dimen>

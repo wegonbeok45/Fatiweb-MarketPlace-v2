@@ -8,8 +8,8 @@ import coil.ImageLoaderFactory
 import coil.disk.DiskCache
 import coil.memory.MemoryCache
 import coil.request.CachePolicy
+import com.google.firebase.appcheck.AppCheckProviderFactory
 import com.google.firebase.appcheck.FirebaseAppCheck
-import com.google.firebase.appcheck.debug.DebugAppCheckProviderFactory
 import com.google.firebase.appcheck.playintegrity.PlayIntegrityAppCheckProviderFactory
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreSettings
@@ -37,7 +37,7 @@ class MyApplication : Application(), ImageLoaderFactory {
     private fun configureAppCheck() {
         val appCheck = firebaseAppCheck
         val factory = if (BuildConfig.DEBUG) {
-            DebugAppCheckProviderFactory.getInstance()
+            debugAppCheckProviderFactory()
         } else {
             PlayIntegrityAppCheckProviderFactory.getInstance()
         }
@@ -46,6 +46,11 @@ class MyApplication : Application(), ImageLoaderFactory {
         if (BuildConfig.DEBUG) {
             Log.d("MyApplication", "Firebase App Check: debug provider installed.")
         }
+    }
+
+    private fun debugAppCheckProviderFactory(): AppCheckProviderFactory {
+        val providerClass = Class.forName("com.google.firebase.appcheck.debug.DebugAppCheckProviderFactory")
+        return providerClass.getMethod("getInstance").invoke(null) as AppCheckProviderFactory
     }
 
     private fun configureFirestoreOffline() {
