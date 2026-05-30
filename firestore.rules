@@ -58,7 +58,9 @@ service cloud.firestore {
         'rating', 'ratingAvg', 'reviewsCount', 'ratingCount',
         'sellerId', 'sellerName', 'sellerAvatarUrl', 'sellerProfileUpdatedAt',
         'sellerVerifiedAt', 'sellerMemberSince', 'sellerTotalSold', 'sellerRating', 'sellerRatingCount',
-        'schemaVersion', 'createdAt', 'updatedAt'
+        'schemaVersion', 'createdAt', 'updatedAt',
+        // Category-based attributes & variants (additive; optional for legacy docs).
+        'productType', 'attributes', 'colorOptions', 'sizeOptions', 'variants'
       ];
     }
 
@@ -66,8 +68,33 @@ service cloud.firestore {
       return [
         'title', 'subtitle', 'description', 'bullets', 'tags',
         'category', 'categoryIds', 'categoryLeafId', 'origin', 'price', 'priceMinor', 'stock', 'isBio',
-        'discountPercent', 'imageUrl', 'imageUrls', 'updatedAt'
+        'discountPercent', 'imageUrl', 'imageUrls', 'updatedAt',
+        // Category-based attributes & variants (additive; optional for legacy docs).
+        'productType', 'attributes', 'colorOptions', 'sizeOptions', 'variants'
       ];
+    }
+
+    // Optional variant/attribute payloads. Loose, bounded checks only — the
+    // adminUpsertProduct callable (admin SDK) is the authoritative sanitizer;
+    // these rules just bound the DEBUG direct-write fallback so it can't be
+    // abused to store oversized arrays/maps.
+    function variantPayloadIsSafe() {
+      return (
+        !('productType' in request.resource.data) ||
+        (request.resource.data.productType is string && request.resource.data.productType.size() <= 40)
+      ) && (
+        !('attributes' in request.resource.data) ||
+        request.resource.data.attributes is map
+      ) && (
+        !('colorOptions' in request.resource.data) ||
+        (request.resource.data.colorOptions is list && request.resource.data.colorOptions.size() <= 20)
+      ) && (
+        !('sizeOptions' in request.resource.data) ||
+        (request.resource.data.sizeOptions is list && request.resource.data.sizeOptions.size() <= 30)
+      ) && (
+        !('variants' in request.resource.data) ||
+        (request.resource.data.variants is list && request.resource.data.variants.size() <= 200)
+      );
     }
 
     function vendeurProductFieldsSafe() {
@@ -157,7 +184,8 @@ service cloud.firestore {
         imageUrlListIsSafe(request.resource.data.imageUrls) &&
         optionalStringListIsSafe(request.resource.data.tags, 10, 40) &&
         optionalStringListIsSafe(request.resource.data.bullets, 10, 180) &&
-        optionalStringListIsSafe(request.resource.data.searchKeywords, 80, 80);
+        optionalStringListIsSafe(request.resource.data.searchKeywords, 80, 80) &&
+        variantPayloadIsSafe();
     }
 
     function vendeurProductCreateIsSafe(productId) {
@@ -185,7 +213,23 @@ service cloud.firestore {
         'avatarUrl',
         'avatar',
         'photoUrl',
+        'location',
         'notificationPreferences',
+        'vendorStatus',
+        'vendorApplicationSubmittedAt',
+        'vendorApprovedAt',
+        'vendorSuspendedReason',
+        'shopName',
+        'shopBio',
+        'shopBannerUrl',
+        'shopLogoUrl',
+        'shopOperatingHours',
+        'shippingFeeDt',
+        'deliveryZones',
+        'sellerAccessGrantedAt',
+        'sellerAccessGrantedBy',
+        'sellerAccessRevokedAt',
+        'sellerAccessRevokedBy',
         'schemaVersion',
         'createdAt',
         'updatedAt'
@@ -202,6 +246,96 @@ service cloud.firestore {
         request.resource.data.notificationPreferences.announcements is bool &&
         request.resource.data.notificationPreferences.pushEnabled is bool
       );
+    }
+
+    function locationIsSafe() {
+      return !('location' in request.resource.data) || (
+        request.resource.data.location is map &&
+        request.resource.data.location.keys().hasOnly([
+          'latitude', 'longitude', 'address', 'city', 'source', 'updatedAt'
+        ]) &&
+        (!('latitude' in request.resource.data.location) || request.resource.data.location.latitude is number) &&
+        (!('longitude' in request.resource.data.location) || request.resource.data.location.longitude is number) &&
+        request.resource.data.location.address is string &&
+        request.resource.data.location.address.size() <= 240 &&
+        request.resource.data.location.city is string &&
+        request.resource.data.location.city.size() <= 120 &&
+        ['gps', 'manual'].hasAny([request.resource.data.location.source]) &&
+        request.resource.data.location.updatedAt is number
+      );
+    }
+
+    function userVendorFieldsAreSafe() {
+      return (
+        !('vendorStatus' in request.resource.data) ||
+        ['pending', 'approved', 'suspended', 'rejected']
+          .hasAny([request.resource.data.vendorStatus])
+      ) &&
+      (!('shopName' in request.resource.data) || (
+        request.resource.data.shopName is string &&
+        request.resource.data.shopName.size() <= 80
+      )) &&
+      (!('shopBio' in request.resource.data) || (
+        request.resource.data.shopBio is string &&
+        request.resource.data.shopBio.size() <= 500
+      )) &&
+      (!('shopLogoUrl' in request.resource.data) || (
+        request.resource.data.shopLogoUrl is string &&
+        request.resource.data.shopLogoUrl.size() <= 2048
+      )) &&
+      (!('shopBannerUrl' in request.resource.data) || (
+        request.resource.data.shopBannerUrl is string &&
+        request.resource.data.shopBannerUrl.size() <= 2048
+      )) &&
+      (!('shopOperatingHours' in request.resource.data) || (
+        request.resource.data.shopOperatingHours is string &&
+        request.resource.data.shopOperatingHours.size() <= 240
+      )) &&
+      (!('shippingFeeDt' in request.resource.data) || (
+        request.resource.data.shippingFeeDt is number &&
+        request.resource.data.shippingFeeDt >= 0 &&
+        request.resource.data.shippingFeeDt <= 500
+      )) &&
+      (!('deliveryZones' in request.resource.data) ||
+        optionalStringListIsSafe(request.resource.data.deliveryZones, 10, 80)
+      );
+    }
+
+    function ownerVendorApplicationSubmitIsSafe() {
+      return request.resource.data.role == 'client' &&
+        request.resource.data.vendorStatus == 'pending' &&
+        request.resource.data.vendorApplicationSubmittedAt == request.time &&
+        request.resource.data.shopName is string &&
+        request.resource.data.shopName.size() >= 2 &&
+        request.resource.data.shopName.size() <= 80 &&
+        request.resource.data.phone is string &&
+        request.resource.data.phone.size() >= 8 &&
+        request.resource.data.phone.size() <= 24;
+    }
+
+    function ownerVendorCreateIsSafe() {
+      return userVendorFieldsAreSafe() &&
+        (
+          !('vendorStatus' in request.resource.data) ||
+          ownerVendorApplicationSubmitIsSafe()
+        );
+    }
+
+    function ownerVendorUpdateIsSafe() {
+      return userVendorFieldsAreSafe() &&
+        !request.resource.data.diff(resource.data).changedKeys().hasAny([
+          'vendorApprovedAt',
+          'vendorSuspendedReason',
+          'sellerAccessGrantedAt',
+          'sellerAccessGrantedBy',
+          'sellerAccessRevokedAt',
+          'sellerAccessRevokedBy'
+        ]) &&
+        (
+          !request.resource.data.diff(resource.data).changedKeys()
+            .hasAny(['vendorStatus', 'vendorApplicationSubmittedAt']) ||
+          ownerVendorApplicationSubmitIsSafe()
+        );
     }
 
     function ownerProfileCreateRoleIsSafe() {
@@ -221,6 +355,8 @@ service cloud.firestore {
         request.resource.data.uid == userId &&
         ownerProfileCreateRoleIsSafe() &&
         notificationPreferencesAreSafe() &&
+        locationIsSafe() &&
+        ownerVendorCreateIsSafe() &&
         (
           !('status' in request.resource.data) ||
           request.resource.data.status == 'active'
@@ -235,7 +371,15 @@ service cloud.firestore {
         request.resource.data.createdAt == resource.data.createdAt &&
         !request.resource.data.diff(resource.data).changedKeys()
           .hasAny(['uid', 'role', 'createdAt', 'status']) &&
-        notificationPreferencesAreSafe();
+        notificationPreferencesAreSafe() &&
+        locationIsSafe() &&
+        ownerVendorUpdateIsSafe();
+    }
+
+    function ownerProfileTouchIsSafe() {
+      return request.resource.data.diff(resource.data).changedKeys().hasOnly(['updatedAt']) &&
+        request.resource.data.role == resource.data.role &&
+        request.resource.data.status == resource.data.status;
     }
 
     function onlyReadStateChanged() {
@@ -351,7 +495,8 @@ service cloud.firestore {
     match /users/{userId} {
       allow read: if isOwner(userId) || isAdmin();
       allow create: if isAdmin() || (isOwner(userId) && ownerProfileCreateIsSafe(userId));
-      allow update: if isAdmin() || (isOwner(userId) && ownerProfileUpdateIsSafe(userId));
+      allow update: if isAdmin() ||
+        (isOwner(userId) && (ownerProfileUpdateIsSafe(userId) || ownerProfileTouchIsSafe()));
       allow delete: if isAdmin();
 
       match /addresses/{addressId} {
