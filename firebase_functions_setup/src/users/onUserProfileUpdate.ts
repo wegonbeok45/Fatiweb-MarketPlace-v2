@@ -11,6 +11,7 @@ export const onUserProfileUpdate = onDocumentUpdated(
   {
     document: `${COLLECTIONS.USERS}/{uid}`,
     region: FUNCTIONS_REGION,
+    retry: false,
   },
   async (event) => {
     const uid = event.params.uid;
@@ -25,23 +26,17 @@ export const onUserProfileUpdate = onDocumentUpdated(
     const beforeTrust = JSON.stringify({
       verifiedAt: before.get("verifiedAt") || before.get("sellerVerifiedAt") || null,
       memberSince: before.get("memberSince") || before.get("createdAt") || null,
-      totalSold: before.get("totalSold") || before.get("sellerTotalSold") || 0,
-      sellerRating: before.get("sellerRating") || before.get("ratingAvg") || 0,
-      sellerRatingCount: before.get("sellerRatingCount") || before.get("ratingCount") || 0,
     });
     const afterTrust = JSON.stringify({
       verifiedAt: after.get("verifiedAt") || after.get("sellerVerifiedAt") || null,
       memberSince: after.get("memberSince") || after.get("createdAt") || null,
-      totalSold: after.get("totalSold") || after.get("sellerTotalSold") || 0,
-      sellerRating: after.get("sellerRating") || after.get("ratingAvg") || 0,
-      sellerRatingCount: after.get("sellerRatingCount") || after.get("ratingCount") || 0,
     });
 
     if (beforeAvatar === afterAvatar && beforeName === afterName && beforeTrust === afterTrust) return;
 
     const productsSnapshot = await db.collection(COLLECTIONS.PRODUCTS)
       .where("sellerId", "==", uid)
-      .limit(450)
+      .limit(200)
       .get();
     if (productsSnapshot.empty) return;
 

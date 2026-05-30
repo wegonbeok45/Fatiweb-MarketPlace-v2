@@ -28,6 +28,7 @@ import {onUserProfileUpdate} from "./users/onUserProfileUpdate";
 setGlobalOptions({
   region: "europe-west1",
   maxInstances: 10,
+  concurrency: 80,
 });
 
 export {

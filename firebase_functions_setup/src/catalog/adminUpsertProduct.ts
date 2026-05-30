@@ -29,6 +29,90 @@ const TRUSTED_IMAGE_HOSTS = new Set([
   "res.cloudinary.com",
 ]);
 
+// ── Variant & attribute sanitizers ──────────────────────────────────────────
+
+function sanitizeAttributeValue(v: unknown): string | number | boolean | null {
+  if (typeof v === "string") return v.trim().slice(0, 500);
+  if (typeof v === "number" && isFinite(v)) return v;
+  if (typeof v === "boolean") return v;
+  return null;
+}
+
+function sanitizeAttributes(raw: unknown): Record<string, unknown> {
+  const rec = asRecord(raw);
+  if (!rec) return {};
+  const out: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(rec)) {
+    const key = k.trim().slice(0, 80);
+    if (!key) continue;
+    const val = sanitizeAttributeValue(v);
+    if (val !== null) out[key] = val;
+  }
+  return out;
+}
+
+function sanitizeColorOptions(raw: unknown): Array<Record<string, string>> {
+  if (!Array.isArray(raw)) return [];
+  return raw
+    .slice(0, 20)
+    .map((item) => {
+      const rec = asRecord(item);
+      if (!rec) return null;
+      const name = asString(rec.name).trim().slice(0, 80);
+      if (!name) return null;
+      return {name, hex: asString(rec.hex).trim().slice(0, 20)};
+    })
+    .filter((x): x is {name: string; hex: string} => x !== null);
+}
+
+function sanitizeSizeOptions(raw: unknown): string[] {
+  if (!Array.isArray(raw)) return [];
+  return raw
+    .slice(0, 30)
+    .map((s) => asString(s).trim().slice(0, 40))
+    .filter((s) => s.length > 0);
+}
+
+type SanitizedVariant = {
+  variantId: string;
+  colorName: string;
+  colorHex: string;
+  size: string;
+  stock: number;
+  priceOverrideMinor?: number;
+  imageUrl: string | null;
+  sku: string;
+  active: boolean;
+};
+
+function sanitizeVariants(raw: unknown): SanitizedVariant[] {
+  if (!Array.isArray(raw)) return [];
+  const results: SanitizedVariant[] = [];
+  for (const item of raw.slice(0, 200)) {
+    const rec = asRecord(item);
+    if (!rec) continue;
+    const variantId = asString(rec.variantId).trim().slice(0, 120);
+    if (!variantId) continue;
+    const stock = Math.max(0, Math.floor(asNumber(rec.stock)));
+    const priceOverrideRaw = rec.priceOverrideMinor;
+    const entry: SanitizedVariant = {
+      variantId,
+      colorName: asString(rec.colorName).trim().slice(0, 80),
+      colorHex: asString(rec.colorHex).trim().slice(0, 20),
+      size: asString(rec.size).trim().slice(0, 40),
+      stock,
+      imageUrl: asString(rec.imageUrl).trim().slice(0, 500) || null,
+      sku: asString(rec.sku).trim().slice(0, 120),
+      active: asBoolean(rec.active, true),
+    };
+    if (priceOverrideRaw != null) {
+      entry.priceOverrideMinor = Math.max(0, Math.floor(asNumber(priceOverrideRaw)));
+    }
+    results.push(entry);
+  }
+  return results;
+}
+
 function normalizeProductId(rawId: string, title: string): string {
   const sanitized = rawId.trim().toLowerCase()
     .replace(/[^a-z0-9_]+/g, "_")
@@ -175,6 +259,11 @@ export const adminUpsertProduct = onCall(trustedCallableOptions, async (request)
     sellerTotalSold: Math.max(0, Math.floor(asNumber(sellerDoc.get("totalSold"), asNumber(sellerDoc.get("sellerTotalSold"))))),
     sellerRating: asNumber(sellerDoc.get("sellerRating"), asNumber(sellerDoc.get("ratingAvg"))),
     sellerRatingCount: Math.max(0, Math.floor(asNumber(sellerDoc.get("sellerRatingCount"), asNumber(sellerDoc.get("ratingCount"))))),
+    productType: asString(product.productType).trim().slice(0, 40),
+    attributes: sanitizeAttributes(product.attributes),
+    colorOptions: sanitizeColorOptions(product.colorOptions),
+    sizeOptions: sanitizeSizeOptions(product.sizeOptions),
+    variants: sanitizeVariants(product.variants),
     createdAt: existing.get("createdAt") || admin.firestore.FieldValue.serverTimestamp(),
     updatedAt: admin.firestore.FieldValue.serverTimestamp(),
   };

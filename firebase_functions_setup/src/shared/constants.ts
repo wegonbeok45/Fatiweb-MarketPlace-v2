@@ -10,6 +10,7 @@ export const COLLECTIONS = {
   IN_APP_NOTIFICATIONS: "in_app_notifications",
   ADMIN_STATS: "admin_stats",
   ASSISTANT_RATE_LIMITS: "assistant_rate_limits",
+  ASSISTANT_CONTEXT_CACHE: "assistantContextCache",
   CONVERSATIONS: "conversations",
   CONVERSATION_RATE_LIMITS: "conversation_rate_limits",
 } as const;
@@ -49,6 +50,6 @@ export const DEFAULTS = {
   currency: "TND",
   standardShippingFee: 7.0,
   expressShippingFee: 12.5,
-  assistantCooldownMs: 3000,
+  assistantCooldownMs: 15000,
   assistantMaxTurns: 12,
 } as const;

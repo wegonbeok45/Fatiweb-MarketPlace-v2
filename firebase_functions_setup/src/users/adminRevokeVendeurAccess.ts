@@ -31,6 +31,7 @@ export const adminRevokeVendeurAccess = onCall(trustedCallableOptions, async (re
 
   await userRef.set({
     role: USER_ROLES.CLIENT,
+    vendorStatus: "rejected",
     sellerAccessRevokedAt: admin.firestore.FieldValue.serverTimestamp(),
     sellerAccessRevokedBy: adminContext.uid,
     updatedAt: admin.firestore.FieldValue.serverTimestamp(),

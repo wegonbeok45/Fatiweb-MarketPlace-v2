@@ -48,17 +48,12 @@ export async function assertAdminOrVendeur(request: CallableRequest<unknown>): P
     (typeof token.role === "string" ? token.role : "");
 
   if (token.admin === true || tokenRole === USER_ROLES.ADMIN || tokenRole === USER_ROLES.VENDEUR) {
-    const userDoc = await db.collection(COLLECTIONS.USERS).doc(authContext.uid).get();
-    const docRole = userDoc.get("role");
-    const role = docRole === USER_ROLES.ADMIN || docRole === USER_ROLES.VENDEUR ? docRole : tokenRole;
-    if (role === USER_ROLES.ADMIN || role === USER_ROLES.VENDEUR) {
-      return {
-        ...authContext,
-        role,
-        name: userDisplayName(userDoc.data(), authContext.email),
-        avatarUrl: userAvatarUrl(userDoc.data()),
-      };
-    }
+    return {
+      ...authContext,
+      role: tokenRole,
+      name: tokenDisplayName(token, authContext.email),
+      avatarUrl: tokenAvatarUrl(token),
+    };
   }
 
   const userDoc = await db.collection(COLLECTIONS.USERS).doc(authContext.uid).get();
@@ -86,4 +81,15 @@ function userDisplayName(data: Record<string, unknown> | undefined, email: strin
   const name = typeof data?.name === "string" ? data.name.trim() : "";
   const displayName = typeof data?.displayName === "string" ? data.displayName.trim() : "";
   return name || displayName || email || "Fatiweb Seller";
+}
+
+function tokenAvatarUrl(token: Record<string, unknown>): string {
+  const picture = typeof token.picture === "string" ? token.picture.trim() : "";
+  const avatarUrl = typeof token.avatarUrl === "string" ? token.avatarUrl.trim() : "";
+  return avatarUrl || picture;
+}
+
+function tokenDisplayName(token: Record<string, unknown>, email: string | null): string {
+  const name = typeof token.name === "string" ? token.name.trim() : "";
+  return name || email || "Fatiweb Seller";
 }

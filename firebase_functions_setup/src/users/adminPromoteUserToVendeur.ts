@@ -29,6 +29,9 @@ export const adminPromoteUserToVendeur = onCall(trustedCallableOptions, async (r
   if (currentRole !== USER_ROLES.VENDEUR) {
     await userRef.set({
       role: USER_ROLES.VENDEUR,
+      vendorStatus: "approved",
+      vendorApprovedAt: admin.firestore.FieldValue.serverTimestamp(),
+      vendorSuspendedReason: "",
       sellerAccessGrantedAt: admin.firestore.FieldValue.serverTimestamp(),
       sellerAccessGrantedBy: adminContext.uid,
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),

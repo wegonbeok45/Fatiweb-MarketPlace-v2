@@ -4,10 +4,16 @@ import {HttpsError, onCall} from "firebase-functions/v2/https";
 import {assertAdminOrVendeur} from "../shared/auth";
 import {asRecord, asString} from "../shared/domain";
 import {trustedCallableOptions} from "../shared/callableOptions";
+import {admin, db} from "../shared/firestore";
+import {chatCompletion} from "../shared/groqClient";
 
-const geminiApiKey = defineSecret("GEMINI_API_KEY");
-const GEMINI_MODEL = "gemini-2.5-flash-lite";
-const MAX_INLINE_IMAGE_CHARS = 7_000_000;
+const groqApiKey = defineSecret("GROQ_API_KEY");
+
+// Vision-capable Groq model. Llama 4 Scout supports multimodal input via the
+// OpenAI-style image_url content part.
+const VISION_MODEL = "meta-llama/llama-4-scout-17b-16e-instruct";
+const MAX_INLINE_IMAGE_CHARS = 2_000_000;
+const RATE_LIMIT_WINDOW_MS = 30_000;
 
 type ProductInfoDraft = {
   title: string;
@@ -80,7 +86,7 @@ function extractJsonObject(text: string): Record<string, unknown> {
   const start = trimmed.indexOf("{");
   const end = trimmed.lastIndexOf("}");
   if (start < 0 || end <= start) {
-    throw new HttpsError("internal", "Gemini did not return a product JSON object.");
+    throw new HttpsError("internal", "Groq did not return a product JSON object.");
   }
   return JSON.parse(trimmed.slice(start, end + 1)) as Record<string, unknown>;
 }
@@ -107,7 +113,7 @@ function normalizeDraft(raw: Record<string, unknown>): ProductInfoDraft {
   const bullets = stringArray(raw.bullets);
 
   if (title.length < 3 || subtitle.length < 3 || description.length < 12 || bullets.length === 0) {
-    throw new HttpsError("internal", "Gemini returned incomplete product information.");
+    throw new HttpsError("internal", "Groq returned incomplete product information.");
   }
 
   const stockValue = Number(raw.suggestedStock);
@@ -126,10 +132,32 @@ function normalizeDraft(raw: Record<string, unknown>): ProductInfoDraft {
   };
 }
 
+async function enforceGenerateProductInfoRateLimit(uid: string): Promise<void> {
+  const rateLimitRef = db.collection("generateProductInfoRateLimits").doc(uid);
+  const nowMs = Date.now();
+
+  await db.runTransaction(async (transaction) => {
+    const rateDoc = await transaction.get(rateLimitRef);
+    const lastCallAt = rateDoc.get("lastCallAt");
+    const lastCallAtMs = lastCallAt instanceof admin.firestore.Timestamp ? lastCallAt.toMillis() : 0;
+    if (nowMs - lastCallAtMs < RATE_LIMIT_WINDOW_MS) {
+      throw new HttpsError("resource-exhausted", "Please wait before generating product info again.");
+    }
+
+    transaction.set(rateLimitRef, {
+      uid,
+      lastCallAt: admin.firestore.Timestamp.fromMillis(nowMs),
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    }, {merge: true});
+  });
+}
+
 export const generateProductInfo = onCall(
-  {...trustedCallableOptions, secrets: [geminiApiKey], timeoutSeconds: 60},
+  {...trustedCallableOptions, secrets: [groqApiKey], timeoutSeconds: 30, maxInstances: 3},
   async (request) => {
     const actor = await assertAdminOrVendeur(request);
+    await enforceGenerateProductInfoRateLimit(actor.uid);
+
     const payload = asRecord(request.data) || {};
     const imageBase64 = asString(payload.imageBase64).trim();
     const imageMimeType = asString(payload.imageMimeType, "image/jpeg").trim() || "image/jpeg";
@@ -141,57 +169,32 @@ export const generateProductInfo = onCall(
       throw new HttpsError("invalid-argument", "The product image is too large.");
     }
 
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-goog-api-key": geminiApiKey.value(),
-        },
-        body: JSON.stringify({
-          contents: [{
-            role: "user",
-            parts: [
-              {text: buildPrompt()},
-              {
-                inline_data: {
-                  mime_type: imageMimeType,
-                  data: imageBase64,
-                },
+    const reply = await chatCompletion({
+      apiKey: groqApiKey.value(),
+      model: VISION_MODEL,
+      messages: [
+        {
+          role: "user",
+          content: [
+            {type: "text", text: buildPrompt()},
+            {
+              type: "image_url",
+              image_url: {
+                url: `data:${imageMimeType};base64,${imageBase64}`,
+                detail: "low",
               },
-            ],
-          }],
-          generationConfig: {
-            temperature: 0.35,
-            topP: 0.9,
-            maxOutputTokens: 900,
-            responseMimeType: "application/json",
-          },
-        }),
-      },
-    );
+            },
+          ],
+        },
+      ],
+      temperature: 0.35,
+      topP: 0.9,
+      maxTokens: 900,
+      responseFormat: {type: "json_object"},
+      logTag: "generateProductInfo",
+    });
 
-    const responseBody = await response.text();
-    if (!response.ok) {
-      logger.error("Product info generation failed", {
-        status: response.status,
-        body: responseBody.slice(0, 400),
-        actorUid: actor.uid,
-        actorRole: actor.role,
-      });
-      throw new HttpsError("internal", "Product information generation is temporarily unavailable.");
-    }
-
-    const parsed = JSON.parse(responseBody) as {
-      candidates?: Array<{content?: {parts?: Array<{text?: string}>}}>;
-    };
-    const text = parsed.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
-    if (!text) {
-      throw new HttpsError("internal", "Gemini returned an empty product response.");
-    }
-
-    const draft = normalizeDraft(extractJsonObject(text));
+    const draft = normalizeDraft(extractJsonObject(reply));
     logger.info("Product info generated", {
       actorUid: actor.uid,
       actorRole: actor.role,

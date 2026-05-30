@@ -8,30 +8,26 @@ export const syncUserRoleClaims = onDocumentWritten(
   {
     document: `${COLLECTIONS.USERS}/{userId}`,
     region: FUNCTIONS_REGION,
+    retry: false,
   },
   async (event) => {
     const userId = event.params.userId;
+    if (!event.data?.after?.exists) {
+      return;
+    }
+    if (!event.data?.before?.exists) {
+      return;
+    }
+
     const beforeRole = normalizeRole(event.data?.before?.get("role"));
     const afterRole = normalizeRole(event.data?.after?.get("role"));
 
-    if (event.data?.before?.exists && beforeRole === afterRole && event.data?.after?.exists) {
+    if (beforeRole === afterRole) {
       return;
     }
 
     const userRecord = await auth.getUser(userId);
     const existingClaims = userRecord.customClaims || {};
-
-    if (!event.data?.after?.exists) {
-      if (existingClaims.admin || existingClaims.role) {
-        await auth.setCustomUserClaims(userId, {
-          ...existingClaims,
-          admin: false,
-          role: USER_ROLES.CLIENT,
-        });
-      }
-      logger.info("Cleared elevated claims for deleted user profile", {userId});
-      return;
-    }
 
     const normalizedRole = afterRole;
     const isAdmin = normalizedRole === USER_ROLES.ADMIN;

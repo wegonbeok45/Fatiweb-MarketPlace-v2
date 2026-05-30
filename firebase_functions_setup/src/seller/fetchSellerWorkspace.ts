@@ -23,9 +23,11 @@ export const sellerFetchWorkspace = onCall(trustedCallableOptions, async (reques
   const [ordersSnapshot, productsSnapshot] = await Promise.all([
     db.collection(COLLECTIONS.ORDERS)
       .where("sellerIds", "array-contains", sellerId)
+      .limit(MAX_SELLER_ORDERS)
       .get(),
     db.collection(COLLECTIONS.PRODUCTS)
       .where("sellerId", "==", sellerId)
+      .limit(200)
       .get(),
   ]);
 

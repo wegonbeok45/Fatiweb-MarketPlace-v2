@@ -8,11 +8,10 @@ import {
 import {assertAdmin} from "../shared/auth";
 import {admin, db} from "../shared/firestore";
 import {heavyCallableOptions} from "../shared/callableOptions";
-import {asRecord, asString, chunk} from "../shared/domain";
-import {sendPushToUser} from "./push";
+import {asRecord, asString} from "../shared/domain";
+import {sendPushToUsers} from "./push";
 
 type Audience = "all" | "clients" | "admins";
-const PUSH_FAN_OUT_BATCH_SIZE = 50;
 const USER_PAGE_SIZE = 500;
 
 function normalizeAudience(value: unknown): Audience {
@@ -29,7 +28,7 @@ function validateAnnouncementCopy(title: string, message: string): void {
   }
 }
 
-export const adminSendAnnouncement = onCall(heavyCallableOptions, async (request) => {
+export const adminSendAnnouncement = onCall({...heavyCallableOptions, maxInstances: 1, timeoutSeconds: 540}, async (request) => {
   const adminContext = await assertAdmin(request);
   const payload = asRecord(request.data) || {};
   const title = asString(payload.title).trim();
@@ -57,7 +56,9 @@ export const adminSendAnnouncement = onCall(heavyCallableOptions, async (request
   };
   await notificationRef.set(notificationPayload);
 
-  const userIds: string[] = [];
+  let recipientCount = 0;
+  let scannedCount = 0;
+  let pushFailureCount = 0;
   let lastUserDoc: FirebaseFirestore.QueryDocumentSnapshot | null = null;
   let reachedEnd = false;
 
@@ -73,41 +74,48 @@ export const adminSendAnnouncement = onCall(heavyCallableOptions, async (request
     reachedEnd = usersSnapshot.size < USER_PAGE_SIZE;
     lastUserDoc = usersSnapshot.docs[usersSnapshot.docs.length - 1] || null;
 
-    userIds.push(...usersSnapshot.docs
+    const userIds = usersSnapshot.docs
       .filter((doc) => {
-      const role = asString(doc.get("role"), USER_ROLES.CLIENT).trim().toLowerCase();
-      if (audience === "admins") return role === USER_ROLES.ADMIN;
-      if (audience === "clients") return role !== USER_ROLES.ADMIN;
-      return true;
+        const role = asString(doc.get("role"), USER_ROLES.CLIENT).trim().toLowerCase();
+        if (audience === "admins") return role === USER_ROLES.ADMIN;
+        if (audience === "clients") return role !== USER_ROLES.ADMIN;
+        return true;
       })
-      .map((doc) => doc.id));
-  }
-  const pushResults: Array<PromiseSettledResult<void>> = [];
-  for (const userIdBatch of chunk(userIds, PUSH_FAN_OUT_BATCH_SIZE)) {
-    const batchResults = await Promise.allSettled(
-      userIdBatch.map((uid) =>
-        sendPushToUser(uid, title, message, {
+      .map((doc) => doc.id);
+    recipientCount += userIds.length;
+    scannedCount += usersSnapshot.size;
+
+    if (userIds.length > 0) {
+      try {
+        const pushResult = await sendPushToUsers(userIds, title, message, {
           route: "notifications",
           notificationId: notificationRef.id,
           type: "announcement",
-        }, "announcements"),
-      ),
-    );
-    pushResults.push(...batchResults);
-  }
-  const pushFailureCount = pushResults.filter((result) => result.status === "rejected").length;
-  if (pushFailureCount > 0) {
-    logger.warn("Announcement push fan-out had failed recipients", {
+        }, "announcements");
+        pushFailureCount += pushResult.failureCount;
+      } catch (error) {
+        pushFailureCount += userIds.length;
+        logger.warn("Announcement push fan-out page failed", {
+          createdBy: adminContext.uid,
+          audience,
+          userCount: userIds.length,
+          error,
+        });
+      }
+    }
+
+    logger.info("Announcement fan-out progress", {
       createdBy: adminContext.uid,
       audience,
-      pushFailureCount,
+      scannedCount,
+      recipientCount,
     });
   }
 
   logger.info("Announcement published", {
     createdBy: adminContext.uid,
     audience,
-    recipientCount: userIds.length,
+    recipientCount,
     pushFailureCount,
   });
 
@@ -117,7 +125,7 @@ export const adminSendAnnouncement = onCall(heavyCallableOptions, async (request
       createdAtTs: nowMs,
       updatedAt: nowMs,
     },
-    recipientCount: userIds.length,
+    recipientCount,
     pushFailureCount,
   };
 });
