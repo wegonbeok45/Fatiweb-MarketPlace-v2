@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- One column in the lightweight bar chart. The fill view's vertical
+     weight is set programmatically (0..1 of max). -->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="0dp"
+    android:layout_height="match_parent"
+    android:layout_marginStart="2dp"
+    android:layout_marginEnd="2dp"
+    android:layout_weight="1"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/msChartValueLabel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="2dp"
+        android:fontFamily="@font/manrope_semibold"
+        android:gravity="center"
+        android:includeFontPadding="false"
+        android:textColor="@color/ms_text_secondary"
+        android:textSize="10sp" />
+
+    <View
+        android:id="@+id/msChartBarSpacer"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <View
+        android:id="@+id/msChartBarFill"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0"
+        android:background="@drawable/ms_bg_chart_bar" />
+</LinearLayout>

@@ -23,42 +23,42 @@
     <color name="colorOnAccentDeep">#FFFFFF</color>
 
     <!-- Design-system source-of-truth aliases -->
-    <color name="color_grey_mid">#6F6A61</color>
+    <color name="color_grey_mid">@color/ms_text_secondary</color>
 
     <color name="colorSurfaceVariant">#EFEBE3</color>
     <color name="colorOnSurfaceVariant">#6F6A61</color>
     <color name="colorScrim">#99000000</color>
     <color name="colorOnScrim">#FFFFFF</color>
     <color name="colorLoadingScrim">#66000000</color>
-    <color name="colorBorderLight">#DED8CC</color>
+    <color name="colorBorderLight">@color/ms_border_default</color>
 
     <!-- Legacy aliases kept to avoid broken references -->
     <!-- #1A1A1A â€” aliases of colorPrimary: brand_primary, text_primary -->
     <!-- #FFFFFF â€” aliases of colorSurface / colorOnPrimary: background_primary, white -->
     <!-- #FAFAFA â€” aliases: background_loading (same as home_screen_bg, panier_screen_bg, profile_header_bg, home_surface_soft) -->
-    <color name="text_primary">#171717</color>
+    <color name="text_primary">@color/ms_text_primary</color>
     <!-- #666666 â€” aliases of colorOnSurfaceVariant: text_secondary -->
-    <color name="text_secondary">#6F6A61</color>
+    <color name="text_secondary">@color/ms_text_secondary</color>
     <!-- #A3A3A3 â€” aliases: text_tertiary (same as profile_text_muted, panier_delete_tint, home_nav_inactive, panier_nav_inactive, profile_nav_inactive) -->
-    <color name="text_tertiary">#918A7D</color>
+    <color name="text_tertiary">@color/ms_text_tertiary</color>
     <color name="white">#FFFFFF</color>
 
     <!-- Profile screen -->
     <!-- #FAFAFA â€” alias of background_loading -->
-    <color name="profile_header_bg">#F7F5F0</color>
+    <color name="profile_header_bg">@color/ms_surface_canvas</color>
     <!-- #FFFFFF â€” alias of colorSurface -->
-    <color name="profile_body_bg">#F7F5F0</color>
-    <color name="profile_divider">#E8E1D6</color>
+    <color name="profile_body_bg">@color/ms_surface_canvas</color>
+    <color name="profile_divider">@color/ms_border_subtle</color>
     <!-- #FFFFFF â€” alias of colorSurface -->
-    <color name="profile_card_bg">#FFFFFF</color>
+    <color name="profile_card_bg">@color/ms_surface_card</color>
     <!-- #F5F5F5 â€” alias of colorSurfaceVariant group (same as home_search_bg, home_category_bg, panier_card_image_bg, etc.) -->
-    <color name="profile_card_icon_bg">#EFEBE3</color>
+    <color name="profile_card_icon_bg">@color/ms_surface_sunken</color>
     <!-- #1A1A1A â€” alias of colorPrimary -->
-    <color name="profile_text_primary">#171717</color>
+    <color name="profile_text_primary">@color/ms_text_primary</color>
     <!-- #666666 â€” alias of colorOnSurfaceVariant -->
-    <color name="profile_text_secondary">#6F6A61</color>
+    <color name="profile_text_secondary">@color/ms_text_secondary</color>
     <!-- #A3A3A3 â€” alias of text_tertiary -->
-    <color name="profile_text_muted">#918A7D</color>
+    <color name="profile_text_muted">@color/ms_text_tertiary</color>
     <!-- #1A1A1A â€” alias of colorPrimary -->
     <color name="profile_accent">#74613F</color>
     <!-- #F5F5F5 â€” alias of colorSurfaceVariant group -->
@@ -77,19 +77,19 @@
     <color name="profile_edit_icon">#FFFFFF</color>
     <color name="profile_logout_bg">#FFFFFF</color>
     <color name="profile_logout_text">#171717</color>
-    <color name="profile_logout_border">#DED8CC</color>
+    <color name="profile_logout_border">@color/ms_border_default</color>
     <!-- #FFFFFF â€” alias of colorSurface -->
-    <color name="profile_nav_bg">#FFFFFF</color>
+    <color name="profile_nav_bg">@color/ms_surface_card</color>
     <!-- #A3A3A3 â€” alias of text_tertiary -->
-    <color name="profile_nav_inactive">#918A7D</color>
+    <color name="profile_nav_inactive">@color/ms_text_tertiary</color>
     <!-- #1A1A1A â€” alias of colorPrimary -->
-    <color name="profile_nav_active">#171717</color>
+    <color name="profile_nav_active">@color/ms_text_primary</color>
     <color name="profile_language_selected_bg">#171717</color>
     <color name="profile_language_selected_text">#FFFFFF</color>
     <color name="profile_language_unselected_bg">#FFFFFF</color>
     <color name="profile_language_unselected_text">#6F6A61</color>
-    <color name="profile_section_bg">#FFFFFF</color>
-    <color name="profile_section_stroke">#DED8CC</color>
+    <color name="profile_section_bg">@color/ms_surface_card</color>
+    <color name="profile_section_stroke">@color/ms_border_default</color>
 
     <!-- Panier screen -->
     <!-- #FAFAFA â€” alias of background_loading -->
@@ -112,43 +112,43 @@
 
     <!-- Home screen -->
     <!-- #FAFAFA â€” alias of background_loading -->
-    <color name="home_screen_bg">#F7F5F0</color>
+    <color name="home_screen_bg">@color/ms_surface_canvas</color>
     <!-- #1A1A1A â€” alias of colorPrimary -->
-    <color name="home_text_primary">#171717</color>
+    <color name="home_text_primary">@color/ms_text_primary</color>
     <!-- #666666 â€” alias of colorOnSurfaceVariant -->
-    <color name="home_text_secondary">#6F6A61</color>
+    <color name="home_text_secondary">@color/ms_text_secondary</color>
     <!-- #F5F5F5 â€” alias of colorSurfaceVariant group -->
-    <color name="home_search_bg">#EFEBE3</color>
+    <color name="home_search_bg">@color/ms_surface_sunken</color>
     <!-- #1A1A1A â€” alias of colorPrimary -->
     <color name="home_chip_bg">#171717</color>
     <color name="home_chip_text">#FFFFFF</color>
     <!-- #F5F5F5 â€” alias of colorSurfaceVariant group -->
-    <color name="home_category_bg">#EFEBE3</color>
+    <color name="home_category_bg">@color/ms_surface_sunken</color>
     <!-- #1A1A1A â€” alias of colorPrimary -->
     <!-- #FFFFFF â€” alias of colorSurface -->
-    <color name="home_product_surface">#FFFFFF</color>
+    <color name="home_product_surface">@color/ms_surface_card</color>
     <color name="home_heart_bg">#FFFFFF</color>
     <color name="home_heart_active">#B84A3A</color>
     <!-- #1A1A1A â€” alias of colorPrimary -->
     <!-- #FFFFFF â€” alias of colorSurface -->
-    <color name="home_nav_bg">#FFFFFF</color>
+    <color name="home_nav_bg">@color/ms_surface_card</color>
     <!-- #1A1A1A â€” alias of colorPrimary -->
-    <color name="home_nav_active">#171717</color>
+    <color name="home_nav_active">@color/ms_text_primary</color>
     <!-- #A3A3A3 â€” alias of text_tertiary -->
-    <color name="home_nav_inactive">#918A7D</color>
+    <color name="home_nav_inactive">@color/ms_text_tertiary</color>
     <!-- #EEEEEE â€” alias of colorOutline -->
-    <color name="home_divider">#E8E1D6</color>
+    <color name="home_divider">@color/ms_border_subtle</color>
     <!-- #FAFAFA â€” alias of background_loading -->
-    <color name="home_surface_soft">#F7F5F0</color>
+    <color name="home_surface_soft">@color/ms_surface_canvas</color>
     <!-- #FFFFFF â€” alias of colorSurface -->
-    <color name="home_surface_raised">#FFFFFF</color>
+    <color name="home_surface_raised">@color/ms_surface_card</color>
     <color name="home_hero_primary_start">#2B261E</color>
     <color name="home_hero_primary_end">#171717</color>
-    <color name="home_ref_bg">#FAF7F2</color>
-    <color name="home_ref_surface">#FFFFFF</color>
+    <color name="home_ref_bg">@color/ms_surface_canvas</color>
+    <color name="home_ref_surface">@color/ms_surface_card</color>
     <color name="home_ref_surface_alt">#F4F1EC</color>
-    <color name="home_ref_text_primary">#141414</color>
-    <color name="home_ref_text_secondary">#8B867D</color>
+    <color name="home_ref_text_primary">@color/ms_text_primary</color>
+    <color name="home_ref_text_secondary">@color/ms_text_secondary</color>
     <color name="home_ref_text_tertiary">#B3ADA2</color>
     <color name="home_ref_gold">#B7904F</color>
     <color name="home_ref_gold_soft">#E8D2A9</color>
@@ -167,30 +167,30 @@
     <color name="home_ref_badge_icon">#A98443</color>
     <color name="home_ref_nav_icon">#5E574C</color>
     <color name="home_ref_shadow">#14000000</color>
-    <color name="product_card_surface">#F7F5F0</color>
-    <color name="product_card_image_surface">#EFEBE3</color>
-    <color name="product_card_floating_surface">#FFFFFF</color>
+    <color name="product_card_surface">@color/ms_surface_canvas</color>
+    <color name="product_card_image_surface">@color/ms_surface_sunken</color>
+    <color name="product_card_floating_surface">@color/ms_surface_card</color>
     <color name="chip_popular_bg">#ECEAE5</color>
     <color name="product_card_chip_bg">#EEE8DE</color>
     <color name="product_card_chip_text">#74613F</color>
     <color name="product_card_rating_text">#74613F</color>
     <!-- #F5F5F5 â€” alias of colorSurfaceVariant group -->
-    <color name="home_hero_secondary_bg">#EFEBE3</color>
+    <color name="home_hero_secondary_bg">@color/ms_surface_sunken</color>
     <!-- #EEEEEE â€” alias of colorOutline -->
-    <color name="home_hero_secondary_stroke">#DED8CC</color>
-    <color name="home_category_tile_bg">#FFFFFF</color>
+    <color name="home_hero_secondary_stroke">@color/ms_border_default</color>
+    <color name="home_category_tile_bg">@color/ms_surface_card</color>
     <!-- #EEEEEE â€” alias of colorOutline -->
-    <color name="home_category_tile_stroke">#DED8CC</color>
+    <color name="home_category_tile_stroke">@color/ms_border_default</color>
     <!-- #F5F5F5 â€” alias of colorSurfaceVariant group -->
-    <color name="home_meta_bg">#EFEBE3</color>
+    <color name="home_meta_bg">@color/ms_surface_sunken</color>
     <!-- #1A1A1A â€” alias of colorPrimary -->
-    <color name="home_meta_text">#171717</color>
+    <color name="home_meta_text">@color/ms_text_primary</color>
 
     <!-- Product details & Checkout -->
-    <color name="details_background">#F7F5F0</color>
-    <color name="details_topbar_bg">#FFFFFF</color>
-    <color name="details_text_primary">#171717</color>
-    <color name="details_text_muted">#6F6A61</color>
+    <color name="details_background">@color/ms_surface_canvas</color>
+    <color name="details_topbar_bg">@color/ms_surface_card</color>
+    <color name="details_text_primary">@color/ms_text_primary</color>
+    <color name="details_text_muted">@color/ms_text_secondary</color>
     <color name="details_star">#74613F</color>
 
     <!-- Drawable gradient colors (extracted from hardcoded hex in drawables) -->
@@ -238,23 +238,55 @@
     <color name="status_chip_text_cancelled">#1A1A1A</color>
 
     <!-- Semantic colors (renamed from auto-extracted hex names) -->
+    <!-- Overlay tokens -->
+    <color name="overlay_black_0">#00000000</color>
+    <color name="overlay_black_20">#33000000</color>
+    <color name="overlay_black_30">#4D000000</color>
+    <color name="overlay_black_40">#66000000</color>
+    <color name="overlay_black_44">#70000000</color>
+    <color name="overlay_black_50">#80000000</color>
+    <color name="overlay_black_70">#B3000000</color>
+    <color name="overlay_black_76">#C2000000</color>
+    <color name="overlay_black_80">#CC000000</color>
+    <color name="overlay_black_90">#E6000000</color>
     <!-- White overlays at various opacities -->
     <color name="overlay_white_8">#14FFFFFF</color>
     <color name="overlay_white_12">#1FFFFFFF</color>
     <color name="overlay_white_15">#26FFFFFF</color>
     <color name="overlay_white_20">#33FFFFFF</color>
+    <color name="overlay_white_70">#B3FFFFFF</color>
     <color name="overlay_white_80">#CCFFFFFF</color>
     <color name="overlay_white_90">#E6FFFFFF</color>
+
+    <!-- Extracted marketplace drawable colors -->
+    <color name="market_dark_gradient_start">#2A2620</color>
+    <color name="market_dark_gradient_end">#0F0E0D</color>
+    <color name="market_admin_dark_start">#2B261E</color>
+    <color name="market_admin_dark_alt">#2A241B</color>
+    <color name="market_admin_dark_end">#151311</color>
+    <color name="market_gold_gradient_start">#D9B47D</color>
+    <color name="market_gold_gradient_mid">#B7904F</color>
+    <color name="market_gold_gradient_end">#7A5B2A</color>
+    <color name="market_gold_overlay_10">#1AB7904F</color>
+    <color name="market_gold_overlay_20">#33B7904F</color>
+    <color name="market_gold_overlay_24">#3DB7904F</color>
+    <color name="market_gold_overlay_32">#52B7904F</color>
+    <color name="market_gold_soft_overlay">#33EDD09A</color>
+    <color name="market_home_dot_inactive">#DFDFDF</color>
+    <color name="illustration_ai_green">#2C4A42</color>
+    <color name="illustration_ai_green_dark">#142D28</color>
+    <color name="illustration_ai_mint">#32D6A4</color>
+    <color name="illustration_ai_gold">#D3B073</color>
 
     <!-- Warm surface tones (admin / product details) -->
     <color name="surface_warm_muted">#D6CEC0</color>
     <!-- #F4F0EC â€” same value as admin_stat_neutral_bg -->
-    <color name="surface_warm">#EFEBE3</color>
-    <color name="surface_warm_border">#DED8CC</color>
+    <color name="surface_warm">@color/ms_surface_sunken</color>
+    <color name="surface_warm_border">@color/ms_border_default</color>
 
     <!-- Neutral surfaces and borders -->
     <!-- #F5F5F5 â€” duplicates colorSurfaceVariant group -->
-    <color name="surface_neutral">#EFEBE3</color>
+    <color name="surface_neutral">@color/ms_surface_sunken</color>
     <color name="border_medium">#D6CEC0</color>
 
     <!-- Status / semantic feedback colors -->
@@ -272,14 +304,14 @@
     <color name="profile_accent_text">#171717</color>
     <color name="profile_location_bg">#F1EEE8</color>
     <color name="profile_location_icon">#74613F</color>
-    <color name="panier_screen_bg">#F7F5F0</color>
-    <color name="panier_topbar_icon">#171717</color>
-    <color name="panier_text_primary">#171717</color>
-    <color name="panier_text_secondary">#6F6A61</color>
-    <color name="panier_card_bg">#FFFFFF</color>
+    <color name="panier_screen_bg">@color/ms_surface_canvas</color>
+    <color name="panier_topbar_icon">@color/ms_text_primary</color>
+    <color name="panier_text_primary">@color/ms_text_primary</color>
+    <color name="panier_text_secondary">@color/ms_text_secondary</color>
+    <color name="panier_card_bg">@color/ms_surface_card</color>
     <color name="panier_card_image_bg">#F1EEE8</color>
-    <color name="panier_summary_divider">#DED8CC</color>
-    <color name="panier_cta_bg">#171717</color>
+    <color name="panier_summary_divider">@color/ms_border_default</color>
+    <color name="panier_cta_bg">@color/ms_surface_inverse</color>
     <color name="home_banner_text">#FFFFFF</color>
     <color name="home_category_icon">#74613F</color>
     <color name="home_add_cart_bg">#171717</color>
@@ -293,10 +325,80 @@
     <color name="banner_secondary_gradient_start">#EFEBE3</color>
     <color name="banner_secondary_gradient_center">#D6CEC0</color>
     <color name="banner_secondary_gradient_end">#A99772</color>
-    <color name="search_skeleton_bg">#EFEBE3</color>
+    <color name="search_skeleton_bg">@color/ms_surface_sunken</color>
     <color name="warning_box_bg">#FFF8E8</color>
     <color name="warning_box_stroke">#E0C493</color>
-    <color name="details_chip_bg">#EFEBE3</color>
+    <color name="details_chip_bg">@color/ms_surface_sunken</color>
     <color name="details_quantity_bg">#FFFFFF</color>
-    <color name="details_quantity_stroke">#DED8CC</color>
+    <color name="details_quantity_stroke">@color/ms_border_default</color>
+
+    <!-- ============================================================ -->
+    <!-- Marketplace design system (Phase 0)                          -->
+    <!-- ms_* tokens for admin + vendor rebuild. Do not reuse outside  -->
+    <!-- the new marketplace surfaces; legacy aliases above stay.     -->
+    <!-- ============================================================ -->
+
+    <!-- Surface tiers -->
+    <color name="ms_surface_canvas">#F7F5F0</color>
+    <color name="ms_surface_card">#FFFFFF</color>
+    <color name="ms_surface_sunken">#EFEBE3</color>
+    <color name="ms_surface_inverse">#171717</color>
+    <color name="ms_surface_inverse_soft">#262626</color>
+
+    <!-- Text tiers -->
+    <color name="ms_text_primary">#171717</color>
+    <color name="ms_text_secondary">#6F6A61</color>
+    <color name="ms_text_tertiary">#A8A095</color>
+    <color name="ms_text_inverse">#FFFFFF</color>
+    <color name="ms_text_inverse_muted">#C9C2B3</color>
+    <color name="ms_text_link">#74613F</color>
+
+    <!-- Borders / dividers -->
+    <color name="ms_border_subtle">#ECE7DC</color>
+    <color name="ms_border_default">#DED8CC</color>
+    <color name="ms_border_strong">#B7B0A1</color>
+
+    <!-- Accent (kept from existing brand gold) -->
+    <color name="ms_accent_gold">#B8965A</color>
+    <color name="ms_accent_gold_soft">#E3C98E</color>
+    <color name="ms_accent_gold_bg">#FAF3E1</color>
+
+    <!-- Status — vendor + product approval workflow -->
+    <color name="ms_status_pending_fg">#7A5A12</color>
+    <color name="ms_status_pending_bg">#FFF3D1</color>
+    <color name="ms_status_approved_fg">#15633C</color>
+    <color name="ms_status_approved_bg">#DCF3E5</color>
+    <color name="ms_status_rejected_fg">#9C2D28</color>
+    <color name="ms_status_rejected_bg">#FBE0DC</color>
+    <color name="ms_status_draft_fg">#4B4A45</color>
+    <color name="ms_status_draft_bg">#ECE9E2</color>
+    <color name="ms_status_archived_fg">#4B5563</color>
+    <color name="ms_status_archived_bg">#E5E7EB</color>
+    <color name="ms_status_info_fg">#1F4FA8</color>
+    <color name="ms_status_info_bg">#E0EAFB</color>
+
+    <!-- Order status -->
+    <color name="ms_order_pending">#D38A1D</color>
+    <color name="ms_order_confirmed">#1F4FA8</color>
+    <color name="ms_order_preparing">#6B4FB8</color>
+    <color name="ms_order_shipped">#0E7C95</color>
+    <color name="ms_order_delivered">#1F8A5B</color>
+    <color name="ms_order_cancelled">#B84A3A</color>
+
+    <!-- Chart palette (analytics) -->
+    <color name="ms_chart_1">#B8965A</color>
+    <color name="ms_chart_2">#1F8A5B</color>
+    <color name="ms_chart_3">#1F4FA8</color>
+    <color name="ms_chart_4">#B84A3A</color>
+    <color name="ms_chart_5">#6B4FB8</color>
+    <color name="ms_chart_grid">#ECE7DC</color>
+
+    <!-- Skeleton -->
+    <color name="ms_skeleton_base">#ECE7DC</color>
+    <color name="ms_skeleton_highlight">#F7F2E6</color>
+
+    <!-- Press / ripple -->
+    <color name="ms_ripple_on_light">#1A171717</color>
+    <color name="ms_ripple_on_dark">#33FFFFFF</color>
+
 </resources>

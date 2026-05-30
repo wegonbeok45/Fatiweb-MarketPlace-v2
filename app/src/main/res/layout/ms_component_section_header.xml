@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Marketplace section header. Bind: msSectionTitle, msSectionAction. -->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:minHeight="@dimen/ms_min_touch">
+
+    <View
+        android:layout_width="3dp"
+        android:layout_height="14dp"
+        android:background="@drawable/ms_bg_section_marker" />
+
+    <TextView
+        android:id="@+id/msSectionTitle"
+        style="@style/Ms.Text.SectionHeader"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginStart="@dimen/space_10"
+        tools:text="Vue d'ensemble" />
+
+    <TextView
+        android:id="@+id/msSectionAction"
+        style="@style/Ms.Text.Label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingStart="@dimen/space_8"
+        android:paddingEnd="@dimen/space_4"
+        android:paddingTop="@dimen/space_4"
+        android:paddingBottom="@dimen/space_4"
+        android:background="?selectableItemBackgroundBorderless"
+        android:clickable="true"
+        android:focusable="true"
+        android:textColor="@color/ms_text_link"
+        android:visibility="gone"
+        tools:text="Tout voir"
+        tools:visibility="visible" />
+</LinearLayout>

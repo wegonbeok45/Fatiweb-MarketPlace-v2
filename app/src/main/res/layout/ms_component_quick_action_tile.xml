@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Marketplace quick action tile. Bind: msTileIcon, msTileTitle, msTileSubtitle. -->
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/Ms.Card.Surface"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:minHeight="@dimen/ms_quick_tile_min_height"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="@dimen/space_16"
+        android:paddingEnd="@dimen/space_16"
+        android:paddingTop="@dimen/space_14"
+        android:paddingBottom="@dimen/space_14">
+
+        <FrameLayout
+            android:layout_width="@dimen/ms_icon_chip_size"
+            android:layout_height="@dimen/ms_icon_chip_size"
+            android:background="@drawable/ms_bg_icon_chip_gold">
+
+            <ImageView
+                android:id="@+id/msTileIcon"
+                android:layout_width="@dimen/ms_icon_chip_inner"
+                android:layout_height="@dimen/ms_icon_chip_inner"
+                android:layout_gravity="center"
+                android:importantForAccessibility="no"
+                app:tint="@color/ms_accent_gold"
+                tools:srcCompat="@android:drawable/ic_menu_add" />
+        </FrameLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="@dimen/space_12"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/msTileTitle"
+                style="@style/Ms.Text.BodyStrong"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="Ajouter un produit" />
+
+            <TextView
+                android:id="@+id/msTileSubtitle"
+                style="@style/Ms.Text.Label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:visibility="gone"
+                tools:text="Photos, prix, stock"
+                tools:visibility="visible" />
+        </LinearLayout>
+
+        <ImageView
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:importantForAccessibility="no"
+            android:rotation="180"
+            app:srcCompat="@drawable/back"
+            app:tint="@color/ms_text_tertiary" />
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

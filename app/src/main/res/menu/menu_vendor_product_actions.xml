@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/vendorProductActionPublish"
+        android:title="@string/ms_action_publish" />
+    <item
+        android:id="@+id/vendorProductActionUnpublish"
+        android:title="@string/ms_action_unpublish" />
+    <item
+        android:id="@+id/vendorProductActionDiscount"
+        android:title="@string/vendor_products_action_discount" />
+    <item
+        android:id="@+id/vendorProductActionRemoveDiscount"
+        android:title="@string/vendor_products_action_remove_discount" />
+    <item
+        android:id="@+id/vendorProductActionDuplicate"
+        android:title="@string/ms_action_duplicate" />
+    <item
+        android:id="@+id/vendorProductActionArchive"
+        android:title="@string/ms_action_archive" />
+    <item
+        android:id="@+id/vendorProductActionDelete"
+        android:title="@string/ms_action_delete" />
+</menu>

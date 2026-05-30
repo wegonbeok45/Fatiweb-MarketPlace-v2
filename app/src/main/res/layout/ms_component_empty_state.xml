@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Empty state. Bind: msEmptyIcon, msEmptyTitle, msEmptySubtitle, msEmptyCta. -->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    android:paddingStart="@dimen/space_24"
+    android:paddingEnd="@dimen/space_24"
+    android:paddingTop="@dimen/space_32"
+    android:paddingBottom="@dimen/space_32">
+
+    <ImageView
+        android:id="@+id/msEmptyIcon"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:importantForAccessibility="no"
+        android:background="@drawable/ms_bg_icon_chip_gold"
+        android:padding="@dimen/space_16"
+        app:tint="@color/ms_accent_gold"
+        tools:srcCompat="@android:drawable/ic_menu_info_details" />
+
+    <TextView
+        android:id="@+id/msEmptyTitle"
+        style="@style/Ms.Text.Subtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_16"
+        android:gravity="center"
+        tools:text="Aucun élément" />
+
+    <TextView
+        android:id="@+id/msEmptySubtitle"
+        style="@style/Ms.Text.Body"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_8"
+        android:gravity="center"
+        tools:text="Vous n'avez encore rien ici. Commencez par ajouter votre premier produit." />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/msEmptyCta"
+        style="@style/Ms.Button.Primary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_20"
+        android:paddingStart="@dimen/space_24"
+        android:paddingEnd="@dimen/space_24"
+        android:visibility="gone"
+        tools:text="Ajouter"
+        tools:visibility="visible" />
+</LinearLayout>

@@ -1,14 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="screen_padding_horizontal">24dp</dimen>
-    <dimen name="screen_padding_vertical">16dp</dimen>
-    <dimen name="text_size_title_large">24sp</dimen>
-    <dimen name="text_size_title">20sp</dimen>
-    <dimen name="text_size_subtitle">16sp</dimen>
-    <dimen name="text_size_body">14sp</dimen>
-    <dimen name="text_size_caption">12sp</dimen>
-    <dimen name="text_size_overline">11sp</dimen>
-    <dimen name="home_horizontal_padding">24dp</dimen>
-    <dimen name="details_horizontal_padding">24dp</dimen>
-</resources>
+    <!-- Tablet layout (sw ≥ 600 dp) -->
 
+    <!-- Screen chrome -->
+    <dimen name="screen_padding_horizontal">48dp</dimen>
+    <dimen name="screen_padding_vertical">24dp</dimen>
+    <dimen name="screen_section_gap">24dp</dimen>
+    <dimen name="screen_section_gap_small">12dp</dimen>
+
+    <!-- Auth -->
+    <dimen name="auth_screen_padding_compact">40dp</dimen>
+    <dimen name="auth_hero_height_compact">200dp</dimen>
+    <dimen name="auth_hero_height_register">200dp</dimen>
+
+    <!-- Top bar -->
+    <dimen name="app_top_bar_height">64dp</dimen>
+    <dimen name="app_top_bar_horizontal_padding">48dp</dimen>
+
+    <!-- Buttons + inputs -->
+    <dimen name="button_height">52dp</dimen>
+    <dimen name="input_height">52dp</dimen>
+
+    <!-- Corner radii (slightly larger on tablets) -->
+    <dimen name="corner_radius_large">16dp</dimen>
+
+    <!-- Type scale — bumped 1 step for tablets -->
+    <dimen name="text_size_title_large">28sp</dimen>
+    <dimen name="text_size_title">22sp</dimen>
+    <dimen name="text_size_subtitle">17sp</dimen>
+    <dimen name="text_size_body">15sp</dimen>
+    <dimen name="text_size_caption">13sp</dimen>
+    <dimen name="text_size_overline">11sp</dimen>
+
+    <!-- Screen-specific horizontal padding -->
+    <dimen name="home_horizontal_padding">48dp</dimen>
+    <dimen name="details_horizontal_padding">48dp</dimen>
+
+    <!-- Ms component sizes -->
+    <dimen name="ms_radius_md">12dp</dimen>
+    <dimen name="ms_radius_lg">20dp</dimen>
+    <dimen name="ms_component_height_sm">44dp</dimen>
+    <dimen name="ms_component_height_md">56dp</dimen>
+    <dimen name="ms_component_height_lg">72dp</dimen>
+</resources>

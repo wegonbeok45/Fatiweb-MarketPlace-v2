@@ -74,17 +74,19 @@
     </style>
 
     <style name="AppButton.Primary" parent="AppButton.Base">
-        <item name="backgroundTint">@color/colorAccentDeep</item>
-        <item name="android:textColor">@color/colorOnAccentDeep</item>
+        <item name="backgroundTint">@color/ms_surface_inverse</item>
+        <item name="android:textColor">@color/ms_text_inverse</item>
         <item name="strokeWidth">@dimen/space_0</item>
-        <item name="elevation">@dimen/space_0</item>
+        <item name="elevation">@dimen/ms_elev_0</item>
+        <item name="rippleColor">@color/ms_ripple_on_dark</item>
     </style>
 
     <style name="AppButton.Secondary" parent="AppButton.Base">
-        <item name="backgroundTint">@color/colorSurface</item>
-        <item name="android:textColor">@color/colorOnSurface</item>
-        <item name="strokeColor">@color/colorOutline</item>
-        <item name="strokeWidth">@dimen/stroke_width_default</item>
+        <item name="backgroundTint">@color/ms_surface_card</item>
+        <item name="android:textColor">@color/ms_text_primary</item>
+        <item name="strokeColor">@color/ms_border_default</item>
+        <item name="strokeWidth">@dimen/ms_stroke_hairline</item>
+        <item name="rippleColor">@color/ms_ripple_on_light</item>
     </style>
 
     <style name="AppButton.Text" parent="Widget.MaterialComponents.Button.TextButton">
@@ -101,12 +103,12 @@
     </style>
 
     <style name="AppInput.Layout" parent="Widget.MaterialComponents.CardView">
-        <item name="android:layout_height">@dimen/input_height</item>
-        <item name="cardBackgroundColor">@color/colorSurface</item>
-        <item name="cardCornerRadius">@dimen/corner_radius_medium</item>
-        <item name="cardElevation">@dimen/space_0</item>
-        <item name="strokeColor">@color/colorOutline</item>
-        <item name="strokeWidth">@dimen/stroke_width_default</item>
+        <item name="android:layout_height">@dimen/ms_input_height</item>
+        <item name="cardBackgroundColor">@color/ms_surface_card</item>
+        <item name="cardCornerRadius">@dimen/ms_radius_md</item>
+        <item name="cardElevation">@dimen/ms_elev_0</item>
+        <item name="strokeColor">@color/ms_border_default</item>
+        <item name="strokeWidth">@dimen/ms_stroke_hairline</item>
     </style>
 
     <style name="AppInput.EditText" parent="">
@@ -120,12 +122,49 @@
         <item name="android:paddingEnd">@dimen/space_16</item>
     </style>
 
+    <style name="AppInput.TextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="boxBackgroundColor">@color/ms_surface_card</item>
+        <item name="boxStrokeColor">@color/ms_border_default</item>
+        <item name="boxStrokeWidth">@dimen/ms_stroke_hairline</item>
+        <item name="boxStrokeWidthFocused">1dp</item>
+        <item name="boxCornerRadiusTopStart">@dimen/ms_radius_md</item>
+        <item name="boxCornerRadiusTopEnd">@dimen/ms_radius_md</item>
+        <item name="boxCornerRadiusBottomStart">@dimen/ms_radius_md</item>
+        <item name="boxCornerRadiusBottomEnd">@dimen/ms_radius_md</item>
+        <item name="hintTextColor">@color/ms_text_secondary</item>
+        <item name="android:textColorHint">@color/ms_text_secondary</item>
+        <item name="hintTextAppearance">@style/AppInput.HintText</item>
+        <item name="startIconTint">@color/ms_text_tertiary</item>
+        <item name="errorTextAppearance">@style/AppInput.ErrorText</item>
+    </style>
+
+    <style name="AppInput.TextInputEditText" parent="">
+        <item name="android:minHeight">@dimen/ms_input_height</item>
+        <item name="android:fontFamily">@font/manrope_regular</item>
+        <item name="android:textSize">@dimen/text_size_input</item>
+        <item name="android:textColor">@color/ms_text_primary</item>
+        <item name="android:textColorHint">@color/ms_text_secondary</item>
+        <item name="android:paddingStart">12dp</item>
+        <item name="android:paddingEnd">12dp</item>
+        <item name="android:includeFontPadding">true</item>
+    </style>
+
+    <style name="AppInput.HintText" parent="">
+        <item name="android:fontFamily">@font/manrope_medium</item>
+        <item name="android:textSize">@dimen/text_size_caption</item>
+        <item name="android:textColor">@color/ms_text_secondary</item>
+    </style>
+
+    <style name="AppInput.ErrorText" parent="AppInput.HintText">
+        <item name="android:textColor">@color/colorError</item>
+    </style>
+
     <style name="AppCard" parent="Widget.MaterialComponents.CardView">
-        <item name="cardCornerRadius">@dimen/corner_radius_large</item>
-        <item name="cardElevation">@dimen/space_0</item>
-        <item name="cardBackgroundColor">@color/colorSurface</item>
-        <item name="strokeWidth">@dimen/stroke_width_default</item>
-        <item name="strokeColor">@color/colorBorderLight</item>
+        <item name="cardCornerRadius">@dimen/ms_radius_lg</item>
+        <item name="cardElevation">@dimen/ms_elev_0</item>
+        <item name="cardBackgroundColor">@color/ms_surface_card</item>
+        <item name="strokeWidth">@dimen/ms_stroke_hairline</item>
+        <item name="strokeColor">@color/ms_border_subtle</item>
         <item name="cardUseCompatPadding">false</item>
     </style>
 
@@ -372,9 +411,9 @@
         <item name="android:minHeight">@dimen/button_height</item>
         <item name="android:paddingTop">14dp</item>
         <item name="android:paddingBottom">14dp</item>
-        <item name="backgroundTint">@color/panier_cta_bg</item>
-        <item name="cornerRadius">@dimen/panier_checkout_radius</item>
-        <item name="android:textColor">@color/colorOnPrimary</item>
+        <item name="backgroundTint">@color/ms_surface_inverse</item>
+        <item name="cornerRadius">@dimen/ms_radius_md</item>
+        <item name="android:textColor">@color/ms_text_inverse</item>
         <item name="android:textAllCaps">false</item>
         <item name="android:letterSpacing">0</item>
         <item name="android:textSize">@dimen/panier_text_size_checkout</item>
@@ -488,5 +527,221 @@
         <item name="android:windowBackground">@android:color/transparent</item>
     </style>
 
-</resources>
+    <!-- ============================================================ -->
+    <!-- Marketplace design system (Phase 0)                          -->
+    <!-- Ms.* styles for admin + vendor rebuild.                      -->
+    <!-- ============================================================ -->
 
+    <!-- ====== Text ====== -->
+    <style name="Ms.Text" parent="">
+        <item name="android:fontFamily">@font/manrope</item>
+        <item name="android:textColor">@color/ms_text_primary</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
+
+    <style name="Ms.Text.Display" parent="Ms.Text">
+        <item name="android:fontFamily">@font/manrope_semibold</item>
+        <item name="android:textSize">@dimen/ms_text_display</item>
+        <item name="android:lineSpacingExtra">2dp</item>
+    </style>
+
+    <style name="Ms.Text.Title" parent="Ms.Text">
+        <item name="android:fontFamily">@font/manrope_semibold</item>
+        <item name="android:textSize">@dimen/ms_text_title</item>
+    </style>
+
+    <style name="Ms.Text.Subtitle" parent="Ms.Text">
+        <item name="android:fontFamily">@font/manrope_semibold</item>
+        <item name="android:textSize">@dimen/ms_text_subtitle</item>
+    </style>
+
+    <style name="Ms.Text.Body" parent="Ms.Text">
+        <item name="android:fontFamily">@font/manrope_regular</item>
+        <item name="android:textSize">@dimen/ms_text_body</item>
+        <item name="android:textColor">@color/ms_text_secondary</item>
+        <item name="android:lineSpacingExtra">2dp</item>
+    </style>
+
+    <style name="Ms.Text.BodyStrong" parent="Ms.Text.Body">
+        <item name="android:fontFamily">@font/manrope_semibold</item>
+        <item name="android:textColor">@color/ms_text_primary</item>
+    </style>
+
+    <style name="Ms.Text.Label" parent="Ms.Text">
+        <item name="android:fontFamily">@font/manrope_medium</item>
+        <item name="android:textSize">@dimen/ms_text_label</item>
+        <item name="android:textColor">@color/ms_text_secondary</item>
+    </style>
+
+    <style name="Ms.Text.Overline" parent="Ms.Text">
+        <item name="android:fontFamily">@font/manrope_semibold</item>
+        <item name="android:textSize">@dimen/ms_text_overline</item>
+        <item name="android:textColor">@color/ms_text_tertiary</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:letterSpacing">0.10</item>
+    </style>
+
+    <style name="Ms.Text.KpiValue" parent="Ms.Text">
+        <item name="android:fontFamily">@font/manrope_semibold</item>
+        <item name="android:textSize">@dimen/ms_text_kpi_value</item>
+        <item name="android:textColor">@color/ms_text_primary</item>
+        <item name="android:includeFontPadding">false</item>
+    </style>
+
+    <style name="Ms.Text.Caption" parent="Ms.Text">
+        <item name="android:fontFamily">@font/manrope_regular</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">@color/ms_text_secondary</item>
+    </style>
+
+    <style name="Ms.Text.SectionHeader" parent="Ms.Text">
+        <item name="android:fontFamily">@font/manrope_semibold</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:textColor">@color/ms_text_primary</item>
+    </style>
+
+    <!-- ====== Cards ====== -->
+    <style name="Ms.Card" parent="Widget.MaterialComponents.CardView">
+        <item name="cardCornerRadius">@dimen/ms_radius_lg</item>
+        <item name="cardElevation">@dimen/ms_elev_0</item>
+        <item name="cardBackgroundColor">@color/ms_surface_card</item>
+        <item name="strokeColor">@color/ms_border_subtle</item>
+        <item name="strokeWidth">@dimen/ms_stroke_hairline</item>
+        <item name="contentPadding">0dp</item>
+    </style>
+
+    <style name="Ms.Card.Surface" parent="Ms.Card" />
+
+    <style name="Ms.Card.Elevated" parent="Ms.Card">
+        <item name="cardElevation">@dimen/ms_elev_3</item>
+        <item name="strokeWidth">0dp</item>
+    </style>
+
+    <style name="Ms.Card.Hero" parent="Ms.Card">
+        <item name="cardBackgroundColor">@color/ms_surface_inverse</item>
+        <item name="cardCornerRadius">@dimen/ms_radius_xl</item>
+        <item name="strokeWidth">0dp</item>
+    </style>
+
+    <!-- ====== Buttons ====== -->
+    <style name="Ms.Button" parent="Widget.MaterialComponents.Button">
+        <item name="android:minHeight">@dimen/ms_button_height</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="android:textSize">@dimen/ms_text_body</item>
+        <item name="android:fontFamily">@font/manrope_semibold</item>
+        <item name="cornerRadius">@dimen/ms_radius_md</item>
+        <item name="iconPadding">8dp</item>
+        <item name="iconGravity">textStart</item>
+    </style>
+
+    <style name="Ms.Button.Primary" parent="Ms.Button">
+        <item name="backgroundTint">@color/ms_surface_inverse</item>
+        <item name="android:textColor">@color/ms_text_inverse</item>
+        <item name="iconTint">@color/ms_accent_gold_soft</item>
+        <item name="rippleColor">@color/ms_ripple_on_dark</item>
+    </style>
+
+    <style name="Ms.Button.Secondary" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="android:minHeight">@dimen/ms_button_height</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="android:textSize">@dimen/ms_text_body</item>
+        <item name="android:fontFamily">@font/manrope_semibold</item>
+        <item name="android:textColor">@color/ms_text_primary</item>
+        <item name="cornerRadius">@dimen/ms_radius_md</item>
+        <item name="strokeColor">@color/ms_border_default</item>
+        <item name="strokeWidth">@dimen/ms_stroke_hairline</item>
+        <item name="rippleColor">@color/ms_ripple_on_light</item>
+    </style>
+
+    <style name="Ms.Button.Ghost" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="android:minHeight">@dimen/ms_button_height_compact</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="android:textSize">@dimen/ms_text_body</item>
+        <item name="android:fontFamily">@font/manrope_semibold</item>
+        <item name="android:textColor">@color/ms_text_primary</item>
+        <item name="rippleColor">@color/ms_ripple_on_light</item>
+    </style>
+
+    <style name="Ms.Button.Danger" parent="Ms.Button.Primary">
+        <item name="backgroundTint">@color/colorError</item>
+        <item name="iconTint">@color/ms_text_inverse</item>
+    </style>
+
+    <style name="Ms.Chip.Filter" parent="Widget.MaterialComponents.Chip.Choice">
+        <item name="chipMinHeight">36dp</item>
+        <item name="chipCornerRadius">@dimen/ms_radius_pill</item>
+        <item name="chipBackgroundColor">@color/ms_surface_sunken</item>
+        <item name="chipStrokeColor">@color/ms_border_default</item>
+        <item name="chipStrokeWidth">@dimen/ms_stroke_hairline</item>
+        <item name="android:textColor">@color/ms_text_primary</item>
+        <item name="android:textSize">@dimen/ms_text_label</item>
+        <item name="android:fontFamily">@font/manrope_semibold</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="rippleColor">@color/ms_ripple_on_light</item>
+    </style>
+
+    <style name="Ms.Chip.Action" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="android:minHeight">36dp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="android:textSize">@dimen/ms_text_label</item>
+        <item name="android:fontFamily">@font/manrope_semibold</item>
+        <item name="android:textColor">@color/ms_text_primary</item>
+        <item name="cornerRadius">@dimen/ms_radius_pill</item>
+        <item name="strokeColor">@color/ms_border_default</item>
+        <item name="strokeWidth">@dimen/ms_stroke_hairline</item>
+        <item name="backgroundTint">@color/ms_surface_card</item>
+        <item name="rippleColor">@color/ms_ripple_on_light</item>
+    </style>
+
+    <!-- ====== Status chips ====== -->
+    <style name="Ms.Chip.Status" parent="">
+        <item name="android:minHeight">@dimen/ms_pill_height</item>
+        <item name="android:paddingStart">10dp</item>
+        <item name="android:paddingEnd">10dp</item>
+        <item name="android:paddingTop">3dp</item>
+        <item name="android:paddingBottom">3dp</item>
+        <item name="android:fontFamily">@font/manrope_semibold</item>
+        <item name="android:textSize">@dimen/ms_text_overline</item>
+        <item name="android:gravity">center</item>
+        <item name="android:includeFontPadding">false</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:letterSpacing">0.02</item>
+    </style>
+
+    <style name="Ms.Chip.Status.Pending" parent="Ms.Chip.Status">
+        <item name="android:textColor">@color/ms_status_pending_fg</item>
+        <item name="android:background">@drawable/ms_bg_status_pending</item>
+    </style>
+
+    <style name="Ms.Chip.Status.Approved" parent="Ms.Chip.Status">
+        <item name="android:textColor">@color/ms_status_approved_fg</item>
+        <item name="android:background">@drawable/ms_bg_status_approved</item>
+    </style>
+
+    <style name="Ms.Chip.Status.Rejected" parent="Ms.Chip.Status">
+        <item name="android:textColor">@color/ms_status_rejected_fg</item>
+        <item name="android:background">@drawable/ms_bg_status_rejected</item>
+    </style>
+
+    <style name="Ms.Chip.Status.Draft" parent="Ms.Chip.Status">
+        <item name="android:textColor">@color/ms_status_draft_fg</item>
+        <item name="android:background">@drawable/ms_bg_status_draft</item>
+    </style>
+
+    <style name="Ms.Chip.Status.Archived" parent="Ms.Chip.Status">
+        <item name="android:textColor">@color/ms_status_archived_fg</item>
+        <item name="android:background">@drawable/ms_bg_status_archived</item>
+    </style>
+
+    <style name="Ms.Chip.Status.Info" parent="Ms.Chip.Status">
+        <item name="android:textColor">@color/ms_status_info_fg</item>
+        <item name="android:background">@drawable/ms_bg_status_info</item>
+    </style>
+
+</resources>

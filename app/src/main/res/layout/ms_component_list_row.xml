@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Marketplace generic list row. Bind:
+     msRowAvatar, msRowTitle, msRowSubtitle, msRowMeta, msRowStatus, msRowChevron. -->
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:minHeight="@dimen/ms_list_row_min_height_lg"
+    android:background="?selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true"
+    android:paddingStart="@dimen/space_16"
+    android:paddingEnd="@dimen/space_16"
+    android:paddingTop="@dimen/space_12"
+    android:paddingBottom="@dimen/space_12">
+
+    <ImageView
+        android:id="@+id/msRowAvatar"
+        android:layout_width="@dimen/ms_avatar_md"
+        android:layout_height="@dimen/ms_avatar_md"
+        android:scaleType="centerCrop"
+        android:background="@drawable/ms_bg_icon_chip_dark"
+        android:importantForAccessibility="no"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        tools:srcCompat="@color/ms_surface_sunken" />
+
+    <TextView
+        android:id="@+id/msRowTitle"
+        style="@style/Ms.Text.BodyStrong"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/space_12"
+        android:maxLines="1"
+        android:ellipsize="end"
+        app:layout_constraintStart_toEndOf="@id/msRowAvatar"
+        app:layout_constraintEnd_toStartOf="@id/msRowStatus"
+        app:layout_constraintTop_toTopOf="@id/msRowAvatar"
+        tools:text="FW-1234 · Ahmed Ben Salem" />
+
+    <TextView
+        android:id="@+id/msRowSubtitle"
+        style="@style/Ms.Text.Label"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/space_12"
+        android:layout_marginTop="2dp"
+        android:maxLines="1"
+        android:ellipsize="end"
+        app:layout_constraintStart_toEndOf="@id/msRowAvatar"
+        app:layout_constraintEnd_toStartOf="@id/msRowStatus"
+        app:layout_constraintTop_toBottomOf="@id/msRowTitle"
+        tools:text="3 articles · il y a 12 min" />
+
+    <TextView
+        android:id="@+id/msRowMeta"
+        style="@style/Ms.Text.Label"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/space_12"
+        android:layout_marginTop="2dp"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:visibility="gone"
+        app:layout_constraintStart_toEndOf="@id/msRowAvatar"
+        app:layout_constraintEnd_toStartOf="@id/msRowStatus"
+        app:layout_constraintTop_toBottomOf="@id/msRowSubtitle"
+        tools:text="85,500 DT"
+        tools:visibility="visible" />
+
+    <TextView
+        android:id="@+id/msRowStatus"
+        style="@style/Ms.Chip.Status.Pending"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/space_8"
+        android:visibility="gone"
+        app:layout_constraintEnd_toStartOf="@id/msRowChevron"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="En attente"
+        tools:visibility="visible" />
+
+    <ImageView
+        android:id="@+id/msRowChevron"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:importantForAccessibility="no"
+        android:rotation="180"
+        app:srcCompat="@drawable/back"
+        app:tint="@color/ms_text_tertiary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

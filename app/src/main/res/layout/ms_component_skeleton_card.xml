@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Skeleton card placeholder. Wrap in a ShimmerFrameLayout if shimmer is desired. -->
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    style="@style/Ms.Card.Surface"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:minHeight="@dimen/ms_kpi_card_min_height">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/space_16">
+
+        <View
+            android:layout_width="@dimen/ms_icon_chip_size"
+            android:layout_height="@dimen/ms_icon_chip_size"
+            android:background="@drawable/ms_bg_skeleton_block" />
+
+        <View
+            android:layout_width="80dp"
+            android:layout_height="20dp"
+            android:layout_marginTop="@dimen/space_14"
+            android:background="@drawable/ms_bg_skeleton_block" />
+
+        <View
+            android:layout_width="120dp"
+            android:layout_height="10dp"
+            android:layout_marginTop="@dimen/space_8"
+            android:background="@drawable/ms_bg_skeleton_block" />
+
+        <View
+            android:layout_width="64dp"
+            android:layout_height="10dp"
+            android:layout_marginTop="@dimen/space_8"
+            android:background="@drawable/ms_bg_skeleton_block" />
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

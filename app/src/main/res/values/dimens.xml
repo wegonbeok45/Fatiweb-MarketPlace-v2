@@ -20,8 +20,8 @@
     <dimen name="auth_screen_vertical_inset_padding">8dp</dimen>
     <dimen name="auth_logo_width_compact">88dp</dimen>
     <dimen name="auth_logo_height_compact">52dp</dimen>
-    <dimen name="auth_hero_height_compact">136dp</dimen>
-    <dimen name="auth_hero_height_register">136dp</dimen>
+    <dimen name="auth_hero_height_compact">160dp</dimen>
+    <dimen name="auth_hero_height_register">160dp</dimen>
     <dimen name="auth_icon_slot_size">44dp</dimen>
     <dimen name="auth_social_button_height">44dp</dimen>
     <dimen name="screen_section_gap">16dp</dimen>
@@ -39,7 +39,7 @@
     <dimen name="app_top_bar_height">56dp</dimen>
     <dimen name="app_top_bar_horizontal_padding">24dp</dimen>
     <dimen name="app_top_bar_side_slot_size">44dp</dimen>
-    <dimen name="app_top_bar_title_size">@dimen/text_size_body</dimen>
+    <dimen name="app_top_bar_title_size">@dimen/ms_text_title</dimen>
     <dimen name="app_top_bar_action_text_size">@dimen/text_size_caption</dimen>
     <dimen name="screen_fab_size">44dp</dimen>
     <dimen name="screen_fab_corner_radius">22dp</dimen>
@@ -51,7 +51,7 @@
     <dimen name="screen_fab_dot_margin_bottom">48dp</dimen>
 
     <dimen name="button_height">48dp</dimen>
-    <dimen name="input_height">48dp</dimen>
+    <dimen name="input_height">@dimen/ms_input_height</dimen>
     <dimen name="toolbar_height">56dp</dimen>
     <dimen name="icon_size_large">24dp</dimen>
 
@@ -139,15 +139,15 @@
     <dimen name="home_ref_category_card_radius">18dp</dimen>
     <dimen name="home_ref_category_badge_size">52dp</dimen>
     <dimen name="home_ref_product_radius">16dp</dimen>
-    <dimen name="product_card_corner_radius">@dimen/corner_radius_large</dimen>
+    <dimen name="product_card_corner_radius">@dimen/ms_radius_lg</dimen>
     <dimen name="product_card_inner_padding">8dp</dimen>
-    <dimen name="product_card_image_radius">18dp</dimen>
+    <dimen name="product_card_image_radius">@dimen/ms_radius_md</dimen>
     <dimen name="product_card_image_height">154dp</dimen>
-    <dimen name="product_card_elevation">2dp</dimen>
+    <dimen name="product_card_elevation">@dimen/ms_elev_0</dimen>
     <dimen name="product_card_content_padding_horizontal">12dp</dimen>
     <dimen name="product_card_content_padding_bottom">12dp</dimen>
-    <dimen name="product_card_floating_button_size">38dp</dimen>
-    <dimen name="product_card_floating_button_radius">19dp</dimen>
+    <dimen name="product_card_floating_button_size">36dp</dimen>
+    <dimen name="product_card_floating_button_radius">18dp</dimen>
     <dimen name="product_card_floating_button_padding">10dp</dimen>
     <dimen name="product_card_shop_button_padding">11dp</dimen>
     <dimen name="product_card_stock_height">28dp</dimen>
@@ -158,7 +158,7 @@
     <dimen name="product_card_category_max_width">96dp</dimen>
     <dimen name="product_card_category_text_max_width">72dp</dimen>
     <dimen name="product_card_star_size">13dp</dimen>
-    <dimen name="product_card_text_title">13sp</dimen>
+    <dimen name="product_card_text_title">14sp</dimen>
     <dimen name="product_card_text_seller">11sp</dimen>
     <dimen name="product_card_text_price">16sp</dimen>
     <dimen name="product_card_text_meta">11sp</dimen>
@@ -316,4 +316,59 @@
 <dimen name="panier_scroll_top_padding">16dp</dimen>
 <dimen name="panier_scroll_bottom_padding">24dp</dimen>
 <dimen name="panier_summary_gap_from_list">18dp</dimen>
+
+    <!-- ============================================================ -->
+    <!-- Marketplace design system (Phase 0)                          -->
+    <!-- Radii, elevations, component sizes for admin + vendor.       -->
+    <!-- Spacing reuses existing space_* (4pt grid).                  -->
+    <!-- ============================================================ -->
+
+    <!-- Radii -->
+    <dimen name="ms_radius_sm">8dp</dimen>
+    <dimen name="ms_radius_md">12dp</dimen>
+    <dimen name="ms_radius_lg">16dp</dimen>
+    <dimen name="ms_radius_xl">24dp</dimen>
+    <dimen name="ms_radius_pill">999dp</dimen>
+
+    <!-- Elevations -->
+    <dimen name="ms_elev_0">0dp</dimen>
+    <dimen name="ms_elev_1">1dp</dimen>
+    <dimen name="ms_elev_3">3dp</dimen>
+    <dimen name="ms_elev_8">8dp</dimen>
+
+    <!-- Strokes -->
+    <dimen name="ms_stroke_hairline">1dp</dimen>
+    <dimen name="ms_stroke_focus">2dp</dimen>
+
+    <!-- Component heights -->
+    <dimen name="ms_button_height">48dp</dimen>
+    <dimen name="ms_button_height_compact">40dp</dimen>
+    <dimen name="ms_input_height">52dp</dimen>
+    <dimen name="ms_list_row_min_height">56dp</dimen>
+    <dimen name="ms_list_row_min_height_lg">72dp</dimen>
+    <dimen name="ms_chip_height">28dp</dimen>
+    <dimen name="ms_pill_height">22dp</dimen>
+    <dimen name="ms_top_bar_height">56dp</dimen>
+    <dimen name="ms_bottom_nav_height">72dp</dimen>
+
+    <!-- KPI / quick action / tile -->
+    <dimen name="ms_kpi_card_min_height">120dp</dimen>
+    <dimen name="ms_quick_tile_min_height">96dp</dimen>
+    <dimen name="ms_icon_chip_size">40dp</dimen>
+    <dimen name="ms_icon_chip_inner">20dp</dimen>
+    <dimen name="ms_avatar_sm">32dp</dimen>
+    <dimen name="ms_avatar_md">40dp</dimen>
+    <dimen name="ms_avatar_lg">56dp</dimen>
+
+    <!-- Type scale (extends existing text_size_*) -->
+    <dimen name="ms_text_display">28sp</dimen>
+    <dimen name="ms_text_title">20sp</dimen>
+    <dimen name="ms_text_subtitle">16sp</dimen>
+    <dimen name="ms_text_body">14sp</dimen>
+    <dimen name="ms_text_label">12sp</dimen>
+    <dimen name="ms_text_overline">11sp</dimen>
+    <dimen name="ms_text_kpi_value">26sp</dimen>
+
+    <!-- Touch target floor -->
+    <dimen name="ms_min_touch">44dp</dimen>
 </resources>

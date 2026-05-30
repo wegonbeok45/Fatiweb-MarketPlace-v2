@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Compact phone layout (w ≤ 399 dp) — tighten side padding -->
+    <dimen name="screen_padding_horizontal">16dp</dimen>
+    <dimen name="auth_screen_padding_compact">12dp</dimen>
+    <dimen name="app_top_bar_horizontal_padding">16dp</dimen>
+    <dimen name="home_horizontal_padding">16dp</dimen>
+    <dimen name="details_horizontal_padding">16dp</dimen>
+    <dimen name="auth_hero_height_compact">148dp</dimen>
+    <dimen name="auth_hero_height_register">148dp</dimen>
+    <dimen name="product_card_inner_padding">6dp</dimen>
+    <dimen name="product_card_content_padding_horizontal">10dp</dimen>
+    <dimen name="product_card_category_max_width">84dp</dimen>
+    <dimen name="product_card_category_text_max_width">60dp</dimen>
+</resources>

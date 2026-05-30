@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/vendorOrderActionUpdateStatus"
+        android:title="@string/vendor_orders_action_update_status" />
+    <item
+        android:id="@+id/vendorOrderActionViewDetail"
+        android:title="@string/vendor_orders_action_view_detail" />
+</menu>

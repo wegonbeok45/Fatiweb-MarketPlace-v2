@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Status pill used as a stamp on cards / rows.
+     Apply Ms.Chip.Status.* style via MsStatusPill.bind() in code. -->
+<TextView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/msStatusPill"
+    style="@style/Ms.Chip.Status.Pending"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    tools:text="En attente" />
