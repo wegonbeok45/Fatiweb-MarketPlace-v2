@@ -44,3 +44,12 @@ firebase_functions_setup/lib/
 firebase_functions_setup/lib-scripts/
 categories/
 local.secrets.properties
+.agent/
+.claude/
+.cursor/
+.screenshots/
+scripts/__pycache__/
+*.pyc
+app-launch-confirmation.png
+FATIWEB_FINAL_DELIVERY_*.md
+.maestro/tmp_*.yaml
