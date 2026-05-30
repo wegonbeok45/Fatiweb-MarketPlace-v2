@@ -145,6 +145,7 @@
     <string name="auth_password_helper">Minimum 6 caracteres.</string>
 
     <!-- Onboarding -->
+    <string name="onboard_brand">Fatiweb</string>
     <string name="onboard_skip">Passer</string>
     <string name="onboard_next">Suivant &gt;</string>
     <string name="onboard_start">Commencer &gt;</string>

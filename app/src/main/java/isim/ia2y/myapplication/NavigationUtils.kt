@@ -81,7 +81,7 @@ fun AppCompatActivity.launchMainFromLoader(tab: MainActivity.Tab) {
 }
 
 fun AppCompatActivity.launchOnboardingFromLoader() {
-    val intent = Intent(this, Onboard1::class.java).apply {
+    val intent = Intent(this, OnboardingActivity::class.java).apply {
         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
     }
     startActivity(intent)

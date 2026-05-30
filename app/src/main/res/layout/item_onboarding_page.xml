@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingStart="@dimen/screen_padding_horizontal"
+    android:paddingEnd="@dimen/screen_padding_horizontal">
+
+    <!-- Hero area: either a single illustration card OR the category showcase. -->
+    <FrameLayout
+        android:id="@+id/heroContainer"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="@dimen/space_24">
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardOnboardHero"
+            style="@style/AppCard"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            app:cardBackgroundColor="@color/colorSurfaceVariant">
+
+            <ImageView
+                android:id="@+id/ivOnboardHero"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:adjustViewBounds="true"
+                android:contentDescription="@string/cd_onboarding_image"
+                android:padding="@dimen/space_24"
+                android:scaleType="fitCenter" />
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Category showcase (visible only on the "shop by category" page). -->
+        <LinearLayout
+            android:id="@+id/layoutOnboardShowcase"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <com.google.android.material.card.MaterialCardView
+                    style="@style/AppCard"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/onboarding_showcase_tile_size"
+                    android:layout_weight="1"
+                    android:layout_margin="@dimen/space_4"
+                    app:cardBackgroundColor="@color/colorSurfaceVariant">
+
+                    <ImageView
+                        android:id="@+id/ivShowcase1"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:contentDescription="@string/cd_onboarding_image"
+                        android:padding="@dimen/space_16"
+                        android:scaleType="fitCenter" />
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    style="@style/AppCard"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/onboarding_showcase_tile_size"
+                    android:layout_weight="1"
+                    android:layout_margin="@dimen/space_4"
+                    app:cardBackgroundColor="@color/colorSurfaceVariant">
+
+                    <ImageView
+                        android:id="@+id/ivShowcase2"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:contentDescription="@string/cd_onboarding_image"
+                        android:padding="@dimen/space_16"
+                        android:scaleType="fitCenter" />
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    style="@style/AppCard"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/onboarding_showcase_tile_size"
+                    android:layout_weight="1"
+                    android:layout_margin="@dimen/space_4"
+                    app:cardBackgroundColor="@color/colorSurfaceVariant">
+
+                    <ImageView
+                        android:id="@+id/ivShowcase3"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:contentDescription="@string/cd_onboarding_image"
+                        android:padding="@dimen/space_16"
+                        android:scaleType="fitCenter" />
+
+                </com.google.android.material.card.MaterialCardView>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <com.google.android.material.card.MaterialCardView
+                    style="@style/AppCard"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/onboarding_showcase_tile_size"
+                    android:layout_weight="1"
+                    android:layout_margin="@dimen/space_4"
+                    app:cardBackgroundColor="@color/colorSurfaceVariant">
+
+                    <ImageView
+                        android:id="@+id/ivShowcase4"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:contentDescription="@string/cd_onboarding_image"
+                        android:padding="@dimen/space_16"
+                        android:scaleType="fitCenter" />
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    style="@style/AppCard"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/onboarding_showcase_tile_size"
+                    android:layout_weight="1"
+                    android:layout_margin="@dimen/space_4"
+                    app:cardBackgroundColor="@color/colorSurfaceVariant">
+
+                    <ImageView
+                        android:id="@+id/ivShowcase5"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:contentDescription="@string/cd_onboarding_image"
+                        android:padding="@dimen/space_16"
+                        android:scaleType="fitCenter" />
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    style="@style/AppCard"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/onboarding_showcase_tile_size"
+                    android:layout_weight="1"
+                    android:layout_margin="@dimen/space_4"
+                    app:cardBackgroundColor="@color/colorSurfaceVariant">
+
+                    <ImageView
+                        android:id="@+id/ivShowcase6"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:contentDescription="@string/cd_onboarding_image"
+                        android:padding="@dimen/space_16"
+                        android:scaleType="fitCenter" />
+
+                </com.google.android.material.card.MaterialCardView>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/tvOnboardTitle"
+        style="@style/AppText.Title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_32"
+        android:gravity="center"
+        tools:text="Welcome to Fatiweb" />
+
+    <TextView
+        android:id="@+id/tvOnboardDescription"
+        style="@style/AppText.Body"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_16"
+        android:layout_marginBottom="@dimen/space_24"
+        android:gravity="center"
+        tools:text="Discover a curated marketplace." />
+
+</LinearLayout>
