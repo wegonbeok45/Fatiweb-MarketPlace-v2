@@ -33,12 +33,11 @@ data class CatalogSyncState(
 }
 
 object CatalogSyncManager {
-    private const val REALTIME_LISTENER_DELAY_MS = 4_000L
-    private const val CATALOG_CACHE_TTL_MS = 10 * 60 * 1000L
+    private const val CATALOG_CACHE_TTL_MS = 60 * 60 * 1000L
+    private const val COST_SAFE_CATALOG_CACHE_TTL_MS = 24 * 60 * 60 * 1000L
     private const val HOME_CATALOG_PAGE_SIZE = 24L
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private val syncMutex = Mutex()
-    private var listenerRegistration: com.google.firebase.firestore.ListenerRegistration? = null
     private val _syncState = MutableStateFlow(CatalogSyncState())
     val syncState: StateFlow<CatalogSyncState> = _syncState.asStateFlow()
 
@@ -48,10 +47,6 @@ object CatalogSyncManager {
 
     @Volatile
     private var inFlightSync: kotlinx.coroutines.Deferred<List<Product>>? = null
-
-    @Volatile
-    private var realtimeListenerStartRequested = false
-    private var realtimeListenerJob: kotlinx.coroutines.Job? = null
 
     val isRefreshing: Boolean
         get() = syncState.value.isRefreshing
@@ -68,11 +63,6 @@ object CatalogSyncManager {
     }
 
     fun stop() {
-        listenerRegistration?.remove()
-        listenerRegistration = null
-        realtimeListenerStartRequested = false
-        realtimeListenerJob?.cancel()
-        realtimeListenerJob = null
         _isFirstSyncCompleted = false
         inFlightSync = null
         emitSuccess(ProductCatalog.all(includeInactive = true), fromCache = true)
@@ -91,9 +81,15 @@ object CatalogSyncManager {
             }
         }
         val hasFreshCache = cachedProducts.isNotEmpty() && CatalogDiskCache.isFresh(appContext, CATALOG_CACHE_TTL_MS)
+        val hasCostSafeFreshCache = cachedProducts.isNotEmpty() &&
+            CatalogDiskCache.isFresh(appContext, COST_SAFE_CATALOG_CACHE_TTL_MS)
+        if (FirebaseCostSafeMode.enabled && !force && hasCostSafeFreshCache) {
+            _isFirstSyncCompleted = true
+            emitSuccess(cachedProducts, fromCache = true)
+            return cachedProducts
+        }
         if (!force && _isFirstSyncCompleted && hasFreshCache) {
             emitSuccess(cachedProducts, fromCache = true)
-            startRealtimeListenerDelayed()
             return cachedProducts
         }
 
@@ -156,7 +152,6 @@ object CatalogSyncManager {
                 val products = ProductCatalog.all(includeInactive = true)
                 CatalogDiskCache.save(appContext, products)
                 emitSuccess(products, fromCache = false)
-                startRealtimeListenerDelayed()
                 products
             }.also { inFlightSync = it }
         }
@@ -176,38 +171,7 @@ object CatalogSyncManager {
         }.getOrDefault(emptyList())
     }
 
-    private fun startRealtimeListenerDelayed() {
-        if (listenerRegistration != null || realtimeListenerStartRequested) return
-        realtimeListenerStartRequested = true
-        realtimeListenerJob = scope.launch {
-            try {
-                delay(REALTIME_LISTENER_DELAY_MS)
-                if (listenerRegistration == null) {
-                    listenerRegistration = ProductService.listenToProducts(
-                        onUpdate = ::handleRealtimeCatalogUpdate,
-                        onError = ::handleRealtimeCatalogError
-                    )
-                }
-            } finally {
-                realtimeListenerStartRequested = false
-            }
-        }
-    }
-
-    private fun handleRealtimeCatalogUpdate(products: List<Product>) {
-        ProductCatalog.replaceAll(products)
-        _isFirstSyncCompleted = true
-        val snapshot = ProductCatalog.all(includeInactive = true)
-        CatalogDiskCache.save(MyApplication.instance, snapshot)
-        emitSuccess(snapshot, fromCache = false)
-    }
-
     private fun handleRealtimeCatalogError(throwable: Throwable) {
-        listenerRegistration?.remove()
-        listenerRegistration = null
-        realtimeListenerStartRequested = false
-        realtimeListenerJob?.cancel()
-        realtimeListenerJob = null
         val products = ProductCatalog.all(includeInactive = true)
         if (products.isNotEmpty()) {
             _isFirstSyncCompleted = true
@@ -253,20 +217,27 @@ object AppStartupCoordinator {
         deferredStarted = true
         val appContext = context.applicationContext
         scope.launch {
+            if (FirebaseCostSafeMode.enabled) return@launch
             runCatching { AdminSession.init(appContext) }
         }
         scope.launch {
             delay(CATALOG_REFRESH_DELAY_MS)
+            if (FirebaseCostSafeMode.enabled) {
+                runCatching { CatalogSyncManager.ensureSynced(force = false) }
+                return@launch
+            }
             runCatching { CatalogSyncManager.ensureSynced(force = false) }
         }
         scope.launch {
             delay(SESSION_REFRESH_DELAY_MS)
+            if (FirebaseCostSafeMode.enabled) return@launch
             runCatching { CartStore.refreshFromCloud(appContext) }
             runCatching { FavoritesStore.refreshFromCloud(appContext) }
             runCatching { AddressBookStore.refreshFromCloud(appContext) }
         }
         scope.launch {
             delay(NOTIFICATION_REFRESH_DELAY_MS)
+            if (FirebaseCostSafeMode.enabled) return@launch
             runCatching {
                 if (NotificationStore.shouldRefreshFromCloud(appContext)) {
                     NotificationStore.refreshFromCloud(appContext)
@@ -275,8 +246,11 @@ object AppStartupCoordinator {
         }
         scope.launch {
             delay(NON_CRITICAL_STARTUP_DELAY_MS)
+            if (FirebaseCostSafeMode.enabled) return@launch
             runCatching { AppNotificationChannels.ensureCreated(appContext) }
-            if (FirebaseAuthManager.isLoggedIn && NotificationPreferencesStore.load(appContext).pushEnabled) {
+            if (FirebaseAuthManager.isLoggedIn &&
+                NotificationPreferencesStore.load(appContext).pushEnabled
+            ) {
                 runCatching { FcmTokenService.syncCurrentUserToken(appContext) }
             }
             runCatching { AnalyticsTracker.appOpen() }

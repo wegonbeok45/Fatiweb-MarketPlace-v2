@@ -3,6 +3,7 @@ package isim.ia2y.myapplication
 import android.content.Context
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
+import com.google.firebase.firestore.Source
 import kotlinx.coroutines.tasks.await
 
 object ConfigService {
@@ -10,18 +11,27 @@ object ConfigService {
     private const val KEY_STANDARD_SHIPPING_FEE = "standardShippingFee"
     private const val KEY_EXPRESS_SHIPPING_FEE = "expressShippingFee"
     private const val KEY_UPDATED_AT = "updatedAt"
+    private const val CACHE_TTL_MS = 24L * 60 * 60 * 1000
 
     private val db: FirebaseFirestore get() = FirebaseFirestore.getInstance()
     private val commerceConfigRef = db.collection(FirestoreCollections.APP_CONFIG).document(FirestoreCollections.COMMERCE)
 
     suspend fun fetchCommerceConfig(): FirestoreService.CommerceConfig {
-        val doc = commerceConfigRef.get().await()
+        val appContext = MyApplication.instance
+        cachedCommerceConfig(appContext)
+            ?.takeIf { System.currentTimeMillis() - it.updatedAt < CACHE_TTL_MS }
+            ?.let { return it }
+
+        val cachedDoc = runCatching { commerceConfigRef.get(Source.CACHE).await() }.getOrNull()
+        if (cachedDoc != null && cachedDoc.exists()) {
+            FirebaseCostTracker.read("ConfigService.fetchCommerceConfig", "appConfig/commerce", 1, Source.CACHE.name)
+            return cachedDoc.toCommerceConfig().also { cacheCommerceConfig(appContext, it) }
+        }
+
+        val doc = commerceConfigRef.get(Source.SERVER).await()
+        FirebaseCostTracker.read("ConfigService.fetchCommerceConfig", "appConfig/commerce", if (doc.exists()) 1 else 0, Source.SERVER.name)
         if (!doc.exists()) return FirestoreService.CommerceConfig()
-        return FirestoreService.CommerceConfig(
-            standardShippingFee = doc.getDouble("standardShippingFee") ?: CartStore.LIVRAISON_FEE,
-            expressShippingFee = doc.getDouble("expressShippingFee") ?: 12.5,
-            updatedAt = doc.getLong("updatedAt") ?: 0L
-        )
+        return doc.toCommerceConfig().also { cacheCommerceConfig(appContext, it) }
     }
 
     fun cachedCommerceConfig(context: Context): FirestoreService.CommerceConfig? {
@@ -55,6 +65,14 @@ object ConfigService {
             ),
             SetOptions.merge()
         ).await()
+        FirebaseCostTracker.write("ConfigService.saveCommerceConfig", "appConfig/commerce")
         return normalized
     }
+
+    private fun com.google.firebase.firestore.DocumentSnapshot.toCommerceConfig(): FirestoreService.CommerceConfig =
+        FirestoreService.CommerceConfig(
+            standardShippingFee = getDouble("standardShippingFee") ?: CartStore.LIVRAISON_FEE,
+            expressShippingFee = getDouble("expressShippingFee") ?: 12.5,
+            updatedAt = getLong("updatedAt") ?: System.currentTimeMillis()
+        )
 }
