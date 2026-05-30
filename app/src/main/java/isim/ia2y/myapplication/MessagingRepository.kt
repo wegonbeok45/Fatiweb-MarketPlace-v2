@@ -64,6 +64,7 @@ object MessagingRepository {
                     }
                     return@addSnapshotListener
                 }
+                FirebaseCostTracker.read("MessagingRepository.listenConversations", CONVERSATIONS, snapshot?.size() ?: 0, "listener")
                 val conversations = snapshot?.documents.orEmpty()
                     .mapNotNull { document -> document.data?.let { Conversation.fromMap(document.id, it) } }
                     .filter { it.status == "active" }
@@ -104,6 +105,7 @@ object MessagingRepository {
                     onError(error)
                     return@addSnapshotListener
                 }
+                FirebaseCostTracker.read("MessagingRepository.listenMessages", "$CONVERSATIONS/$conversationId/$MESSAGES", snapshot?.size() ?: 0, "listener")
                 val messages = snapshot?.documents.orEmpty()
                     .mapNotNull { document -> document.data?.let { ConversationMessage.fromMap(document.id, it) } }
                     .asReversed()
@@ -126,6 +128,7 @@ object MessagingRepository {
             .limit(PAGE_SIZE)
             .get()
             .await()
+        FirebaseCostTracker.read("MessagingRepository.loadOlderMessages", "$CONVERSATIONS/$conversationId/$MESSAGES", snapshot.size(), "default")
         val messages = snapshot.documents
             .mapNotNull { document -> document.data?.let { ConversationMessage.fromMap(document.id, it) } }
             .asReversed()
@@ -147,6 +150,7 @@ object MessagingRepository {
 
     private suspend fun fetchConversation(conversationId: String, source: Source): Conversation {
         val snapshot = db.collection(CONVERSATIONS).document(conversationId).get(source).await()
+        FirebaseCostTracker.read("MessagingRepository.fetchConversation", "$CONVERSATIONS/$conversationId", if (snapshot.exists()) 1 else 0, source.name)
         val data = snapshot.data ?: throw IllegalStateException("Conversation not found.")
         return Conversation.fromMap(snapshot.id, data)
     }
@@ -213,6 +217,13 @@ object MessagingRepository {
     }
 
     fun newClientMessageId(): String = "android_${UUID.randomUUID().toString().replace("-", "")}"
+
+    /** Clear all in-memory caches. Must be called on user sign-out. */
+    fun clearCaches() {
+        conversationCacheByUid.clear()
+        conversationCacheById.clear()
+        messagesCacheByConversationId.clear()
+    }
 
     private fun conversationIdFor(buyerId: String, sellerId: String, productId: String): String {
         val digest = MessageDigest.getInstance("SHA-256")

@@ -8,56 +8,72 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 
 class ConversationMessagesAdapter(
     private val currentUid: String,
     private val onRetry: (ConversationMessage) -> Unit,
     private val onToggleHeart: (ConversationMessage) -> Unit
-) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+) : ListAdapter<ConversationMessagesAdapter.Row, RecyclerView.ViewHolder>(RowDiff) {
+
+    /** URL of the other participant's avatar. Changing this triggers a targeted rebind. */
     var otherAvatarUrl: String = ""
         set(value) {
+            if (field == value) return
             field = value
-            notifyDataSetChanged()
+            // Notify only received-message rows (avoids full notifyDataSetChanged)
+            notifyItemRangeChanged(0, itemCount, PAYLOAD_AVATAR)
         }
 
-    private val rows = mutableListOf<Row>()
+    // ── Public API ────────────────────────────────────────────────────────────
 
-    fun submitList(next: List<ConversationMessage>) {
-        rows.clear()
-        var lastDay = ""
-        next.forEach { message ->
-            val day = formatConversationDay(message.createdAt)
-            if (day.isNotBlank() && day != lastDay) {
-                rows += Row.Day(day)
-                lastDay = day
-            }
-            rows += Row.Message(message)
-        }
-        notifyDataSetChanged()
+    /** Transform a flat message list into day-divider rows and submit via DiffUtil. */
+    fun submitMessages(messages: List<ConversationMessage>) {
+        submitList(buildRows(messages))
     }
 
-    override fun getItemViewType(position: Int): Int = when (rows[position]) {
+    // ── Row model ─────────────────────────────────────────────────────────────
+
+    sealed class Row {
+        data class Day(val label: String) : Row()
+        data class Message(val message: ConversationMessage) : Row()
+    }
+
+    // ── ViewHolder types ──────────────────────────────────────────────────────
+
+    override fun getItemViewType(position: Int): Int = when (getItem(position)) {
         is Row.Day -> VIEW_DAY
         is Row.Message -> VIEW_MESSAGE
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        return if (viewType == VIEW_DAY) {
-            DayHolder(createDayView(parent))
-        } else {
-            MessageHolder(createMessageView(parent))
-        }
-    }
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
+        if (viewType == VIEW_DAY) DayHolder(createDayView(parent))
+        else MessageHolder(createMessageView(parent))
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        when (val row = rows[position]) {
+        when (val row = getItem(position)) {
             is Row.Day -> (holder as DayHolder).bind(row.label)
             is Row.Message -> (holder as MessageHolder).bind(row.message)
         }
     }
 
-    override fun getItemCount(): Int = rows.size
+    /** Partial-bind: only update avatar when triggered by otherAvatarUrl change. */
+    override fun onBindViewHolder(
+        holder: RecyclerView.ViewHolder,
+        position: Int,
+        payloads: MutableList<Any>
+    ) {
+        if (payloads.contains(PAYLOAD_AVATAR) && holder is MessageHolder) {
+            val row = getItem(position) as? Row.Message ?: return
+            holder.updateAvatar(row.message)
+        } else {
+            super.onBindViewHolder(holder, position, payloads)
+        }
+    }
+
+    // ── View factories ────────────────────────────────────────────────────────
 
     private fun createDayView(parent: ViewGroup): View {
         val context = parent.context
@@ -150,7 +166,7 @@ class ConversationMessagesAdapter(
         root.addView(line)
         root.addView(TextView(context).apply {
             id = R.id.messagingMessageReaction
-            this.text = "\u2764\uFE0F"
+            this.text = "❤️"
             gravity = Gravity.CENTER
             textSize = 17f
             includeFontPadding = false
@@ -163,6 +179,8 @@ class ConversationMessagesAdapter(
         }, LinearLayout.LayoutParams(56.dp, 36.dp).apply { topMargin = (-3).dp })
         return root
     }
+
+    // ── ViewHolders ───────────────────────────────────────────────────────────
 
     inner class DayHolder(view: View) : RecyclerView.ViewHolder(view) {
         private val label: TextView = view.findViewById(R.id.messagingDayLabel)
@@ -181,6 +199,11 @@ class ConversationMessagesAdapter(
         private val progress: ProgressBar = view.findViewById(R.id.messagingMessageProgress)
         private val reaction: TextView = view.findViewById(R.id.messagingMessageReaction)
         private var lastTapAt = 0L
+
+        fun updateAvatar(message: ConversationMessage) {
+            val mine = message.senderId == currentUid
+            if (!mine) avatar.loadAvatarImage(otherAvatarUrl, 96)
+        }
 
         fun bind(message: ConversationMessage) {
             val context = itemView.context
@@ -229,7 +252,7 @@ class ConversationMessagesAdapter(
             meta.text = buildString {
                 append(formatConversationClock(message.createdAt))
                 if (message.isLocalPending && message.localError == null) append(" sending")
-                if (mine && message.deliveryStatus == "sent" && !message.isLocalPending) append(" \u2713\u2713")
+                if (mine && message.deliveryStatus == "sent" && !message.isLocalPending) append(" ✓✓")
             }
             progress.visibility = if (message.isLocalPending && message.localProgress in 1..99) View.VISIBLE else View.GONE
             progress.progress = message.localProgress
@@ -255,14 +278,43 @@ class ConversationMessagesAdapter(
         }
     }
 
-    private sealed class Row {
-        data class Day(val label: String) : Row()
-        data class Message(val message: ConversationMessage) : Row()
+    // ── Helpers ───────────────────────────────────────────────────────────────
+
+    private fun buildRows(messages: List<ConversationMessage>): List<Row> {
+        val result = mutableListOf<Row>()
+        var lastDay = ""
+        messages.forEach { message ->
+            val day = formatConversationDay(message.createdAt)
+            if (day.isNotBlank() && day != lastDay) {
+                result += Row.Day(day)
+                lastDay = day
+            }
+            result += Row.Message(message)
+        }
+        return result
+    }
+
+    // ── DiffUtil ──────────────────────────────────────────────────────────────
+
+    private object RowDiff : DiffUtil.ItemCallback<Row>() {
+        override fun areItemsTheSame(oldItem: Row, newItem: Row): Boolean = when {
+            oldItem is Row.Day && newItem is Row.Day -> oldItem.label == newItem.label
+            oldItem is Row.Message && newItem is Row.Message -> {
+                // Local pending messages use clientMessageId as stable key
+                val oldId = oldItem.message.clientMessageId.ifBlank { oldItem.message.id }
+                val newId = newItem.message.clientMessageId.ifBlank { newItem.message.id }
+                oldId == newId
+            }
+            else -> false
+        }
+
+        override fun areContentsTheSame(oldItem: Row, newItem: Row): Boolean = oldItem == newItem
     }
 
     companion object {
         private const val VIEW_DAY = 0
         private const val VIEW_MESSAGE = 1
         private const val DOUBLE_TAP_MS = 320L
+        private const val PAYLOAD_AVATAR = "avatar"
     }
 }

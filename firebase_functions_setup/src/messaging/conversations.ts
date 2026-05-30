@@ -31,8 +31,8 @@ function conversationIdFor(buyerId: string, sellerId: string, productId: string)
 function displayName(data: FirebaseFirestore.DocumentData | undefined, fallback: string): string {
   const name = asTrimmedString(data?.name);
   const display = asTrimmedString(data?.displayName);
-  const email = asTrimmedString(data?.email);
-  return name || display || email.split("@")[0] || fallback;
+  // Never leak email addresses as display names — use the provided fallback instead
+  return name || display || fallback;
 }
 
 function userAvatar(data: FirebaseFirestore.DocumentData | undefined): string {

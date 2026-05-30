@@ -13,8 +13,8 @@
         android:id="@+id/chatTopBar"
         android:layout_width="0dp"
         android:layout_height="56dp"
-        android:background="@color/colorSurface"
-        android:elevation="3dp"
+        android:background="@color/ms_surface_canvas"
+        android:elevation="0dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -34,14 +34,14 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_back"
-            app:tint="@color/colorPrimary" />
+            app:tint="@color/ms_surface_inverse" />
 
         <androidx.cardview.widget.CardView
             android:id="@+id/chatBotAvatarCard"
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:layout_marginStart="6dp"
-            app:cardBackgroundColor="@color/home_ref_gold_soft"
+            app:cardBackgroundColor="@color/ms_accent_gold_bg"
             app:cardCornerRadius="16dp"
             app:cardElevation="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -72,7 +72,7 @@
                 android:fontFamily="@font/manrope_semibold"
                 android:includeFontPadding="false"
                 android:text="@string/chat_title"
-                android:textColor="@color/colorPrimary"
+                android:textColor="@color/ms_surface_inverse"
                 android:textSize="14sp" />
 
             <TextView
@@ -104,14 +104,14 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="10dp"
         android:layout_marginEnd="16dp"
-        app:cardBackgroundColor="@color/profile_card_bg"
-        app:cardCornerRadius="14dp"
+        app:cardBackgroundColor="@color/ms_surface_card"
+        app:cardCornerRadius="@dimen/ms_radius_lg"
         app:cardElevation="0dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/chatTopDivider"
-        app:strokeColor="@color/colorBorderLight"
-        app:strokeWidth="1dp">
+        app:strokeColor="@color/ms_border_subtle"
+        app:strokeWidth="@dimen/ms_stroke_hairline">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -165,7 +165,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/chatSuggestionProducts"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                style="@style/Ms.Chip.Action"
                 android:layout_width="wrap_content"
                 android:layout_height="36dp"
                 android:insetTop="0dp"
@@ -181,7 +181,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/chatSuggestionOrders"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                style="@style/Ms.Chip.Action"
                 android:layout_width="wrap_content"
                 android:layout_height="36dp"
                 android:layout_marginStart="6dp"
@@ -198,7 +198,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/chatSuggestionDelivery"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                style="@style/Ms.Chip.Action"
                 android:layout_width="wrap_content"
                 android:layout_height="36dp"
                 android:layout_marginStart="6dp"
@@ -271,14 +271,14 @@
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="10dp"
         android:visibility="gone"
-        app:cardBackgroundColor="@color/status_chip_bg_pending"
-        app:cardCornerRadius="18dp"
+        app:cardBackgroundColor="@color/ms_accent_gold_bg"
+        app:cardCornerRadius="@dimen/ms_radius_lg"
         app:cardElevation="0dp"
         app:layout_constraintBottom_toTopOf="@id/chatInputBar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:strokeColor="@color/status_chip_text_pending"
-        app:strokeWidth="1dp">
+        app:strokeColor="@color/ms_accent_gold_soft"
+        app:strokeWidth="@dimen/ms_stroke_hairline">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -302,7 +302,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/chatRetryButton"
-                style="@style/Widget.MaterialComponents.Button.TextButton"
+                style="@style/Ms.Button.Ghost"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:insetTop="0dp"
@@ -317,8 +317,8 @@
         android:id="@+id/chatInputBar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="@color/colorSurface"
-        android:elevation="6dp"
+        android:background="@color/ms_surface_card"
+        android:elevation="@dimen/ms_elev_1"
         android:paddingHorizontal="12dp"
         android:paddingVertical="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -329,8 +329,8 @@
             android:id="@+id/chatInputContainer"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:cardBackgroundColor="@color/home_search_bg"
-            app:cardCornerRadius="22dp"
+            app:cardBackgroundColor="@color/ms_surface_sunken"
+            app:cardCornerRadius="@dimen/ms_radius_pill"
             app:cardElevation="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/chatBtnSend"
@@ -360,9 +360,9 @@
             android:layout_height="44dp"
             android:layout_marginStart="8dp"
             android:contentDescription="@string/chat_send"
-            app:cardBackgroundColor="@color/colorPrimary"
-            app:cardCornerRadius="22dp"
-            app:cardElevation="0dp"
+            app:cardBackgroundColor="@color/ms_surface_inverse"
+            app:cardCornerRadius="@dimen/ms_radius_pill"
+            app:cardElevation="@dimen/ms_elev_0"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent">
@@ -373,7 +373,7 @@
                 android:padding="11dp"
                 android:scaleType="centerInside"
                 app:srcCompat="@drawable/ic_send"
-                app:tint="@color/colorOnPrimary" />
+                app:tint="@color/ms_text_inverse" />
         </androidx.cardview.widget.CardView>
 
     </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Inbox conversation row.
+    Avatar (48 dp circle) | copy column (name / preview / product) | meta (time / badge)
+    The divider is drawn by the RecyclerView ItemDecoration; no extra View needed here.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rootRow"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?attr/selectableItemBackground"
+    android:minHeight="@dimen/ms_list_row_min_height_lg"
+    android:orientation="horizontal"
+    android:paddingStart="@dimen/space_16"
+    android:paddingTop="@dimen/space_10"
+    android:paddingEnd="@dimen/space_16"
+    android:paddingBottom="@dimen/space_10"
+    android:gravity="center_vertical">
+
+    <!-- Avatar + online dot -->
+    <FrameLayout
+        android:layout_width="@dimen/ms_avatar_md"
+        android:layout_height="@dimen/ms_avatar_md">
+
+        <ImageView
+            android:id="@+id/ivInboxAvatar"
+            android:layout_width="@dimen/ms_avatar_md"
+            android:layout_height="@dimen/ms_avatar_md"
+            android:layout_gravity="center"
+            android:clipToOutline="true"
+            android:scaleType="centerCrop"
+            tools:src="@drawable/placeholder" />
+
+        <!-- Online indicator — hidden by default, shown when online -->
+        <View
+            android:id="@+id/vInboxOnline"
+            android:layout_width="10dp"
+            android:layout_height="10dp"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="1dp"
+            android:visibility="gone" />
+    </FrameLayout>
+
+    <!-- Copy: name / preview / product -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/space_12"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <!-- Name row + time -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tvInboxName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ellipsize="end"
+                android:fontFamily="@font/manrope_semibold"
+                android:includeFontPadding="false"
+                android:maxLines="1"
+                android:textColor="@color/ms_text_primary"
+                android:textSize="15sp"
+                tools:text="Fatima Ben Ali" />
+
+            <TextView
+                android:id="@+id/tvInboxTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/space_8"
+                android:fontFamily="@font/manrope_regular"
+                android:includeFontPadding="false"
+                android:textColor="@color/ms_text_tertiary"
+                android:textSize="11sp"
+                tools:text="14:23" />
+        </LinearLayout>
+
+        <!-- Preview row + unread badge -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_2"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tvInboxPreview"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ellipsize="end"
+                android:fontFamily="@font/manrope_regular"
+                android:includeFontPadding="false"
+                android:maxLines="1"
+                android:textColor="@color/ms_text_secondary"
+                android:textSize="13sp"
+                tools:text="Bonjour, est-ce disponible ?" />
+
+            <!-- Unread count badge -->
+            <TextView
+                android:id="@+id/tvInboxUnread"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginStart="@dimen/space_6"
+                android:fontFamily="@font/manrope_bold"
+                android:gravity="center"
+                android:includeFontPadding="false"
+                android:textColor="@color/ms_text_inverse"
+                android:textSize="10sp"
+                android:visibility="invisible"
+                tools:text="3"
+                tools:visibility="visible" />
+        </LinearLayout>
+
+        <!-- Product context chip -->
+        <TextView
+            android:id="@+id/tvInboxProduct"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_4"
+            android:ellipsize="end"
+            android:fontFamily="@font/manrope_regular"
+            android:includeFontPadding="false"
+            android:maxLines="1"
+            android:paddingStart="@dimen/space_6"
+            android:paddingTop="2dp"
+            android:paddingEnd="@dimen/space_6"
+            android:paddingBottom="2dp"
+            android:textColor="@color/ms_text_tertiary"
+            android:textSize="11sp"
+            android:visibility="gone"
+            tools:text="Robe marocaine brodée"
+            tools:visibility="visible" />
+    </LinearLayout>
+
+</LinearLayout>

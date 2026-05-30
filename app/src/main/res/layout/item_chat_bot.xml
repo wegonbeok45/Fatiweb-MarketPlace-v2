@@ -17,7 +17,7 @@
         android:layout_gravity="bottom"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="2dp"
-        app:cardBackgroundColor="@color/home_ref_gold_soft"
+        app:cardBackgroundColor="@color/ms_accent_gold_soft"
         app:cardCornerRadius="13dp"
         app:cardElevation="0dp">
 
@@ -33,7 +33,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="48dp"
-        app:cardBackgroundColor="@color/colorSurface"
+        app:cardBackgroundColor="@color/ms_surface_card"
         app:cardCornerRadius="14dp"
         app:cardElevation="0dp"
         app:strokeColor="@color/colorOutline"

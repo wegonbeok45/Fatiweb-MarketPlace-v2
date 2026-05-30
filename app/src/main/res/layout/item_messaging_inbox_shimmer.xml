@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Skeleton placeholder shown while inbox conversations are loading.
+    Matches the real item_messaging_inbox.xml dimensions exactly so the list
+    doesn't jump when real data arrives.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingStart="@dimen/space_16"
+    android:paddingTop="@dimen/space_10"
+    android:paddingEnd="@dimen/space_16"
+    android:paddingBottom="@dimen/space_10">
+
+    <!-- Avatar skeleton circle -->
+    <View
+        android:layout_width="@dimen/ms_avatar_md"
+        android:layout_height="@dimen/ms_avatar_md"
+        android:background="@drawable/bg_home_skeleton_pill" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/space_12"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <!-- Name + time row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <View
+                android:layout_width="120dp"
+                android:layout_height="13dp"
+                android:background="@drawable/bg_home_skeleton_block" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" />
+
+            <View
+                android:layout_width="32dp"
+                android:layout_height="10dp"
+                android:background="@drawable/bg_home_skeleton_block" />
+        </LinearLayout>
+
+        <!-- Preview line -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="11dp"
+            android:layout_marginTop="@dimen/space_6"
+            android:background="@drawable/bg_home_skeleton_block" />
+
+        <!-- Shorter second preview line -->
+        <View
+            android:layout_width="160dp"
+            android:layout_height="11dp"
+            android:layout_marginTop="@dimen/space_4"
+            android:background="@drawable/bg_home_skeleton_block" />
+    </LinearLayout>
+</LinearLayout>

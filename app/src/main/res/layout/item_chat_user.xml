@@ -14,7 +14,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_weight="0"
-        app:cardBackgroundColor="@color/colorPrimary"
+        app:cardBackgroundColor="@color/ms_surface_inverse"
         app:cardCornerRadius="14dp"
         app:cardElevation="0dp"
         android:layout_marginStart="48dp">
@@ -29,7 +29,7 @@
             android:maxWidth="260dp"
             android:paddingHorizontal="12dp"
             android:paddingVertical="8dp"
-            android:textColor="@color/colorOnPrimary"
+            android:textColor="@color/ms_text_inverse"
             android:textSize="13sp"
             android:text="Message" />
     </androidx.cardview.widget.CardView>
