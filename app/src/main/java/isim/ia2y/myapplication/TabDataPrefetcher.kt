@@ -31,10 +31,11 @@ class TabDataPrefetcher(context: Context) {
                     MainActivity.Tab.CART -> {
                         CatalogSyncManager.ensureSynced(force = false)
                         val cart = CartStore.getCart(appContext)
-                        ProductCatalog.orderedFavorites(cart.keys)
+                        val productIds = cart.keys.mapTo(linkedSetOf()) { CartKey.productId(it) }
+                        ProductCatalog.orderedFavorites(productIds)
                     }
                     MainActivity.Tab.PROFILE -> {
-                        FirebaseAuthManager.currentUser?.uid?.let { uid ->
+                        FirebaseAuthManager.currentUser?.uid?.takeUnless { FirebaseCostSafeMode.enabled }?.let { uid ->
                             FirestoreService.fetchUserProfile(uid)
                             FirestoreService.fetchUserRole(uid)
                         }

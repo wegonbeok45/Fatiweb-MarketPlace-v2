@@ -77,6 +77,11 @@ object CatalogDiskCache {
         .put("sellerTotalSold", sellerTotalSold)
         .put("sellerRating", sellerRating)
         .put("sellerRatingCount", sellerRatingCount)
+        .put("productType", productType)
+        .put("attributes", JSONObject(attributes))
+        .put("colorOptions", JSONArray(colorOptions.map { JSONObject(it.toMap()) }))
+        .put("sizeOptions", JSONArray(sizeOptions))
+        .put("variants", JSONArray(variants.map { JSONObject(it.toMap()) }))
         .put("createdAt", createdAtMillis)
         .put("updatedAt", updatedAtMillis)
 
@@ -118,9 +123,43 @@ object CatalogDiskCache {
             sellerTotalSold = json.optInt("sellerTotalSold", 0),
             sellerRating = json.optDouble("sellerRating", 0.0),
             sellerRatingCount = json.optInt("sellerRatingCount", 0),
+            productType = json.optString("productType", ""),
+            attributes = json.optJSONObject("attributes").toAttributeMap(),
+            colorOptions = json.optJSONArray("colorOptions").toColorOptions(),
+            sizeOptions = json.optJSONArray("sizeOptions").toStringList(),
+            variants = json.optJSONArray("variants").toVariants(),
             createdAt = json.optLong("createdAt", 0L),
             updatedAt = json.optLong("updatedAt", 0L)
         )
+    }
+
+    private fun JSONObject?.toAttributeMap(): Map<String, Any?> {
+        if (this == null) return emptyMap()
+        return keys().asSequence().associateWith { key ->
+            when (val value = opt(key)) {
+                is JSONObject -> value.toAttributeMap()
+                JSONObject.NULL -> null
+                else -> value
+            }
+        }
+    }
+
+    private fun JSONArray?.toColorOptions(): List<ProductColor> {
+        if (this == null) return emptyList()
+        return (0 until length()).mapNotNull { index ->
+            optJSONObject(index)?.let { obj ->
+                ProductColor.fromMap(obj.toAttributeMap())
+            }
+        }
+    }
+
+    private fun JSONArray?.toVariants(): List<ProductVariant> {
+        if (this == null) return emptyList()
+        return (0 until length()).mapNotNull { index ->
+            optJSONObject(index)?.let { obj ->
+                ProductVariant.fromMap(obj.toAttributeMap())
+            }
+        }
     }
 
     private fun JSONArray?.toStringList(): List<String> {

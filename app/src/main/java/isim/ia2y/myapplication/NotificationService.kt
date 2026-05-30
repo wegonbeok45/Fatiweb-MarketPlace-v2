@@ -22,6 +22,7 @@ object NotificationService {
             .limit(NOTIFICATION_PAGE_LIMIT)
             .get()
             .await()
+        FirebaseCostTracker.read("NotificationService.fetchNotifications", FirestoreCollections.IN_APP_NOTIFICATIONS, snapshot.size())
         return snapshot.documents.mapNotNull { doc ->
             val data = doc.data ?: return@mapNotNull null
             FirestoreService.InAppNotification(
@@ -55,6 +56,7 @@ object NotificationService {
             .limit(NOTIFICATION_PAGE_LIMIT)
             .get()
             .await()
+        FirebaseCostTracker.read("NotificationService.fetchPublicAnnouncementNotifications", FirestoreCollections.IN_APP_NOTIFICATIONS, snapshot.size())
         return snapshot.documents.mapNotNull { doc ->
             val data = doc.data ?: return@mapNotNull null
             val message = (data["body"] as? String)
@@ -84,6 +86,7 @@ object NotificationService {
             .limit(NOTIFICATION_PAGE_LIMIT)
             .get()
             .await()
+        FirebaseCostTracker.read("NotificationService.fetchUserInboxNotifications", "users/$uid/inbox", snapshot.size())
         return snapshot.documents.mapNotNull { doc ->
             val data = doc.data ?: return@mapNotNull null
             val message = (data["body"] as? String)
@@ -140,6 +143,7 @@ object NotificationService {
                     )
                 }
                 batch.commit().await()
+                FirebaseCostTracker.write("NotificationService.markNotificationsRead", "users/$uid/notificationReads", ids.size)
             }
     }
 
@@ -149,6 +153,7 @@ object NotificationService {
             .limit(NOTIFICATION_PAGE_LIMIT)
             .get()
             .await()
+        FirebaseCostTracker.read("NotificationService.fetchNotificationReadIds", "users/$uid/notificationReads", readSnapshot.size())
         val explicitReads = readSnapshot.documents.map { it.id }.toSet()
 
         val inboxSnapshot = inboxRef(uid)
@@ -156,6 +161,7 @@ object NotificationService {
             .limit(NOTIFICATION_PAGE_LIMIT)
             .get()
             .await()
+        FirebaseCostTracker.read("NotificationService.fetchNotificationReadIds", "users/$uid/inbox", inboxSnapshot.size())
         val legacyInboxReads = inboxSnapshot.documents
             .filter { it.get("readAt") != null }
             .map { it.id }

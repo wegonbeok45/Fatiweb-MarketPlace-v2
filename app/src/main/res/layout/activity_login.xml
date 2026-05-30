@@ -19,7 +19,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/back"
-        app:tint="?attr/colorOnSurface" />
+        app:tint="@color/ms_text_primary" />
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -41,7 +41,7 @@
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardWelcomePanel"
             android:layout_width="0dp"
-            android:layout_height="100dp"
+            android:layout_height="@dimen/auth_hero_height_compact"
             app:cardCornerRadius="@dimen/corner_radius_large"
             app:cardElevation="0dp"
             app:strokeColor="@color/overlay_white_8"
@@ -88,8 +88,8 @@
                             android:paddingTop="5dp"
                             android:paddingEnd="10dp"
                             android:paddingBottom="5dp"
-                            android:text="@string/auto_premium_commerce_9fb5"
-                            android:textColor="?attr/colorOnSurface"
+                            android:text="@string/login_hero_badge"
+                            android:textColor="@color/ms_text_primary"
                             android:textSize="@dimen/text_size_overline"
                             android:fontFamily="@font/manrope_semibold" />
                     </com.google.android.material.card.MaterialCardView>
@@ -99,7 +99,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/space_8"
                         android:ellipsize="end"
-                        android:text="@string/auto_connexion_rapide_commandes_et_f014"
+                        android:text="@string/login_feature_bullet"
                         android:textColor="@android:color/white"
                         android:textSize="@dimen/text_size_title"
                         android:fontFamily="@font/manrope_semibold"
@@ -117,7 +117,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_10"
             android:gravity="center"
-            android:text="@string/auto_text_032"
+            android:text="@string/login_welcome_title"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/cardWelcomePanel" />
@@ -130,7 +130,7 @@
             android:layout_marginTop="@dimen/space_4"
             android:gravity="center"
             android:maxLines="2"
-            android:text="@string/auto_text_033"
+            android:text="@string/login_welcome_subtitle"
             android:textSize="@dimen/text_size_caption"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -142,7 +142,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_10"
-            android:text="@string/auto_text_034"
+            android:text="@string/login_email_label"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tvWelcomeSubtitle" />
 
@@ -175,7 +175,7 @@
                     android:id="@+id/etEmail"
                     style="@style/AppInput.EditText"
                     android:layout_width="0dp"
-                    android:hint="@string/auto_text_035"
+                    android:hint="@string/login_email_hint"
                     android:inputType="textEmailAddress"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -186,14 +186,28 @@
         </com.google.android.material.card.MaterialCardView>
 
         <TextView
+            android:id="@+id/tvEmailError"
+            style="@style/Ms.Text.Label"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_4"
+            android:text="@string/auth_error_email_inline"
+            android:textColor="@color/colorError"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="@id/cardEmailField"
+            app:layout_constraintStart_toStartOf="@id/cardEmailField"
+            app:layout_constraintTop_toBottomOf="@id/cardEmailField"
+            tools:visibility="visible" />
+
+        <TextView
             android:id="@+id/tvPasswordLabel"
             style="@style/AppText.FieldLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_12"
-            android:text="@string/auto_text_036"
+            android:text="@string/login_password_label"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/cardEmailField" />
+            app:layout_constraintTop_toBottomOf="@id/tvEmailError" />
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardPasswordField"
@@ -230,13 +244,13 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:srcCompat="@drawable/ic_eye_off"
-                    app:tint="?attr/colorOnSurfaceVariant" />
+                    app:tint="@color/ms_text_secondary" />
 
                 <EditText
                     android:id="@+id/etPassword"
                     style="@style/AppInput.EditText"
                     android:layout_width="0dp"
-                    android:hint="@string/auto_text_108"
+                    android:hint="@string/login_password_hint"
                     android:inputType="textPassword"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@id/ivPasswordToggle"
@@ -247,23 +261,37 @@
         </com.google.android.material.card.MaterialCardView>
 
         <TextView
+            android:id="@+id/tvPasswordError"
+            style="@style/Ms.Text.Label"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_4"
+            android:text="@string/auth_error_password_inline"
+            android:textColor="@color/colorError"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="@id/cardPasswordField"
+            app:layout_constraintStart_toStartOf="@id/cardPasswordField"
+            app:layout_constraintTop_toBottomOf="@id/cardPasswordField"
+            tools:visibility="visible" />
+
+        <TextView
             android:id="@+id/tvForgotPassword"
             style="@style/AppText.Body"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_6"
-            android:text="@string/auto_text_037"
-            android:textColor="?attr/colorPrimary"
+            android:text="@string/login_forgot_password"
+            android:textColor="@color/ms_text_primary"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/cardPasswordField" />
+            app:layout_constraintTop_toBottomOf="@id/tvPasswordError" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnLogin"
             style="@style/AppButton.Primary"
             android:layout_width="0dp"
             android:layout_marginTop="@dimen/space_10"
-            android:text="@string/auto_text_038"
+            android:text="@string/login_btn_label"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tvForgotPassword" />
@@ -294,7 +322,7 @@
                 android:layout_height="wrap_content"
                 android:paddingStart="@dimen/space_16"
                 android:paddingEnd="@dimen/space_16"
-                android:text="@string/auto_text_039"
+                android:text="@string/login_social_divider"
                 android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -327,7 +355,7 @@
                 android:minHeight="@dimen/auth_social_button_height"
                 android:paddingTop="10dp"
                 android:paddingBottom="10dp"
-                android:text="@string/auto_text_040"
+                android:text="@string/login_google_label"
                 app:icon="@drawable/googlelogo"
                 app:iconGravity="textStart"
                 app:iconPadding="@dimen/space_8"
@@ -344,11 +372,11 @@
                 android:layout_marginTop="@dimen/space_8"
                 android:clickable="true"
                 android:focusable="true"
-                app:cardBackgroundColor="#FFF3E6"
-                app:cardCornerRadius="@dimen/corner_radius_large"
+                app:cardBackgroundColor="@color/ms_surface_card"
+                app:cardCornerRadius="@dimen/ms_radius_md"
                 app:cardElevation="0dp"
-                app:strokeColor="#E8C99A"
-                app:strokeWidth="1dp"
+                app:strokeColor="@color/ms_border_default"
+                app:strokeWidth="@dimen/ms_stroke_hairline"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/btnGoogle">
@@ -366,7 +394,7 @@
                     <com.google.android.material.card.MaterialCardView
                         android:layout_width="36dp"
                         android:layout_height="36dp"
-                        app:cardBackgroundColor="@android:color/white"
+                            app:cardBackgroundColor="@color/ms_surface_sunken"
                         app:cardCornerRadius="999dp"
                         app:cardElevation="0dp"
                         app:strokeWidth="0dp">
@@ -377,7 +405,7 @@
                             android:padding="8dp"
                             android:importantForAccessibility="no"
                             app:srcCompat="@drawable/ic_home_category_phone"
-                            app:tint="#7A5C2E" />
+                            app:tint="@color/ms_text_primary" />
                     </com.google.android.material.card.MaterialCardView>
 
                     <TextView
@@ -386,7 +414,7 @@
                         android:layout_weight="1"
                         android:gravity="center"
                         android:text="@string/phone_login_cta"
-                        android:textColor="#7A5C2E"
+                        android:textColor="@color/ms_text_primary"
                         android:textSize="14sp"
                         android:fontFamily="@font/manrope_semibold" />
 
@@ -395,7 +423,7 @@
                         android:layout_height="16dp"
                         android:importantForAccessibility="no"
                         app:srcCompat="@drawable/ic_chevron_right"
-                        app:tint="#7A5C2E" />
+                        app:tint="@color/ms_text_tertiary" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
         </androidx.constraintlayout.widget.ConstraintLayout>
@@ -441,7 +469,7 @@
                 style="@style/AppText.Body"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/auto_text_042"
+                android:text="@string/login_no_account"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/tvSignUp"
                 app:layout_constraintStart_toStartOf="parent"
@@ -453,8 +481,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/space_8"
-                android:text="@string/auto_text_043"
-                android:textColor="?attr/colorPrimary"
+                android:text="@string/login_register_cta"
+                android:textColor="@color/ms_text_primary"
                 android:textStyle="bold"
                 app:layout_constraintBaseline_toBaselineOf="@id/tvNoAccount"
                 app:layout_constraintEnd_toEndOf="parent"

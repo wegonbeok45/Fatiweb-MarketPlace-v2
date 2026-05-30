@@ -3,10 +3,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:cardBackgroundColor="@color/home_surface_raised"
+    app:cardBackgroundColor="@color/ms_surface_card"
     app:cardCornerRadius="@dimen/corner_radius_large"
     app:cardElevation="0dp"
-    app:strokeColor="@color/colorBorderLight"
+    app:strokeColor="@color/ms_border_default"
     app:strokeWidth="@dimen/stroke_width_default">
 
     <LinearLayout
@@ -19,13 +19,13 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginStart="56dp"
-            android:background="@color/colorBorderLight" />
+            android:background="@color/ms_border_default" />
         <include layout="@layout/row_about_link_privacy" />
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginStart="56dp"
-            android:background="@color/colorBorderLight" />
+            android:background="@color/ms_border_default" />
         <include layout="@layout/row_about_link_licenses" />
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

@@ -107,15 +107,28 @@ class RegisterActivity : AppCompatActivity() {
             val name = etFullName.text?.toString().orEmpty().trim()
             val email = etEmail.text?.toString().orEmpty().trim()
             val password = etPassword.text?.toString().orEmpty()
+            clearRegisterInlineErrors()
 
             val hasName = name.length >= 3
             val hasValidEmail = email.contains("@") && email.contains(".")
             val hasValidPassword = password.length >= 6
 
             if (!hasName || !hasValidEmail || !hasValidPassword) {
-                if (!hasName) markInputState(R.id.cardFullNameField, InputFieldState.ERROR)
-                if (!hasValidEmail) markInputState(R.id.cardEmailField, InputFieldState.ERROR)
-                if (!hasValidPassword) markInputState(R.id.cardPasswordField, InputFieldState.ERROR)
+                if (!hasName) {
+                    markInputState(R.id.cardFullNameField, InputFieldState.ERROR)
+                    findViewById<TextView>(R.id.tvFullNameError)?.visibility = View.VISIBLE
+                }
+                if (!hasValidEmail) {
+                    markInputState(R.id.cardEmailField, InputFieldState.ERROR)
+                    findViewById<TextView>(R.id.tvEmailError)?.visibility = View.VISIBLE
+                }
+                if (!hasValidPassword) {
+                    markInputState(R.id.cardPasswordField, InputFieldState.ERROR)
+                    findViewById<TextView>(R.id.tvPasswordError)?.apply {
+                        text = getString(R.string.auth_error_password_inline)
+                        setTextColor(getColor(R.color.colorError))
+                    }
+                }
                 showMotionSnackbar(getString(R.string.register_validation_error))
                 return@setOnClickListener
             }
@@ -129,13 +142,17 @@ class RegisterActivity : AppCompatActivity() {
                             AnalyticsTracker.signUp("email")
                             GuestSessionMerger.mergeIntoCurrentUserInBackground(this@RegisterActivity)
                             runCatching { FirebaseAuthManager.sendEmailVerification() }
+                            clearRegisterInlineErrors()
                             markInputState(R.id.cardFullNameField, InputFieldState.SUCCESS)
                             markInputState(R.id.cardEmailField, InputFieldState.SUCCESS)
                             markInputState(R.id.cardPasswordField, InputFieldState.SUCCESS)
                             showEmailVerificationDialog(email)
                         },
                         onFailure = { e ->
-                            showMotionSnackbar(FirebaseAuthManager.friendlyError(this@RegisterActivity, e))
+                            findViewById<TextView>(R.id.tvPasswordError)?.apply {
+                                text = FirebaseAuthManager.friendlyError(this@RegisterActivity, e)
+                                setTextColor(getColor(R.color.colorError))
+                            }
                         }
                     )
                 } finally {
@@ -228,6 +245,15 @@ class RegisterActivity : AppCompatActivity() {
         button.isEnabled = !isLoading
         button.text =
             getString(if (isLoading) R.string.register_submitting else R.string.register_btn_label)
+    }
+
+    private fun clearRegisterInlineErrors() {
+        findViewById<TextView>(R.id.tvFullNameError)?.visibility = View.GONE
+        findViewById<TextView>(R.id.tvEmailError)?.visibility = View.GONE
+        findViewById<TextView>(R.id.tvPasswordError)?.apply {
+            text = getString(R.string.auth_password_helper)
+            setTextColor(getColor(R.color.ms_text_secondary))
+        }
     }
 
     private fun showEmailVerificationDialog(email: String) {

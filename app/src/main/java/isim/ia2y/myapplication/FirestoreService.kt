@@ -20,8 +20,13 @@ object FirestoreService {
         val email: String = "",
         val role: String = "client",
         val avatarUrl: String? = null,
+        val location: UserLocation? = null,
         val createdAt: Any? = null,
-        val updatedAt: Any? = null
+        val updatedAt: Any? = null,
+        val phone: String = "",
+        val vendorStatus: String = "",
+        val shopName: String = "",
+        val shopBio: String = ""
     )
 
     data class ClientInfo(
@@ -91,6 +96,10 @@ object FirestoreService {
     ) =
         UserService.saveUserProfile(uid, name, email, avatarUrl, roleOverride)
     suspend fun updateUserProfileName(uid: String, name: String) = UserService.updateUserProfileName(uid, name)
+    suspend fun submitVendorApplication(uid: String, shopName: String, phone: String, note: String) =
+        UserService.submitVendorApplication(uid, shopName, phone, note)
+    suspend fun updateUserLocationIfChanged(uid: String, location: UserLocation) =
+        UserService.updateUserLocationIfChanged(uid, location)
     suspend fun fetchUserProfile(uid: String) = UserService.fetchUserProfile(uid)
     suspend fun fetchUserRole(uid: String, forceRefresh: Boolean = false) =
         UserService.fetchUserRole(uid, forceRefresh)

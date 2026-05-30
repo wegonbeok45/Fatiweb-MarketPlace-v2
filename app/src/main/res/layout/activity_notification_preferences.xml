@@ -4,13 +4,13 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/profile_body_bg">
+    android:background="@color/ms_surface_canvas">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layoutTopBar"
         android:layout_width="0dp"
         android:layout_height="@dimen/app_top_bar_height"
-        android:background="@color/profile_header_bg"
+        android:background="@color/ms_surface_canvas"
         android:paddingStart="@dimen/app_top_bar_horizontal_padding"
         android:paddingEnd="@dimen/app_top_bar_horizontal_padding"
         app:layout_constraintEnd_toEndOf="parent"
@@ -27,7 +27,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/back"
-            app:tint="@color/profile_text_primary" />
+            app:tint="@color/ms_text_primary" />
 
         <TextView
             style="@style/AppTopBar.Title.Profile"
@@ -62,10 +62,10 @@
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardBackgroundColor="@color/colorSurface"
+                app:cardBackgroundColor="@color/ms_surface_card"
                 app:cardCornerRadius="@dimen/corner_radius_large"
                 app:cardElevation="0dp"
-                app:strokeColor="@color/colorBorderLight"
+                app:strokeColor="@color/ms_border_default"
                 app:strokeWidth="1dp">
 
                 <LinearLayout
@@ -79,7 +79,7 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/manrope_semibold"
                         android:text="@string/notification_preferences_heading"
-                        android:textColor="@color/profile_text_primary"
+                        android:textColor="@color/ms_text_primary"
                         android:textSize="@dimen/text_size_subtitle" />
 
                     <TextView
@@ -87,7 +87,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:textColor="@color/profile_text_secondary"
+                        android:textColor="@color/ms_text_secondary"
                         android:textSize="@dimen/text_size_caption" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -96,10 +96,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="14dp"
-                app:cardBackgroundColor="@color/colorSurface"
+                app:cardBackgroundColor="@color/ms_surface_card"
                 app:cardCornerRadius="@dimen/corner_radius_large"
                 app:cardElevation="0dp"
-                app:strokeColor="@color/colorBorderLight"
+                app:strokeColor="@color/ms_border_default"
                 app:strokeWidth="1dp">
 
                 <LinearLayout
@@ -119,7 +119,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
                         android:text="@string/notification_preferences_push_subtitle"
-                        android:textColor="@color/profile_text_secondary"
+                        android:textColor="@color/ms_text_secondary"
                         android:textSize="@dimen/text_size_caption" />
 
                     <View
@@ -140,7 +140,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
                         android:text="@string/notification_preferences_orders_subtitle"
-                        android:textColor="@color/profile_text_secondary"
+                        android:textColor="@color/ms_text_secondary"
                         android:textSize="@dimen/text_size_caption" />
 
                     <View
@@ -161,7 +161,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
                         android:text="@string/notification_preferences_promotions_subtitle"
-                        android:textColor="@color/profile_text_secondary"
+                        android:textColor="@color/ms_text_secondary"
                         android:textSize="@dimen/text_size_caption" />
 
                     <View
@@ -182,7 +182,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
                         android:text="@string/notification_preferences_announcements_subtitle"
-                        android:textColor="@color/profile_text_secondary"
+                        android:textColor="@color/ms_text_secondary"
                         android:textSize="@dimen/text_size_caption" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -192,10 +192,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="14dp"
-                app:cardBackgroundColor="@color/colorSurfaceVariant"
+                app:cardBackgroundColor="@color/ms_surface_sunken"
                 app:cardCornerRadius="@dimen/corner_radius_large"
                 app:cardElevation="0dp"
-                app:strokeColor="@color/colorPrimary"
+                app:strokeColor="@color/ms_surface_inverse"
                 app:strokeWidth="1dp">
 
                 <LinearLayout
@@ -213,14 +213,14 @@
                         android:contentDescription="@string/cd_notification_icon"
                         android:padding="@dimen/space_10"
                         app:srcCompat="@drawable/notification"
-                        app:tint="@color/colorPrimary" />
+                        app:tint="@color/ms_surface_inverse" />
 
                     <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="@string/notification_preferences_open_inbox"
-                        android:textColor="@color/profile_text_primary"
+                        android:textColor="@color/ms_text_primary"
                         android:textSize="@dimen/text_size_body" />
 
                     <ImageView
@@ -228,7 +228,7 @@
                         android:layout_height="@dimen/profile_chevron_size"
                         android:contentDescription="@string/cd_chevron"
                         app:srcCompat="@drawable/ic_profile_chevron_right"
-                        app:tint="@color/profile_chevron" />
+                        app:tint="@color/ms_text_tertiary" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
         </LinearLayout>

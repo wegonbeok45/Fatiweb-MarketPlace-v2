@@ -16,7 +16,7 @@
         app:cardBackgroundColor="@color/details_topbar_bg"
         app:cardCornerRadius="@dimen/dialog_alert_corner_radius"
         app:cardElevation="@dimen/space_0"
-        app:strokeColor="@color/colorBorderLight"
+        app:strokeColor="@color/ms_border_default"
         app:strokeWidth="@dimen/space_0">
 
         <LinearLayout

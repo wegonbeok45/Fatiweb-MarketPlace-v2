@@ -4,13 +4,13 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/profile_body_bg">
+    android:background="@color/ms_surface_canvas">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layoutTopBar"
         android:layout_width="0dp"
         android:layout_height="@dimen/app_top_bar_height"
-        android:background="@color/profile_header_bg"
+        android:background="@color/ms_surface_canvas"
         android:paddingStart="@dimen/app_top_bar_horizontal_padding"
         android:paddingEnd="@dimen/app_top_bar_horizontal_padding"
         app:layout_constraintEnd_toEndOf="parent"
@@ -27,7 +27,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/back"
-            app:tint="@color/profile_text_primary" />
+            app:tint="@color/ms_text_primary" />
 
         <TextView
             style="@style/AppTopBar.Title.Profile"
@@ -79,7 +79,7 @@
                         android:fontFamily="@font/manrope_semibold"
                         android:gravity="center"
                         android:text="@string/about_curator_mark"
-                        android:textColor="@color/profile_text_primary"
+                        android:textColor="@color/ms_text_primary"
                         android:textSize="24sp" />
                 </com.google.android.material.card.MaterialCardView>
 
@@ -89,7 +89,7 @@
                     android:layout_marginTop="@dimen/space_12"
                     android:fontFamily="@font/manrope_semibold"
                     android:text="@string/app_name"
-                    android:textColor="@color/profile_text_primary"
+                    android:textColor="@color/ms_text_primary"
                     android:textSize="@dimen/text_size_subtitle" />
 
                 <TextView
@@ -97,7 +97,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
-                    android:textColor="@color/profile_text_secondary"
+                    android:textColor="@color/ms_text_secondary"
                     android:textSize="@dimen/text_size_caption" />
 
                 <TextView
@@ -106,7 +106,7 @@
                     android:layout_marginTop="@dimen/space_16"
                     android:gravity="center"
                     android:text="@string/about_curator_description"
-                    android:textColor="@color/profile_text_secondary"
+                    android:textColor="@color/ms_text_secondary"
                     android:textSize="@dimen/text_size_body" />
             </LinearLayout>
 
@@ -136,7 +136,7 @@
                 android:layout_marginTop="@dimen/space_24"
                 android:fontFamily="@font/manrope_medium"
                 android:text="@string/about_curator_footer"
-                android:textColor="@color/profile_text_secondary"
+                android:textColor="@color/ms_text_secondary"
                 android:textSize="@dimen/text_size_caption" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

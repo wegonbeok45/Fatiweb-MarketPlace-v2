@@ -46,6 +46,18 @@
         </provider>
 
         <activity
+            android:name=".AdminAnalyticsActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MyApplication.Admin" />
+        <activity
+            android:name=".AdminHomeActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MyApplication.Admin" />
+        <activity
+            android:name=".AdminVendorsActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MyApplication.Admin" />
+        <activity
             android:name=".AdminDashboardActivity"
             android:exported="false"
             android:theme="@style/Theme.MyApplication.Admin" />
@@ -71,6 +83,34 @@
             android:theme="@style/Theme.MyApplication.Admin" />
         <activity
             android:name=".SellerDashboardActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MyApplication.Admin" />
+        <activity
+            android:name=".VendorHomeActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MyApplication.Admin" />
+        <activity
+            android:name=".VendorProductsActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MyApplication.Admin" />
+        <activity
+            android:name=".VendorProductEditorActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MyApplication.Admin" />
+        <activity
+            android:name=".VendorOrdersActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MyApplication.Admin" />
+        <activity
+            android:name=".VendorOrderDetailActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MyApplication.Admin" />
+        <activity
+            android:name=".VendorShopProfileActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MyApplication.Admin" />
+        <activity
+            android:name=".VendorAnalyticsActivity"
             android:exported="false"
             android:theme="@style/Theme.MyApplication.Admin" />
         <activity

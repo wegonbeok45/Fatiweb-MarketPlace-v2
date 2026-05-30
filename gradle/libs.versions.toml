@@ -18,6 +18,7 @@ firebaseCrashlyticsPlugin = "3.0.2"
 firebasePerfPlugin = "2.0.2"
 coroutines = "1.8.1"
 googlePlayServicesAuth = "21.3.0"
+googlePlayServicesLocation = "21.3.0"
 credentialManager = "1.3.0"
 googleIdentity = "1.1.1"
 lottie = "6.4.0"
@@ -62,6 +63,7 @@ androidx-security-crypto = { group = "androidx.security", name = "security-crypt
 kotlinx-coroutines-play-services = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-play-services", version.ref = "coroutines" }
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
 play-services-auth = { group = "com.google.android.gms", name = "play-services-auth", version.ref = "googlePlayServicesAuth" }
+play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "googlePlayServicesLocation" }
 androidx-credentials = { group = "androidx.credentials", name = "credentials", version.ref = "credentialManager" }
 androidx-credentials-play-services-auth = { group = "androidx.credentials", name = "credentials-play-services-auth", version.ref = "credentialManager" }
 google-identity-googleid = { group = "com.google.android.libraries.identity.googleid", name = "googleid", version.ref = "googleIdentity" }

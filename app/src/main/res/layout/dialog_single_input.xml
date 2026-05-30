@@ -17,7 +17,7 @@
         android:paddingEnd="@dimen/space_16"
         android:paddingBottom="@dimen/space_12"
         android:fontFamily="@font/manrope_regular"
-        android:textColor="?attr/colorOnSurface"
+        android:textColor="@color/ms_text_primary"
         android:inputType="text" />
 </FrameLayout>
 

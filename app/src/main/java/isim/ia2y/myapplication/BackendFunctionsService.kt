@@ -382,7 +382,12 @@ private fun Product.toFunctionPayload(): Map<String, Any?> = mapOf(
     "sellerMemberSince" to sellerMemberSince,
     "sellerTotalSold" to sellerTotalSold,
     "sellerRating" to sellerRating,
-    "sellerRatingCount" to sellerRatingCount
+    "sellerRatingCount" to sellerRatingCount,
+    "productType" to productType,
+    "attributes" to attributes,
+    "colorOptions" to colorOptions.map { it.toMap() },
+    "sizeOptions" to sizeOptions,
+    "variants" to variants.map { it.toMap() }
 )
 
 private fun Any?.asStringKeyedMap(): Map<String, Any?>? {

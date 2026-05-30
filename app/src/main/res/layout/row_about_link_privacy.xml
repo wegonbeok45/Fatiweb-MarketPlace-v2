@@ -13,7 +13,7 @@
         android:layout_height="24dp"
         android:contentDescription="@string/about_curator_privacy_title"
         app:srcCompat="@drawable/ic_admin_shield"
-        app:tint="@color/profile_text_secondary" />
+        app:tint="@color/ms_text_secondary" />
 
     <TextView
         android:layout_width="0dp"
@@ -22,7 +22,7 @@
         android:layout_weight="1"
         android:fontFamily="@font/manrope_medium"
         android:text="@string/about_curator_privacy_title"
-        android:textColor="@color/profile_text_primary"
+        android:textColor="@color/ms_text_primary"
         android:textSize="@dimen/text_size_body" />
 
     <ImageView
@@ -30,6 +30,6 @@
         android:layout_height="16dp"
         android:contentDescription="@string/cd_chevron"
         app:srcCompat="@drawable/ic_profile_chevron_right"
-        app:tint="@color/profile_chevron" />
+        app:tint="@color/ms_text_tertiary" />
 </LinearLayout>
 

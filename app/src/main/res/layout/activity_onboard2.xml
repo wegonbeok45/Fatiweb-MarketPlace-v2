@@ -19,14 +19,14 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/back"
-        app:tint="?attr/colorOnSurface" />
+        app:tint="@color/ms_text_primary" />
 
     <TextView
         android:id="@+id/tvSkip"
         style="@style/AppText.Caption"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/auto_text_081"
+        android:text="@string/onboard_skip"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@id/ivBack"
         app:layout_constraintEnd_toEndOf="parent"
@@ -58,7 +58,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="@string/auto_text_085"
+                android:text="@string/onboard_slide2_title"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -70,7 +70,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_16"
                 android:gravity="center"
-                android:text="@string/auto_text_086"
+                android:text="@string/onboard_slide2_subtitle"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tvHeadline" />
@@ -116,7 +116,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:visibility="gone"
-                            android:textColor="@color/colorSurface"
+                            android:textColor="@color/ms_surface_card"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
 
@@ -125,8 +125,8 @@
                             style="@style/AppText.Subtitle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/auto_text_088"
-                            android:textColor="@color/colorSurface"
+                            android:text="@string/onboard_cat_food"
+                            android:textColor="@color/ms_surface_card"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
 
@@ -136,7 +136,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/space_2"
-                            android:text="@string/auto_text_089"
+                            android:text="@string/onboard_cat_food_subtitle"
                             android:textColor="@color/colorOnScrim"
                             app:layout_constraintStart_toStartOf="@id/tvCategoryFoodTitle"
                             app:layout_constraintTop_toBottomOf="@id/tvCategoryFoodTitle" />
@@ -187,7 +187,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:visibility="gone"
-                            android:textColor="@color/colorSurface"
+                            android:textColor="@color/ms_surface_card"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
 
@@ -196,8 +196,8 @@
                             style="@style/AppText.Subtitle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/auto_text_090"
-                            android:textColor="@color/colorSurface"
+                            android:text="@string/onboard_cat_beauty"
+                            android:textColor="@color/ms_surface_card"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
 
@@ -207,7 +207,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/space_2"
-                            android:text="@string/auto_text_091"
+                            android:text="@string/onboard_cat_beauty_subtitle"
                             android:textColor="@color/colorOnScrim"
                             app:layout_constraintStart_toStartOf="@id/tvCategoryCosmeticsTitle"
                             app:layout_constraintTop_toBottomOf="@id/tvCategoryCosmeticsTitle" />
@@ -259,7 +259,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:visibility="gone"
-                            android:textColor="@color/colorSurface"
+                            android:textColor="@color/ms_surface_card"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
 
@@ -268,8 +268,8 @@
                             style="@style/AppText.Subtitle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/auto_text_013"
-                            android:textColor="@color/colorSurface"
+                            android:text="@string/onboard_cat_craft"
+                            android:textColor="@color/ms_surface_card"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
 
@@ -279,7 +279,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/space_2"
-                            android:text="@string/auto_text_092"
+                            android:text="@string/onboard_cat_craft_subtitle"
                             android:textColor="@color/colorOnScrim"
                             app:layout_constraintStart_toStartOf="@id/tvCategoryCraftsTitle"
                             app:layout_constraintTop_toBottomOf="@id/tvCategoryCraftsTitle" />
@@ -327,7 +327,7 @@
         style="@style/AppButton.Primary"
         android:layout_width="0dp"
         android:layout_marginBottom="@dimen/space_32"
-        android:text="@string/auto_text_084"
+        android:text="@string/onboard_next"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

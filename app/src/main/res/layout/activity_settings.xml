@@ -5,14 +5,14 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/profile_body_bg"
+    android:background="@color/ms_surface_canvas"
     tools:context=".SettingsActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layoutTopBar"
         android:layout_width="0dp"
         android:layout_height="@dimen/app_top_bar_height"
-        android:background="@color/profile_header_bg"
+        android:background="@color/ms_surface_canvas"
         android:paddingStart="@dimen/app_top_bar_horizontal_padding"
         android:paddingEnd="@dimen/app_top_bar_horizontal_padding"
         app:layout_constraintEnd_toEndOf="parent"
@@ -29,7 +29,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/back"
-            app:tint="@color/profile_text_primary" />
+            app:tint="@color/ms_text_primary" />
 
         <TextView
             style="@style/AppTopBar.Title.Profile"
@@ -79,11 +79,11 @@
         android:id="@+id/cardLanguage"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:cardBackgroundColor="@color/profile_section_bg"
+        app:cardBackgroundColor="@color/ms_surface_card"
         app:cardCornerRadius="@dimen/profile_menu_group_radius"
         app:cardElevation="0dp"
         app:cardUseCompatPadding="false"
-        app:strokeColor="@color/profile_section_stroke"
+        app:strokeColor="@color/ms_border_subtle"
         app:strokeWidth="@dimen/stroke_width_default"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -101,7 +101,7 @@
                 android:id="@+id/cardLangIcon"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                app:cardBackgroundColor="@color/profile_card_icon_bg"
+                app:cardBackgroundColor="@color/ms_surface_sunken"
                 app:cardCornerRadius="@dimen/corner_radius_round"
                 app:cardElevation="@dimen/space_0"
                 app:cardUseCompatPadding="false"
@@ -117,7 +117,7 @@
                     android:layout_gravity="center"
                     android:contentDescription="@string/cd_language"
                     app:srcCompat="@drawable/ic_language"
-                    app:tint="@color/profile_text_primary" />
+                    app:tint="@color/ms_text_primary" />
             </com.google.android.material.card.MaterialCardView>
 
             <TextView
@@ -157,7 +157,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/ic_profile_chevron_right"
-                app:tint="@color/profile_chevron" />
+                app:tint="@color/ms_text_tertiary" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.card.MaterialCardView>
 
@@ -166,11 +166,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/space_12"
-        app:cardBackgroundColor="@color/profile_section_bg"
+        app:cardBackgroundColor="@color/ms_surface_card"
         app:cardCornerRadius="@dimen/profile_menu_group_radius"
         app:cardElevation="0dp"
         app:cardUseCompatPadding="false"
-        app:strokeColor="@color/profile_section_stroke"
+        app:strokeColor="@color/ms_border_subtle"
         app:strokeWidth="@dimen/stroke_width_default">
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -185,7 +185,7 @@
                 android:id="@+id/cardNotificationsIcon"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                app:cardBackgroundColor="@color/profile_card_icon_bg"
+                app:cardBackgroundColor="@color/ms_surface_sunken"
                 app:cardCornerRadius="@dimen/corner_radius_round"
                 app:cardElevation="@dimen/space_0"
                 app:cardUseCompatPadding="false"
@@ -201,7 +201,7 @@
                     android:layout_gravity="center"
                     android:contentDescription="@string/cd_notifications"
                     app:srcCompat="@drawable/notification"
-                    app:tint="@color/profile_text_primary" />
+                    app:tint="@color/ms_text_primary" />
             </com.google.android.material.card.MaterialCardView>
 
             <TextView
@@ -237,7 +237,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/ic_profile_chevron_right"
-                app:tint="@color/profile_chevron" />
+                app:tint="@color/ms_text_tertiary" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.card.MaterialCardView>
 
@@ -253,11 +253,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/space_12"
-        app:cardBackgroundColor="@color/profile_section_bg"
+        app:cardBackgroundColor="@color/ms_surface_card"
         app:cardCornerRadius="@dimen/profile_menu_group_radius"
         app:cardElevation="0dp"
         app:cardUseCompatPadding="false"
-        app:strokeColor="@color/profile_section_stroke"
+        app:strokeColor="@color/ms_border_subtle"
         app:strokeWidth="@dimen/stroke_width_default">
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -272,7 +272,7 @@
                 android:id="@+id/cardSupportIcon"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                app:cardBackgroundColor="@color/profile_card_icon_bg"
+                app:cardBackgroundColor="@color/ms_surface_sunken"
                 app:cardCornerRadius="@dimen/corner_radius_round"
                 app:cardElevation="@dimen/space_0"
                 app:cardUseCompatPadding="false"
@@ -288,7 +288,7 @@
                     android:layout_gravity="center"
                     android:contentDescription="@string/cd_menu"
                     app:srcCompat="@drawable/ic_profile_help"
-                    app:tint="@color/profile_text_primary" />
+                    app:tint="@color/ms_text_primary" />
             </com.google.android.material.card.MaterialCardView>
 
             <TextView
@@ -324,7 +324,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/ic_profile_chevron_right"
-                app:tint="@color/profile_chevron" />
+                app:tint="@color/ms_text_tertiary" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.card.MaterialCardView>
 
@@ -340,11 +340,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/space_12"
-        app:cardBackgroundColor="@color/profile_section_bg"
+        app:cardBackgroundColor="@color/ms_surface_card"
         app:cardCornerRadius="@dimen/profile_menu_group_radius"
         app:cardElevation="0dp"
         app:cardUseCompatPadding="false"
-        app:strokeColor="@color/profile_section_stroke"
+        app:strokeColor="@color/ms_border_subtle"
         app:strokeWidth="@dimen/stroke_width_default">
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -359,7 +359,7 @@
                 android:id="@+id/cardAboutIcon"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                app:cardBackgroundColor="@color/profile_card_icon_bg"
+                app:cardBackgroundColor="@color/ms_surface_sunken"
                 app:cardCornerRadius="@dimen/corner_radius_round"
                 app:cardElevation="@dimen/space_0"
                 app:cardUseCompatPadding="false"
@@ -375,7 +375,7 @@
                     android:layout_gravity="center"
                     android:contentDescription="@string/cd_logo"
                     app:srcCompat="@drawable/settings"
-                    app:tint="@color/profile_text_primary" />
+                    app:tint="@color/ms_text_primary" />
             </com.google.android.material.card.MaterialCardView>
 
             <TextView
@@ -411,7 +411,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/ic_profile_chevron_right"
-                app:tint="@color/profile_chevron" />
+                app:tint="@color/ms_text_tertiary" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.card.MaterialCardView>
 

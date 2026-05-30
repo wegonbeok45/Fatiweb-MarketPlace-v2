@@ -5,14 +5,14 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/profile_body_bg"
+    android:background="@color/ms_surface_canvas"
     tools:context=".LanguageSettingsActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layoutTopBar"
         android:layout_width="0dp"
         android:layout_height="@dimen/app_top_bar_height"
-        android:background="@color/profile_header_bg"
+        android:background="@color/ms_surface_canvas"
         android:paddingStart="@dimen/app_top_bar_horizontal_padding"
         android:paddingEnd="@dimen/app_top_bar_horizontal_padding"
         app:layout_constraintEnd_toEndOf="parent"
@@ -29,7 +29,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/back"
-            app:tint="@color/profile_text_primary" />
+            app:tint="@color/ms_text_primary" />
 
         <TextView
             style="@style/AppTopBar.Title.Profile"
@@ -56,11 +56,11 @@
         android:layout_marginStart="@dimen/profile_horizontal_margin"
         android:layout_marginTop="@dimen/profile_menu_top_padding"
         android:layout_marginEnd="@dimen/profile_horizontal_margin"
-        app:cardBackgroundColor="@color/profile_section_bg"
+        app:cardBackgroundColor="@color/ms_surface_card"
         app:cardCornerRadius="@dimen/profile_menu_group_radius"
         app:cardElevation="0dp"
         app:cardUseCompatPadding="false"
-        app:strokeColor="@color/profile_section_stroke"
+        app:strokeColor="@color/ms_border_subtle"
         app:strokeWidth="@dimen/stroke_width_default"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

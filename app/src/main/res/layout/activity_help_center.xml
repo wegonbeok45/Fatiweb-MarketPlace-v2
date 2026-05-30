@@ -4,13 +4,13 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/profile_body_bg">
+    android:background="@color/ms_surface_canvas">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layoutTopBar"
         android:layout_width="0dp"
         android:layout_height="@dimen/app_top_bar_height"
-        android:background="@color/profile_header_bg"
+        android:background="@color/ms_surface_canvas"
         android:paddingStart="@dimen/app_top_bar_horizontal_padding"
         android:paddingEnd="@dimen/app_top_bar_horizontal_padding"
         app:layout_constraintEnd_toEndOf="parent"
@@ -27,7 +27,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/back"
-            app:tint="@color/profile_text_primary" />
+            app:tint="@color/ms_text_primary" />
 
         <TextView
             style="@style/AppTopBar.Title.Profile"
@@ -49,7 +49,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/notification"
-            app:tint="@color/profile_text_primary" />
+            app:tint="@color/ms_text_primary" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.core.widget.NestedScrollView
@@ -95,7 +95,7 @@
                         android:layout_height="18dp"
                         android:contentDescription="@string/cd_search"
                         app:srcCompat="@drawable/ic_profile_nav_search"
-                        app:tint="@color/profile_text_secondary" />
+                        app:tint="@color/ms_text_secondary" />
 
                     <EditText
                         android:id="@+id/etHelpSearch"
@@ -107,8 +107,8 @@
                         android:fontFamily="@font/manrope_regular"
                         android:hint="@string/help_center_search_hint"
                         android:inputType="textCapSentences"
-                        android:textColor="@color/profile_text_primary"
-                        android:textColorHint="@color/profile_text_secondary" />
+                        android:textColor="@color/ms_text_primary"
+                        android:textColorHint="@color/ms_text_secondary" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -118,7 +118,7 @@
                 android:layout_marginTop="@dimen/space_20"
                 android:fontFamily="@font/manrope_semibold"
                 android:text="@string/help_center_common_topics"
-                android:textColor="@color/profile_text_primary"
+                android:textColor="@color/ms_text_primary"
                 android:textSize="@dimen/text_size_body" />
 
             <LinearLayout
@@ -137,7 +137,7 @@
                 android:layout_marginTop="@dimen/space_20"
                 android:fontFamily="@font/manrope_semibold"
                 android:text="@string/help_center_contact_us"
-                android:textColor="@color/profile_text_primary"
+                android:textColor="@color/ms_text_primary"
                 android:textSize="@dimen/text_size_body" />
 
             <LinearLayout
@@ -152,10 +152,10 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    app:cardBackgroundColor="@color/home_surface_raised"
+                    app:cardBackgroundColor="@color/ms_surface_card"
                     app:cardCornerRadius="@dimen/corner_radius_large"
                     app:cardElevation="0dp"
-                    app:strokeColor="@color/colorBorderLight"
+                    app:strokeColor="@color/ms_border_default"
                     app:strokeWidth="@dimen/stroke_width_default">
 
                     <LinearLayout
@@ -169,7 +169,7 @@
                             android:layout_height="24dp"
                             android:contentDescription="@string/cd_menu"
                             app:srcCompat="@drawable/ic_profile_help"
-                            app:tint="@color/profile_text_primary" />
+                            app:tint="@color/ms_text_primary" />
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -177,7 +177,7 @@
                             android:layout_marginTop="@dimen/space_12"
                             android:fontFamily="@font/manrope_semibold"
                             android:text="@string/help_center_live_chat"
-                            android:textColor="@color/profile_text_primary"
+                            android:textColor="@color/ms_text_primary"
                             android:textSize="@dimen/text_size_body" />
 
                         <TextView
@@ -185,7 +185,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
                             android:text="@string/help_center_live_chat_subtitle"
-                            android:textColor="@color/profile_text_secondary"
+                            android:textColor="@color/ms_text_secondary"
                             android:textSize="@dimen/text_size_caption" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
@@ -199,10 +199,10 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    app:cardBackgroundColor="@color/home_surface_raised"
+                    app:cardBackgroundColor="@color/ms_surface_card"
                     app:cardCornerRadius="@dimen/corner_radius_large"
                     app:cardElevation="0dp"
-                    app:strokeColor="@color/colorBorderLight"
+                    app:strokeColor="@color/ms_border_default"
                     app:strokeWidth="@dimen/stroke_width_default">
 
                     <LinearLayout
@@ -216,7 +216,7 @@
                             android:layout_height="24dp"
                             android:contentDescription="@string/cd_notifications"
                             app:srcCompat="@drawable/notification"
-                            app:tint="@color/profile_text_primary" />
+                            app:tint="@color/ms_text_primary" />
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -224,7 +224,7 @@
                             android:layout_marginTop="@dimen/space_12"
                             android:fontFamily="@font/manrope_semibold"
                             android:text="@string/help_center_email_support"
-                            android:textColor="@color/profile_text_primary"
+                            android:textColor="@color/ms_text_primary"
                             android:textSize="@dimen/text_size_body" />
 
                         <TextView
@@ -232,7 +232,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
                             android:text="@string/help_center_email_support_subtitle"
-                            android:textColor="@color/profile_text_secondary"
+                            android:textColor="@color/ms_text_secondary"
                             android:textSize="@dimen/text_size_caption" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>

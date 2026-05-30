@@ -44,7 +44,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:indeterminate="true"
-                app:indicatorColor="@color/home_ref_gold"
+                app:indicatorColor="@color/ms_accent_gold"
                 app:indicatorSize="42dp"
                 app:trackThickness="4dp" />
 
@@ -54,8 +54,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:fontFamily="@font/manrope_medium"
-                android:text="@string/auto_loading_8524"
-                android:textColor="@color/home_ref_text_primary"
+                android:text="@string/ms_loading"
+                android:textColor="@color/ms_text_primary"
                 android:textSize="@dimen/text_size_caption" />
 
             <TextView
@@ -74,7 +74,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="14dp"
-                android:text="@string/auto_retry_6327"
+                android:text="@string/ms_action_retry"
                 android:textAllCaps="false"
                 android:visibility="gone"
                 app:cornerRadius="20dp" />
@@ -91,7 +91,7 @@
         app:cardBackgroundColor="@color/home_ref_surface"
         app:cardCornerRadius="@dimen/home_ref_nav_radius"
         app:cardElevation="8dp"
-        app:strokeColor="@color/home_ref_border"
+        app:strokeColor="@color/ms_border_subtle"
         app:strokeWidth="1dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -135,7 +135,7 @@
                     android:layout_height="21dp"
                     android:importantForAccessibility="no"
                     app:srcCompat="@drawable/ic_bottom_nav_home"
-                    app:tint="@color/home_ref_text_primary" />
+                    app:tint="@color/ms_text_primary" />
 
                 <TextView
                     android:id="@+id/hostNavHomeLabel"
@@ -144,7 +144,7 @@
                     android:layout_marginTop="4dp"
                     android:fontFamily="@font/manrope_medium"
                     android:text="@string/home_ref_nav_home"
-                    android:textColor="@color/home_ref_text_primary"
+                    android:textColor="@color/ms_text_primary"
                     android:textSize="@dimen/home_ref_nav_label_size" />
             </LinearLayout>
 
@@ -168,7 +168,7 @@
                     android:layout_height="21dp"
                     android:importantForAccessibility="no"
                     app:srcCompat="@drawable/ic_bottom_nav_categories"
-                    app:tint="@color/home_ref_nav_icon" />
+                    app:tint="@color/ms_text_secondary" />
 
                 <TextView
                     android:id="@+id/hostNavExploreLabel"
@@ -177,7 +177,7 @@
                     android:layout_marginTop="4dp"
                     android:fontFamily="@font/manrope_medium"
                     android:text="@string/home_ref_nav_categories"
-                    android:textColor="@color/home_ref_nav_icon"
+                    android:textColor="@color/ms_text_secondary"
                     android:textSize="@dimen/home_ref_nav_label_size" />
             </LinearLayout>
 
@@ -208,7 +208,7 @@
                         android:layout_gravity="center"
                         android:importantForAccessibility="no"
                         app:srcCompat="@drawable/ic_bottom_nav_cart"
-                        app:tint="@color/home_ref_nav_icon" />
+                        app:tint="@color/ms_text_secondary" />
 
                     <com.google.android.material.card.MaterialCardView
                         android:id="@+id/cardBottomCartBadge"
@@ -216,7 +216,7 @@
                         android:layout_height="18dp"
                         android:layout_gravity="end|top"
                         android:visibility="gone"
-                        app:cardBackgroundColor="@color/home_ref_gold"
+                        app:cardBackgroundColor="@color/ms_accent_gold"
                         app:cardCornerRadius="9dp"
                         app:cardElevation="0dp"
                         app:strokeWidth="0dp">
@@ -241,7 +241,7 @@
                     android:layout_marginTop="4dp"
                     android:fontFamily="@font/manrope_medium"
                     android:text="@string/home_ref_nav_cart"
-                    android:textColor="@color/home_ref_nav_icon"
+                    android:textColor="@color/ms_text_secondary"
                     android:textSize="@dimen/home_ref_nav_label_size" />
             </LinearLayout>
 
@@ -265,7 +265,7 @@
                     android:layout_height="21dp"
                     android:importantForAccessibility="no"
                     app:srcCompat="@drawable/ic_bottom_nav_profile"
-                    app:tint="@color/home_ref_nav_icon" />
+                    app:tint="@color/ms_text_secondary" />
 
                 <TextView
                     android:id="@+id/hostNavProfileLabel"
@@ -274,7 +274,7 @@
                     android:layout_marginTop="4dp"
                     android:fontFamily="@font/manrope_medium"
                     android:text="@string/home_ref_nav_account"
-                    android:textColor="@color/home_ref_nav_icon"
+                    android:textColor="@color/ms_text_secondary"
                     android:textSize="@dimen/home_ref_nav_label_size" />
             </LinearLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
@@ -290,7 +290,7 @@
         android:contentDescription="FatiBot Assistant IA"
         android:elevation="8dp"
         android:focusable="true"
-        app:cardBackgroundColor="@color/colorPrimary"
+        app:cardBackgroundColor="@color/ms_surface_inverse"
         app:cardCornerRadius="@dimen/screen_fab_corner_radius"
         app:cardElevation="8dp"
         app:layout_constraintBottom_toTopOf="@id/hostLayoutBottomNav"
@@ -303,7 +303,7 @@
             android:padding="@dimen/screen_fab_icon_padding"
             android:scaleType="centerInside"
             app:srcCompat="@drawable/ic_chat_bubble"
-            app:tint="@color/colorOnPrimary" />
+            app:tint="@color/ms_text_inverse" />
 
     </androidx.cardview.widget.CardView>
 

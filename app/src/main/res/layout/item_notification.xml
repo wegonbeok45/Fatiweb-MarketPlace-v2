@@ -7,7 +7,7 @@
     app:cardBackgroundColor="@color/home_nav_bg"
     app:cardCornerRadius="@dimen/corner_radius_large"
     app:cardElevation="0dp"
-    app:strokeColor="@color/colorBorderLight"
+    app:strokeColor="@color/ms_border_default"
     app:strokeWidth="@dimen/stroke_width_default">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -30,7 +30,7 @@
                 android:layout_height="20dp"
                 android:layout_gravity="center"
                 app:srcCompat="@drawable/notification"
-                app:tint="?attr/colorPrimary"  android:contentDescription="@string/cd_notification_icon" />
+                app:tint="@color/ms_text_primary"  android:contentDescription="@string/cd_notification_icon" />
         </FrameLayout>
 
         <TextView
@@ -41,7 +41,7 @@
             android:layout_marginStart="14dp"
             android:ellipsize="end"
             android:maxLines="1"
-            android:text="@string/auto_welcome_to_fatiweb_b4d1"
+            android:text="@string/notification_welcome_title"
             android:textColor="@color/home_text_primary"
             android:textSize="@dimen/text_size_body"
             android:layout_marginEnd="12dp"
@@ -58,7 +58,7 @@
             android:layout_marginTop="4dp"
             android:ellipsize="end"
             android:maxLines="2"
-            android:text="@string/auto_discover_the_best_of_887b"
+            android:text="@string/notification_welcome_message"
             android:textSize="@dimen/text_size_caption"
             android:lineSpacingExtra="2dp"
             app:layout_constraintEnd_toEndOf="parent"
@@ -71,7 +71,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="@string/auto_just_now_5803"
+            android:text="@string/notification_time_just_now"
             android:textSize="@dimen/text_size_overline"
             app:layout_constraintStart_toStartOf="@id/tvNotificationTitle"
             app:layout_constraintTop_toBottomOf="@id/tvNotificationMessage" />

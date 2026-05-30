@@ -19,7 +19,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/back"
-        app:tint="?attr/colorOnSurface" />
+        app:tint="@color/ms_text_primary" />
 
     <TextView
         android:id="@+id/tvTitle"
@@ -96,7 +96,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/space_16"
         android:text="@string/phone_verify_resend"
-        android:textColor="?attr/colorPrimary"
+        android:textColor="@color/ms_text_primary"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

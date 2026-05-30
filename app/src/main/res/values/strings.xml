@@ -115,50 +115,130 @@
     <string name="language_option_english">English</string>
     <string name="language_saved">Langue mise &#224; jour</string>
 
-    <string name="auto_text_001">Logo FatiWeb</string>
-    <string name="auto_text_002">FatiWeb Market</string>
-    <string name="auto_text_003">Favoris</string>
-    <string name="auto_text_007">Accueil</string>
-    <string name="auto_text_008">Explorer</string>
-    <string name="auto_text_009">Panier</string>
-    <string name="auto_text_010">Profil</string>
-    <string name="auto_text_013">Artisanat</string>
-    <string name="auto_text_024">Mes Favoris</string>
-    <string name="auto_text_025">Aucun produit en favoris pour le moment.</string>
+    <!-- Login screen -->
+    <string name="login_hero_badge">Premium commerce</string>
+    <string name="login_feature_bullet">Connexion rapide, commandes et profil synchronis&#233;s</string>
+    <string name="login_welcome_title">Bienvenue sur FatiWeb</string>
+    <string name="login_welcome_subtitle">Le meilleur de l&#8217;artisanat tunisien &#224; port&#233;e de main.</string>
+    <string name="login_email_label">E-mail</string>
+    <string name="login_email_hint">votre@email.com</string>
+    <string name="login_password_label">Mot de passe</string>
+    <string name="login_password_hint">Mot de passe</string>
+    <string name="login_forgot_password">Mot de passe oubli&#233; ?</string>
+    <string name="login_social_divider">Ou se connecter avec</string>
+    <string name="login_google_label">Google</string>
+    <string name="login_no_account">Pas encore de compte ?</string>
+    <string name="login_register_cta">S&#8217;inscrire</string>
+
+    <!-- Register screen -->
+    <string name="register_title">Cr&#233;er un compte</string>
+    <string name="register_welcome_subtitle">Rejoignez la communaut&#233; de l&#8217;artisanat.</string>
+    <string name="register_name_label">Nom complet</string>
+    <string name="register_name_hint">Ex: Ahmed Ben Salem</string>
+    <string name="register_social_divider">Ou s&#8217;inscrire avec</string>
+    <string name="register_have_account">D&#233;j&#224; un compte ?</string>
+    <string name="register_feature_premium">Compte premium</string>
+    <string name="register_feature_subtitle">Cr&#233;ez votre profil, synchronisez vos favoris et suivez chaque commande</string>
+    <string name="auth_error_name_inline">Entrez au moins 3 caracteres.</string>
+    <string name="auth_error_email_inline">Entrez une adresse e-mail valide.</string>
+    <string name="auth_error_password_inline">Minimum 6 caracteres.</string>
+    <string name="auth_password_helper">Minimum 6 caracteres.</string>
+
+    <!-- Onboarding -->
+    <string name="onboard_skip">Passer</string>
+    <string name="onboard_next">Suivant &gt;</string>
+    <string name="onboard_start">Commencer &gt;</string>
+    <string name="onboard_slide1_title">Le meilleur de la Tunisie, s&#233;lectionn&#233; avec soin</string>
+    <string name="onboard_slide1_subtitle">Objets artisanaux, produits du terroir et pi&#232;ces de caract&#232;re r&#233;unis dans une exp&#233;rience d&#8217;achat plus &#233;l&#233;gante et plus simple.</string>
+    <string name="onboard_slide2_title">Des collections pens&#233;es pour chaque envie</string>
+    <string name="onboard_slide2_subtitle">Parcourez des univers inspir&#233;s par les r&#233;gions, les mati&#232;res et les savoir-faire tunisiens.</string>
+    <string name="onboard_slide3_title">Livraison suivie, paiement en confiance</string>
+    <string name="onboard_slide3_subtitle">Recevez vos pi&#232;ces pr&#233;f&#233;r&#233;es chez vous avec un suivi clair, un paiement s&#233;curis&#233; et une confirmation imm&#233;diate.</string>
+    <string name="onboard_cat_craft">Artisanat</string>
+    <string name="onboard_cat_craft_subtitle">L&#8217;h&#233;ritage de nos artisans</string>
+    <string name="onboard_cat_food">Alimentation</string>
+    <string name="onboard_cat_food_subtitle">Saveurs du terroir</string>
+    <string name="onboard_cat_beauty">Cosm&#233;tiques</string>
+    <string name="onboard_cat_beauty_subtitle">Soin naturel et bio</string>
+
+    <!-- Favorites -->
+    <string name="favorites_title">Mes Favoris</string>
+    <string name="favorites_empty_title">Aucun produit en favoris pour le moment.</string>
+
+    <!-- Cart -->
+    <string name="cart_title">Mon Panier</string>
+    <string name="cart_empty_title">Votre panier est vide.</string>
+    <string name="cart_subtotal_label">Sous-total</string>
+    <string name="cart_shipping_label">Livraison</string>
+
+    <!-- Product -->
+    <string name="product_badge_handmade">Artisanat</string>
+
+    <!-- Order details -->
+    <string name="order_details_tracking_label">Suivi</string>
+    <string name="order_details_title">D&#233;tail de la commande</string>
+    <string name="order_section_items_label">Articles</string>
+
+    <!-- Checkout -->
+    <string name="checkout_section_title">D&#233;tails de la commande</string>
+    <string name="checkout_address_label">Adresse de livraison</string>
+    <string name="checkout_shipping_method_label">M&#233;thode de livraison</string>
+    <string name="checkout_shipping_standard_eta">Livraison sous 3 &#224; 5 jours</string>
+    <string name="checkout_shipping_express_eta">Demain avant 13h00</string>
+    <string name="checkout_section_items">Articles</string>
+    <string name="checkout_section_summary">R&#233;sum&#233;</string>
+    <string name="checkout_payment_method_label">M&#233;thode de paiement</string>
+    <string name="checkout_cod_subtitle">Esp&#232;ces ou ch&#232;que au moment de la r&#233;ception</string>
+    <string name="checkout_order_confirmed_title">Commande confirm&#233;e</string>
+    <string name="checkout_order_confirmed_subtitle">Merci pour votre achat chez FatiWeb. Votre s&#233;lection est en route.</string>
+    <string name="checkout_order_number_label">Num&#233;ro de commande</string>
+    <string name="checkout_eta_label">Estimation de livraison</string>
+    <string name="checkout_total_paid_label">Total pay&#233;</string>
+    <string name="checkout_track_order_cta">Suivre ma commande</string>
+    <string name="checkout_back_home_cta">Retour &#224; l&#8217;accueil</string>
+    <string name="checkout_total_to_pay_label">Total &#224; payer</string>
+    <string name="checkout_vat_included">TVA incluse</string>
+    <string name="checkout_step_number_1">1</string>
+    <string name="checkout_step_number_2">2</string>
+    <string name="checkout_step_number_3">3</string>
+
+    <!-- Navigation tabs (canonical names, avoid auto_text duplication) -->
+    <string name="nav_tab_favorites">Favoris</string>
+    <string name="profile_logout">D&#233;connexion</string>
+    <string name="profile_orders_label">Mes commandes</string>
+
+    <!-- Admin navigation labels -->
+    <string name="admin_nav_notifs">Notifs</string>
+    <string name="admin_nav_products">Produits</string>
+
+    <!-- Address actions -->
+    <string name="address_set_default_action">Mettre par d&#233;faut</string>
+
+    <!-- Notifications -->
+    <string name="notification_time_just_now">&#192; l&#8217;instant</string>
+
+    <!-- Order / cart items -->
+    <string name="order_item_product_label">Produit</string>
+    <string name="cart_price_placeholder">0.000 DT</string>
+
+    <!-- Admin price edit dialog -->
+    <string name="admin_price_edit_title">Modifier le prix</string>
+    <string name="admin_price_edit_hint">Nouveau prix (DT)</string>
+
+    <!-- Address dialog fields -->
+    <string name="address_label_hint">Libell&#233; (Maison, Bureau&#8230;)</string>
+    <string name="address_recipient_name_hint">Nom du destinataire</string>
+    <string name="address_phone_hint">T&#233;l&#233;phone</string>
+    <string name="address_governorate_hint">Gouvernorat</string>
+    <string name="address_city_hint">Ville</string>
+    <string name="address_main_line_hint">Adresse principale</string>
+    <string name="address_complement_hint">Compl&#233;ment d&#8217;adresse (optionnel)</string>
+    <string name="address_postal_hint">Code postal (optionnel)</string>
+    <string name="address_instructions_hint">Instructions de livraison (optionnel)</string>
+    <string name="address_set_default_label">D&#233;finir comme adresse par d&#233;faut</string>
+
 
     <!-- Loading Screen Milestones -->
-    <string name="auto_text_031">Connexion</string>
-    <string name="auto_text_032">Bienvenue sur FatiWeb</string>
-    <string name="auto_text_033">Le meilleur de l&#8217;artisanat tunisien &#224; port&#233;e de main.</string>
-    <string name="auto_text_034">E-mail</string>
-    <string name="auto_text_035">votre@email.com</string>
-    <string name="auto_text_036">Mot de passe</string>
-    <string name="auto_text_037">Mot de passe oublie ?</string>
-    <string name="auto_text_038">Se connecter</string>
-    <string name="auto_text_039">Ou se connecter avec</string>
-    <string name="auto_text_040">Google</string>
-    <string name="auto_text_041">Facebook</string>
-    <string name="auto_text_042">Pas encore de compte ?</string>
-    <string name="auto_text_043">S&#8217;inscrire</string>
-    <string name="auto_text_081">Passer</string>
-    <string name="auto_text_082">Le meilleur de la Tunisie, s&#233;lectionn&#233; avec soin</string>
-    <string name="auto_text_083">Objets artisanaux, produits du terroir et pi&#232;ces de caract&#232;re r&#233;unis dans une exp&#233;rience d&#8217;achat plus &#233;l&#233;gante et plus simple.</string>
-    <string name="auto_text_084">Suivant &gt;</string>
-    <string name="auto_text_085">Des collections pens&#233;es pour chaque envie</string>
-    <string name="auto_text_086">Parcourez des univers inspir&#233;s par les r&#233;gions, les mati&#232;res et les savoir-faire tunisiens.</string>
-    <string name="auto_text_088">Alimentation</string>
-    <string name="auto_text_089">Saveurs du terroir</string>
-    <string name="auto_text_090">Cosmetiques</string>
-    <string name="auto_text_091">Soin naturel et bio</string>
-    <string name="auto_text_092">L&#8217;h&#233;ritage de nos artisans</string>
-    <string name="auto_text_093">Livraison suivie, paiement en confiance</string>
-    <string name="auto_text_094">Recevez vos pi&#232;ces pr&#233;f&#233;r&#233;es chez vous avec un suivi clair, un paiement s&#233;curis&#233; et une confirmation imm&#233;diate.</string>
-    <string name="auto_text_095">Commencer &gt;</string>
-    <string name="auto_text_096">Mon Panier</string>
-    <string name="auto_text_097">Votre panier est vide.</string>
-    <string name="auto_text_098">Sous-total</string>
-    <string name="auto_text_099">0.000 DT</string>
-    <string name="auto_text_100">Livraison</string>
     <string name="cart_header_badge">Paiement a la livraison</string>
     <string name="cart_header_helper">Verifiez vos articles, gardez un total clair et finalisez votre commande avec livraison suivie en Tunisie.</string>
     <string name="cart_count_chip_zero">0 article</string>
@@ -167,17 +247,6 @@
     <string name="cart_summary_badge">Resume de commande</string>
     <string name="cart_checkout_action">Continuer vers la livraison</string>
     <string name="cart_summary_helper">Paiement a la livraison uniquement. Le montant final sera confirme avant expedition.</string>
-    <string name="auto_text_102">-</string>
-    <string name="auto_text_103">+</string>
-    <string name="auto_text_104">Creer un compte</string>
-    <string name="auto_text_105">Rejoignez la communaut&#233; de l&#8217;artisanat.</string>
-    <string name="auto_text_106">Nom complet</string>
-    <string name="auto_text_107">Ex: Ahmed Ben Salem</string>
-    <string name="auto_text_108">********</string>
-    <string name="auto_text_109">Ou s&#8217;inscrire avec</string>
-    <string name="auto_text_110">Deja un compte ?</string>
-    <string name="auto_text_121">D&#233;connexion</string>
-    <string name="auto_text_123">1</string>
     <string name="currency_dt">DT</string>
     <string name="search_cancel">Annuler</string>
     <string name="tab_loading_error">Impossible de charger cet ecran.</string>
@@ -326,6 +395,79 @@
     <string name="admin_product_editor_discard_message">Vos modifications non enregistr&#233;es seront perdues.</string>
     <string name="admin_product_editor_discard_keep">Continuer la modification</string>
     <string name="admin_product_editor_discard_confirm">Quitter</string>
+
+    <!-- Product attributes & variants -->
+    <string name="pa_section_type">Type de produit</string>
+    <string name="pa_section_details">Caract&#233;ristiques</string>
+    <string name="pa_section_colors">Couleurs</string>
+    <string name="pa_section_sizes">Tailles</string>
+    <string name="pa_section_dimensions">Dimensions</string>
+    <string name="pa_section_variants">Variantes</string>
+    <string name="pa_hint_product_type">Type de produit</string>
+    <string name="pa_attr_brand">Marque</string>
+    <string name="pa_attr_model">Mod&#232;le</string>
+    <string name="pa_attr_material">Mati&#232;re</string>
+    <string name="pa_attr_gender">Genre</string>
+    <string name="pa_attr_fit">Coupe</string>
+    <string name="pa_attr_storage">Stockage</string>
+    <string name="pa_attr_ram">RAM</string>
+    <string name="pa_attr_warranty">Garantie</string>
+    <string name="pa_attr_accessories">Accessoires inclus</string>
+    <string name="pa_attr_battery">&#201;tat de la batterie</string>
+    <string name="pa_attr_specs">Sp&#233;cifications techniques</string>
+    <string name="pa_attr_weight">Poids / Quantit&#233;</string>
+    <string name="pa_attr_expiry">Date de p&#233;remption</string>
+    <string name="pa_attr_ingredients">Ingr&#233;dients</string>
+    <string name="pa_attr_allergens">Allerg&#232;nes</string>
+    <string name="pa_attr_storage_instructions">Conservation</string>
+    <string name="pa_attr_homemade">Fait maison</string>
+    <string name="pa_attr_handmade">Fait main</string>
+    <string name="pa_attr_customizable">Personnalisable</string>
+    <string name="pa_attr_production_time">D&#233;lai de fabrication</string>
+    <string name="pa_attr_origin_region">R&#233;gion / Origine</string>
+    <string name="pa_attr_craft_technique">Technique artisanale</string>
+    <string name="pa_attr_unique">Pi&#232;ce unique</string>
+    <string name="pa_attr_care">Entretien</string>
+    <string name="pa_attr_measurements">Mesures</string>
+    <string name="pa_attr_style">Style</string>
+    <string name="pa_attr_condition">&#201;tat</string>
+    <string name="pa_attr_room_type">Type de pi&#232;ce</string>
+    <string name="pa_attr_fragile">Fragile</string>
+    <string name="pa_attr_assembly">Montage requis</string>
+    <string name="pa_attr_delivery_available">Livraison disponible</string>
+    <string name="pa_dim_width">Largeur (cm)</string>
+    <string name="pa_dim_height">Hauteur (cm)</string>
+    <string name="pa_dim_depth">Profondeur (cm)</string>
+    <string name="pa_colors_hint">S&#233;lectionnez les couleurs disponibles.</string>
+    <string name="pa_add_custom_color">Couleur personnalis&#233;e</string>
+    <string name="pa_color_custom_name">Nom de la couleur</string>
+    <string name="pa_color_custom_hex">Code hex (optionnel)</string>
+    <string name="pa_sizes_hint">S&#233;lectionnez les tailles disponibles.</string>
+    <string name="pa_custom_size_hint">Taille personnalis&#233;e</string>
+    <string name="pa_add_custom_size">Ajouter</string>
+    <string name="pa_generate_variants">G&#233;n&#233;rer les combinaisons</string>
+    <string name="pa_variants_hint">Laissez vide pour vendre avec un stock simple.</string>
+    <string name="pa_variant_stock">Stock</string>
+    <string name="pa_variant_price">Prix (optionnel)</string>
+    <string name="pa_variant_remove">Supprimer la variante</string>
+    <string name="pa_error_variant_required">Ajoutez au moins une variante active avec du stock.</string>
+    <string name="pa_error_variant_stock">Le stock d une variante ne peut pas &#234;tre n&#233;gatif.</string>
+    <string name="pa_error_variant_price">Le prix d une variante ne peut pas &#234;tre n&#233;gatif.</string>
+    <string name="pa_error_expiry">Indiquez une date de p&#233;remption valide.</string>
+    <string name="pa_error_dimensions">Indiquez des dimensions valides.</string>
+    <string name="pa_select_color">Choisissez une couleur</string>
+    <string name="pa_select_size">Choisissez une taille</string>
+    <string name="pa_select_required">Veuillez s&#233;lectionner les options avant de continuer.</string>
+    <string name="pa_select_required_color">Veuillez choisir une couleur avant de continuer.</string>
+    <string name="pa_select_required_size">Veuillez choisir une taille avant de continuer.</string>
+    <string name="pa_select_required_both">Veuillez choisir la couleur et la taille avant de continuer.</string>
+    <string name="pa_variant_out_of_stock">Rupture de stock</string>
+    <string name="pa_card_sizes_label">Tailles : %1$s</string>
+    <string name="pa_more_colors">+%1$d</string>
+    <string name="pa_spec_row">%1$s : %2$s</string>
+    <string name="common_yes">Oui</string>
+    <string name="common_no">Non</string>
+
     <string name="admin_announcements_title">Annonces</string>
     <string name="admin_announcements_compose_title">Publier une annonce</string>
     <string name="admin_announcements_title_hint">Titre de l annonce</string>
@@ -355,6 +497,9 @@
 
     <!-- Checkout -->
     <string name="checkout_add_address_first">Ajoutez une adresse de livraison avant de confirmer votre commande.</string>
+    <string name="checkout_location_or_manual">Utilisez votre position actuelle ou ajoutez une adresse manuellement.</string>
+    <string name="checkout_use_current_location">Utiliser ma position</string>
+    <string name="checkout_open_location_settings">Open Settings to enable location</string>
     <string name="checkout_address_required_title">Ajoutez une adresse de livraison</string>
     <string name="checkout_address_action">Ajouter une adresse</string>
     <string name="checkout_address_placeholder">Ajoutez une adresse de livraison</string>
@@ -863,10 +1008,12 @@
     <string name="admin_announcements_status_progress">Publication en cours...</string>
     <string name="admin_announcements_status_success">Annonce publi&#233;e et historique actualis&#233;.</string>
     <string name="admin_announcements_status_error">&#201;chec de publication. R&#233;essayez dans un instant.</string>
-    <string name="profile_location_fallback">Tunis, Tunisie</string>
+    <string name="profile_location_fallback">Aucune localisation ajoutee</string>
+    <string name="location_settings_title">Localisation desactivee</string>
+    <string name="location_settings_message">Activez la localisation dans les parametres pour utiliser votre position actuelle.</string>
+    <string name="location_settings_action">Open Settings to enable location</string>
     <string name="profile_admin_dashboard_action">Ouvrir l espace admin</string>
     <string name="admin_product_editor_save_failed_security">La verification de securite Firebase a refuse cette action. Enregistrez le jeton App Check de debogage ou testez sur un build de production.</string>
-    <string name="admin_products_title">Gestion des produits</string>
     <string name="admin_products_chip">Pilotage catalogue</string>
     <string name="admin_products_hero_title">Catalogue synchronise et pret pour les clients.</string>
     <string name="admin_products_hero_subtitle">Ajoutez, modifiez, masquez ou reapprovisionnez les fiches produit avec une mise a jour directe du catalogue utilisateur.</string>
@@ -1020,6 +1167,19 @@
     <string name="profile_role_guest">Invite</string>
     <string name="profile_role_vendeur">Vendeur</string>
     <string name="profile_seller_dashboard_action">Espace vendeur</string>
+    <string name="profile_become_seller">Devenir vendeur</string>
+    <string name="profile_seller_request_pending">Demande vendeur en attente</string>
+    <string name="profile_seller_request_title">Devenir vendeur</string>
+    <string name="profile_seller_request_body">Remplissez ces infos. Un admin verifiera la demande avant d activer votre espace vendeur.</string>
+    <string name="profile_seller_field_shop_name">Nom de la boutique</string>
+    <string name="profile_seller_field_phone">Telephone</string>
+    <string name="profile_seller_field_note">Produits / message optionnel</string>
+    <string name="profile_seller_request_submit">Envoyer la demande</string>
+    <string name="profile_seller_request_success">Demande envoyee. Un admin va la verifier.</string>
+    <string name="profile_seller_request_failed">Impossible d envoyer la demande. Reessayez.</string>
+    <string name="profile_seller_shop_invalid">Entrez un nom de boutique valide.</string>
+    <string name="profile_seller_phone_invalid">Entrez un telephone valide.</string>
+    <string name="profile_seller_already_active">Votre espace vendeur est deja actif.</string>
     <string name="role_selection_title">Choisir votre role</string>
     <string name="role_selection_buyer">Acheteur</string>
     <string name="role_selection_seller">Vendeur</string>
@@ -1179,4 +1339,401 @@
         <item quantity="one">%d subcategory</item>
         <item quantity="other">%d subcategories</item>
     </plurals>
+
+    <!-- ============================================================ -->
+    <!-- Marketplace design system (Phase 0) — French copy             -->
+    <!-- Used by ms_component_*.xml and the new admin/vendor surfaces. -->
+    <!-- ============================================================ -->
+
+    <!-- Common actions -->
+    <string name="ms_action_see_all">Tout voir</string>
+    <string name="ms_action_retry">Réessayer</string>
+    <string name="ms_action_back">Retour</string>
+    <string name="ms_action_more">Plus d\'options</string>
+    <string name="ms_action_cancel">Annuler</string>
+    <string name="ms_action_save">Enregistrer</string>
+    <string name="ms_action_delete">Supprimer</string>
+    <string name="ms_action_edit">Modifier</string>
+    <string name="ms_action_add">Ajouter</string>
+    <string name="ms_action_confirm">Confirmer</string>
+    <string name="ms_action_search">Rechercher</string>
+    <string name="ms_action_filter">Filtrer</string>
+    <string name="ms_action_publish">Publier</string>
+    <string name="ms_action_unpublish">Dépublier</string>
+    <string name="ms_action_archive">Archiver</string>
+    <string name="ms_action_duplicate">Dupliquer</string>
+    <string name="ms_action_approve">Approuver</string>
+    <string name="ms_action_reject">Rejeter</string>
+    <string name="ms_action_suspend">Suspendre</string>
+
+    <!-- Empty / error defaults -->
+    <string name="ms_empty_default_title">Rien à afficher</string>
+    <string name="ms_empty_default_subtitle">Il n\'y a encore aucun élément ici.</string>
+    <string name="ms_error_default_title">Impossible de charger</string>
+    <string name="ms_error_default_subtitle">Vérifiez votre connexion puis réessayez.</string>
+    <string name="ms_loading">Chargement…</string>
+
+    <!-- Status labels -->
+    <string name="ms_status_pending">En attente</string>
+    <string name="ms_status_approved">Approuvé</string>
+    <string name="ms_status_rejected">Rejeté</string>
+    <string name="ms_status_draft">Brouillon</string>
+    <string name="ms_status_archived">Archivé</string>
+    <string name="ms_status_suspended">Suspendu</string>
+    <string name="ms_status_published">Publié</string>
+    <string name="ms_status_active">Actif</string>
+    <string name="ms_status_inactive">Inactif</string>
+    <string name="ms_status_low_stock_short">Bas</string>
+
+    <!-- Order status labels -->
+    <string name="ms_order_status_pending">En attente</string>
+    <string name="ms_order_status_confirmed">Confirmée</string>
+    <string name="ms_order_status_preparing">En préparation</string>
+    <string name="ms_order_status_shipped">Expédiée</string>
+    <string name="ms_order_status_delivered">Livrée</string>
+    <string name="ms_order_status_cancelled">Annulée</string>
+
+    <!-- Section headers (used across new surfaces) -->
+    <string name="ms_section_overview">Vue d\'ensemble</string>
+    <string name="ms_section_quick_actions">Actions rapides</string>
+    <string name="ms_section_recent_orders">Commandes récentes</string>
+    <string name="ms_section_best_sellers">Meilleures ventes</string>
+    <string name="ms_section_low_stock">Stock faible</string>
+    <string name="ms_section_alerts">Alertes</string>
+    <string name="ms_section_pending_approvals">Approbations en attente</string>
+    <string name="ms_section_activity">Activité récente</string>
+    <string name="ms_section_analytics">Analyses</string>
+    <string name="ms_section_messages">Messages</string>
+    <string name="ms_section_notifications">Notifications</string>
+    <string name="ms_section_shop_profile">Profil boutique</string>
+    <string name="ms_section_categories">Catégories</string>
+    <string name="ms_section_vendors">Vendeurs</string>
+    <string name="ms_section_users">Utilisateurs</string>
+    <string name="ms_section_moderation">Modération</string>
+    <string name="ms_section_announcements">Annonces</string>
+    <string name="ms_section_reports">Signalements</string>
+    <string name="ms_section_settings">Paramètres</string>
+
+    <!-- Content descriptions (accessibility) -->
+    <string name="ms_cd_back">Retour</string>
+    <string name="ms_cd_kpi_icon">Icône statistique</string>
+    <string name="ms_cd_chevron">Ouvrir</string>
+    <string name="ms_cd_avatar">Avatar</string>
+    <string name="ms_cd_status_pill">Statut</string>
+
+    <!-- ============================================================ -->
+    <!-- Phase 1 — Vendor Home                                         -->
+    <!-- ============================================================ -->
+    <string name="vendor_home_title">Tableau de bord</string>
+    <string name="vendor_home_hero_eyebrow">VOTRE BOUTIQUE</string>
+    <string name="vendor_home_hero_greeting">Salut, %1$s</string>
+    <string name="vendor_home_hero_greeting_default">Bienvenue</string>
+    <string name="vendor_home_hero_summary_empty">Aucune activité ce mois pour l\'instant.</string>
+    <string name="vendor_home_hero_summary_pending">%1$d commande(s) en attente · %2$d article(s) en rupture</string>
+    <string name="vendor_home_hero_revenue_mtd">CA DU MOIS</string>
+    <string name="vendor_home_hero_orders_mtd">COMMANDES</string>
+
+    <string name="vendor_home_kpi_revenue_label">REVENUS TOTAL</string>
+    <string name="vendor_home_kpi_revenue_meta">Panier moyen %1$s</string>
+    <string name="vendor_home_kpi_pending_label">EN ATTENTE</string>
+    <string name="vendor_home_kpi_pending_meta">Sur %1$d commandes</string>
+    <string name="vendor_home_kpi_low_stock_label">STOCK FAIBLE</string>
+    <string name="vendor_home_kpi_low_stock_meta">Articles à recharger</string>
+    <string name="vendor_home_kpi_products_label">PRODUITS</string>
+    <string name="vendor_home_kpi_products_meta">%1$d actifs sur %2$d</string>
+
+    <string name="vendor_home_action_add_title">Ajouter un produit</string>
+    <string name="vendor_home_action_add_subtitle">Photos, prix, stock</string>
+    <string name="vendor_home_action_products_title">Mes produits</string>
+    <string name="vendor_home_action_products_subtitle">Modifier, dupliquer, archiver</string>
+    <string name="vendor_home_action_orders_title">Mes commandes</string>
+    <string name="vendor_home_action_orders_subtitle">Suivi et statuts</string>
+    <string name="vendor_home_action_messages_title">Messages</string>
+    <string name="vendor_home_action_messages_subtitle">Conversations clients</string>
+
+    <string name="vendor_home_activity_empty_title">Pas d\'activité récente</string>
+    <string name="vendor_home_activity_empty_subtitle">Vos prochaines commandes apparaîtront ici.</string>
+
+    <string name="vendor_home_load_failed">Impossible de charger votre tableau de bord.</string>
+    <string name="vendor_home_currency_dt">%1$s</string>
+    <string name="vendor_home_messages_coming_soon">Messages — bientôt disponible.</string>
+    <string name="vendor_home_profile_coming_soon">Profil boutique — bientôt disponible.</string>
+
+    <!-- ============================================================ -->
+    <!-- Phase 2 — Vendor Products                                     -->
+    <!-- ============================================================ -->
+    <string name="vendor_products_title">Mes produits</string>
+    <string name="vendor_products_filter_all">Tous</string>
+    <string name="vendor_products_filter_published">Publiés</string>
+    <string name="vendor_products_filter_drafts">Brouillons</string>
+    <string name="vendor_products_filter_archived">Archivés</string>
+    <string name="vendor_products_filter_pending">En attente</string>
+    <string name="vendor_products_filter_rejected">Rejetés</string>
+    <string name="vendor_products_filter_low_stock">Stock faible</string>
+    <string name="vendor_products_empty_all_title">Aucun produit</string>
+    <string name="vendor_products_empty_all_subtitle">Ajoutez votre premier produit pour commencer à vendre.</string>
+    <string name="vendor_products_empty_filter_title">Aucun résultat</string>
+    <string name="vendor_products_empty_filter_subtitle">Aucun produit ne correspond à ce filtre.</string>
+    <string name="vendor_products_load_failed">Impossible de charger vos produits.</string>
+    <string name="vendor_products_stock_count">Stock : %1$d</string>
+    <string name="vendor_products_low_stock_threshold">Bas (%1$d)</string>
+    <string name="vendor_products_out_of_stock">Rupture</string>
+    <string name="vendor_products_fab_add">Ajouter</string>
+    <string name="vendor_products_cd_image">Image produit</string>
+    <string name="vendor_products_action_publish_success">Produit publié.</string>
+    <string name="vendor_products_action_unpublish_success">Produit retiré du catalogue.</string>
+    <string name="vendor_products_action_duplicate_success">Produit dupliqué en brouillon.</string>
+    <string name="vendor_products_action_archive_success">Produit archivé.</string>
+    <string name="vendor_products_action_delete_success">Produit supprimé.</string>
+    <string name="vendor_products_action_failed">Action impossible. Réessayez.</string>
+    <string name="vendor_products_action_discount">Appliquer une remise…</string>
+    <string name="vendor_products_action_remove_discount">Retirer la remise</string>
+    <string name="vendor_products_action_discount_success">Remise mise à jour.</string>
+    <string name="vendor_products_discount_dialog_title">Remise (%%)</string>
+    <string name="vendor_products_discount_dialog_message">Entrez un pourcentage entre 1 et 90.</string>
+    <string name="vendor_products_discount_dialog_hint">Pourcentage</string>
+    <string name="vendor_products_discount_invalid">Pourcentage invalide (1–90).</string>
+    <string name="vendor_products_archive_confirm_title">Archiver ce produit ?</string>
+    <string name="vendor_products_archive_confirm_message">Le produit sera caché du catalogue. Vous pourrez le republier plus tard.</string>
+    <string name="vendor_products_delete_confirm_title">Supprimer définitivement ?</string>
+    <string name="vendor_products_delete_confirm_message">Cette action est irréversible. Le produit sera supprimé pour vous et tous vos clients.</string>
+
+    <!-- ============================================================ -->
+    <!-- Phase 3 — Vendor Orders                                       -->
+    <!-- ============================================================ -->
+    <string name="vendor_orders_title">Mes commandes</string>
+    <string name="vendor_orders_action_update_status">Mettre à jour le statut</string>
+    <string name="vendor_orders_action_view_detail">Voir le détail</string>
+    <string name="vendor_orders_status_updated">Statut mis à jour.</string>
+    <string name="vendor_orders_status_update_failed">Échec de la mise à jour.</string>
+    <string name="vendor_orders_filter_all">Toutes</string>
+    <string name="vendor_orders_filter_pending">En attente</string>
+    <string name="vendor_orders_filter_confirmed">Confirmées</string>
+    <string name="vendor_orders_filter_preparing">En préparation</string>
+    <string name="vendor_orders_filter_shipped">Expédiées</string>
+    <string name="vendor_orders_filter_delivered">Livrées</string>
+    <string name="vendor_orders_filter_cancelled">Annulées</string>
+    <string name="vendor_orders_empty_title">Aucune commande</string>
+    <string name="vendor_orders_empty_subtitle">Vos prochaines commandes apparaîtront ici.</string>
+    <string name="vendor_orders_empty_filter_title">Aucun résultat</string>
+    <string name="vendor_orders_empty_filter_subtitle">Aucune commande ne correspond à ce filtre.</string>
+    <string name="vendor_orders_load_failed">Impossible de charger vos commandes.</string>
+    <string name="vendor_orders_row_id">Commande #%1$s</string>
+    <string name="vendor_orders_row_items">%1$d article(s) · %2$s</string>
+    <string name="vendor_orders_row_time_relative">il y a %1$s</string>
+
+    <!-- ============================================================ -->
+    <!-- Phase 4 — Vendor Shop Profile + Analytics                     -->
+    <!-- ============================================================ -->
+    <string name="vendor_profile_title">Profil boutique</string>
+    <string name="vendor_profile_section_branding">Identité de la boutique</string>
+    <string name="vendor_profile_section_delivery">Livraison</string>
+    <string name="vendor_profile_section_hours">Horaires d\'ouverture</string>
+    <string name="vendor_profile_section_contact">Contact</string>
+    <string name="vendor_profile_field_shop_name">Nom de la boutique</string>
+    <string name="vendor_profile_field_shop_bio">Description</string>
+    <string name="vendor_profile_field_logo_url">URL du logo</string>
+    <string name="vendor_profile_field_banner_url">URL de la bannière</string>
+    <string name="vendor_profile_field_shipping_fee">Frais de livraison (DT)</string>
+    <string name="vendor_profile_field_delivery_zones">Zones de livraison</string>
+    <string name="vendor_profile_field_delivery_zones_hint">Séparées par des virgules</string>
+    <string name="vendor_profile_field_hours">Horaires</string>
+    <string name="vendor_profile_field_hours_hint">Ex : Lun–Ven 09:00–18:00, Sam 09:00–13:00</string>
+    <string name="vendor_profile_field_email">Email</string>
+    <string name="vendor_profile_field_phone">Téléphone</string>
+    <string name="vendor_profile_save">Enregistrer</string>
+    <string name="vendor_profile_save_success">Boutique mise à jour.</string>
+    <string name="vendor_profile_save_failed">Impossible d\'enregistrer. Réessayez.</string>
+    <string name="vendor_profile_load_failed">Impossible de charger votre boutique.</string>
+    <string name="vendor_profile_unsaved_title">Modifications non enregistrées</string>
+    <string name="vendor_profile_unsaved_message">Quitter sans enregistrer ?</string>
+    <string name="vendor_profile_unsaved_discard">Quitter</string>
+
+    <string name="vendor_analytics_title">Statistiques</string>
+    <string name="vendor_analytics_section_overview">Vue d\'ensemble</string>
+    <string name="vendor_analytics_section_orders_chart">Commandes des 7 derniers jours</string>
+    <string name="vendor_analytics_section_top_products">Meilleures ventes</string>
+    <string name="vendor_analytics_section_low_stock">Stock faible</string>
+    <string name="vendor_analytics_kpi_week_revenue">CA semaine</string>
+    <string name="vendor_analytics_kpi_week_orders">Commandes semaine</string>
+    <string name="vendor_analytics_kpi_delivery_rate">Taux de livraison</string>
+    <string name="vendor_analytics_kpi_avg_basket">Panier moyen</string>
+    <string name="vendor_analytics_empty_chart">Pas encore assez de données.</string>
+    <string name="vendor_analytics_top_product_meta">%1$d vendu(s) · %2$s</string>
+    <string name="vendor_analytics_low_stock_meta">Stock %1$d · %2$s</string>
+    <string name="vendor_analytics_load_failed">Impossible de charger vos statistiques.</string>
+    <string name="vendor_home_action_analytics_title">Statistiques</string>
+    <string name="vendor_home_action_analytics_subtitle">Ventes et tendances</string>
+
+    <!-- ============================================================ -->
+    <!-- Phase 5 — Admin Home + Vendors                                -->
+    <!-- ============================================================ -->
+    <string name="admin_home_title">Tableau de bord</string>
+    <string name="admin_home_hero_eyebrow">ADMINISTRATION</string>
+    <string name="admin_home_hero_title">Marketplace</string>
+    <string name="admin_home_hero_subtitle">Vue d\'ensemble de toute la plateforme.</string>
+    <string name="admin_home_kpi_users_label">UTILISATEURS</string>
+    <string name="admin_home_kpi_vendors_label">VENDEURS</string>
+    <string name="admin_home_kpi_products_label">PRODUITS</string>
+    <string name="admin_home_kpi_revenue_label">CA TOTAL</string>
+    <string name="admin_home_kpi_orders_label">COMMANDES</string>
+    <string name="admin_home_kpi_low_stock_label">STOCK FAIBLE</string>
+    <string name="admin_home_pending_approvals_title">Approbations en attente</string>
+    <string name="admin_home_pending_approvals_count">%1$d demande(s) vendeur</string>
+    <string name="admin_home_pending_approvals_cta">Examiner</string>
+    <string name="admin_home_pending_approvals_empty">Tout est à jour.</string>
+    <string name="admin_home_action_vendors_title">Vendeurs</string>
+    <string name="admin_home_action_vendors_subtitle">Demandes et suspensions</string>
+    <string name="admin_home_action_users_title">Utilisateurs</string>
+    <string name="admin_home_action_users_subtitle">Comptes et rôles</string>
+    <string name="admin_home_action_orders_title">Commandes</string>
+    <string name="admin_home_action_orders_subtitle">Toute la marketplace</string>
+    <string name="admin_home_action_analytics_title">Analyses</string>
+    <string name="admin_home_action_analytics_subtitle">CA, funnel et vendeurs</string>
+    <string name="admin_home_action_settings_title">Paramètres</string>
+    <string name="admin_home_action_settings_subtitle">Frais, livraison, modération</string>
+    <string name="admin_home_recent_orders_title">Commandes récentes</string>
+    <string name="admin_home_load_failed">Impossible de charger les statistiques.</string>
+
+    <string name="admin_analytics_title">Analyses</string>
+    <string name="admin_analytics_section_revenue">Revenus des 7 derniers jours</string>
+    <string name="admin_analytics_section_funnel">Funnel commandes</string>
+    <string name="admin_analytics_section_top_products">Top produits</string>
+    <string name="admin_analytics_section_top_vendors">Top vendeurs</string>
+    <string name="admin_analytics_kpi_revenue">CA TOTAL</string>
+    <string name="admin_analytics_kpi_orders">COMMANDES</string>
+    <string name="admin_analytics_kpi_average">PANIER MOYEN</string>
+    <string name="admin_analytics_kpi_delivered">LIVREES</string>
+    <string name="admin_analytics_chart_empty">Pas encore assez de revenus sur cette periode.</string>
+    <string name="admin_analytics_empty_title">Aucune donnee</string>
+    <string name="admin_analytics_empty_subtitle">Les analyses apparaitront apres les premieres commandes.</string>
+    <string name="admin_analytics_load_failed">Impossible de charger les analyses.</string>
+    <string name="admin_analytics_product_rank_meta">%1$d article(s) &#183; %2$s</string>
+    <string name="admin_analytics_vendor_rank_meta">%1$d commande(s) &#183; %2$s</string>
+    <string name="admin_analytics_no_top_products">Aucun produit classe pour le moment.</string>
+    <string name="admin_analytics_no_top_vendors">Aucun vendeur classe pour le moment.</string>
+    <string name="admin_analytics_compact_kdt">%1$sk DT</string>
+
+    <string name="admin_vendors_title">Vendeurs</string>
+    <string name="admin_vendors_filter_all">Tous</string>
+    <string name="admin_vendors_filter_pending">En attente</string>
+    <string name="admin_vendors_filter_approved">Approuvés</string>
+    <string name="admin_vendors_filter_suspended">Suspendus</string>
+    <string name="admin_vendors_filter_rejected">Rejetés</string>
+    <string name="admin_vendors_empty_title">Aucun vendeur</string>
+    <string name="admin_vendors_empty_subtitle">Aucun vendeur ne correspond à ce filtre.</string>
+    <string name="admin_vendors_load_failed">Impossible de charger la liste des vendeurs.</string>
+    <string name="admin_vendors_row_shop_fallback">Boutique sans nom</string>
+    <string name="admin_vendors_action_approve">Approuver</string>
+    <string name="admin_vendors_action_reject">Rejeter</string>
+    <string name="admin_vendors_action_suspend">Suspendre</string>
+    <string name="admin_vendors_action_restore">Restaurer</string>
+    <string name="admin_vendors_action_success_approved">Vendeur approuvé.</string>
+    <string name="admin_vendors_action_success_rejected">Demande rejetée.</string>
+    <string name="admin_vendors_action_success_suspended">Vendeur suspendu.</string>
+    <string name="admin_vendors_action_success_restored">Statut remis en attente.</string>
+    <string name="admin_vendors_action_failed">Action impossible. Réessayez.</string>
+
+    <!-- ============================================================ -->
+    <!-- Phase 6 — Admin Products                                     -->
+    <!-- ============================================================ -->
+    <string name="admin_products_title">Produits</string>
+    <string name="admin_products_filter_all">Tous</string>
+    <string name="admin_products_filter_pending">En attente</string>
+    <string name="admin_products_filter_approved">Approuvés</string>
+    <string name="admin_products_filter_rejected">Rejetés</string>
+    <string name="admin_products_filter_draft">Brouillons</string>
+    <string name="admin_products_filter_archived">Archivés</string>
+    <string name="admin_products_empty_title">Aucun produit</string>
+    <string name="admin_products_empty_subtitle">Aucun produit ne correspond à ce filtre.</string>
+    <string name="admin_products_load_failed">Impossible de charger les produits.</string>
+    <string name="admin_products_action_approve">Approuver</string>
+    <string name="admin_products_action_reject">Rejeter</string>
+    <string name="admin_products_action_archive">Archiver</string>
+    <string name="admin_products_action_edit">Modifier</string>
+    <string name="admin_products_action_success_approved">Produit approuvé — visible dans le catalogue.</string>
+    <string name="admin_products_action_success_rejected">Produit rejeté.</string>
+    <string name="admin_products_action_success_archived">Produit archivé.</string>
+    <string name="admin_products_action_failed">Action impossible. Réessayez.</string>
+    <string name="admin_products_reject_confirm_title">Rejeter ce produit ?</string>
+    <string name="admin_products_reject_confirm_message">Le vendeur sera informé que son produit n\'a pas été approuvé.</string>
+    <string name="admin_products_seller_unknown">Vendeur inconnu</string>
+    <string name="admin_products_pending_badge">%1$d en attente</string>
+
+    <!-- ============================================================ -->
+    <!-- Phase 6b — Admin Orders                                      -->
+    <!-- ============================================================ -->
+    <string name="admin_commandes_title">Commandes</string>
+    <string name="admin_commandes_filter_all">Toutes</string>
+    <string name="admin_commandes_filter_pending">En attente</string>
+    <string name="admin_commandes_filter_confirmed">Confirmées</string>
+    <string name="admin_commandes_filter_preparing">En préparation</string>
+    <string name="admin_commandes_filter_shipped">Expédiées</string>
+    <string name="admin_commandes_filter_delivered">Livrées</string>
+    <string name="admin_commandes_filter_cancelled">Annulées</string>
+    <string name="admin_commandes_empty_title">Aucune commande</string>
+    <string name="admin_commandes_empty_subtitle">Aucune commande ne correspond à ce filtre.</string>
+    <string name="admin_commandes_load_failed">Impossible de charger les commandes.</string>
+    <string name="admin_commandes_items_count">%1$d article(s)</string>
+    <string name="admin_vendors_suspend_confirm_title">Suspendre ce vendeur ?</string>
+    <string name="admin_vendors_suspend_confirm_message">Ses produits seront masqués du catalogue. Vous pourrez restaurer le compte plus tard.</string>
+    <string name="admin_vendors_reject_confirm_title">Rejeter la demande ?</string>
+    <string name="admin_vendors_reject_confirm_message">Le vendeur ne pourra plus publier de produits.</string>
+
+    <string name="vendor_nav_home">Accueil</string>
+    <string name="vendor_nav_orders">Commandes</string>
+    <string name="vendor_nav_products">Produits</string>
+    <string name="vendor_nav_messages">Messages</string>
+    <string name="vendor_nav_profile">Profil</string>
+
+    <!-- Conversation screen strings -->
+    <string name="messaging_seller_reply_hint">Le vendeur r&#233;pond g&#233;n&#233;ralement vite</string>
+    <string name="messaging_input_hint">Message&#8230;</string>
+    <string name="messaging_offline_banner">Hors ligne. Les nouveaux messages se synchroniseront &#224; la reconnexion.</string>
+    <string name="messaging_message_too_long">Message trop long</string>
+    <string name="messaging_menu_hide">Masquer la conversation</string>
+    <string name="messaging_menu_block">Bloquer l&#8217;utilisateur</string>
+    <string name="messaging_menu_report">Signaler</string>
+    <string name="messaging_user_blocked">Utilisateur bloqu&#233;</string>
+    <string name="messaging_reported">Signalement envoy&#233;</string>
+    <string name="messaging_profile_product_context">&#192; propos de&#160;: %1$s</string>
+    <string name="action_failed">Action impossible. R&#233;essayez.</string>
+    <string name="messaging_empty_title">Aucun message pour l&#8217;instant</string>
+    <string name="messaging_empty_subtitle">Vos conversations avec les vendeurs apparaissent ici. Parcourez le catalogue pour commencer &#224; discuter.</string>
+
+    <!-- Product type labels -->
+    <string name="pa_type_tshirt">T-shirt</string>
+    <string name="pa_type_hoodie">Sweat / Hoodie</string>
+    <string name="pa_type_pants">Pantalon</string>
+    <string name="pa_type_dress">Robe</string>
+    <string name="pa_type_shoes">Chaussures</string>
+    <string name="pa_type_bag">Sac</string>
+    <string name="pa_type_accessory">Accessoire</string>
+    <string name="pa_type_furniture">Meuble</string>
+    <string name="pa_type_decoration">D&#233;coration</string>
+    <string name="pa_type_electronics">&#201;lectronique</string>
+    <string name="pa_type_handmade">Artisanat</string>
+    <string name="pa_type_food">Alimentation</string>
+    <string name="pa_type_other">Autre</string>
+    <string name="pa_type_unset">Choisir un type</string>
+
+    <!-- Attribute dropdown options -->
+    <string-array name="pa_options_gender">
+        <item>Homme</item>
+        <item>Femme</item>
+        <item>Enfant</item>
+        <item>Unisexe</item>
+    </string-array>
+    <string-array name="pa_options_fit">
+        <item>Slim</item>
+        <item>Regular</item>
+        <item>Oversized</item>
+    </string-array>
+    <string-array name="pa_options_condition">
+        <item>Neuf</item>
+        <item>Comme neuf</item>
+        <item>Bon &#233;tat</item>
+        <item>Occasion</item>
+    </string-array>
+
 </resources>

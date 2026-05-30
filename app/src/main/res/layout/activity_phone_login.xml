@@ -19,7 +19,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/back"
-        app:tint="?attr/colorOnSurface" />
+        app:tint="@color/ms_text_primary" />
 
     <TextView
         android:id="@+id/tvTitle"
@@ -76,7 +76,7 @@
                 android:paddingStart="@dimen/space_16"
                 android:paddingEnd="@dimen/space_12"
                 android:text="@string/phone_login_country_code"
-                android:textColor="?attr/colorOnSurface"
+                android:textColor="@color/ms_text_primary"
                 android:textSize="@dimen/text_size_body"
                 android:fontFamily="@font/manrope_semibold"
                 app:layout_constraintBottom_toBottomOf="parent"

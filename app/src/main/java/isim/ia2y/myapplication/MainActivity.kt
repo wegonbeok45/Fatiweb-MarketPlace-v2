@@ -1,5 +1,6 @@
 package isim.ia2y.myapplication
 
+import android.Manifest
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -7,6 +8,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.addCallback
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.constraintlayout.widget.ConstraintSet
@@ -38,6 +40,16 @@ class MainActivity : AppCompatActivity() {
     private var unreadMessagesListener: ListenerRegistration? = null
     private lateinit var tabDataPrefetcher: TabDataPrefetcher
     private lateinit var binding: ActivityMainBinding
+
+    private val requestLocationLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        val granted = permissions.values.any { it }
+        val permanentlyDenied = LocationHelper.isPermanentlyDenied(this)
+        LocationPermissionStore.markPermissionResult(this, granted, permanentlyDenied)
+        Log.d("LocationFlow", if (granted) "Permission accepted" else "Permission rejected")
+        if (granted) fetchAndSaveStartupLocation()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
@@ -122,11 +134,11 @@ class MainActivity : AppCompatActivity() {
 
         if (FirebaseAuthManager.isLoggedIn) {
             AppNotificationChannels.ensureCreated(this)
-            if (NotificationPreferencesStore.load(this).pushEnabled) {
+            if (!FirebaseCostSafeMode.enabled && NotificationPreferencesStore.load(this).pushEnabled) {
                 maybeRequestNotificationPermissionForPush()
             }
             listenForUnreadMessages()
-            if (runHeavyWork) {
+            if (!FirebaseCostSafeMode.enabled && runHeavyWork) {
                 if (NotificationStore.shouldRefreshFromCloud(this)) {
                     lifecycleScope.launch {
                         runCatching { NotificationStore.refreshFromCloud(this@MainActivity) }
@@ -287,9 +299,30 @@ class MainActivity : AppCompatActivity() {
         binding.root.post {
             binding.root.post {
                 if (!isFinishing && !isDestroyed) {
+                    maybeAskLocationOnFirstOpen()
                     AppStartupCoordinator.startDeferred(applicationContext)
                 }
             }
+        }
+    }
+
+    private fun maybeAskLocationOnFirstOpen() {
+        if (!LocationPermissionStore.shouldAskOnStartup(this)) return
+        LocationPermissionStore.markStartupRequestShown(this)
+        Log.d("LocationFlow", "Location permission requested")
+        requestLocationLauncher.launch(
+            arrayOf(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            )
+        )
+    }
+
+    private fun fetchAndSaveStartupLocation() {
+        lifecycleScope.launch {
+            LocationHelper.fetchCurrentLocation(this@MainActivity)
+                .onSuccess { LocationProfileSync.saveLocation(this@MainActivity, it) }
+                .onFailure { Log.w("LocationFlow", "Startup location failed", it) }
         }
     }
 

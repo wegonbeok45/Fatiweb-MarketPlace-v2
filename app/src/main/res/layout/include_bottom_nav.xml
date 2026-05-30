@@ -31,7 +31,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/profile_nav_text_margin_top"
-            android:text="@string/auto_text_007" />
+            android:text="@string/nav_tab_home" />
     </LinearLayout>
 
     <LinearLayout
@@ -59,7 +59,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/profile_nav_text_margin_top"
-            android:text="@string/auto_text_008" />
+            android:text="@string/nav_tab_explore" />
     </LinearLayout>
 
     <LinearLayout
@@ -88,7 +88,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/profile_nav_text_margin_top"
-            android:text="@string/auto_text_003" />
+            android:text="@string/nav_tab_favorites" />
     </LinearLayout>
 
     <LinearLayout
@@ -147,7 +147,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/profile_nav_text_margin_top"
-            android:text="@string/auto_text_009" />
+            android:text="@string/nav_tab_cart" />
     </LinearLayout>
 
     <LinearLayout
@@ -175,7 +175,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/profile_nav_text_margin_top"
-            android:text="@string/auto_text_010" />
+            android:text="@string/nav_tab_profile" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

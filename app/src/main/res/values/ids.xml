@@ -2,6 +2,15 @@
 <resources>
     <item name="etEditProfileName" type="id" />
     <item name="etResetPasswordEmail" type="id" />
+    <!-- item_messaging_inbox.xml -->
+    <item name="rootRow" type="id" />
+    <item name="ivInboxAvatar" type="id" />
+    <item name="vInboxOnline" type="id" />
+    <item name="tvInboxName" type="id" />
+    <item name="tvInboxTime" type="id" />
+    <item name="tvInboxPreview" type="id" />
+    <item name="tvInboxUnread" type="id" />
+    <item name="tvInboxProduct" type="id" />
     <item name="messagingDayLabel" type="id" />
     <item name="messagingMessageLine" type="id" />
     <item name="messagingMessageAvatar" type="id" />
@@ -11,4 +20,15 @@
     <item name="messagingMessageMeta" type="id" />
     <item name="messagingMessageProgress" type="id" />
     <item name="messagingMessageReaction" type="id" />
+    <!-- Removed home placeholders kept as IDs so nullable Kotlin lookups compile. -->
+    <item name="ivFeaturedEditMain" type="id" />
+    <item name="ivFeaturedEditLeft" type="id" />
+    <item name="ivFeaturedEditRight" type="id" />
+    <item name="cardBannerSecondary" type="id" />
+    <item name="cardShopCategoryCraft" type="id" />
+    <item name="cardShopCategoryDecor" type="id" />
+    <item name="cardShopCategoryFood" type="id" />
+    <item name="cardShopCategoryFashion" type="id" />
+    <item name="cardShopCategoryBeauty" type="id" />
+    <item name="messageBadge" type="id" />
 </resources>

@@ -15,6 +15,8 @@ object FcmTokenService {
     private const val PREFS_NAME = "fcm_token_cache"
     private const val KEY_UID = "uid"
     private const val KEY_TOKEN = "token"
+    private const val KEY_LAST_SYNC_AT = "last_sync_at"
+    private const val TOKEN_SYNC_TTL_MS = 7L * 24 * 60 * 60 * 1000
     private val backgroundScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     fun syncCurrentUserTokenInBackground(context: Context) {
@@ -25,10 +27,12 @@ object FcmTokenService {
     }
 
     suspend fun syncCurrentUserToken(context: Context) {
+        if (FirebaseCostSafeMode.enabled) return
         AppNotificationChannels.ensureCreated(context)
         val uid = FirebaseAuthManager.currentUser?.uid ?: return
         runCatching {
             val token = Firebase.messaging.token.await()
+            if (!shouldWriteToken(context, uid, token)) return@runCatching
             UserService.saveFcmToken(uid, token)
             rememberToken(context, uid, token)
         }.onFailure { error ->
@@ -56,7 +60,15 @@ object FcmTokenService {
             .edit()
             .putString(KEY_UID, uid)
             .putString(KEY_TOKEN, token)
+            .putLong(KEY_LAST_SYNC_AT, System.currentTimeMillis())
             .apply()
+    }
+
+    private fun shouldWriteToken(context: Context, uid: String, token: String): Boolean {
+        val prefs = context.applicationContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val sameToken = prefs.getString(KEY_UID, null) == uid && prefs.getString(KEY_TOKEN, null) == token
+        val lastSyncAt = prefs.getLong(KEY_LAST_SYNC_AT, 0L)
+        return !sameToken || System.currentTimeMillis() - lastSyncAt >= TOKEN_SYNC_TTL_MS
     }
 
     private fun cachedTokenFor(context: Context, uid: String): String? {

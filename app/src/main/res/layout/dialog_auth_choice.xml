@@ -12,10 +12,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        app:cardBackgroundColor="@color/colorSurface"
+        app:cardBackgroundColor="@color/ms_surface_card"
         app:cardCornerRadius="@dimen/dialog_alert_corner_radius"
         app:cardElevation="@dimen/space_0"
-        app:strokeColor="@color/colorBorderLight"
+        app:strokeColor="@color/ms_border_default"
         app:strokeWidth="@dimen/space_0">
 
         <LinearLayout

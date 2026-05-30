@@ -106,6 +106,42 @@ fun AppCompatActivity.navigateBackToMain() {
     finish()
 }
 
+fun AppCompatActivity.navigateAdminBack(activeTab: AdminNavTab = AdminNavTab.DASHBOARD) {
+    if (activeTab == AdminNavTab.DASHBOARD || this::class.java == AdminHomeActivity::class.java) {
+        val intent = Intent(this, MainActivity::class.java).apply {
+            addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+            putExtra(MainActivity.EXTRA_OPEN_TAB, MainActivity.Tab.PROFILE.name)
+        }
+        startActivity(intent)
+        finish()
+        if (isReducedMotionEnabled()) {
+            overridePendingTransition(0, 0)
+        } else {
+            overridePendingTransition(R.anim.motion_activity_enter_backward, R.anim.motion_activity_exit_backward)
+        }
+        return
+    }
+
+    val intent = Intent(this, AdminHomeActivity::class.java).apply {
+        addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+    }
+    startActivity(intent)
+    finish()
+    if (isReducedMotionEnabled()) {
+        overridePendingTransition(0, 0)
+    } else {
+        overridePendingTransition(R.anim.motion_activity_enter_backward, R.anim.motion_activity_exit_backward)
+    }
+}
+
+fun AppCompatActivity.bindAdminBack(activeTab: AdminNavTab = AdminNavTab.DASHBOARD) {
+    onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            navigateAdminBack(activeTab)
+        }
+    })
+}
+
 fun AppCompatActivity.bindBackToMainForBottomNavScreens() {
     onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {

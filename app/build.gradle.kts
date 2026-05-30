@@ -46,7 +46,11 @@ android {
     }
 
     buildTypes {
+        debug {
+            buildConfigField("boolean", "COST_SAFE_MODE", "true")
+        }
         release {
+            buildConfigField("boolean", "COST_SAFE_MODE", "false")
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(
@@ -57,6 +61,14 @@ android {
             if (cfg.storeFile != null) {
                 signingConfig = cfg
             }
+        }
+        create("staging") {
+            initWith(getByName("release"))
+            buildConfigField("boolean", "COST_SAFE_MODE", "true")
+            matchingFallbacks += listOf("release")
+            isMinifyEnabled = false
+            isShrinkResources = false
+            isDebuggable = true
         }
     }
 
@@ -98,6 +110,7 @@ dependencies {
     implementation(libs.firebase.perf)
     implementation(libs.firebase.appcheck.playintegrity)
     debugImplementation(libs.firebase.appcheck.debug)
+    add("stagingImplementation", libs.firebase.appcheck.debug)
     implementation(libs.androidx.security.crypto)
 
     // Coroutines for Firebase .await() support
@@ -109,6 +122,7 @@ dependencies {
     implementation(libs.google.identity.googleid)
     // play-services-auth kept for transitive deps (e.g. phone auth)
     implementation(libs.play.services.auth)
+    implementation(libs.play.services.location)
     implementation(libs.lottie)
     implementation(libs.coil)
     implementation(libs.androidx.profileinstaller)

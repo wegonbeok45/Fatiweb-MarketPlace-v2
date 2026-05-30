@@ -25,7 +25,7 @@ object NotificationStore {
     private const val KEY_NOTIFICATIONS = "notifications_json"
     private const val KEY_LAST_REFRESH_AT = "last_refresh_at"
     private const val GUEST_KEY = "guest"
-    private const val DEFAULT_REFRESH_TTL_MS = 2 * 60 * 1000L
+    private const val DEFAULT_REFRESH_TTL_MS = 30 * 60 * 1000L
     private const val WELCOME_GRACE_PERIOD_MS = 14L * 24 * 60 * 60 * 1000
     private const val WELCOME_NOTIFICATION_PREFIX = "welcome_"
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
@@ -70,6 +70,7 @@ object NotificationStore {
     }
 
     suspend fun refreshFromCloud(context: Context): List<AppNotification> {
+        if (FirebaseCostSafeMode.enabled) return getAll(context)
         val uid = currentUidOrNull()
         val remote = if (uid != null) {
             val readIds = getAllForAccount(context, uid)

@@ -42,6 +42,7 @@ object NotificationPreferencesStore {
     }
 
     suspend fun refreshFromCloud(context: Context): NotificationPreferences {
+        if (FirebaseCostSafeMode.enabled) return load(context)
         val uid = FirebaseAuthManager.currentUser?.uid ?: return load(context)
         val remotePreferences = runCatching {
             val snapshot = FirebaseFirestore.getInstance()
@@ -49,6 +50,7 @@ object NotificationPreferencesStore {
                 .document(uid)
                 .get()
                 .await()
+            FirebaseCostTracker.read("NotificationPreferencesStore.refreshFromCloud", "users/$uid", if (snapshot.exists()) 1 else 0)
             (snapshot.get(CLOUD_FIELD) as? Map<*, *>)?.toNotificationPreferences()
         }.getOrNull()
 
@@ -71,6 +73,7 @@ object NotificationPreferencesStore {
     }
 
     private fun syncToCloud(value: NotificationPreferences) {
+        if (FirebaseCostSafeMode.enabled) return
         val uid = FirebaseAuthManager.currentUser?.uid ?: return
         syncScope.launch {
             runCatching {
@@ -85,6 +88,7 @@ object NotificationPreferencesStore {
                         SetOptions.merge()
                     )
                     .await()
+                FirebaseCostTracker.write("NotificationPreferencesStore.syncToCloud", "users/$uid")
             }
         }
     }

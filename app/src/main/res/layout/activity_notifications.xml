@@ -59,7 +59,7 @@
         android:id="@+id/viewTopDivider"
         android:layout_width="0dp"
         android:layout_height="@dimen/divider_height"
-        android:background="@color/profile_divider"
+        android:background="@color/ms_border_subtle"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/layoutTopBar" />

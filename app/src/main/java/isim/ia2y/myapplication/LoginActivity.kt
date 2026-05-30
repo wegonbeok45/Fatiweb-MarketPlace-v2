@@ -123,13 +123,20 @@ class LoginActivity : AppCompatActivity() {
 
             val email = etEmail.text?.toString().orEmpty().trim()
             val password = etPassword.text?.toString().orEmpty()
+            clearLoginInlineErrors()
 
             val hasValidEmail = email.contains("@") && email.contains(".")
             val hasValidPassword = password.length >= 6
 
             if (!hasValidEmail || !hasValidPassword) {
-                if (!hasValidEmail) markInputState(R.id.cardEmailField, InputFieldState.ERROR)
-                if (!hasValidPassword) markInputState(R.id.cardPasswordField, InputFieldState.ERROR)
+                if (!hasValidEmail) {
+                    markInputState(R.id.cardEmailField, InputFieldState.ERROR)
+                    binding.tvEmailError.visibility = View.VISIBLE
+                }
+                if (!hasValidPassword) {
+                    markInputState(R.id.cardPasswordField, InputFieldState.ERROR)
+                    binding.tvPasswordError.visibility = View.VISIBLE
+                }
                 showMotionSnackbar(getString(R.string.login_validation_error))
                 return@setOnClickListener
             }
@@ -142,6 +149,7 @@ class LoginActivity : AppCompatActivity() {
                         onSuccess = {
                             GuestSessionMerger.mergeIntoCurrentUserInBackground(this@LoginActivity)
                             AnalyticsTracker.login("email")
+                            clearLoginInlineErrors()
                             markInputState(R.id.cardEmailField, InputFieldState.SUCCESS)
                             markInputState(R.id.cardPasswordField, InputFieldState.SUCCESS)
                             completeAuthFlow()
@@ -149,7 +157,8 @@ class LoginActivity : AppCompatActivity() {
                         onFailure = { e ->
                             markInputState(R.id.cardEmailField, InputFieldState.ERROR)
                             markInputState(R.id.cardPasswordField, InputFieldState.ERROR)
-                            showMotionSnackbar(FirebaseAuthManager.friendlyError(this@LoginActivity, e))
+                            binding.tvPasswordError.text = FirebaseAuthManager.friendlyError(this@LoginActivity, e)
+                            binding.tvPasswordError.visibility = View.VISIBLE
                         }
                     )
                 } finally {
@@ -231,7 +240,7 @@ class LoginActivity : AppCompatActivity() {
         val view = layoutInflater.inflate(R.layout.dialog_single_input, null)
         val input = view.findViewById<EditText>(R.id.etDialogInput).apply {
             inputType = android.text.InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS
-            hint = getString(R.string.auto_text_035)
+            hint = getString(R.string.login_email_hint)
             if (prefill.isNotBlank()) {
                 setText(prefill)
                 setSelection(prefill.length)
@@ -289,6 +298,12 @@ class LoginActivity : AppCompatActivity() {
         binding.btnLogin.isEnabled = !isLoading
         binding.btnLogin.text =
             getString(if (isLoading) R.string.login_connecting else R.string.login_btn_label)
+    }
+
+    private fun clearLoginInlineErrors() {
+        binding.tvEmailError.visibility = View.GONE
+        binding.tvPasswordError.text = getString(R.string.auth_error_password_inline)
+        binding.tvPasswordError.visibility = View.GONE
     }
 
     private fun completeAuthFlow() {

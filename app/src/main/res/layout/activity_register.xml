@@ -20,7 +20,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/back"
-        app:tint="?attr/colorOnSurface" />
+        app:tint="@color/ms_text_primary" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layoutLoginRow"
@@ -36,7 +36,7 @@
             style="@style/AppText.Body"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/auto_text_110"
+            android:text="@string/register_have_account"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/tvGoToLogin"
             app:layout_constraintStart_toStartOf="parent"
@@ -48,8 +48,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/space_8"
-            android:text="@string/auto_text_038"
-            android:textColor="?attr/colorPrimary"
+            android:text="@string/login_btn_label"
+            android:textColor="@color/ms_text_primary"
             android:textStyle="bold"
             app:layout_constraintBaseline_toBaselineOf="@id/tvAlreadyHaveAccount"
             app:layout_constraintEnd_toEndOf="parent"
@@ -76,7 +76,7 @@
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardRegisterPanel"
                 android:layout_width="0dp"
-                android:layout_height="100dp"
+                android:layout_height="@dimen/auth_hero_height_register"
                 app:cardCornerRadius="@dimen/corner_radius_large"
                 app:cardElevation="0dp"
                 app:strokeColor="@color/overlay_white_8"
@@ -123,8 +123,8 @@
                                 android:paddingTop="4dp"
                                 android:paddingEnd="10dp"
                                 android:paddingBottom="4dp"
-                                android:text="@string/auto_compte_premium_0868"
-                                android:textColor="?attr/colorOnSurface"
+                                android:text="@string/register_feature_premium"
+                                android:textColor="@color/ms_text_primary"
                                 android:textSize="@dimen/text_size_overline"
                                 android:fontFamily="@font/manrope_semibold" />
                         </com.google.android.material.card.MaterialCardView>
@@ -133,7 +133,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="6dp"
-                            android:text="@string/auto_creez_votre_profil_synchronisez_137e"
+                            android:text="@string/register_feature_subtitle"
                             android:textColor="@android:color/white"
                             android:textSize="@dimen/text_size_title"
                             android:fontFamily="@font/manrope_semibold"
@@ -151,7 +151,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_8"
                 android:gravity="center"
-                android:text="@string/auto_text_104"
+                android:text="@string/register_title"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/cardRegisterPanel" />
@@ -163,7 +163,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_4"
                 android:gravity="center"
-                android:text="@string/auto_text_105"
+                android:text="@string/register_welcome_subtitle"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tvHeadline" />
@@ -174,7 +174,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:text="@string/auto_text_106"
+                android:text="@string/register_name_label"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tvSubtitle" />
 
@@ -207,7 +207,7 @@
                         android:id="@+id/etFullName"
                         style="@style/AppInput.EditText"
                         android:layout_width="0dp"
-                        android:hint="@string/auto_text_107"
+                        android:hint="@string/register_name_hint"
                         android:inputType="textPersonName"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -218,14 +218,28 @@
             </com.google.android.material.card.MaterialCardView>
 
             <TextView
+                android:id="@+id/tvFullNameError"
+                style="@style/Ms.Text.Label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_4"
+                android:text="@string/auth_error_name_inline"
+                android:textColor="@color/colorError"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="@id/cardFullNameField"
+                app:layout_constraintStart_toStartOf="@id/cardFullNameField"
+                app:layout_constraintTop_toBottomOf="@id/cardFullNameField"
+                tools:visibility="visible" />
+
+            <TextView
                 android:id="@+id/tvEmailLabel"
                 style="@style/AppText.FieldLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:text="@string/auto_text_034"
+                android:text="@string/login_email_label"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/cardFullNameField" />
+                app:layout_constraintTop_toBottomOf="@id/tvFullNameError" />
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardEmailField"
@@ -258,7 +272,7 @@
                         android:layout_width="0dp"
                         android:ellipsize="end"
                         android:gravity="start|center_vertical"
-                        android:hint="@string/auto_text_035"
+                        android:hint="@string/login_email_hint"
                         android:inputType="textEmailAddress"
                         android:maxLines="1"
                         android:scrollHorizontally="false"
@@ -273,14 +287,28 @@
             </com.google.android.material.card.MaterialCardView>
 
             <TextView
+                android:id="@+id/tvEmailError"
+                style="@style/Ms.Text.Label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_4"
+                android:text="@string/auth_error_email_inline"
+                android:textColor="@color/colorError"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="@id/cardEmailField"
+                app:layout_constraintStart_toStartOf="@id/cardEmailField"
+                app:layout_constraintTop_toBottomOf="@id/cardEmailField"
+                tools:visibility="visible" />
+
+            <TextView
                 android:id="@+id/tvPasswordLabel"
                 style="@style/AppText.FieldLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:text="@string/auto_text_036"
+                android:text="@string/login_password_label"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/cardEmailField" />
+                app:layout_constraintTop_toBottomOf="@id/tvEmailError" />
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardPasswordField"
@@ -317,13 +345,13 @@
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
                         app:srcCompat="@drawable/ic_eye_off"
-                        app:tint="?attr/colorOnSurfaceVariant" />
+                        app:tint="@color/ms_text_secondary" />
 
                     <EditText
                         android:id="@+id/etPassword"
                         style="@style/AppInput.EditText"
                         android:layout_width="0dp"
-                        android:hint="@string/auto_text_108"
+                        android:hint="@string/login_password_hint"
                         android:inputType="textPassword"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toStartOf="@id/ivPasswordToggle"
@@ -333,15 +361,27 @@
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <TextView
+                android:id="@+id/tvPasswordError"
+                style="@style/Ms.Text.Label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_4"
+                android:text="@string/auth_password_helper"
+                android:textColor="@color/ms_text_secondary"
+                app:layout_constraintEnd_toEndOf="@id/cardPasswordField"
+                app:layout_constraintStart_toStartOf="@id/cardPasswordField"
+                app:layout_constraintTop_toBottomOf="@id/cardPasswordField" />
+
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnRegister"
-                style="@style/AppButton.Primary"
+                style="@style/Ms.Button.Primary"
                 android:layout_width="0dp"
                 android:layout_marginTop="16dp"
-                android:text="@string/auto_text_043"
+                android:text="@string/login_register_cta"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/cardPasswordField" />
+                app:layout_constraintTop_toBottomOf="@id/tvPasswordError" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/layoutOrDivider"
@@ -369,7 +409,7 @@
                     android:layout_height="wrap_content"
                     android:paddingStart="@dimen/space_16"
                     android:paddingEnd="@dimen/space_16"
-                    android:text="@string/auto_text_109"
+                    android:text="@string/register_social_divider"
                     android:textStyle="bold"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -401,7 +441,7 @@
                     android:id="@+id/btnGoogle"
                     style="@style/AppButton.Secondary"
                     android:layout_width="0dp"
-                    android:text="@string/auto_text_040"
+                    android:text="@string/login_google_label"
                     app:icon="@drawable/googlelogo"
                     app:iconGravity="textStart"
                     app:iconPadding="@dimen/space_8"

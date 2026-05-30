@@ -53,9 +53,9 @@ fun AppCompatActivity.markInputState(@IdRes cardId: Int, state: InputFieldState)
 
 private fun AppCompatActivity.animateInputState(card: MaterialCardView, state: InputFieldState) {
     val targetStroke = when (state) {
-        InputFieldState.NEUTRAL -> ContextCompat.getColor(this, R.color.colorOutline)
-        InputFieldState.FOCUSED -> ContextCompat.getColor(this, R.color.colorPrimary)
-        InputFieldState.SUCCESS -> ContextCompat.getColor(this, R.color.colorPrimary)
+        InputFieldState.NEUTRAL -> ContextCompat.getColor(this, R.color.ms_border_default)
+        InputFieldState.FOCUSED -> ContextCompat.getColor(this, R.color.ms_surface_inverse)
+        InputFieldState.SUCCESS -> ContextCompat.getColor(this, R.color.ms_surface_inverse)
         InputFieldState.ERROR -> ContextCompat.getColor(this, R.color.colorError)
     }
 
