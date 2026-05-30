@@ -7,6 +7,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
+import android.os.SystemClock
 import android.util.Base64
 import android.util.Log
 import android.view.View
@@ -45,7 +46,7 @@ import java.net.URL
 import java.util.Locale
 import kotlin.random.Random
 
-class AdminProductEditorActivity : AppCompatActivity() {
+open class AdminProductEditorActivity : AppCompatActivity() {
     private val logTag = "AdminProductEditor"
     private val maxProductImages = 5
 
@@ -113,9 +114,11 @@ class AdminProductEditorActivity : AppCompatActivity() {
     private var initialFormSignature = ""
     private var isSaving = false
     private var isGeneratingProductInfo = false
+    private var lastAutofillAt = 0L
     private var lastAutofillSnapshot: AutofillSnapshot? = null
     private var activeRole: String = UserRoles.CLIENT
     private var pendingCameraImageUri: Uri? = null
+    private var attributesController: ProductAttributesFormController? = null
     private val isSellerMode: Boolean
         get() = intent.getBooleanExtra(AdminProduitsActivity.EXTRA_SELLER_MODE, false)
 
@@ -135,6 +138,7 @@ class AdminProductEditorActivity : AppCompatActivity() {
         }
 
         setupCategoryDropdown()
+        setupProductTypeDropdown()
         bindExistingProduct()
         bindActions()
         bindImagePreviewRefresh()
@@ -233,6 +237,35 @@ class AdminProductEditorActivity : AppCompatActivity() {
         }
     }
 
+    private fun setupProductTypeDropdown() {
+        val controller = ProductAttributesFormController(this, findViewById(R.id.adminProductEditorScroll))
+        attributesController = controller
+
+        val typeInput = findViewById<AutoCompleteTextView>(R.id.actvAdminProductType) ?: return
+        val labels = ProductTypeCatalog.options.map { getString(it.labelRes) }
+        typeInput.setAdapter(
+            android.widget.ArrayAdapter(this, android.R.layout.simple_list_item_1, labels)
+        )
+        typeInput.setOnClickListener { typeInput.showDropDown() }
+        typeInput.setOnFocusChangeListener { _, hasFocus -> if (hasFocus) typeInput.showDropDown() }
+        typeInput.setOnItemClickListener { _, _, position, _ ->
+            val option = ProductTypeCatalog.options.getOrNull(position) ?: return@setOnItemClickListener
+            controller.applyConfig(ProductTypeCatalog.byKey(option.key))
+        }
+    }
+
+    private fun productTypeLabel(key: String): String {
+        val option = ProductTypeCatalog.options.firstOrNull { it.key.equals(key, ignoreCase = true) }
+        return option?.let { getString(it.labelRes) }.orEmpty()
+    }
+
+    private fun resolveProductTypeKey(label: String): String {
+        if (label.isBlank()) return ""
+        return ProductTypeCatalog.options.firstOrNull {
+            getString(it.labelRes).equals(label.trim(), ignoreCase = true)
+        }?.key.orEmpty()
+    }
+
     private fun bindExistingProduct() {
         val title = findViewById<TextView>(R.id.adminProductEditorTvTitle)
         val save = findViewById<MaterialButton>(R.id.adminProductEditorBtnSave)
@@ -268,6 +301,13 @@ class AdminProductEditorActivity : AppCompatActivity() {
         findViewById<TextInputEditText>(R.id.etAdminProductBullets)?.setText(existing.bullets.joinToString("\n"))
         findViewById<SwitchMaterial>(R.id.switchAdminProductBio)?.isChecked = existing.isBio
         findViewById<SwitchMaterial>(R.id.switchAdminProductActive)?.isChecked = existing.isActive
+
+        val config = ProductTypeCatalog.byKey(existing.productType)
+        if (config != null) {
+            findViewById<AutoCompleteTextView>(R.id.actvAdminProductType)?.setText(productTypeLabel(config.key), false)
+            attributesController?.applyConfig(config)
+            attributesController?.bind(existing)
+        }
     }
 
     private fun loadExistingProduct(productId: String, canRefreshImage: Boolean) {
@@ -310,6 +350,12 @@ class AdminProductEditorActivity : AppCompatActivity() {
         findViewById<MaterialButton>(R.id.adminProductEditorBtnAutofill)?.let { button ->
             button.visibility = View.VISIBLE
             button.setOnClickListener {
+                if (isGeneratingProductInfo) return@setOnClickListener
+                val now = SystemClock.elapsedRealtime()
+                if (now - lastAutofillAt < AUTOFILL_COOLDOWN_MS) {
+                    showMotionSnackbar(getString(R.string.admin_product_editor_ai_failed_quota))
+                    return@setOnClickListener
+                }
                 generateProductInfoFromImage()
             }
         }
@@ -378,19 +424,23 @@ class AdminProductEditorActivity : AppCompatActivity() {
             return
         }
 
+        lastAutofillAt = SystemClock.elapsedRealtime()
         setGeneratingProductInfoState(true)
         lifecycleScope.launch {
-            runCatching {
-                val payload = buildProductGenerationImagePayload(image)
-                BackendFunctionsService.generateProductInfo(payload.base64, payload.mimeType)
-            }.onSuccess { draft ->
-                applyGeneratedProductInfo(draft)
-                showMotionSnackbar(getString(R.string.admin_product_editor_autofill_done))
-            }.onFailure { error ->
-                Log.w(logTag, "Product info generation failed", error)
-                showMotionSnackbar(friendlyProductGenerationError(error))
+            try {
+                runCatching {
+                    val payload = buildProductGenerationImagePayload(image)
+                    BackendFunctionsService.generateProductInfo(payload.base64, payload.mimeType)
+                }.onSuccess { draft ->
+                    applyGeneratedProductInfo(draft)
+                    showMotionSnackbar(getString(R.string.admin_product_editor_autofill_done))
+                }.onFailure { error ->
+                    Log.w(logTag, "Product info generation failed", error)
+                    showMotionSnackbar(friendlyProductGenerationError(error))
+                }
+            } finally {
+                setGeneratingProductInfoState(false)
             }
-            setGeneratingProductInfoState(false)
         }
     }
 
@@ -705,6 +755,12 @@ class AdminProductEditorActivity : AppCompatActivity() {
         }
         val isBio = findViewById<SwitchMaterial>(R.id.switchAdminProductBio)?.isChecked ?: autofillSnapshot?.bioFriendly ?: false
         val isActive = findViewById<SwitchMaterial>(R.id.switchAdminProductActive)?.isChecked ?: true
+        val productTypeLabelText = findViewById<AutoCompleteTextView>(R.id.actvAdminProductType)?.text?.toString().orEmpty()
+        val productType = resolveProductTypeKey(productTypeLabelText)
+        val productAttributes = attributesController?.collectAttributes() ?: emptyMap()
+        val productColors = attributesController?.collectColors() ?: emptyList()
+        val productSizes = attributesController?.collectSizes() ?: emptyList()
+        val productVariants = attributesController?.collectVariants() ?: emptyList()
         Log.d(
             logTag,
             "Save tapped title='${title}' subtitle='${subtitle}' price=$price stock=$stock categoryLabel='${categoryLabel}' origin='${originRaw}' tags=${tags.size} bullets=${bullets.size} hasAutofill=${autofillSnapshot != null} rawDescriptionLength=${rawDescription.length}"
@@ -772,10 +828,18 @@ class AdminProductEditorActivity : AppCompatActivity() {
             findViewById<TextView>(R.id.adminProductEditorImageEmpty)?.visibility = View.VISIBLE
             showMotionSnackbar(getString(R.string.admin_product_editor_error_image))
         }
+        val attributesError = attributesController?.validate()
+        if (attributesError != null) {
+            valid = false
+            firstErrorView = firstErrorView ?: findViewById(R.id.sectionAdminProductVariants)
+            showMotionSnackbar(attributesError)
+        }
         if (!valid) {
             Log.w(logTag, "Save blocked by validation")
             scrollToError(firstErrorView)
-            showMotionSnackbar(getString(R.string.admin_product_editor_fix_errors))
+            if (attributesError == null) {
+                showMotionSnackbar(getString(R.string.admin_product_editor_fix_errors))
+            }
             return
         }
 
@@ -849,7 +913,11 @@ class AdminProductEditorActivity : AppCompatActivity() {
                     categoryIds = listOf(category),
                     categoryLeafId = category,
                     origin = normalizedOrigin,
-                    stock = stock ?: 0,
+                    stock = if (productVariants.isNotEmpty()) {
+                        productVariants.filter { it.active }.sumOf { it.stock }
+                    } else {
+                        stock ?: 0
+                    },
                     isBio = isBio,
                     isActive = isActive,
                     status = product?.status ?: "published",
@@ -858,6 +926,11 @@ class AdminProductEditorActivity : AppCompatActivity() {
                     sellerId = resolvedSellerId,
                     sellerName = resolvedSellerName,
                     sellerAvatarUrl = resolvedSellerAvatar,
+                    productType = productType,
+                    attributes = productAttributes,
+                    colorOptions = productColors,
+                    sizeOptions = productSizes,
+                    variants = productVariants,
                     updatedAt = com.google.firebase.Timestamp.now()
                 )
                 ProductService.saveProduct(savedProduct, knownExistingProduct = product)
@@ -939,7 +1012,7 @@ class AdminProductEditorActivity : AppCompatActivity() {
 
     private fun handleCloseRequest() {
         if (isSaving || isGeneratingProductInfo || !hasUnsavedChanges()) {
-            finish()
+            closeEditor()
             return
         }
         androidx.appcompat.app.AlertDialog.Builder(this)
@@ -947,9 +1020,13 @@ class AdminProductEditorActivity : AppCompatActivity() {
             .setMessage(getString(R.string.admin_product_editor_discard_message))
             .setNegativeButton(getString(R.string.admin_product_editor_discard_keep), null)
             .setPositiveButton(getString(R.string.admin_product_editor_discard_confirm)) { _: DialogInterface, _: Int ->
-                finish()
+                closeEditor()
             }
             .show()
+    }
+
+    private fun closeEditor() {
+        if (isSellerMode) finishWithMotion() else navigateAdminBack(AdminNavTab.PRODUITS)
     }
 
     private fun hasUnsavedChanges(): Boolean = captureFormSignature() != initialFormSignature
@@ -968,6 +1045,8 @@ class AdminProductEditorActivity : AppCompatActivity() {
             findViewById<TextInputEditText>(R.id.etAdminProductBullets)?.text?.toString().orEmpty().trim(),
             (findViewById<SwitchMaterial>(R.id.switchAdminProductBio)?.isChecked == true).toString(),
             (findViewById<SwitchMaterial>(R.id.switchAdminProductActive)?.isChecked == true).toString(),
+            findViewById<AutoCompleteTextView>(R.id.actvAdminProductType)?.text?.toString().orEmpty().trim(),
+            attributesController?.signature().orEmpty(),
             editorImages.joinToString(",") { it.stableId }
         ).joinToString("|")
     }
@@ -1390,6 +1469,7 @@ class AdminProductEditorActivity : AppCompatActivity() {
         private const val STATE_PENDING_CAMERA_URI = "state_pending_camera_uri"
         private const val MAX_PARALLEL_IMAGE_UPLOADS = 2
         private const val IMAGE_UPLOAD_TIMEOUT_MS = 60_000L
+        private const val AUTOFILL_COOLDOWN_MS = 30_000L
 
         fun createIntent(context: Context, productId: String?, sellerMode: Boolean = false): Intent {
             return Intent(context, AdminProductEditorActivity::class.java).apply {

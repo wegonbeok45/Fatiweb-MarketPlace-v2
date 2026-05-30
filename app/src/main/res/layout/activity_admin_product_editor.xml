@@ -5,14 +5,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:importantForAutofill="noExcludeDescendants"
-    android:background="@color/profile_body_bg"
+    android:background="@color/ms_surface_canvas"
     tools:context=".AdminProductEditorActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/adminProductEditorAppBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/profile_header_bg"
+        android:background="@color/ms_surface_canvas"
         app:elevation="0dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -33,7 +33,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/back"
-                app:tint="@color/profile_text_primary" />
+                app:tint="@color/ms_text_primary" />
 
             <TextView
                 android:id="@+id/adminProductEditorTvTitle"
@@ -42,7 +42,7 @@
                 android:layout_marginStart="14dp"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:textColor="@color/profile_text_primary"
+                android:textColor="@color/ms_text_primary"
                 android:textSize="@dimen/text_size_subtitle"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -55,7 +55,7 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="@color/profile_divider" />
+            android:background="@color/ms_border_subtle" />
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.core.widget.NestedScrollView
@@ -82,7 +82,7 @@
                 app:cardBackgroundColor="@color/profile_card_bg"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="0dp"
-                app:strokeColor="@color/colorBorderLight"
+                app:strokeColor="@color/ms_border_default"
                 app:strokeWidth="1dp">
 
                 <FrameLayout
@@ -104,7 +104,7 @@
                         android:layout_gravity="center"
                         android:gravity="center"
                         android:text="@string/admin_product_editor_image_empty"
-                        android:textColor="@color/profile_text_secondary"
+                        android:textColor="@color/ms_text_secondary"
                         android:textSize="@dimen/text_size_caption" />
                 </FrameLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -124,7 +124,7 @@
                     android:text="@string/admin_product_editor_pick_image"
                     android:textAllCaps="false"
                     android:textSize="13sp"
-                    app:backgroundTint="?attr/colorPrimary"
+                    app:backgroundTint="@color/ms_surface_inverse"
                     app:cornerRadius="12dp"
                     app:icon="@drawable/ic_home_add_cart"
                     app:iconGravity="textStart"
@@ -134,27 +134,27 @@
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/adminProductEditorBtnCameraImage"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    style="@style/Ms.Button.Secondary"
                     android:layout_width="wrap_content"
                     android:layout_height="42dp"
                     android:layout_marginStart="8dp"
                     android:text="@string/admin_product_editor_pick_image"
                     android:textAllCaps="false"
                     android:textSize="13sp"
-                    android:textColor="@color/colorPrimary"
+                    android:textColor="@color/ms_surface_inverse"
                     app:cornerRadius="12dp"
                     app:strokeColor="@color/colorOutline" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/adminProductEditorBtnRemoveImage"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    style="@style/Ms.Button.Secondary"
                     android:layout_width="wrap_content"
                     android:layout_height="42dp"
                     android:layout_marginStart="8dp"
                     android:text="@string/admin_product_editor_remove_image"
                     android:textAllCaps="false"
                     android:textSize="13sp"
-                    android:textColor="@color/colorPrimary"
+                    android:textColor="@color/ms_surface_inverse"
                     android:visibility="gone"
                     app:cornerRadius="12dp"
                     app:strokeColor="@color/colorOutline" />
@@ -395,11 +395,284 @@
                     android:minLines="3" />
             </com.google.android.material.textfield.TextInputLayout>
 
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilAdminProductType"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:boxCornerRadiusBottomEnd="12dp"
+                app:boxCornerRadiusBottomStart="12dp"
+                app:boxCornerRadiusTopEnd="12dp"
+                app:boxCornerRadiusTopStart="12dp">
+
+                <AutoCompleteTextView
+                    android:id="@+id/actvAdminProductType"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/pa_hint_product_type"
+                    android:inputType="none" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Dynamic attributes -->
+            <LinearLayout
+                android:id="@+id/sectionAdminProductAttributes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    style="@style/Ms.Text.SectionHeader"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/pa_section_details" />
+
+                <LinearLayout
+                    android:id="@+id/llAdminProductAttributes"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
+            </LinearLayout>
+
+            <!-- Colors -->
+            <LinearLayout
+                android:id="@+id/sectionAdminProductColors"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    style="@style/Ms.Text.SectionHeader"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/pa_section_colors" />
+
+                <TextView
+                    style="@style/AppText.Caption"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="@string/pa_colors_hint" />
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/cgAdminProductColors"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    app:chipSpacingVertical="4dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnAdminProductAddColor"
+                    style="@style/Ms.Button.Ghost"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="@string/pa_add_custom_color"
+                    android:textAllCaps="false" />
+            </LinearLayout>
+
+            <!-- Sizes -->
+            <LinearLayout
+                android:id="@+id/sectionAdminProductSizes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    style="@style/Ms.Text.SectionHeader"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/pa_section_sizes" />
+
+                <TextView
+                    style="@style/AppText.Caption"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="@string/pa_sizes_hint" />
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/cgAdminProductSizes"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    app:chipSpacingVertical="4dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/tilAdminProductCustomSize"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        app:boxCornerRadiusBottomEnd="12dp"
+                        app:boxCornerRadiusBottomStart="12dp"
+                        app:boxCornerRadiusTopEnd="12dp"
+                        app:boxCornerRadiusTopStart="12dp">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etAdminProductCustomSize"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/pa_custom_size_hint"
+                            android:imeOptions="actionDone"
+                            android:inputType="textCapCharacters" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnAdminProductAddSize"
+                        style="@style/Ms.Button.Secondary"
+                        android:layout_width="wrap_content"
+                        android:layout_height="48dp"
+                        android:layout_marginStart="8dp"
+                        android:text="@string/pa_add_custom_size"
+                        android:textAllCaps="false"
+                        app:cornerRadius="12dp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Dimensions -->
+            <LinearLayout
+                android:id="@+id/sectionAdminProductDimensions"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    style="@style/Ms.Text.SectionHeader"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/pa_section_dimensions" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:orientation="horizontal">
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/tilAdminProductDimWidth"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        app:boxCornerRadiusBottomEnd="12dp"
+                        app:boxCornerRadiusBottomStart="12dp"
+                        app:boxCornerRadiusTopEnd="12dp"
+                        app:boxCornerRadiusTopStart="12dp">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etAdminProductDimWidth"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/pa_dim_width"
+                            android:imeOptions="actionNext"
+                            android:inputType="numberDecimal" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/tilAdminProductDimHeight"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_weight="1"
+                        app:boxCornerRadiusBottomEnd="12dp"
+                        app:boxCornerRadiusBottomStart="12dp"
+                        app:boxCornerRadiusTopEnd="12dp"
+                        app:boxCornerRadiusTopStart="12dp">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etAdminProductDimHeight"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/pa_dim_height"
+                            android:imeOptions="actionNext"
+                            android:inputType="numberDecimal" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/tilAdminProductDimDepth"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_weight="1"
+                        app:boxCornerRadiusBottomEnd="12dp"
+                        app:boxCornerRadiusBottomStart="12dp"
+                        app:boxCornerRadiusTopEnd="12dp"
+                        app:boxCornerRadiusTopStart="12dp">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etAdminProductDimDepth"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/pa_dim_depth"
+                            android:imeOptions="actionDone"
+                            android:inputType="numberDecimal" />
+                    </com.google.android.material.textfield.TextInputLayout>
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Variants -->
+            <LinearLayout
+                android:id="@+id/sectionAdminProductVariants"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    style="@style/Ms.Text.SectionHeader"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/pa_section_variants" />
+
+                <TextView
+                    style="@style/AppText.Caption"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="@string/pa_variants_hint" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnAdminProductGenerateVariants"
+                    style="@style/Ms.Button.Secondary"
+                    android:layout_width="wrap_content"
+                    android:layout_height="44dp"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/pa_generate_variants"
+                    android:textAllCaps="false"
+                    app:cornerRadius="12dp" />
+
+                <LinearLayout
+                    android:id="@+id/llAdminProductVariants"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:orientation="vertical" />
+            </LinearLayout>
+
             <com.google.android.material.switchmaterial.SwitchMaterial
                 android:id="@+id/switchAdminProductBio"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="16dp"
                 android:text="@string/admin_product_editor_toggle_bio" />
 
             <com.google.android.material.switchmaterial.SwitchMaterial
@@ -417,7 +690,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:background="@color/profile_header_bg"
+        android:background="@color/ms_surface_canvas"
         android:elevation="8dp"
         android:gravity="center_vertical"
         android:orientation="horizontal"
@@ -435,14 +708,14 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/adminProductEditorBtnAutofill"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            style="@style/Ms.Button.Secondary"
             android:layout_width="wrap_content"
             android:layout_height="44dp"
             android:layout_marginEnd="10dp"
             android:text="@string/admin_product_editor_action_autofill"
             android:textAllCaps="false"
             android:textSize="13sp"
-            android:textColor="@color/colorPrimary"
+            android:textColor="@color/ms_surface_inverse"
             android:visibility="gone"
             app:cornerRadius="14dp"
             app:strokeColor="@color/colorOutline" />
@@ -453,7 +726,7 @@
             android:layout_height="44dp"
             android:layout_weight="1"
             android:textAllCaps="false"
-            app:backgroundTint="?attr/colorPrimary"
+            app:backgroundTint="@color/ms_surface_inverse"
             app:cornerRadius="14dp"
             app:strokeWidth="0dp"
             tools:text="Ajouter le produit" />

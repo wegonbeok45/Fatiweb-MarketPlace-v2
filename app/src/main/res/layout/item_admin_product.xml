@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Product list row for the admin products / moderation screen.
+  Thumbnail | name + seller | price + stock badge | approval pill | overflow
+-->
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/Ms.Card.Surface"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="@dimen/space_10">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/space_12">
+
+        <!-- Thumbnail -->
+        <ImageView
+            android:id="@+id/adminProductThumb"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            android:background="@drawable/ms_bg_icon_chip_dark"
+            android:scaleType="centerCrop"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="ContentDescription"
+            tools:src="@drawable/ic_admin_nav_produits" />
+
+        <!-- Product title -->
+        <TextView
+            android:id="@+id/adminProductTitle"
+            style="@style/Ms.Text.Label"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/space_12"
+            android:ellipsize="end"
+            android:maxLines="1"
+            app:layout_constraintEnd_toStartOf="@id/adminProductOverflow"
+            app:layout_constraintStart_toEndOf="@id/adminProductThumb"
+            app:layout_constraintTop_toTopOf="@id/adminProductThumb"
+            tools:text="Huile d'argan bio 100ml" />
+
+        <!-- Seller name -->
+        <TextView
+            android:id="@+id/adminProductSeller"
+            style="@style/Ms.Text.Caption"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/space_12"
+            android:layout_marginTop="@dimen/space_2"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="@color/ms_text_secondary"
+            app:layout_constraintEnd_toStartOf="@id/adminProductOverflow"
+            app:layout_constraintStart_toEndOf="@id/adminProductThumb"
+            app:layout_constraintTop_toBottomOf="@id/adminProductTitle"
+            tools:text="Boutique Fati" />
+
+        <!-- Price + stock row -->
+        <LinearLayout
+            android:id="@+id/adminProductMetaRow"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/space_12"
+            android:layout_marginTop="@dimen/space_6"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toStartOf="@id/adminProductOverflow"
+            app:layout_constraintStart_toEndOf="@id/adminProductThumb"
+            app:layout_constraintTop_toBottomOf="@id/adminProductSeller">
+
+            <TextView
+                android:id="@+id/adminProductPrice"
+                style="@style/Ms.Text.Label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="@color/ms_accent_gold"
+                tools:text="24,900 DT" />
+
+            <!-- Stock pill — color driven in code -->
+            <TextView
+                android:id="@+id/adminProductStock"
+                style="@style/Ms.Chip.Status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/space_8"
+                android:ellipsize="end"
+                android:maxLines="1"
+                tools:background="@drawable/ms_bg_status_approved"
+                tools:text="12 en stock"
+                tools:textColor="@color/ms_status_approved_fg" />
+
+            <!-- Approval status pill -->
+            <TextView
+                android:id="@+id/adminProductApprovalStatus"
+                style="@style/Ms.Chip.Status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/space_8"
+                android:ellipsize="end"
+                android:maxLines="1"
+                tools:background="@drawable/ms_bg_status_pending"
+                tools:text="En attente"
+                tools:textColor="@color/ms_status_pending_fg" />
+        </LinearLayout>
+
+        <!-- 3-dot overflow -->
+        <ImageView
+            android:id="@+id/adminProductOverflow"
+            android:layout_width="@dimen/ms_min_touch"
+            android:layout_height="@dimen/ms_min_touch"
+            android:background="?selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:contentDescription="@string/ms_action_more"
+            android:focusable="true"
+            android:padding="12dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_ms_more_vert"
+            app:tint="@color/ms_text_secondary" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>
