@@ -28,10 +28,8 @@
                 android:id="@+id/ivOnboardHero"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:adjustViewBounds="true"
                 android:contentDescription="@string/cd_onboarding_image"
-                android:padding="@dimen/space_24"
-                android:scaleType="fitCenter" />
+                android:scaleType="centerCrop" />
 
         </com.google.android.material.card.MaterialCardView>
 
@@ -62,8 +60,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:contentDescription="@string/cd_onboarding_image"
-                        android:padding="@dimen/space_16"
-                        android:scaleType="fitCenter" />
+                        android:scaleType="centerCrop" />
 
                 </com.google.android.material.card.MaterialCardView>
 
@@ -80,8 +77,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:contentDescription="@string/cd_onboarding_image"
-                        android:padding="@dimen/space_16"
-                        android:scaleType="fitCenter" />
+                        android:scaleType="centerCrop" />
 
                 </com.google.android.material.card.MaterialCardView>
 
@@ -98,8 +94,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:contentDescription="@string/cd_onboarding_image"
-                        android:padding="@dimen/space_16"
-                        android:scaleType="fitCenter" />
+                        android:scaleType="centerCrop" />
 
                 </com.google.android.material.card.MaterialCardView>
 
@@ -123,8 +118,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:contentDescription="@string/cd_onboarding_image"
-                        android:padding="@dimen/space_16"
-                        android:scaleType="fitCenter" />
+                        android:scaleType="centerCrop" />
 
                 </com.google.android.material.card.MaterialCardView>
 
@@ -141,8 +135,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:contentDescription="@string/cd_onboarding_image"
-                        android:padding="@dimen/space_16"
-                        android:scaleType="fitCenter" />
+                        android:scaleType="centerCrop" />
 
                 </com.google.android.material.card.MaterialCardView>
 
@@ -159,8 +152,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:contentDescription="@string/cd_onboarding_image"
-                        android:padding="@dimen/space_16"
-                        android:scaleType="fitCenter" />
+                        android:scaleType="centerCrop" />
 
                 </com.google.android.material.card.MaterialCardView>
 

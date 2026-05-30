@@ -133,7 +133,8 @@ class OnboardingActivity : AppCompatActivity() {
         val gap = resources.getDimensionPixelSize(R.dimen.space_8)
         pages.indices.forEach { index ->
             val dot = View(this)
-            val params = LinearLayout.LayoutParams(0, height)
+            val dotWidth = resources.getDimensionPixelSize(R.dimen.onboarding_indicator_dot_width)
+            val params = LinearLayout.LayoutParams(dotWidth, height)
             if (index > 0) params.marginStart = gap
             dot.layoutParams = params
             indicatorContainer.addView(dot)

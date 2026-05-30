@@ -41,6 +41,7 @@ class LanguageSettingsActivity : AppCompatActivity() {
     private fun onLanguageSelected(languageCode: String) {
         updateLanguageButtons(languageCode)
         if (languageCode != LanguageManager.getSelectedLanguage(this)) {
+            setResult(RESULT_OK)
             LanguageManager.setLanguage(this, languageCode)
             showMotionSnackbar(getString(R.string.language_saved))
         }

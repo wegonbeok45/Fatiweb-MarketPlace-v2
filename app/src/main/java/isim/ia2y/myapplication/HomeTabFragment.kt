@@ -81,16 +81,11 @@ class HomeTabFragment : Fragment(R.layout.fragment_home_tab), TabReselectionHand
         view.findViewById<View?>(R.id.viewBottomDivider)?.isGone = true
         setupCatalogSections(view)
         setupCategoryCarousel(view)
-        refreshMarketplaceCategories()
         renderCatalogSections(view)
-        setupHomeHeroCarousel(view)
-        bindCuratorEditorialImages(view)
         setupHeaderAndContentActions(view)
         setupHomeRefresh(view)
-        listenForMessageUnread()
-        setupCollapsingHeader(view)
         setupMotionPolish()
-        startSearchHintTyping(view)
+        startDeferredHomeStartup(view)
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -107,12 +102,30 @@ class HomeTabFragment : Fragment(R.layout.fragment_home_tab), TabReselectionHand
         }
 
         val hasLocalCatalog = ProductCatalog.all(includeInactive = true).isNotEmpty()
-        if (hasLocalCatalog) {
-            CatalogSyncManager.refreshAsync(force = false)
-        } else {
+        if (!hasLocalCatalog) {
             setShimmering(true)
-            viewLifecycleOwner.lifecycleScope.launch {
-                runCatching { CatalogSyncManager.ensureSynced(force = false) }
+        }
+    }
+
+    private fun startDeferredHomeStartup(root: View) {
+        root.post {
+            root.post {
+                if (view !== root || !isAdded) return@post
+                setupCollapsingHeader(root)
+                startSearchHintTyping(root)
+                bindCuratorEditorialImages(root)
+                setupHomeHeroCarousel(root)
+                refreshMarketplaceCategories()
+                listenForMessageUnread()
+
+                val hasLocalCatalog = ProductCatalog.all(includeInactive = true).isNotEmpty()
+                if (hasLocalCatalog) {
+                    CatalogSyncManager.refreshAsync(force = false)
+                } else {
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        runCatching { CatalogSyncManager.ensureSynced(force = false) }
+                    }
+                }
             }
         }
     }

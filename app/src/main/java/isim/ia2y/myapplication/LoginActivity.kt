@@ -82,9 +82,11 @@ class LoginActivity : AppCompatActivity() {
         binding.ivBack.setOnClickListener {
             finishAuthEntry()
         }
-        binding.tvSignUp.setOnClickListener {
+        val openRegister = View.OnClickListener {
             startActivity(RegisterActivity.createIntent(this).copyAuthReturnFrom(intent))
         }
+        binding.layoutSignUpRow.setOnClickListener(openRegister)
+        binding.tvSignUp.setOnClickListener(openRegister)
         setupGoogleLogin()
 
         binding.tvForgotPassword.setOnClickListener {
@@ -185,6 +187,7 @@ class LoginActivity : AppCompatActivity() {
         }
         applyPressFeedback(
             R.id.ivBack,
+            R.id.layoutSignUpRow,
             R.id.tvSignUp,
             R.id.tvForgotPassword,
             R.id.btnLogin,

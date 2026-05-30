@@ -401,4 +401,8 @@
     <color name="ms_ripple_on_light">#1A171717</color>
     <color name="ms_ripple_on_dark">#33FFFFFF</color>
 
+    <!-- Splash screen -->
+    <color name="splash_bg">#FFFFFF</color>
+
 </resources>
+

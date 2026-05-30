@@ -9,6 +9,7 @@ import android.os.Handler
 import android.os.Looper
 import android.text.InputType
 import android.util.Log
+import android.view.ContextThemeWrapper
 import android.view.View
 import android.widget.EditText
 import android.widget.FrameLayout
@@ -65,23 +66,47 @@ class ProfileTabFragment : Fragment() {
         ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         if (uri == null) return@registerForActivityResult
-        
-        val uid = FirebaseAuthManager.currentUser?.uid ?: return@registerForActivityResult
+
+        val uid = FirebaseAuthManager.currentUser?.uid ?: run {
+            (activity as? AppCompatActivity)?.showMotionSnackbar(getString(R.string.profile_avatar_login_required))
+            return@registerForActivityResult
+        }
         val appContext = context?.applicationContext ?: return@registerForActivityResult
-        
+
+        setAvatarUploadOverlayVisible(true)
         lifecycleScope.launch {
             runCatching { UserAvatarService.uploadAndSaveAvatar(appContext, uid, uri) }
                 .onSuccess { remoteUrl ->
                     if (!isAdded) return@onSuccess
+                    setAvatarUploadOverlayVisible(false)
                     latestProfile = latestProfile?.copy(avatarUrl = remoteUrl)
                     loadAvatarUrl(remoteUrl)
                     (activity as? AppCompatActivity)?.showSuccess(getString(R.string.profile_avatar_updated))
                 }
                 .onFailure { error ->
                     Log.e(logTag, "Avatar upload failed", error)
-                    (activity as? AppCompatActivity)?.showMotionSnackbar(getString(R.string.profile_avatar_update_failed))
+                    if (!isAdded) return@onFailure
+                    setAvatarUploadOverlayVisible(false)
+                    (activity as? AppCompatActivity)?.showMotionSnackbar(avatarErrorMessage(error))
                 }
         }
+    }
+
+    private fun setAvatarUploadOverlayVisible(visible: Boolean) {
+        val overlay = _binding?.layoutAvatarUploadOverlay ?: return
+        overlay.isGone = !visible
+    }
+
+    private fun avatarErrorMessage(error: Throwable): String {
+        val reason = (error as? UserAvatarService.AvatarUploadException)?.reason
+            ?: UserAvatarService.FailureReason.UNKNOWN
+        val resId = when (reason) {
+            UserAvatarService.FailureReason.NETWORK -> R.string.profile_avatar_error_network
+            UserAvatarService.FailureReason.PERMISSION -> R.string.profile_avatar_error_permission
+            UserAvatarService.FailureReason.TOO_LARGE -> R.string.profile_avatar_error_too_large
+            UserAvatarService.FailureReason.UNKNOWN -> R.string.profile_avatar_update_failed
+        }
+        return getString(resId)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -285,6 +310,9 @@ class ProfileTabFragment : Fragment() {
         root.findViewById<View>(R.id.cardNotifications)?.setOnClickListener {
             (activity as? AppCompatActivity)?.navigateNoShift(NotificationPreferencesActivity::class.java)
         }
+        root.findViewById<View>(R.id.cardPrivacy)?.setOnClickListener {
+            showPrivacyDialog()
+        }
         binding.tvLocation.setOnClickListener {
             val context = context ?: return@setOnClickListener
             if (LocationHelper.hasPermission(context)) {
@@ -318,7 +346,12 @@ class ProfileTabFragment : Fragment() {
                 FirebaseAuthManager.signOut()
                 (activity as? AppCompatActivity)?.navigateNoShift(LoginActivity::class.java)
             } else {
-                (activity as? AppCompatActivity)?.navigateNoShift(LoginActivity::class.java)
+                startActivity(
+                    RegisterActivity.createIntent(
+                        requireContext(),
+                        returnToTab = MainActivity.Tab.PROFILE
+                    )
+                )
             }
         }
         updatePrimaryAccountAction(FirebaseAuthManager.isLoggedIn)
@@ -341,6 +374,7 @@ class ProfileTabFragment : Fragment() {
             R.id.cardAddresses,
             R.id.cardAccountCenter,
             R.id.cardNotifications,
+            R.id.cardPrivacy,
             R.id.cardSettings,
             R.id.cardHelp,
             R.id.cardAbout,
@@ -542,7 +576,7 @@ class ProfileTabFragment : Fragment() {
             requireContext(),
             if (isLoggedIn) R.color.profile_logout_text else R.color.white
         )
-        button.text = getString(if (isLoggedIn) R.string.profile_logout else R.string.login_btn_label)
+        button.text = getString(if (isLoggedIn) R.string.profile_logout else R.string.register_btn_label)
         button.icon = ContextCompat.getDrawable(
             requireContext(),
             if (isLoggedIn) R.drawable.ic_profile_logout else R.drawable.ic_profile_nav_user
@@ -607,8 +641,9 @@ class ProfileTabFragment : Fragment() {
         }
         content.addView(TextView(requireContext()).apply {
             text = getString(R.string.profile_seller_request_body)
-            setTextAppearance(R.style.AppText_Body)
-            setTextColor(ContextCompat.getColor(requireContext(), R.color.details_text_primary))
+            setTextAppearance(R.style.Ms_Text_Body)
+            setTextColor(ContextCompat.getColor(requireContext(), R.color.ms_text_secondary))
+            setLineSpacing(2.dp.toFloat(), 1f)
         })
 
         val (shopLayout, shopInput) = content.addSellerInput(
@@ -637,6 +672,9 @@ class ProfileTabFragment : Fragment() {
 
         dialog.setOnShowListener {
             val submit = dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE)
+            dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_NEGATIVE)
+                ?.setTextColor(ContextCompat.getColor(requireContext(), R.color.ms_text_secondary))
+            submit?.setTextColor(ContextCompat.getColor(requireContext(), R.color.ms_surface_inverse))
             submit.setOnClickListener {
                 val shopName = shopInput.text?.toString().orEmpty().trim()
                 val phone = phoneInput.text?.toString().orEmpty().trim()
@@ -701,13 +739,21 @@ class ProfileTabFragment : Fragment() {
         inputType: Int = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_WORDS,
         maxLines: Int = 1
     ): Pair<TextInputLayout, TextInputEditText> {
-        val inputLayout = TextInputLayout(context).apply {
+        val themedContext = ContextThemeWrapper(context, R.style.AppInput_TextInputLayout)
+        val inputLayout = TextInputLayout(themedContext).apply {
             hint = getString(hintRes)
+            boxBackgroundMode = TextInputLayout.BOX_BACKGROUND_OUTLINE
+            boxBackgroundColor = ContextCompat.getColor(context, R.color.ms_surface_card)
+            setBoxStrokeColorStateList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.ms_border_default)))
+            setHintTextColor(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.ms_text_secondary)))
+            isErrorEnabled = true
         }
-        val input = TextInputEditText(inputLayout.context).apply {
+        val input = TextInputEditText(ContextThemeWrapper(inputLayout.context, R.style.AppInput_TextInputEditText)).apply {
             setText(initialValue)
             this.inputType = inputType
             this.maxLines = maxLines
+            setTextColor(ContextCompat.getColor(context, R.color.ms_text_primary))
+            setHintTextColor(ContextCompat.getColor(context, R.color.ms_text_secondary))
         }
         inputLayout.addView(
             input,

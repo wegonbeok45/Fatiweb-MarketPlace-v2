@@ -1,11 +1,13 @@
 package isim.ia2y.myapplication
 
 import android.os.Bundle
+import android.text.InputType
 import android.util.Log
 import android.text.method.PasswordTransformationMethod
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -141,12 +143,11 @@ class RegisterActivity : AppCompatActivity() {
                         onSuccess = {
                             AnalyticsTracker.signUp("email")
                             GuestSessionMerger.mergeIntoCurrentUserInBackground(this@RegisterActivity)
-                            runCatching { FirebaseAuthManager.sendEmailVerification() }
                             clearRegisterInlineErrors()
                             markInputState(R.id.cardFullNameField, InputFieldState.SUCCESS)
                             markInputState(R.id.cardEmailField, InputFieldState.SUCCESS)
                             markInputState(R.id.cardPasswordField, InputFieldState.SUCCESS)
-                            showEmailVerificationDialog(email)
+                            showPhoneVerificationPrompt()
                         },
                         onFailure = { e ->
                             findViewById<TextView>(R.id.tvPasswordError)?.apply {
@@ -256,47 +257,140 @@ class RegisterActivity : AppCompatActivity() {
         }
     }
 
-    private fun showEmailVerificationDialog(email: String) {
+    private fun showPhoneVerificationPrompt() {
+        val input = EditText(this).apply {
+            hint = getString(R.string.signup_phone_hint)
+            inputType = InputType.TYPE_CLASS_PHONE
+            setSingleLine(true)
+        }
+        val content = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            val pad = resources.getDimensionPixelSize(R.dimen.space_20)
+            setPadding(pad, resources.getDimensionPixelSize(R.dimen.space_8), pad, 0)
+            addView(input)
+        }
+
         val dialog = MaterialAlertDialogBuilder(this)
-            .setTitle(getString(R.string.auth_verify_dialog_title))
-            .setMessage(getString(R.string.auth_verify_dialog_message, email))
+            .setTitle(R.string.signup_phone_verify_title)
+            .setMessage(R.string.signup_phone_verify_message)
+            .setView(content)
             .setCancelable(false)
-            .setPositiveButton(getString(R.string.auth_verify_dialog_confirmed), null)
-            .setNeutralButton(getString(R.string.auth_verify_dialog_resend), null)
-            .setNegativeButton(getString(R.string.auth_verify_dialog_cancel), null)
+            .setPositiveButton(R.string.signup_phone_send_code, null)
+            .setNegativeButton(R.string.signup_phone_skip, null)
             .create()
 
         dialog.setOnShowListener {
             dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE)?.setOnClickListener {
+                val phone = normalizePhoneForSms(input.text?.toString().orEmpty())
+                if (phone == null) {
+                    input.error = getString(R.string.signup_phone_invalid)
+                    return@setOnClickListener
+                }
                 lifecycleScope.launch {
-                    val result = FirebaseAuthManager.reloadAndCheckEmailVerified()
+                    val button = dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE)
+                    button.isEnabled = false
+                    button.text = getString(R.string.phone_login_sending)
+                    val result = FirebaseAuthManager.startPhoneLinkVerification(
+                        activity = this@RegisterActivity,
+                        e164PhoneNumber = phone
+                    )
                     result.fold(
-                        onSuccess = { verified ->
-                            if (verified) {
+                        onSuccess = { start ->
+                            val user = start.autoLinkedUser
+                            if (user != null) {
+                                runCatching { UserService.markPhoneVerified(user.uid, phone) }
                                 dialog.dismiss()
+                                showMotionSnackbar(getString(R.string.signup_phone_verified))
                                 completeAuthFlow()
-                            } else {
-                                showMotionSnackbar(getString(R.string.auth_verify_not_yet))
+                            } else if (start.verificationId != null) {
+                                dialog.dismiss()
+                                showSmsCodeDialog(start.verificationId, phone)
                             }
                         },
                         onFailure = { e ->
+                            button.isEnabled = true
+                            button.text = getString(R.string.signup_phone_send_code)
                             showMotionSnackbar(FirebaseAuthManager.friendlyError(this@RegisterActivity, e))
                         }
                     )
                 }
             }
-            dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_NEUTRAL)?.setOnClickListener {
-                lifecycleScope.launch {
-                    runCatching { FirebaseAuthManager.sendEmailVerification() }
-                    showMotionSnackbar(getString(R.string.auth_verify_resent))
-                }
-            }
             dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_NEGATIVE)?.setOnClickListener {
-                FirebaseAuthManager.signOut()
                 dialog.dismiss()
+                completeAuthFlow()
             }
         }
         dialog.show()
+    }
+
+    private fun showSmsCodeDialog(verificationId: String, phone: String) {
+        val input = EditText(this).apply {
+            hint = getString(R.string.phone_verify_field_hint)
+            inputType = InputType.TYPE_CLASS_NUMBER
+            setSingleLine(true)
+            gravity = android.view.Gravity.CENTER
+            filters = arrayOf(android.text.InputFilter.LengthFilter(6))
+        }
+        val content = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            val pad = resources.getDimensionPixelSize(R.dimen.space_20)
+            setPadding(pad, resources.getDimensionPixelSize(R.dimen.space_8), pad, 0)
+            addView(input)
+        }
+
+        val dialog = MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.phone_verify_title)
+            .setMessage(getString(R.string.phone_verify_subtitle, phone))
+            .setView(content)
+            .setCancelable(false)
+            .setPositiveButton(R.string.phone_verify_confirm, null)
+            .setNegativeButton(R.string.signup_phone_skip, null)
+            .create()
+
+        dialog.setOnShowListener {
+            dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE)?.setOnClickListener {
+                val code = input.text?.toString().orEmpty().filter { it.isDigit() }
+                if (code.length != 6) {
+                    input.error = getString(R.string.phone_verify_invalid)
+                    return@setOnClickListener
+                }
+                lifecycleScope.launch {
+                    val button = dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE)
+                    button.isEnabled = false
+                    button.text = getString(R.string.phone_verify_verifying)
+                    val result = FirebaseAuthManager.linkCurrentUserWithSmsCode(verificationId, code)
+                    result.fold(
+                        onSuccess = { user ->
+                            runCatching { UserService.markPhoneVerified(user.uid, phone) }
+                            dialog.dismiss()
+                            showMotionSnackbar(getString(R.string.signup_phone_verified))
+                            completeAuthFlow()
+                        },
+                        onFailure = { e ->
+                            button.isEnabled = true
+                            button.text = getString(R.string.phone_verify_confirm)
+                            showMotionSnackbar(FirebaseAuthManager.friendlyError(this@RegisterActivity, e))
+                        }
+                    )
+                }
+            }
+            dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_NEGATIVE)?.setOnClickListener {
+                dialog.dismiss()
+                completeAuthFlow()
+            }
+        }
+        dialog.show()
+    }
+
+    private fun normalizePhoneForSms(raw: String): String? {
+        val trimmed = raw.trim()
+        val digits = trimmed.filter { it.isDigit() }
+        return when {
+            trimmed.startsWith("+") && digits.length in 8..15 -> "+$digits"
+            digits.startsWith("216") && digits.length == 11 -> "+$digits"
+            digits.trimStart('0').length == 8 -> "+216${digits.trimStart('0')}"
+            else -> null
+        }
     }
 
     private fun completeAuthFlow() {

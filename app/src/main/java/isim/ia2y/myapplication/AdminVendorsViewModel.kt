@@ -72,6 +72,23 @@ class AdminVendorsViewModel : ViewModel() {
 
     // ===== Actions =====
 
+    fun applyLocalStatus(uid: String, status: VendorStatus) {
+        val now = System.currentTimeMillis()
+        allRows = allRows.map { row ->
+            if (row.uid != uid) return@map row
+            row.copy(
+                role = when (status) {
+                    VendorStatus.APPROVED, VendorStatus.SUSPENDED -> UserRoles.VENDEUR
+                    VendorStatus.PENDING, VendorStatus.REJECTED -> UserRoles.CLIENT
+                },
+                status = status,
+                approvedAt = if (status == VendorStatus.APPROVED) now else row.approvedAt,
+                suspendedReason = if (status == VendorStatus.SUSPENDED) row.suspendedReason else "",
+            )
+        }
+        emitFiltered()
+    }
+
     /** Called after an admin action mutates a vendor row. Refreshes from Firestore. */
     fun reload() {
         allRows = emptyList()

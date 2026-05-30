@@ -5,6 +5,7 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.SetOptions
+import com.google.firebase.firestore.Source
 import kotlinx.coroutines.tasks.await
 
 /**
@@ -42,11 +43,12 @@ object AdminVendorService {
     suspend fun fetchVendors(
         status: VendorStatus? = null,
         limit: Long = 100L,
+        source: Source = Source.SERVER,
     ): List<VendorRow> {
         val rowsById = linkedMapOf<String, VendorRow>()
 
         suspend fun addRows(query: Query) {
-            val snap = query.limit(limit).get().await() ?: return
+            val snap = query.limit(limit).get(source).await() ?: return
             snap.documents.forEach { doc ->
                 rowFromDocument(doc)?.let { rowsById[it.uid] = it }
             }

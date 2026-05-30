@@ -1,12 +1,19 @@
 package isim.ia2y.myapplication
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 class SettingsActivity : AppCompatActivity() {
+    private val languageSettingsLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == RESULT_OK) recreate()
+        }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -18,7 +25,14 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         findViewById<View>(R.id.ivBack)?.setOnClickListener { finishWithMotion() }
-        findViewById<View>(R.id.cardLanguage)?.setOnClickListener { navigateNoShift(LanguageSettingsActivity::class.java) }
+        findViewById<View>(R.id.cardLanguage)?.setOnClickListener {
+            languageSettingsLauncher.launch(Intent(this, LanguageSettingsActivity::class.java))
+            if (isReducedMotionEnabled()) {
+                overridePendingTransition(0, 0)
+            } else {
+                overridePendingTransition(R.anim.motion_activity_enter_forward, R.anim.motion_activity_exit_forward)
+            }
+        }
         findViewById<View>(R.id.cardNotifications)?.setOnClickListener { navigateNoShift(NotificationPreferencesActivity::class.java) }
         findViewById<View>(R.id.cardHelpCenter)?.setOnClickListener { navigateNoShift(HelpCenterActivity::class.java) }
         findViewById<View>(R.id.cardAboutCurator)?.setOnClickListener { navigateNoShift(AboutCuratorActivity::class.java) }

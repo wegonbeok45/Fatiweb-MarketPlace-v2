@@ -81,7 +81,7 @@ class AdminHomeActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        if (roleVerified) viewModel.load()
+        if (roleVerified) viewModel.refresh()
     }
 
     private fun applyInsets() {

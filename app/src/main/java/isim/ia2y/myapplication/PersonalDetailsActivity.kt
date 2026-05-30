@@ -45,18 +45,39 @@ class PersonalDetailsActivity : AppCompatActivity() {
             return@registerForActivityResult
         }
 
+        setAvatarUploadOverlayVisible(true)
         lifecycleScope.launch {
             runCatching { UserAvatarService.uploadAndSaveAvatar(this@PersonalDetailsActivity, uid, uri) }
                 .onSuccess { remoteUrl ->
                     if (isFinishing || isDestroyed) return@onSuccess
+                    setAvatarUploadOverlayVisible(false)
                     loadAvatarUrl(remoteUrl)
                     showSuccess(getString(R.string.profile_avatar_updated))
                 }
                 .onFailure { error ->
                     android.util.Log.e(TAG, "Avatar upload failed", error)
-                    showMotionSnackbar(getString(R.string.profile_avatar_update_failed))
+                    if (isFinishing || isDestroyed) return@onFailure
+                    setAvatarUploadOverlayVisible(false)
+                    showMotionSnackbar(avatarErrorMessage(error))
                 }
         }
+    }
+
+    private fun setAvatarUploadOverlayVisible(visible: Boolean) {
+        findViewById<View>(R.id.layoutAvatarUploadOverlay)?.visibility =
+            if (visible) View.VISIBLE else View.GONE
+    }
+
+    private fun avatarErrorMessage(error: Throwable): String {
+        val reason = (error as? UserAvatarService.AvatarUploadException)?.reason
+            ?: UserAvatarService.FailureReason.UNKNOWN
+        val resId = when (reason) {
+            UserAvatarService.FailureReason.NETWORK -> R.string.profile_avatar_error_network
+            UserAvatarService.FailureReason.PERMISSION -> R.string.profile_avatar_error_permission
+            UserAvatarService.FailureReason.TOO_LARGE -> R.string.profile_avatar_error_too_large
+            UserAvatarService.FailureReason.UNKNOWN -> R.string.profile_avatar_update_failed
+        }
+        return getString(resId)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -176,15 +197,25 @@ class PersonalDetailsActivity : AppCompatActivity() {
 
         lifecycleScope.launch {
             val newDisplayName = details.fullName.ifBlank { currentUser.displayName.orEmpty() }
-            val result = if (newDisplayName != currentUser.displayName.orEmpty()) {
+            val nameResult = if (newDisplayName.isNotBlank() && newDisplayName != currentUser.displayName.orEmpty()) {
                 FirebaseAuthManager.updateDisplayName(newDisplayName)
             } else {
                 Result.success(currentUser)
             }
 
-            result.fold(
+            nameResult.fold(
                 onSuccess = {
-                    showMotionSnackbar(getString(R.string.personal_details_saved))
+                    // Mirror the change into the Firestore user doc so it's not only on this device.
+                    runCatching {
+                        withContext(Dispatchers.IO) {
+                            if (newDisplayName.isNotBlank()) {
+                                UserService.updateUserProfileName(currentUser.uid, newDisplayName)
+                            }
+                        }
+                    }.onFailure { error ->
+                        android.util.Log.w(TAG, "Firestore profile name sync failed", error)
+                    }
+                    showSuccess(getString(R.string.personal_details_saved))
                     finishWithMotion()
                 },
                 onFailure = { error ->

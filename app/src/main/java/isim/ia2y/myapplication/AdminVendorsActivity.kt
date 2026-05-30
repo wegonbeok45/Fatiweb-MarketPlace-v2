@@ -210,24 +210,32 @@ class AdminVendorsActivity : AppCompatActivity() {
                 titleRes = null,
                 messageRes = null,
                 doAction = { AdminVendorService.approve(row.uid) },
+                localStatus = VendorStatus.APPROVED,
+                row = row,
                 successRes = R.string.admin_vendors_action_success_approved,
             )
             ACTION_REJECT -> confirmDestructive(
                 titleRes = R.string.admin_vendors_reject_confirm_title,
                 messageRes = R.string.admin_vendors_reject_confirm_message,
                 doAction = { AdminVendorService.reject(row.uid) },
+                localStatus = VendorStatus.REJECTED,
+                row = row,
                 successRes = R.string.admin_vendors_action_success_rejected,
             )
             ACTION_SUSPEND -> confirmDestructive(
                 titleRes = R.string.admin_vendors_suspend_confirm_title,
                 messageRes = R.string.admin_vendors_suspend_confirm_message,
                 doAction = { AdminVendorService.suspend(row.uid) },
+                localStatus = VendorStatus.SUSPENDED,
+                row = row,
                 successRes = R.string.admin_vendors_action_success_suspended,
             )
             ACTION_RESTORE -> confirmAndRun(
                 titleRes = null,
                 messageRes = null,
                 doAction = { AdminVendorService.restoreToPending(row.uid) },
+                localStatus = VendorStatus.PENDING,
+                row = row,
                 successRes = R.string.admin_vendors_action_success_restored,
             )
         }
@@ -238,11 +246,14 @@ class AdminVendorsActivity : AppCompatActivity() {
         titleRes: Int?,
         messageRes: Int?,
         doAction: suspend () -> Unit,
+        localStatus: VendorStatus,
+        row: AdminVendorService.VendorRow,
         successRes: Int,
     ) {
         lifecycleScope.launch {
             runCatching { doAction() }
                 .onSuccess {
+                    viewModel.applyLocalStatus(row.uid, localStatus)
                     showMotionSnackbar(getString(successRes))
                     viewModel.reload()
                 }
@@ -257,6 +268,8 @@ class AdminVendorsActivity : AppCompatActivity() {
         titleRes: Int,
         messageRes: Int,
         doAction: suspend () -> Unit,
+        localStatus: VendorStatus,
+        row: AdminVendorService.VendorRow,
         successRes: Int,
     ) {
         MaterialAlertDialogBuilder(this)
@@ -267,6 +280,8 @@ class AdminVendorsActivity : AppCompatActivity() {
                     titleRes = null,
                     messageRes = null,
                     doAction = doAction,
+                    localStatus = localStatus,
+                    row = row,
                     successRes = successRes,
                 )
             }

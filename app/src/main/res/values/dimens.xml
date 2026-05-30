@@ -58,8 +58,8 @@
     <dimen name="stroke_width_default">1dp</dimen>
     <dimen name="divider_height">1dp</dimen>
 
-    <dimen name="onboarding_indicator_dot_width">10dp</dimen>
-    <dimen name="onboarding_indicator_active_width">34dp</dimen>
+    <dimen name="onboarding_indicator_dot_width">8dp</dimen>
+    <dimen name="onboarding_indicator_active_width">8dp</dimen>
     <dimen name="onboarding_indicator_height">8dp</dimen>
     <dimen name="onboarding_showcase_tile_size">92dp</dimen>
     <dimen name="category_card_height">140dp</dimen>

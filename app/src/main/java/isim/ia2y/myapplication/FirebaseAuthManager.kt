@@ -139,6 +139,11 @@ object FirebaseAuthManager {
         val resendToken: PhoneAuthProvider.ForceResendingToken?
     )
 
+    data class PhoneLinkVerificationStart(
+        val verificationId: String?,
+        val autoLinkedUser: FirebaseUser?
+    )
+
     /**
      * Start phone number verification. SMS is sent to [e164PhoneNumber] (must be E.164, e.g. +21612345678).
      * The [activity] is required by Firebase to mount the reCAPTCHA / Play Integrity flow if needed.
@@ -230,6 +235,79 @@ object FirebaseAuthManager {
             )
             warmUserRoleInBackground(user)
             user
+        }
+    }
+
+    suspend fun startPhoneLinkVerification(
+        activity: android.app.Activity,
+        e164PhoneNumber: String
+    ): Result<PhoneLinkVerificationStart> = runAuthAction {
+        val current = auth.currentUser ?: throw IllegalStateException("No user logged in")
+        suspendCancellableCoroutine { cont ->
+            val callbacks = object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
+                override fun onVerificationCompleted(credential: PhoneAuthCredential) {
+                    backgroundScope.launch {
+                        val linkResult = runCatching {
+                            val result = current.linkWithCredential(credential).await()
+                            requireNotNull(result.user) { "Linked user missing" }
+                        }
+                        if (cont.isActive) {
+                            linkResult.fold(
+                                onSuccess = { user ->
+                                    setCrashlyticsUser(user)
+                                    warmUserRoleInBackground(user)
+                                    cont.resume(
+                                        PhoneLinkVerificationStart(
+                                            verificationId = null,
+                                            autoLinkedUser = user
+                                        )
+                                    )
+                                },
+                                onFailure = { cont.resumeWithException(it) }
+                            )
+                        }
+                    }
+                }
+
+                override fun onVerificationFailed(e: com.google.firebase.FirebaseException) {
+                    Log.w(TAG, "Phone link verification failed", e)
+                    if (cont.isActive) cont.resumeWithException(e)
+                }
+
+                override fun onCodeSent(
+                    verificationId: String,
+                    token: PhoneAuthProvider.ForceResendingToken
+                ) {
+                    if (cont.isActive) {
+                        cont.resume(
+                            PhoneLinkVerificationStart(
+                                verificationId = verificationId,
+                                autoLinkedUser = null
+                            )
+                        )
+                    }
+                }
+            }
+
+            val options = PhoneAuthOptions.newBuilder(auth)
+                .setPhoneNumber(e164PhoneNumber)
+                .setTimeout(60L, TimeUnit.SECONDS)
+                .setActivity(activity)
+                .setCallbacks(callbacks)
+                .build()
+            PhoneAuthProvider.verifyPhoneNumber(options)
+        }
+    }
+
+    suspend fun linkCurrentUserWithSmsCode(verificationId: String, smsCode: String): Result<FirebaseUser> {
+        val user = auth.currentUser ?: return Result.failure(IllegalStateException("No user logged in"))
+        return runAuthAction {
+            val credential = PhoneAuthProvider.getCredential(verificationId, smsCode)
+            val result = awaitAuthRequest { user.linkWithCredential(credential).await() }
+            val linkedUser = requireNotNull(result.user) { "Linked user missing" }
+            setCrashlyticsUser(linkedUser)
+            warmUserRoleInBackground(linkedUser)
+            linkedUser
         }
     }
 

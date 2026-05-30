@@ -1,5 +1,4 @@
-<resources xmlns:tools="http://schemas.android.com/tools"
-    tools:ignore="MissingTranslation">
+<resources>
     <string name="app_name">FatiWeb Market</string>
     <string name="admin_dashboard_stats_retry_hint">Échec du chargement — touchez pour réessayer</string>
     <!-- Account deletion (Play Store Data Safety) -->
@@ -33,6 +32,13 @@
     <string name="phone_verify_resend">Renvoyer le code</string>
     <string name="phone_verify_resend_in">Renvoyer dans %1$d s</string>
     <string name="phone_verify_resent">Nouveau code envoyé.</string>
+    <string name="signup_phone_verify_title">Vérifier votre téléphone</string>
+    <string name="signup_phone_verify_message">Ajoutez un numéro pour recevoir un code à 6 chiffres par SMS. Vous pouvez ignorer cette étape et la faire plus tard.</string>
+    <string name="signup_phone_hint">+216 12 345 678</string>
+    <string name="signup_phone_send_code">Envoyer le code</string>
+    <string name="signup_phone_skip">Ignorer pour le moment</string>
+    <string name="signup_phone_invalid">Entrez un numéro valide.</string>
+    <string name="signup_phone_verified">Téléphone vérifié.</string>
     <string name="details_top_title">D&#233;tails du produit</string>
     <string name="details_back">Retour</string>
     <string name="details_share">Partager</string>
@@ -155,6 +161,7 @@
     <string name="onboard_slide2_subtitle">Parcourez des univers inspir&#233;s par les r&#233;gions, les mati&#232;res et les savoir-faire tunisiens.</string>
     <string name="onboard_slide3_title">Livraison suivie, paiement en confiance</string>
     <string name="onboard_slide3_subtitle">Recevez vos pi&#232;ces pr&#233;f&#233;r&#233;es chez vous avec un suivi clair, un paiement s&#233;curis&#233; et une confirmation imm&#233;diate.</string>
+    <string name="splash_trust_badge">Paiement s&#233;curis&#233; &#8226; Donn&#233;es prot&#233;g&#233;es</string>
     <string name="onboard_cat_craft">Artisanat</string>
     <string name="onboard_cat_craft_subtitle">L&#8217;h&#233;ritage de nos artisans</string>
     <string name="onboard_cat_food">Alimentation</string>
@@ -960,6 +967,9 @@
     <string name="profile_avatar_uploading">Mise a jour de la photo...</string>
     <string name="profile_avatar_updated">Photo de profil mise a jour.</string>
     <string name="profile_avatar_update_failed">Impossible de mettre a jour la photo de profil.</string>
+    <string name="profile_avatar_error_network">Connexion impossible. Verifiez votre internet et reessayez.</string>
+    <string name="profile_avatar_error_permission">Vous n\'avez pas l\'autorisation de modifier cette photo. Reconnectez-vous puis reessayez.</string>
+    <string name="profile_avatar_error_too_large">L\'image selectionnee est trop volumineuse. Choisissez une photo plus petite.</string>
     <string name="profile_avatar_login_required">Connectez-vous pour modifier votre photo de profil.</string>
     
     <string name="notifications_clear_all">Tout lire</string>
@@ -1128,6 +1138,9 @@
     <string name="orders_history_action_track">Suivre</string>
     <string name="orders_history_filter_delivered">Livrees</string>
     <string name="orders_history_filter_cancelled">Annulees</string>
+    <string name="orders_history_filter_all">Toutes</string>
+    <string name="orders_history_filter_active">En cours</string>
+    <string name="orders_history_total_label">Total</string>
     <string name="payment_methods_title">Moyens de paiement</string>
     <string name="payment_methods_saved_cards">Cartes enregistrees</string>
     <string name="payment_methods_add">Ajouter</string>
@@ -1337,8 +1350,8 @@
         <item quantity="other">%d produits</item>
     </plurals>
     <plurals name="category_subcategory_count">
-        <item quantity="one">%d subcategory</item>
-        <item quantity="other">%d subcategories</item>
+        <item quantity="one">%d sous-categorie</item>
+        <item quantity="other">%d sous-categories</item>
     </plurals>
 
     <!-- ============================================================ -->

@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 
 class OrdersHistoryActivity : AppCompatActivity() {
     private var allOrders: List<AppOrder> = emptyList()
-    private var selectedFilter: OrderFilter = OrderFilter.ACTIVE
+    private var selectedFilter: OrderFilter = OrderFilter.ALL
     private var ordersErrorVisible: Boolean = false
 
     private val ordersAdapter = OrdersHistoryAdapter { order ->
@@ -200,9 +200,10 @@ class OrdersHistoryActivity : AppCompatActivity() {
         findViewById<com.google.android.material.chip.ChipGroup>(R.id.chipGroupOrders)
             ?.setOnCheckedStateChangeListener { _, checkedIds ->
                 selectedFilter = when (checkedIds.firstOrNull()) {
+                    R.id.chipOrdersActive -> OrderFilter.ACTIVE
                     R.id.chipOrdersDelivered -> OrderFilter.DELIVERED
                     R.id.chipOrdersCancelled -> OrderFilter.CANCELLED
-                    else -> OrderFilter.ACTIVE
+                    else -> OrderFilter.ALL
                 }
                 renderFilteredOrders()
             }
@@ -213,10 +214,12 @@ class OrdersHistoryActivity : AppCompatActivity() {
         val emptyState = findViewById<View>(R.id.layoutEmptyOrdersState) ?: return
         val emptyAnimation = findViewById<com.airbnb.lottie.LottieAnimationView>(R.id.ivEmptyOrdersAnimation)
         val filtered = allOrders.filter { order ->
+            val normalized = OrderStatuses.normalize(order.status)
             when (selectedFilter) {
-                OrderFilter.ACTIVE -> order.status.lowercase() !in setOf("delivered", "cancelled")
-                OrderFilter.DELIVERED -> order.status.lowercase() == "delivered"
-                OrderFilter.CANCELLED -> order.status.lowercase() == "cancelled"
+                OrderFilter.ALL -> true
+                OrderFilter.ACTIVE -> normalized !in setOf(OrderStatuses.DELIVERED, OrderStatuses.CANCELLED)
+                OrderFilter.DELIVERED -> normalized == OrderStatuses.DELIVERED
+                OrderFilter.CANCELLED -> normalized == OrderStatuses.CANCELLED
             }
         }
         ordersErrorVisible = false
@@ -236,6 +239,7 @@ class OrdersHistoryActivity : AppCompatActivity() {
     }
 
     private enum class OrderFilter {
+        ALL,
         ACTIVE,
         DELIVERED,
         CANCELLED

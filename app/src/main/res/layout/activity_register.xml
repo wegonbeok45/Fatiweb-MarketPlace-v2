@@ -57,13 +57,23 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnRegister"
+        style="@style/AppButton.Primary"
+        android:layout_width="0dp"
+        android:layout_marginBottom="@dimen/space_8"
+        android:text="@string/login_register_cta"
+        app:layout_constraintBottom_toTopOf="@id/layoutLoginRow"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
     <androidx.core.widget.NestedScrollView
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="8dp"
         android:fillViewport="true"
         android:overScrollMode="never"
-        app:layout_constraintBottom_toTopOf="@id/layoutLoginRow"
+        app:layout_constraintBottom_toTopOf="@id/btnRegister"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/ivBack">
@@ -373,16 +383,6 @@
                 app:layout_constraintStart_toStartOf="@id/cardPasswordField"
                 app:layout_constraintTop_toBottomOf="@id/cardPasswordField" />
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnRegister"
-                style="@style/Ms.Button.Primary"
-                android:layout_width="0dp"
-                android:layout_marginTop="16dp"
-                android:text="@string/login_register_cta"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tvPasswordError" />
-
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/layoutOrDivider"
                 android:layout_width="0dp"
@@ -390,7 +390,7 @@
                 android:layout_marginTop="10dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/btnRegister">
+                app:layout_constraintTop_toBottomOf="@id/tvPasswordError">
 
                 <View
                     android:id="@+id/viewDividerLeft"

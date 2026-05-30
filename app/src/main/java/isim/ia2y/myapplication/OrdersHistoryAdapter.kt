@@ -7,6 +7,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import isim.ia2y.myapplication.ui.base.MsStatusPill
 
 class OrdersHistoryAdapter(
     private val onClick: (AppOrder) -> Unit
@@ -21,8 +22,6 @@ class OrdersHistoryAdapter(
         val thumbnailsLayout: android.widget.LinearLayout = view.findViewById(R.id.layoutOrderThumbnails)
         val primaryAction: com.google.android.material.button.MaterialButton =
             view.findViewById(R.id.btnOrderPrimary)
-        val secondaryAction: com.google.android.material.button.MaterialButton =
-            view.findViewById(R.id.btnOrderSecondary)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -33,24 +32,30 @@ class OrdersHistoryAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val order = getItem(position)
-        val itemsSummary = order.items.take(2).joinToString(", ") { item ->
-            val name = item.name.split(" ").firstOrNull() ?: item.productId
-            "$name x${item.quantity}"
-        }.let { if (order.items.size > 2) "$it..." else it }
+        val context = holder.itemView.context
 
         holder.orderId.text = order.displayId
-        holder.orderDate.text = buildHeadline(holder.itemView.context, order)
+        holder.orderDate.text = order.formattedDate
+
+        val itemsSummary = order.items.take(3).joinToString(", ") { item ->
+            val name = item.name.takeIf { it.isNotBlank() } ?: item.productId
+            "$name ×${item.quantity}"
+        }.let { if (order.items.size > 3) "$it…" else it }
         holder.orderItems.text = itemsSummary
+
         holder.orderTotal.text = formatDt(order.total)
-        holder.orderStatus.text = order.statusLabel(holder.itemView.context)
-        holder.primaryAction.text = holder.itemView.context.getString(R.string.orders_history_action_details)
-        holder.secondaryAction.text = when (order.status.lowercase()) {
-            "delivered" -> holder.itemView.context.getString(R.string.orders_history_action_reorder)
-            else -> holder.itemView.context.getString(R.string.orders_history_action_track)
+
+        val (pillKind, pillLabel) = statusPillFor(order.status)
+        MsStatusPill.bind(holder.orderStatus, pillKind, pillLabel)
+
+        holder.primaryAction.text = when (OrderStatuses.normalize(order.status)) {
+            OrderStatuses.DELIVERED -> context.getString(R.string.orders_history_action_reorder)
+            OrderStatuses.CANCELLED -> context.getString(R.string.orders_history_action_details)
+            else -> context.getString(R.string.orders_history_action_track)
         }
-        
+
         holder.thumbnailsLayout.removeAllViews()
-        val inflater = LayoutInflater.from(holder.itemView.context)
+        val inflater = LayoutInflater.from(context)
         order.items.take(4).forEach { item ->
             val thumbView = inflater.inflate(R.layout.item_checkout_thumbnail, holder.thumbnailsLayout, false)
             val image = thumbView.findViewById<android.widget.ImageView>(R.id.ivThumbnail)
@@ -59,25 +64,27 @@ class OrdersHistoryAdapter(
                 item.thumbnailUrl.ifBlank { fallbackProduct?.previewImageUrl() },
                 fallbackProduct?.catalogFallbackImageRes() ?: R.drawable.placeholder
             )
-            
+
             val lp = thumbView.layoutParams
-            lp.width = (44 * holder.itemView.context.resources.displayMetrics.density).toInt()
-            lp.height = (44 * holder.itemView.context.resources.displayMetrics.density).toInt()
+            lp.width = (48 * context.resources.displayMetrics.density).toInt()
+            lp.height = (48 * context.resources.displayMetrics.density).toInt()
             thumbView.layoutParams = lp
-            
+
             holder.thumbnailsLayout.addView(thumbView)
         }
-        
+
         holder.primaryAction.setOnClickListener { onClick(order) }
-        holder.secondaryAction.setOnClickListener { onClick(order) }
         holder.itemView.setOnClickListener { onClick(order) }
     }
 
-    private fun buildHeadline(context: android.content.Context, order: AppOrder): String {
-        return when (order.status.lowercase()) {
-            "delivered" -> context.getString(R.string.orders_history_filter_delivered) + " " + order.formattedDate
-            "cancelled" -> context.getString(R.string.orders_history_filter_cancelled) + " " + order.formattedDate
-            else -> "Arriving soon"
+    private fun statusPillFor(rawStatus: String): Pair<MsStatusPill.Kind, Int> {
+        return when (OrderStatuses.normalize(rawStatus)) {
+            OrderStatuses.PENDING -> MsStatusPill.Kind.Pending to R.string.ms_order_status_pending
+            OrderStatuses.CONFIRMED -> MsStatusPill.Kind.Info to R.string.ms_order_status_confirmed
+            OrderStatuses.PREPARING -> MsStatusPill.Kind.Info to R.string.ms_order_status_preparing
+            OrderStatuses.SHIPPED -> MsStatusPill.Kind.Info to R.string.ms_order_status_shipped
+            OrderStatuses.DELIVERED -> MsStatusPill.Kind.Approved to R.string.ms_order_status_delivered
+            else -> MsStatusPill.Kind.Archived to R.string.ms_order_status_cancelled
         }
     }
 

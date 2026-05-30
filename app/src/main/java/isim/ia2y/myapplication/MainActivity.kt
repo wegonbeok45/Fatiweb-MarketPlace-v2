@@ -299,7 +299,6 @@ class MainActivity : AppCompatActivity() {
         binding.root.post {
             binding.root.post {
                 if (!isFinishing && !isDestroyed) {
-                    maybeAskLocationOnFirstOpen()
                     AppStartupCoordinator.startDeferred(applicationContext)
                 }
             }

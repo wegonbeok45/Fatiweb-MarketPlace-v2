@@ -242,6 +242,19 @@ object UserService {
         FirebaseCostTracker.write("UserService.markPhoneAccount", "users/$uid")
     }
 
+    suspend fun markPhoneVerified(uid: String, phone: String) {
+        userRef(uid).set(
+            mapOf(
+                "phone" to DeliveryAddressValidator.normalizedPhone(phone),
+                "phoneVerified" to true,
+                "phoneVerifiedAt" to com.google.firebase.firestore.FieldValue.serverTimestamp(),
+                "updatedAt" to com.google.firebase.firestore.FieldValue.serverTimestamp()
+            ),
+            SetOptions.merge()
+        ).await()
+        FirebaseCostTracker.write("UserService.markPhoneVerified", "users/$uid")
+    }
+
     suspend fun fetchUserProfile(uid: String): FirestoreService.UserProfile? {
         val cachedDoc = runCatching { userRef(uid).get(Source.CACHE).await() }.getOrNull()
         val doc = cachedDoc ?: userRef(uid).get().await().also {

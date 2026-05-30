@@ -48,19 +48,72 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <!-- Filter chip row -->
+    <HorizontalScrollView
+        android:id="@+id/scrollOrderFilters"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:overScrollMode="never"
+        android:paddingStart="@dimen/space_16"
+        android:paddingTop="@dimen/space_8"
+        android:paddingEnd="@dimen/space_16"
+        android:paddingBottom="@dimen/space_8"
+        android:scrollbars="none"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/layoutTopBar">
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chipGroupOrders"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:selectionRequired="true"
+            app:singleSelection="true">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipOrdersAll"
+                style="@style/Ms.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="@string/orders_history_filter_all" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipOrdersActive"
+                style="@style/Ms.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/orders_history_filter_active" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipOrdersDelivered"
+                style="@style/Ms.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/orders_history_filter_delivered" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipOrdersCancelled"
+                style="@style/Ms.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/orders_history_filter_cancelled" />
+        </com.google.android.material.chip.ChipGroup>
+    </HorizontalScrollView>
+
     <FrameLayout
         android:id="@+id/scrollOrders"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:clipToPadding="false"
         android:paddingStart="@dimen/space_16"
-        android:paddingTop="@dimen/space_12"
+        android:paddingTop="@dimen/space_8"
         android:paddingEnd="@dimen/space_16"
         android:paddingBottom="@dimen/space_16"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/layoutTopBar">
+        app:layout_constraintTop_toBottomOf="@id/scrollOrderFilters">
 
         <LinearLayout
             android:id="@+id/layoutEmptyOrdersState"
@@ -149,24 +202,4 @@
                 android:layout_height="wrap_content" />
         </LinearLayout>
     </FrameLayout>
-    <com.google.android.material.chip.ChipGroup
-        android:id="@+id/chipGroupOrders"
-        android:layout_width="1dp"
-        android:layout_height="1dp"
-        android:visibility="gone"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <com.google.android.material.chip.Chip
-            android:id="@+id/chipOrdersDelivered"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/orders_history_filter_delivered" />
-
-        <com.google.android.material.chip.Chip
-            android:id="@+id/chipOrdersCancelled"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/orders_history_filter_cancelled" />
-    </com.google.android.material.chip.ChipGroup>
 </androidx.constraintlayout.widget.ConstraintLayout>

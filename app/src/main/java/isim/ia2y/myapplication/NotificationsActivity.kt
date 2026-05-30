@@ -46,6 +46,14 @@ class NotificationsActivity : AppCompatActivity() {
     }
 
     private fun loadNotifications() {
+        // Show cached notifications instantly so the screen isn't blocked on the network.
+        val cached = NotificationStore.getAll(this)
+            .filter { !it.title.startsWith("{") && !it.message.startsWith("{") }
+        renderNotifications(
+            if (cached.isEmpty()) ScreenState.Loading else ScreenState.Content(cached)
+        )
+
+        // Refresh from the cloud in the background and update once it returns.
         lifecycleScope.launch {
             val result = runCatching { NotificationStore.refreshFromCloud(this@NotificationsActivity) }
             val state: ScreenState<List<AppNotification>> = result.fold(
@@ -54,7 +62,6 @@ class NotificationsActivity : AppCompatActivity() {
                     if (filtered.isEmpty()) ScreenState.Empty() else ScreenState.Content(filtered)
                 },
                 onFailure = {
-                    val cached = NotificationStore.getAll(this@NotificationsActivity).filter { !it.title.startsWith("{") && !it.message.startsWith("{") }
                     if (cached.isEmpty()) {
                         ScreenState.Error(getString(R.string.notifications_load_error))
                     } else {
