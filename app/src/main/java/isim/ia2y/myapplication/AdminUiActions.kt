@@ -24,16 +24,18 @@ enum class AdminNavTab {
     COMMANDES,
     PRODUITS,
     CLIENTS,
+    ANALYTICS,
     NOTIFICATIONS,
     SETTINGS
 }
 
 /** Maps each tab to the Activity class that represents it. */
 private val TAB_TO_ACTIVITY: Map<AdminNavTab, Class<*>> = mapOf(
-    AdminNavTab.DASHBOARD     to AdminDashboardActivity::class.java,
+    AdminNavTab.DASHBOARD     to AdminHomeActivity::class.java,
     AdminNavTab.COMMANDES     to AdminCommandesActivity::class.java,
     AdminNavTab.PRODUITS      to AdminProduitsActivity::class.java,
     AdminNavTab.CLIENTS       to AdminClientsActivity::class.java,
+    AdminNavTab.ANALYTICS     to AdminAnalyticsActivity::class.java,
     AdminNavTab.NOTIFICATIONS to AdminNotificationsActivity::class.java,
     AdminNavTab.SETTINGS      to AdminParametresActivity::class.java
 )
@@ -71,7 +73,7 @@ fun AppCompatActivity.setupAdminTopBar(title: String) {
     val currentTab = resolveAdminTab()
 
     findViewById<View?>(R.id.adminIvBack)?.setOnClickListener {
-        navigateBackToMain()
+        navigateAdminBack(currentTab)
     }
     findViewById<View?>(R.id.adminIvSettings)?.apply {
         visibility = if (currentTab == AdminNavTab.SETTINGS) View.GONE else View.VISIBLE
@@ -128,6 +130,7 @@ fun AppCompatActivity.selectAdminBottomNav(activeTab: AdminNavTab, animate: Bool
 fun AppCompatActivity.setupAdminBottomNav(activeTab: AdminNavTab) {
     // Apply initial visual state
     refreshAdminBottomNav(activeTab)
+    bindAdminBack(activeTab)
 
     // Wire click listeners (only needs to happen once per activity creation)
     VISIBLE_BOTTOM_NAV_TABS.forEach { tab ->

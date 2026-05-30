@@ -1,65 +1,78 @@
 package isim.ia2y.myapplication
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.ProgressBar
 import android.widget.TextView
-import androidx.core.widget.doAfterTextChanged
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
+import androidx.core.widget.doAfterTextChanged
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import isim.ia2y.myapplication.ui.state.StateRenderer
+import isim.ia2y.myapplication.ui.state.UiState
 import kotlinx.coroutines.launch
 
+/**
+ * Rebuilt admin users list screen.
+ *
+ * Paginated list of all registered users with client-side search filtering.
+ * Stats (total loaded + new in last 30 days) shown in a KPI banner that
+ * appears once the first page arrives.
+ *
+ * Tapping a row opens [AdminClientDetailsActivity] for the full profile,
+ * order history, and promote/revoke actions.
+ */
 class AdminClientsActivity : AppCompatActivity() {
-    private val allClients = mutableListOf<FirestoreService.ClientInfo>()
-    private var lastVisible: com.google.firebase.firestore.DocumentSnapshot? = null
-    private var isLastPage = false
-    private var isLoading = false
-    private val pageSize = 30
-    private var searchQuery = ""
-    private val clientsAdapter = AdminClientsAdapter { client -> showClientDetails(client) }
+
+    private val viewModel: AdminClientsViewModel by viewModels()
+
+    private val adapter = AdminClientsAdapter { client ->
+        startActivity(AdminClientDetailsActivity.createIntent(this, client.uid))
+    }
+
+    private lateinit var listState: StateRenderer
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_admin_clients)
-        setupAdminWindowInsets(R.id.adminClientsAppBar)
+        setContentView(R.layout.activity_admin_clients_v2)
+
+        applyInsets()
         setupTopBar()
-        setupAdminBottomNav(AdminNavTab.CLIENTS)
-        setupFilters()
-        val recycler = findViewById<RecyclerView>(R.id.adminClientsList)
-        recycler?.layoutManager = LinearLayoutManager(this)
-        recycler?.adapter = clientsAdapter
-        recycler?.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                val layoutManager = recyclerView.layoutManager as? LinearLayoutManager ?: return
-                if (!isLoading && !isLastPage && layoutManager.findLastVisibleItemPosition() >= allClients.size - 5) {
-                    loadNextPage()
-                }
-            }
-        })
+        setupSearch()
+        setupList()
+        setupBottomNav()
+
+        listState = StateRenderer(
+            loadingView = findViewById(R.id.adminClientsLoading),
+            emptyView   = findViewById(R.id.adminClientsEmpty),
+            errorView   = findViewById(R.id.adminClientsError),
+            dataView    = findViewById(R.id.adminClientsList),
+        ).also { r ->
+            r.bindEmpty(
+                titleRes    = R.string.admin_no_clients,
+                subtitleRes = R.string.admin_clients_search_hint,
+            )
+            r.bindError(
+                titleRes    = R.string.ms_error_default_title,
+                subtitleRes = R.string.admin_clients_load_error,
+                onRetry     = { viewModel.refresh() },
+            )
+        }
+
+        observeState()
 
         lifecycleScope.launch {
             if (!requireAdminRole()) return@launch
-
-            if (savedInstanceState == null) {
-                revealViewsInOrder(
-                    R.id.adminClientsTopBar,
-                    R.id.adminClientsStatsRow,
-                    R.id.adminClientsTvHeader,
-                    R.id.adminClientsCard,
-                    startDelayMs = 60L,
-                    staggerMs = 48L
-                )
-            }
-            resetAndLoadClients()
+            viewModel.load()
         }
     }
 
@@ -68,204 +81,115 @@ class AdminClientsActivity : AppCompatActivity() {
         refreshAdminBottomNav(AdminNavTab.CLIENTS)
     }
 
+    // ===== Insets =====
+
+    private fun applyInsets() {
+        ViewCompat.setOnApplyWindowInsetsListener(
+            findViewById(R.id.adminClientsAppBar)
+        ) { v, insets ->
+            v.updatePadding(top = insets.getInsets(WindowInsetsCompat.Type.statusBars()).top)
+            insets
+        }
+        ViewCompat.setOnApplyWindowInsetsListener(
+            findViewById(R.id.adminClientsList)
+        ) { v, insets ->
+            v.updatePadding(
+                bottom = insets.getInsets(WindowInsetsCompat.Type.systemBars()).bottom + 96
+            )
+            insets
+        }
+    }
+
+    // ===== Top bar =====
+
     private fun setupTopBar() {
-        findViewById<View?>(R.id.adminClientsIvBack)?.setOnClickListener { navigateBackToMain() }
-        findViewById<View?>(R.id.adminClientsIvSettings)?.setOnClickListener {
-            navigateNoShift(AdminParametresActivity::class.java)
+        findViewById<View>(R.id.adminClientsBell)?.setOnClickListener {
+            openNotificationsScreenWithPermissionCheck()
         }
-        applyPressFeedback(R.id.adminClientsIvBack, R.id.adminClientsIvSettings)
+        applyPressFeedback(R.id.adminClientsBell)
     }
 
-    private fun setupFilters() {
-        findViewById<android.widget.EditText>(R.id.adminClientsSearchInput)?.doAfterTextChanged {
-            searchQuery = it?.toString().orEmpty().trim()
-            renderClients(
-                when {
-                    isLoading && allClients.isEmpty() -> ScreenState.Loading
-                    allClients.isEmpty() -> ScreenState.Empty(getString(R.string.admin_no_clients))
-                    else -> ScreenState.Content(allClients)
+    // ===== Search =====
+
+    private fun setupSearch() {
+        findViewById<com.google.android.material.textfield.TextInputEditText>(
+            R.id.adminClientsSearchInput
+        )?.doAfterTextChanged { text ->
+            viewModel.setSearch(text?.toString().orEmpty())
+        }
+    }
+
+    // ===== List + infinite scroll =====
+
+    private fun setupList() {
+        val rv = findViewById<RecyclerView>(R.id.adminClientsList) ?: return
+        rv.layoutManager = LinearLayoutManager(this)
+        rv.adapter = adapter
+        rv.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                if (dy <= 0) return
+                val lm = recyclerView.layoutManager as? LinearLayoutManager ?: return
+                if (lm.findLastVisibleItemPosition() >= lm.itemCount - 5 && viewModel.hasMore) {
+                    viewModel.loadNextPage()
                 }
-            )
-        }
+            }
+        })
     }
 
-    private fun loadClients() {
-        resetAndLoadClients()
+    // ===== Bottom nav =====
+
+    private fun setupBottomNav() {
+        setupAdminBottomNav(AdminNavTab.CLIENTS)
     }
 
-    private fun resetAndLoadClients() {
-        allClients.clear()
-        lastVisible = null
-        isLastPage = false
-        renderClients(ScreenState.Loading)
-        loadNextPage()
-    }
+    // ===== State observation =====
 
-    private fun loadNextPage() {
-        if (isLoading || isLastPage) return
-        isLoading = true
-        findViewById<ProgressBar>(R.id.loadingIndicator)?.visibility = View.VISIBLE
+    private fun observeState() {
         lifecycleScope.launch {
-            val result = runCatching { AdminService.fetchClientsPage(pageSize, lastVisible) }
-            val state: ScreenState<List<FirestoreService.ClientInfo>> = result.fold(
-                onSuccess = { snapshot ->
-                    isLoading = false
-                    findViewById<ProgressBar>(R.id.loadingIndicator)?.visibility = View.GONE
-                    val clients = snapshot.documents.mapNotNull(AdminService::clientInfoFromDocument)
-                    if (clients.isEmpty()) {
-                        isLastPage = true
-                    } else {
-                        allClients.addAll(clients)
-                        lastVisible = snapshot.documents.lastOrNull()
-                        if (clients.size < pageSize) isLastPage = true
-                    }
-                    if (allClients.isEmpty()) ScreenState.Empty(getString(R.string.admin_no_clients)) else ScreenState.Content(allClients)
-                },
-                onFailure = {
-                    isLoading = false
-                    findViewById<ProgressBar>(R.id.loadingIndicator)?.visibility = View.GONE
-                    if (allClients.isNotEmpty()) {
-                        showMotionSnackbar(getString(R.string.admin_clients_load_error))
-                        ScreenState.Content(allClients)
-                    } else {
-                        ScreenState.Error(getString(R.string.admin_clients_load_error))
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.state.collect { state ->
+                    listState.render(state)
+                    when (state) {
+                        is UiState.Data -> {
+                            adapter.submitList(state.value)
+                            updateKpi(show = true)
+                        }
+                        is UiState.Empty -> {
+                            adapter.submitList(emptyList())
+                            // Keep KPI visible if we had data before (search narrowed to zero)
+                            updateKpi(show = viewModel.totalCount > 0)
+                        }
+                        is UiState.Error -> {
+                            adapter.submitList(emptyList())
+                            updateKpi(show = false)
+                        }
+                        else -> Unit
                     }
                 }
-            )
-            renderClients(state)
+            }
         }
-    }
 
-    private fun renderClients(state: ScreenState<List<FirestoreService.ClientInfo>>) {
-        val recycler = findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.adminClientsList) ?: return
-        val totalText = findViewById<TextView>(R.id.adminClientsTvTotal)
-        val newText = findViewById<TextView>(R.id.adminClientsTvNew)
-        val loading = findViewById<ProgressBar>(R.id.loadingIndicator)
-        val emptyView = findViewById<TextView>(R.id.adminClientsEmpty)
-
-        when (state) {
-            is ScreenState.Content -> {
-                loading?.visibility = if (isLoading) View.VISIBLE else View.GONE
-                val filtered = state.data.filter {
-                    searchQuery.isBlank() ||
-                        it.name.contains(searchQuery, true) ||
-                        it.email.contains(searchQuery, true) ||
-                        it.phone.contains(searchQuery, true) ||
-                        it.role.contains(searchQuery, true)
-                }
-                val newClients = state.data.count {
-                    System.currentTimeMillis() - it.createdAt <= 30L * 24L * 60L * 60L * 1000L
-                }
-                totalText?.text = state.data.size.toString()
-                newText?.text = newClients.toString()
-                newText?.visibility = View.VISIBLE
-                clientsAdapter.submitList(filtered.toList())
-                emptyView?.visibility = if (filtered.isEmpty()) View.VISIBLE else View.GONE
-                emptyView?.text = getString(R.string.admin_no_clients)
-            }
-            is ScreenState.Empty -> {
-                loading?.visibility = View.GONE
-                totalText?.text = getString(R.string.str_2f43b4)
-                newText?.text = getString(R.string.str_2f43b4)
-                newText?.visibility = View.VISIBLE
-                clientsAdapter.submitList(emptyList())
-                emptyView?.visibility = View.VISIBLE
-                emptyView?.text = state.message
-            }
-            is ScreenState.Error -> {
-                loading?.visibility = View.GONE
-                totalText?.text = getString(R.string.str_2f43b4)
-                newText?.text = getString(R.string.str_2f43b4)
-                newText?.visibility = View.VISIBLE
-                clientsAdapter.submitList(emptyList())
-                emptyView?.visibility = View.VISIBLE
-                emptyView?.text = state.message
-                showMotionSnackbar(state.message)
-            }
-            ScreenState.Loading -> {
-                loading?.visibility = View.VISIBLE
-                if (allClients.isEmpty()) {
-                    totalText?.text = getString(R.string.str_2f43b4)
-                    newText?.text = getString(R.string.str_2f43b4)
-                    newText?.visibility = View.VISIBLE
-                    emptyView?.visibility = View.GONE
-                    clientsAdapter.submitList(emptyList())
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.loadingMore.collect { loading ->
+                    findViewById<ProgressBar>(R.id.adminClientsLoadMore)?.visibility =
+                        if (loading && viewModel.state.value is UiState.Data) View.VISIBLE
+                        else View.GONE
                 }
             }
         }
     }
 
-    private fun showClientDetails(client: FirestoreService.ClientInfo) {
-        startActivity(AdminClientDetailsActivity.createIntent(this, client.uid))
-    }
+    // ===== KPI banner =====
 
-    private fun showClientDetailsDialog(client: FirestoreService.ClientInfo) {
-        val joinedDate = if (client.createdAt > 0L) {
-            java.text.SimpleDateFormat("dd MMM yyyy", java.util.Locale.FRANCE)
-                .format(java.util.Date(client.createdAt))
-        } else {
-            getString(R.string.admin_client_unknown_date)
+    private fun updateKpi(show: Boolean) {
+        val kpi = findViewById<View>(R.id.adminClientsKpiRow) ?: return
+        if (!show) {
+            kpi.visibility = View.GONE
+            return
         }
-
-        val phone = client.phone.ifBlank { getString(R.string.admin_client_fallback_phone) }
-        val dialog = MaterialAlertDialogBuilder(this)
-            .setTitle(client.name.ifBlank { getString(R.string.admin_client_fallback_name) })
-            .setMessage(
-                getString(
-                    R.string.admin_client_detail_message,
-                    client.email.ifBlank { getString(R.string.admin_client_fallback_email) },
-                    phone,
-                    client.role,
-                    client.uid,
-                    client.orderCount,
-                    joinedDate
-                )
-            )
-            .setNegativeButton(R.string.admin_dialog_close, null)
-        if (client.role.equals(UserRoles.VENDEUR, ignoreCase = true)) {
-            dialog.setPositiveButton(R.string.admin_client_contact) { _, _ ->
-                openEmail(client.email, "FatiWeb - ${client.name}")
-            }
-        } else {
-            dialog
-                .setPositiveButton(R.string.admin_client_make_vendeur) { _, _ -> confirmPromoteClient(client) }
-                .setNeutralButton(R.string.admin_client_contact) { _, _ ->
-                    openEmail(client.email, "FatiWeb - ${client.name}")
-                }
-        }
-        dialog.show()
-    }
-
-    private fun confirmPromoteClient(client: FirestoreService.ClientInfo) {
-        MaterialAlertDialogBuilder(this)
-            .setTitle(R.string.admin_client_make_vendeur)
-            .setMessage(R.string.admin_client_promote_confirm)
-            .setNegativeButton(R.string.admin_dialog_cancel, null)
-            .setPositiveButton(R.string.admin_client_promote_cta) { _, _ ->
-                lifecycleScope.launch {
-                    runCatching { FirestoreService.promoteUserToVendeur(client.uid) }
-                        .onSuccess {
-                            markClientAsVendeur(client.uid)
-                            showMotionSnackbar(getString(R.string.admin_client_promote_success))
-                            loadClients()
-                        }
-                        .onFailure {
-                            Log.e(TAG, "Failed to promote client to vendeur: ${client.uid}", it)
-                            showMotionSnackbar(getString(R.string.admin_client_promote_failed))
-                        }
-                }
-            }
-            .show()
-    }
-
-    private fun markClientAsVendeur(uid: String) {
-        val index = allClients.indexOfFirst { it.uid == uid }
-        if (index == -1) return
-        allClients[index] = allClients[index].copy(role = UserRoles.VENDEUR)
-        renderClients(ScreenState.Content(allClients))
-    }
-
-    private companion object {
-        const val TAG = "AdminClientsActivity"
+        kpi.visibility = View.VISIBLE
+        findViewById<TextView>(R.id.adminClientsTvTotal)?.text = viewModel.totalCount.toString()
+        findViewById<TextView>(R.id.adminClientsTvNew)?.text   = viewModel.newCount.toString()
     }
 }

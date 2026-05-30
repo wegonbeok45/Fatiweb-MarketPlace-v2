@@ -1,447 +1,422 @@
 package isim.ia2y.myapplication
 
+import android.content.Intent
 import android.os.Bundle
-import android.util.Log
+import android.view.MenuItem
 import android.view.View
+import android.widget.ImageView
+import android.widget.PopupMenu
 import android.widget.ProgressBar
 import android.widget.TextView
-import android.widget.AutoCompleteTextView
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
-import androidx.core.widget.doAfterTextChanged
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.firebase.firestore.Source
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.TimeoutCancellationException
+import isim.ia2y.myapplication.ui.base.BaseListAdapter
+import isim.ia2y.myapplication.ui.base.MsStatusPill
+import isim.ia2y.myapplication.ui.base.idDiff
+import isim.ia2y.myapplication.ui.state.StateRenderer
+import isim.ia2y.myapplication.ui.state.UiState
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import kotlinx.coroutines.withTimeout
-import java.util.Locale
 
+/**
+ * Rebuilt admin products screen (Phase 6).
+ *
+ * Replaces the legacy multi-purpose product list with a clean moderation-first
+ * view: filter tabs (All / Pending / Approved / Rejected / Draft / Archived),
+ * per-row approve / reject / archive / edit actions, and infinite-scroll
+ * pagination backed by [AdminProductsViewModel].
+ *
+ * [EXTRA_SELLER_MODE] is kept for backward-compat with [AdminProductEditorActivity]
+ * and [SellerDashboardActivity] — those callers are gradually migrated to
+ * [VendorProductsActivity].
+ */
 open class AdminProduitsActivity : AppCompatActivity() {
-    private data class ProductFilterOption(val key: String, val label: String)
 
-    private val allProducts = mutableListOf<Product>()
-    private val productFilters by lazy {
-        listOf(
-            ProductFilterOption("all", getString(R.string.admin_filter_all)),
-            ProductFilterOption("low_stock", getString(R.string.admin_filter_low_stock)),
-            ProductFilterOption("inactive", getString(R.string.admin_filter_inactive)),
-            ProductFilterOption("active", getString(R.string.admin_filter_active))
-        )
-    }
-    private var lastVisible: com.google.firebase.firestore.DocumentSnapshot? = null
-    private var isLastPage = false
-    private var isLoading = false
-    private val pageSize = 20L
-    private var searchQuery = ""
-    private var selectedFilter = "all"
-    private var productLoadErrorMessage: String? = null
-    private var hasRenderedCachePreview = false
-    private val isSellerDashboard: Boolean
-        get() = intent.getBooleanExtra(EXTRA_SELLER_MODE, false)
-    private var activeRole: String = UserRoles.CLIENT
-    private var activeSellerId: String? = null
+    private val viewModel: AdminProductsViewModel by viewModels()
+    private var roleVerified = false
 
-    private val productEditorLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == RESULT_OK) {
-                resetAndLoad()
-            }
-        }
+    private val adapter = BaseListAdapter<Product>(
+        layoutRes = R.layout.item_admin_product,
+        diff = idDiff { it.id },
+        bind = { view, product -> bindRow(view, product) },
+        onClick = { product -> openEditor(product) },
+    )
+
+    private lateinit var listState: StateRenderer
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_admin_produits)
-        setupAdminWindowInsets(R.id.adminProduitsAppBar)
-        setupTopBar()
-        setupAdminBottomNav(AdminNavTab.PRODUITS)
-        configureModeLabels()
-        setupActions()
-        setupFilters()
+        setContentView(R.layout.activity_admin_produits_v2)
+        applyInsets()
+        setupChips()
+        setupList()
+        setupBottomNav()
 
-        val recycler = findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.adminProduitsList)
-        recycler?.layoutManager = LinearLayoutManager(this)
-        recycler?.adapter = AdminProductsAdapter(
-            items = mutableListOf(),
-            onEdit = { openProductEditor(it) },
-            onDelete = { confirmDelete(it) },
-            canEdit = { canEditProduct(it) },
-            onEditBlocked = { showMotionSnackbar(getString(R.string.admin_product_edit_own_only)) }
-        )
-        
-        recycler?.addOnScrollListener(object : androidx.recyclerview.widget.RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: androidx.recyclerview.widget.RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
-                val layoutManager = recyclerView.layoutManager as? LinearLayoutManager ?: return
-                val visibleItemCount = layoutManager.childCount
-                val totalItemCount = layoutManager.itemCount
-                val firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition()
+        listState = StateRenderer(
+            loadingView = findViewById(R.id.adminProduitsLoading),
+            emptyView = findViewById(R.id.adminProduitsEmpty),
+            errorView = findViewById(R.id.adminProduitsError),
+            dataView = findViewById(R.id.adminProduitsList),
+        ).also { renderer ->
+            renderer.bindEmpty(
+                titleRes = R.string.admin_products_empty_title,
+                subtitleRes = R.string.admin_products_empty_subtitle,
+            )
+            renderer.bindError(
+                titleRes = R.string.ms_error_default_title,
+                subtitleRes = R.string.admin_products_load_failed,
+                onRetry = { viewModel.refresh() },
+            )
+        }
 
-                if (!isLoading && !isLastPage) {
-                    if ((visibleItemCount + firstVisibleItemPosition) >= totalItemCount && firstVisibleItemPosition >= 0) {
-                        loadNextPage()
-                    }
-                }
-            }
-        })
+        observeState()
+        observePendingBadge()
 
         lifecycleScope.launch {
-            activeRole = if (isSellerDashboard) {
-                requireAdminOrVendeurRole() ?: return@launch
-            } else {
-                if (!requireAdminRole()) return@launch
-                UserRoles.ADMIN
-            }
-            activeSellerId = FirebaseAuthManager.currentUser?.uid
-                ?.takeIf { isSellerDashboard && activeRole == UserRoles.VENDEUR }
-
-            if (savedInstanceState == null) {
-                revealViewsInOrder(
-                    R.id.adminProduitsTopBar,
-                    R.id.adminProduitsTvHeader,
-                    R.id.adminProduitsTvSubheader,
-                    R.id.adminProduitsStatsRow,
-                    R.id.adminProduitsBtnAdd,
-                    R.id.adminProduitsCard,
-                    startDelayMs = 60L,
-                    staggerMs = 44L
-                )
-            }
-            loadNextPage()
-            loadStats()
+            if (requireAdminOrVendeurRole() == null) return@launch
+            roleVerified = true
+            viewModel.load()
         }
     }
 
     override fun onResume() {
         super.onResume()
-        if (isSellerDashboard) {
-            hideSellerBottomNav()
-        } else {
-            refreshAdminBottomNav(AdminNavTab.PRODUITS)
+        refreshAdminBottomNav(AdminNavTab.PRODUITS)
+    }
+
+    // ===== Insets =====
+
+    private fun applyInsets() {
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.adminProduitsAppBar)) { v, insets ->
+            v.updatePadding(top = insets.getInsets(WindowInsetsCompat.Type.statusBars()).top)
+            insets
+        }
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.adminProduitsList)) { v, insets ->
+            v.updatePadding(bottom = insets.getInsets(WindowInsetsCompat.Type.systemBars()).bottom + 96)
+            insets
         }
     }
 
-    private fun configureModeLabels() {
-        if (!isSellerDashboard) return
-        hideSellerBottomNav()
-        findViewById<TextView>(R.id.adminProduitsTvTitle)?.text = getString(R.string.seller_dashboard_title)
-        findViewById<TextView>(R.id.adminProduitsTvHeader)?.text = getString(R.string.seller_dashboard_hero_title)
-        findViewById<TextView>(R.id.adminProduitsTvSubheader)?.text = getString(R.string.seller_dashboard_hero_subtitle)
-        findViewById<com.google.android.material.button.MaterialButton>(R.id.adminProduitsBtnAdd)?.text =
-            getString(R.string.seller_dashboard_add_action)
-    }
+    // ===== Chip filter =====
 
-    private fun hideSellerBottomNav() {
-        findViewById<View?>(R.id.adminBottomNav)?.visibility = View.GONE
-        findViewById<View?>(R.id.admin_nav_indicator)?.visibility = View.GONE
-    }
-
-    private fun setupActions() {
-        findViewById<View>(R.id.adminProduitsBtnAdd)?.setOnClickListener {
-            openProductEditor(existing = null)
-        }
-        findViewById<View>(R.id.adminProduitsBtnRefresh)?.setOnClickListener {
-            resetAndLoad()
-        }
-        applyPressFeedback(R.id.adminProduitsBtnAdd, R.id.adminProduitsBtnRefresh)
-    }
-
-    private fun setupFilters() {
-        val searchInput = findViewById<android.widget.EditText>(R.id.adminProduitsSearchInput)
-        val filterInput = findViewById<AutoCompleteTextView>(R.id.adminProduitsFilterInput)
-
-        searchInput?.doAfterTextChanged {
-            searchQuery = it?.toString().orEmpty().trim()
-            renderProducts()
-        }
-
-        filterInput?.setAdapter(
-            android.widget.ArrayAdapter(
-                this,
-                android.R.layout.simple_list_item_1,
-                productFilters.map { it.label }
-            )
-        )
-        filterInput?.setText(productFilters.first().label, false)
-        filterInput?.setOnClickListener { filterInput.showDropDown() }
-        filterInput?.setOnItemClickListener { _, _, position, _ ->
-            selectedFilter = productFilters[position].key
-            renderProducts()
+    private fun setupChips() {
+        val group = findViewById<com.google.android.material.chip.ChipGroup>(
+            R.id.adminProduitsChipGroup
+        ) ?: return
+        group.setOnCheckedStateChangeListener { _, checkedIds ->
+            val filter = when (checkedIds.firstOrNull()) {
+                R.id.adminProduitsChipPending -> AdminProductsViewModel.Filter.PENDING
+                R.id.adminProduitsChipApproved -> AdminProductsViewModel.Filter.APPROVED
+                R.id.adminProduitsChipRejected -> AdminProductsViewModel.Filter.REJECTED
+                R.id.adminProduitsChipDraft -> AdminProductsViewModel.Filter.DRAFT
+                R.id.adminProduitsChipArchived -> AdminProductsViewModel.Filter.ARCHIVED
+                else -> AdminProductsViewModel.Filter.ALL
+            }
+            viewModel.setFilter(filter)
         }
     }
 
-    private fun resetAndLoad() {
-        allProducts.clear()
-        lastVisible = null
-        isLastPage = false
-        productLoadErrorMessage = null
-        hasRenderedCachePreview = false
-        renderProducts()
-        scrollProductsToTop()
-        loadNextPage()
-        loadStats()
-    }
+    // ===== List + pagination =====
 
-    private fun setupTopBar() {
-        findViewById<View?>(R.id.adminProduitsIvBack)?.setOnClickListener {
-            navigateBackToMain()
-        }
-        applyPressFeedback(R.id.adminProduitsIvBack)
-    }
-
-    private fun loadStats() {
-        if (isSellerDashboard) {
-            renderSellerStats()
-            return
-        }
-        lifecycleScope.launch {
-            runCatching { AdminService.fetchAdminStats() }
-                .onSuccess { stats ->
-                    findViewById<TextView>(R.id.adminProduitsTvCount)?.text = stats.totalProducts.toString()
-                    findViewById<TextView>(R.id.adminProduitsTvLowStock)?.text = stats.lowStockProducts.toString()
-                }
-        }
-    }
-
-    private fun renderSellerStats() {
-        findViewById<TextView>(R.id.adminProduitsTvCount)?.text = allProducts.size.toString()
-        findViewById<TextView>(R.id.adminProduitsTvLowStock)?.text =
-            allProducts.count { it.isActive && it.stock in 1..5 }.toString()
-    }
-
-    private fun loadNextPage() {
-        if (isLoading || isLastPage) return
-        renderCachedProductsPreview()
-        isLoading = true
-        productLoadErrorMessage = null
-        findViewById<TextView>(R.id.adminProduitsEmpty)?.visibility = View.GONE
-        findViewById<ProgressBar>(R.id.adminProduitsProgress)?.visibility = View.VISIBLE
-
-        lifecycleScope.launch {
-            val result = runCatching {
-                withTimeout(PRODUCTS_PAGE_TIMEOUT_MS) {
-                    ProductService.fetchProductsPaginated(
-                        pageSize = pageSize,
-                        lastDoc = lastVisible,
-                        sellerIdFilter = activeSellerId
-                    )
+    private fun setupList() {
+        val rv = findViewById<RecyclerView>(R.id.adminProduitsList) ?: return
+        rv.layoutManager = LinearLayoutManager(this)
+        rv.adapter = adapter
+        rv.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                if (dy <= 0) return
+                val lm = recyclerView.layoutManager as? LinearLayoutManager ?: return
+                val lastVisible = lm.findLastVisibleItemPosition()
+                val total = lm.itemCount
+                if (total > 0 && lastVisible >= total - 4 && viewModel.hasMore) {
+                    viewModel.loadNextPage()
                 }
             }
+        })
+    }
 
-            result.onSuccess { (newItems, lastDoc) ->
-                isLoading = false
-                findViewById<ProgressBar>(R.id.adminProduitsProgress)?.visibility = View.GONE
-                productLoadErrorMessage = null
-                
-                if (newItems.isEmpty()) {
-                    isLastPage = true
-                } else {
-                    mergeProducts(newItems)
-                    lastVisible = lastDoc
-                    if (newItems.size < pageSize.toInt()) {
-                        isLastPage = true
+    // ===== Bottom nav =====
+
+    private fun setupBottomNav() {
+        setupAdminBottomNav(AdminNavTab.PRODUITS)
+        findViewById<View>(R.id.adminProduitsBell)?.setOnClickListener {
+            openNotificationsScreenWithPermissionCheck()
+        }
+        applyPressFeedback(R.id.adminProduitsBell)
+    }
+
+    // ===== State observation =====
+
+    private fun observeState() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.state.collect { state ->
+                    listState.render(state)
+                    when (state) {
+                        is UiState.Data -> adapter.submitList(state.value)
+                        is UiState.Empty, is UiState.Error -> adapter.submitList(emptyList())
+                        else -> Unit
                     }
                 }
-                renderProducts()
-                if (isSellerDashboard) renderSellerStats()
-                return@launch
             }
+        }
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.loadingMore.collect { loading ->
+                    findViewById<ProgressBar>(R.id.adminProduitsLoadMore)?.visibility =
+                        if (loading && viewModel.state.value is UiState.Data) View.VISIBLE
+                        else View.GONE
+                }
+            }
+        }
+    }
 
-            val error = result.exceptionOrNull() ?: return@launch
-            Log.e(TAG, "Failed to load products for sellerId=$activeSellerId role=$activeRole", error)
-            isLoading = false
-            findViewById<ProgressBar>(R.id.adminProduitsProgress)?.visibility = View.GONE
-            if (error is TimeoutCancellationException && renderCachedProductsFallback()) {
-                scrollProductsToTop()
+    /** Show/hide the pending badge in the title bar. */
+    private fun observePendingBadge() {
+        lifecycleScope.launch {
+            // Fetch count once on load — lightweight aggregate query
+            val count = runCatching {
+                AdminProductService.countByApprovalStatus(ProductApprovalStatus.PENDING)
+            }.getOrDefault(0)
+            val badge = findViewById<TextView>(R.id.adminProduitsPendingBadge) ?: return@launch
+            if (count > 0) {
+                badge.text = getString(R.string.admin_products_pending_badge, count)
+                badge.visibility = View.VISIBLE
             } else {
-                isLastPage = true
-                if (allProducts.isEmpty()) {
-                    productLoadErrorMessage = getString(R.string.admin_products_load_error)
-                }
-                renderProducts()
-                showMotionSnackbar(getString(R.string.admin_products_load_error))
+                badge.visibility = View.GONE
             }
         }
     }
 
-    private fun renderCachedProductsPreview() {
-        if (hasRenderedCachePreview || allProducts.isNotEmpty() || lastVisible != null) return
-        val cached = cachedProductPreview(pageSize.toInt())
-        if (cached.isEmpty()) return
+    // ===== Row binding =====
 
-        hasRenderedCachePreview = true
-        mergeProducts(cached)
-        renderProducts()
-        if (isSellerDashboard) renderSellerStats()
-    }
-
-    private suspend fun renderCachedProductsFallback(): Boolean {
-        val firestoreCached = runCatching {
-            ProductService.fetchProductsPaginated(
-                pageSize = pageSize,
-                lastDoc = null,
-                sellerIdFilter = activeSellerId,
-                source = Source.CACHE
-            ).first
-        }.getOrDefault(emptyList())
-
-        val cached = firestoreCached.ifEmpty {
-            withContext(Dispatchers.Default) { cachedProductPreview(pageSize.toInt()) }
-        }
-
-        if (cached.isEmpty()) return false
-        mergeProducts(cached)
-        isLastPage = true
-        renderProducts()
-        if (isSellerDashboard) renderSellerStats()
-        return true
-    }
-
-    private fun cachedProductPreview(limit: Int): List<Product> {
-        return ProductCatalog.all(includeInactive = true)
-            .asSequence()
-            .filter { product ->
-                activeSellerId.isNullOrBlank() || product.sellerId == activeSellerId
-            }
-            .sortedWith(compareByDescending<Product> { it.updatedAtMillis }.thenBy { it.title.lowercase(Locale.getDefault()) })
-            .take(limit)
-            .toList()
-    }
-
-    private fun mergeProducts(newItems: List<Product>) {
-        if (newItems.isEmpty()) return
-        val merged = linkedMapOf<String, Product>()
-        allProducts.forEach { product -> merged[product.id] = product }
-        newItems.forEach { product -> merged[product.id] = product }
-        allProducts.clear()
-        allProducts.addAll(
-            merged.values.sortedWith(
-                compareByDescending<Product> { it.updatedAtMillis }
-                    .thenBy { it.title.lowercase(Locale.getDefault()) }
-            )
+    private fun bindRow(view: View, product: Product) {
+        // Thumbnail
+        view.findViewById<ImageView>(R.id.adminProductThumb)?.loadCatalogImage(
+            imageUrl = product.thumbnailUrl ?: product.imageUrl
+                ?: product.thumbnailUrls.firstOrNull()
+                ?: product.imageUrls.firstOrNull(),
+            fallbackRes = R.drawable.placeholder,
+            requestedSizePx = 160,
         )
-    }
 
-    private fun scrollProductsToTop() {
-        val recycler = findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.adminProduitsList) ?: return
-        recycler.post {
-            recycler.stopScroll()
-            recycler.scrollToPosition(0)
+        // Title + seller
+        view.findViewById<TextView>(R.id.adminProductTitle)?.text = product.title.ifBlank {
+            getString(R.string.admin_products_seller_unknown)
         }
-    }
-
-    private fun renderProducts() {
-        val recycler = findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.adminProduitsList) ?: return
-        val emptyView = findViewById<TextView>(R.id.adminProduitsEmpty)
-        val filteredProducts = filteredProducts()
-
-        if (isLoading && allProducts.isEmpty()) {
-            emptyView?.visibility = View.GONE
-            (recycler.adapter as? AdminProductsAdapter)?.updateItems(emptyList())
-            return
+        view.findViewById<TextView>(R.id.adminProductSeller)?.text = product.sellerName.ifBlank {
+            getString(R.string.admin_products_seller_unknown)
         }
 
-        if (filteredProducts.isEmpty() && (isLastPage || productLoadErrorMessage != null)) {
-            emptyView?.visibility = View.VISIBLE
-            emptyView?.text = productLoadErrorMessage ?: getString(
-                if (searchQuery.isNotBlank() || selectedFilter != "all") {
-                    R.string.admin_products_empty_filtered
-                } else {
-                    R.string.auto_aucun_produit_disponible_2470
-                }
-            )
-            (recycler.adapter as? AdminProductsAdapter)?.updateItems(emptyList())
-            return
-        }
+        // Price
+        view.findViewById<TextView>(R.id.adminProductPrice)?.text =
+            formatDt(product.effectivePrice)
 
-        emptyView?.visibility = View.GONE
-        
-        val adapter = recycler.adapter as? AdminProductsAdapter
-        if (adapter == null) {
-            recycler.adapter = AdminProductsAdapter(
-                items = filteredProducts.toMutableList(),
-                onEdit = { openProductEditor(it) },
-                onDelete = { confirmDelete(it) },
-                canEdit = { canEditProduct(it) },
-                onEditBlocked = { showMotionSnackbar(getString(R.string.admin_product_edit_own_only)) }
-            )
-        } else {
-            adapter.updateItems(filteredProducts)
-        }
-    }
-
-    private fun filteredProducts(): List<Product> {
-        return allProducts.filter { product ->
-            val matchesQuery = searchQuery.isBlank() || listOf(
-                product.title,
-                product.subtitle,
-                product.origin,
-                product.category
-            ).any { it.contains(searchQuery, ignoreCase = true) }
-
-            val matchesFilter = when (selectedFilter) {
-                "low_stock" -> product.isActive && product.stock in 1..5
-                "inactive" -> !product.isActive
-                "active" -> product.isActive
-                else -> true
+        // Stock badge
+        val stockView = view.findViewById<TextView>(R.id.adminProductStock)
+        when {
+            product.stock <= 0 -> {
+                stockView?.text = getString(R.string.vendor_products_out_of_stock)
+                stockView?.background = getDrawable(R.drawable.ms_bg_status_rejected)
+                stockView?.setTextColor(getColor(R.color.ms_status_rejected_fg))
+                stockView?.visibility = View.VISIBLE
             }
-
-            matchesQuery && matchesFilter
+            product.stock <= 5 -> {
+                stockView?.text = getString(R.string.vendor_products_low_stock_threshold, product.stock)
+                stockView?.background = getDrawable(R.drawable.ms_bg_status_pending)
+                stockView?.setTextColor(getColor(R.color.ms_status_pending_fg))
+                stockView?.visibility = View.VISIBLE
+            }
+            else -> {
+                stockView?.visibility = View.GONE
+            }
         }
+
+        // Approval status pill
+        val approvalView = view.findViewById<TextView>(R.id.adminProductApprovalStatus)
+        val approvalStatus = ProductApprovalStatus.fromWire(product.approvalStatus)
+        val (kind, labelRes) = approvalStatusPill(approvalStatus)
+        MsStatusPill.bind(approvalView, kind, labelRes)
+        approvalView?.visibility = View.VISIBLE
+
+        // Overflow
+        val overflow = view.findViewById<ImageView>(R.id.adminProductOverflow)
+        overflow?.setOnClickListener { showRowActions(overflow, product) }
+        overflow?.applyPressFeedback()
     }
 
-    private fun openProductEditor(existing: Product?) {
-        if (existing != null && !canEditProduct(existing)) {
-            showMotionSnackbar(getString(R.string.admin_product_edit_own_only))
-            return
+    private fun approvalStatusPill(status: ProductApprovalStatus): Pair<MsStatusPill.Kind, Int> =
+        when (status) {
+            ProductApprovalStatus.PENDING -> MsStatusPill.Kind.Pending to R.string.ms_status_pending
+            ProductApprovalStatus.APPROVED -> MsStatusPill.Kind.Approved to R.string.ms_status_approved
+            ProductApprovalStatus.REJECTED -> MsStatusPill.Kind.Rejected to R.string.ms_status_rejected
+            ProductApprovalStatus.DRAFT -> MsStatusPill.Kind.Draft to R.string.ms_status_draft
+            ProductApprovalStatus.ARCHIVED -> MsStatusPill.Kind.Archived to R.string.ms_status_archived
         }
-        productEditorLauncher.launch(
-            AdminProductEditorActivity.createIntent(
-                context = this,
-                productId = existing?.id,
-                sellerMode = isSellerDashboard
+
+    // ===== Row actions =====
+
+    private fun showRowActions(anchor: View, product: Product) {
+        val popup = PopupMenu(this, anchor)
+        val status = ProductApprovalStatus.fromWire(product.approvalStatus)
+
+        when (status) {
+            ProductApprovalStatus.PENDING -> {
+                popup.menu.add(0, ACTION_APPROVE, 0, R.string.admin_products_action_approve)
+                popup.menu.add(0, ACTION_REJECT, 1, R.string.admin_products_action_reject)
+                popup.menu.add(0, ACTION_EDIT, 2, R.string.admin_products_action_edit)
+            }
+            ProductApprovalStatus.APPROVED -> {
+                popup.menu.add(0, ACTION_REJECT, 0, R.string.admin_products_action_reject)
+                popup.menu.add(0, ACTION_ARCHIVE, 1, R.string.admin_products_action_archive)
+                popup.menu.add(0, ACTION_EDIT, 2, R.string.admin_products_action_edit)
+            }
+            ProductApprovalStatus.REJECTED, ProductApprovalStatus.DRAFT -> {
+                popup.menu.add(0, ACTION_APPROVE, 0, R.string.admin_products_action_approve)
+                popup.menu.add(0, ACTION_ARCHIVE, 1, R.string.admin_products_action_archive)
+                popup.menu.add(0, ACTION_EDIT, 2, R.string.admin_products_action_edit)
+            }
+            ProductApprovalStatus.ARCHIVED -> {
+                popup.menu.add(0, ACTION_APPROVE, 0, R.string.admin_products_action_approve)
+                popup.menu.add(0, ACTION_EDIT, 1, R.string.admin_products_action_edit)
+            }
+        }
+        // Discount available in every state.
+        popup.menu.add(0, ACTION_DISCOUNT, 90, R.string.vendor_products_action_discount)
+        if (product.hasDiscount) {
+            popup.menu.add(0, ACTION_REMOVE_DISCOUNT, 91, R.string.vendor_products_action_remove_discount)
+        }
+
+        popup.setOnMenuItemClickListener { item: MenuItem ->
+            handleAction(item.itemId, product)
+            true
+        }
+        popup.show()
+    }
+
+    private fun handleAction(actionId: Int, product: Product) {
+        when (actionId) {
+            ACTION_APPROVE -> dispatchAction(
+                product = product,
+                action = { viewModel.approve(product) },
+                successRes = R.string.admin_products_action_success_approved,
             )
-        )
+            ACTION_REJECT -> confirmThenRun(
+                titleRes = R.string.admin_products_reject_confirm_title,
+                messageRes = R.string.admin_products_reject_confirm_message,
+                product = product,
+                action = { viewModel.reject(product) },
+                successRes = R.string.admin_products_action_success_rejected,
+            )
+            ACTION_ARCHIVE -> dispatchAction(
+                product = product,
+                action = { viewModel.archive(product) },
+                successRes = R.string.admin_products_action_success_archived,
+            )
+            ACTION_EDIT -> openEditor(product)
+            ACTION_DISCOUNT -> showDiscountDialog(product)
+            ACTION_REMOVE_DISCOUNT -> applyDiscount(product, 0)
+        }
     }
 
-    private fun canEditProduct(product: Product): Boolean {
-        val uid = FirebaseAuthManager.currentUser?.uid ?: return false
-        return activeRole == UserRoles.ADMIN || product.sellerId == uid
-    }
-
-    private fun confirmDelete(product: Product) {
+    private fun showDiscountDialog(product: Product) {
+        val input = android.widget.EditText(this).apply {
+            inputType = android.text.InputType.TYPE_CLASS_NUMBER
+            hint = getString(R.string.vendor_products_discount_dialog_hint)
+            if (product.discountPercentClamped > 0) setText(product.discountPercentClamped.toString())
+        }
+        val padding = resources.getDimensionPixelSize(R.dimen.space_20)
+        val container = android.widget.FrameLayout(this).apply {
+            setPadding(padding, padding / 2, padding, 0)
+            addView(input)
+        }
         MaterialAlertDialogBuilder(this)
-            .setTitle(getString(R.string.admin_delete_product_title, product.title))
-            .setMessage(getString(R.string.admin_delete_product_message))
-            .setNegativeButton(getString(R.string.admin_delete_cancel), null)
-            .setPositiveButton(getString(R.string.admin_delete_confirm)) { _, _ ->
-                lifecycleScope.launch {
-                    runCatching { FirestoreService.deleteProduct(product.id) }
-                        .onSuccess {
-                            allProducts.removeAll { it.id == product.id }
-                            renderProducts()
-                            showMotionSnackbar(getString(R.string.admin_product_deleted))
-                            loadStats()
-                        }
-                        .onFailure {
-                            showMotionSnackbar(getString(R.string.admin_product_delete_failed))
-                        }
+            .setTitle(R.string.vendor_products_discount_dialog_title)
+            .setMessage(R.string.vendor_products_discount_dialog_message)
+            .setView(container)
+            .setNegativeButton(R.string.ms_action_cancel, null)
+            .setPositiveButton(R.string.ms_action_save) { _, _ ->
+                val percent = input.text.toString().trim().toIntOrNull()
+                if (percent == null || percent !in 1..90) {
+                    showMotionSnackbar(getString(R.string.vendor_products_discount_invalid))
+                    return@setPositiveButton
                 }
+                applyDiscount(product, percent)
             }
             .show()
     }
 
+    private fun applyDiscount(product: Product, percent: Int) {
+        lifecycleScope.launch {
+            val result = VendorProductLifecycle.setDiscount(product, percent)
+            if (result is VendorProductLifecycle.Result.Success) {
+                showMotionSnackbar(getString(R.string.vendor_products_action_discount_success))
+                viewModel.refresh()
+            } else {
+                showMotionSnackbar(getString(R.string.vendor_products_action_failed))
+            }
+        }
+    }
+
+    /** For non-destructive actions — run immediately and show snackbar. */
+    private fun dispatchAction(
+        product: Product,
+        action: () -> Unit,
+        successRes: Int,
+    ) {
+        // The ViewModel handles the Firestore write + optimistic list removal.
+        action()
+        showMotionSnackbar(getString(successRes))
+    }
+
+    private fun confirmThenRun(
+        titleRes: Int,
+        messageRes: Int,
+        product: Product,
+        action: () -> Unit,
+        successRes: Int,
+    ) {
+        MaterialAlertDialogBuilder(this)
+            .setTitle(titleRes)
+            .setMessage(messageRes)
+            .setPositiveButton(R.string.ms_action_confirm) { _, _ ->
+                dispatchAction(product, action, successRes)
+            }
+            .setNegativeButton(R.string.ms_action_cancel, null)
+            .show()
+    }
+
+    // ===== Navigation =====
+
+    private fun openEditor(product: Product) {
+        startActivity(
+            AdminProductEditorActivity.createIntent(
+                context = this,
+                productId = product.id,
+                sellerMode = false,
+            )
+        )
+    }
+
     companion object {
+        /** Kept for backward compatibility — vendor-mode callers use [VendorProductsActivity]. */
         const val EXTRA_SELLER_MODE = "extra_seller_mode"
-        private const val PRODUCTS_PAGE_TIMEOUT_MS = 15_000L
-        private const val TAG = "AdminProduitsActivity"
+
+        private const val ACTION_APPROVE = 1
+        private const val ACTION_REJECT = 2
+        private const val ACTION_ARCHIVE = 3
+        private const val ACTION_EDIT = 4
+        private const val ACTION_DISCOUNT = 5
+        private const val ACTION_REMOVE_DISCOUNT = 6
     }
 }

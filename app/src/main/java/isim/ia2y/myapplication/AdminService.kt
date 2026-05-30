@@ -10,6 +10,8 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.tasks.await
+import java.util.Calendar
+import java.util.concurrent.TimeUnit
 
 object AdminService {
     data class OrderStatusSummary(
@@ -59,17 +61,49 @@ object AdminService {
         val products: SellerProductsSummary = SellerProductsSummary()
     )
 
+    data class AnalyticsDayPoint(
+        val dayLabel: String,
+        val orderCount: Int,
+        val revenue: Double
+    )
+
+    data class AnalyticsStatusCount(
+        val status: String,
+        val count: Int
+    )
+
+    data class AnalyticsRankRow(
+        val id: String,
+        val name: String,
+        val count: Int,
+        val revenue: Double,
+        val imageUrl: String = ""
+    )
+
+    data class AnalyticsSnapshot(
+        val totalRevenue: Double,
+        val totalOrders: Int,
+        val averageOrderValue: Double,
+        val deliveredRate: Double,
+        val revenuePoints: List<AnalyticsDayPoint>,
+        val funnel: List<AnalyticsStatusCount>,
+        val topProducts: List<AnalyticsRankRow>,
+        val topVendors: List<AnalyticsRankRow>
+    )
+
     private val db: FirebaseFirestore get() = FirebaseFirestore.getInstance()
     private val productsRef = db.collection("products")
     private const val TAG = "AdminService"
-    private const val ADMIN_CACHE_TTL_MS = 60_000L
+    private const val ADMIN_CACHE_TTL_MS = 5 * 60_000L
     private const val RECENT_PREVIEW_LIMIT = 30L
     private const val MAX_RECENT_LIMIT = 50L
     private const val MAX_PAGE_SIZE = 50
     private const val MAX_SELLER_ORDER_LIMIT = 300L
+    private const val MAX_ANALYTICS_ORDER_LIMIT = 500L
     private var cachedStats: Pair<Long, FirestoreService.AdminStats>? = null
     private var cachedRecentOrders: Pair<Long, List<Pair<String, AppOrder>>>? = null
     private var cachedRecentClients: Pair<Long, List<FirestoreService.ClientInfo>>? = null
+    private var cachedAnalyticsSnapshot: Pair<Long, AnalyticsSnapshot>? = null
     private var statsInFlight: Deferred<FirestoreService.AdminStats>? = null
     private var recentOrdersInFlight: Deferred<List<Pair<String, AppOrder>>>? = null
     private var recentClientsInFlight: Deferred<List<FirestoreService.ClientInfo>>? = null
@@ -78,6 +112,7 @@ object AdminService {
         cachedStats = null
         cachedRecentOrders = null
         cachedRecentClients = null
+        cachedAnalyticsSnapshot = null
         statsInFlight = null
         recentOrdersInFlight = null
         recentClientsInFlight = null
@@ -150,6 +185,7 @@ object AdminService {
         }
 
         val ordersAgg = ordersDeferred.await()
+        FirebaseCostTracker.read("AdminService.fetchAdminStats", "orders/products/users aggregate queries", 5, "aggregate")
         val totalOrders = ordersAgg.count.toInt()
         val totalRevenue = (ordersAgg.get(revenueField) as? Number)?.toDouble() ?: 0.0
 
@@ -234,6 +270,7 @@ object AdminService {
             .limit(safeLimit)
             .get(source)
             .await()
+        FirebaseCostTracker.read("AdminService.fetchRecentOrders", "orders", ordersSnapshot.size(), source.name)
         return ordersSnapshot.documents.mapNotNull { doc ->
             val data = doc.data ?: return@mapNotNull null
             val uid = data["uid"] as? String ?: return@mapNotNull null
@@ -250,6 +287,7 @@ object AdminService {
             .limit(safeLimit)
             .get(source)
             .await()
+        FirebaseCostTracker.read("AdminService.fetchRecentClients", "users", usersSnapshot.size(), source.name)
 
         return usersSnapshot.documents.mapNotNull(::clientInfoFromDocument)
             .sortedByDescending { it.createdAt }
@@ -282,6 +320,9 @@ object AdminService {
             .set(
                 mapOf(
                     "role" to UserRoles.VENDEUR,
+                    VendorFields.STATUS to VendorStatus.APPROVED.wireValue,
+                    VendorFields.APPROVED_AT to FieldValue.serverTimestamp(),
+                    VendorFields.SUSPENDED_REASON to "",
                     "sellerAccessGrantedAt" to FieldValue.serverTimestamp(),
                     "sellerAccessGrantedBy" to adminUid,
                     "updatedAt" to FieldValue.serverTimestamp()
@@ -318,6 +359,7 @@ object AdminService {
             .set(
                 mapOf(
                     "role" to UserRoles.CLIENT,
+                    VendorFields.STATUS to VendorStatus.REJECTED.wireValue,
                     "sellerAccessRevokedAt" to FieldValue.serverTimestamp(),
                     "sellerAccessRevokedBy" to adminUid,
                     "updatedAt" to FieldValue.serverTimestamp()
@@ -371,7 +413,7 @@ object AdminService {
             query.startAfter(lastDoc).get().await()!!
         } else {
             query.get().await()!!
-        }
+        }.also { FirebaseCostTracker.read("AdminService.fetchOrdersPage", "orders", it.size(), "default") }
     }
 
     suspend fun fetchOrderStatusSummary(): OrderStatusSummary {
@@ -447,10 +489,12 @@ object AdminService {
         if (sellerId.isBlank()) return SellerProductsSummary()
         val products = productsRef
             .whereEqualTo("sellerId", sellerId)
+            .limit(200)
             .get()
             .await()
             .documents
             .mapNotNull { it.data }
+        FirebaseCostTracker.read("AdminService.fetchSellerProductsSummaryDirect", "products", products.size, "default")
 
         return SellerProductsSummary(
             totalProducts = products.size,
@@ -473,6 +517,7 @@ object AdminService {
             .limit(safeLimit)
             .get()
             .await()
+        FirebaseCostTracker.read("AdminService.fetchSellerOrderModelsDirect", "orders", snapshot.size(), "default")
 
         return snapshot.documents.mapNotNull { doc ->
             val data = doc.data ?: return@mapNotNull null
@@ -503,6 +548,163 @@ object AdminService {
         )
     }
 
+    suspend fun fetchAnalyticsSnapshot(days: Int = 7): AnalyticsSnapshot {
+        cachedAnalyticsSnapshot.freshValue()?.let { return it }
+        val safeDays = days.coerceIn(7, 30)
+        return coroutineScope {
+            val statsDeferred = async { fetchAdminStats() }
+            val funnelDeferred = async { fetchAnalyticsStatusCounts() }
+            val ordersDeferred = async { fetchAnalyticsOrders(MAX_ANALYTICS_ORDER_LIMIT) }
+
+            val stats = statsDeferred.await()
+            val funnel = funnelDeferred.await()
+            val orders = ordersDeferred.await()
+            val funnelTotal = funnel.sumOf { it.count }.coerceAtLeast(1)
+            val deliveredRate = funnel
+                .firstOrNull { it.status == OrderStatuses.DELIVERED }
+                ?.count
+                ?.toDouble()
+                ?.div(funnelTotal)
+                ?: 0.0
+
+            AnalyticsSnapshot(
+                totalRevenue = stats.totalRevenue,
+                totalOrders = stats.totalOrders,
+                averageOrderValue = if (stats.totalOrders > 0) stats.totalRevenue / stats.totalOrders else 0.0,
+                deliveredRate = deliveredRate,
+                revenuePoints = buildAnalyticsDayPoints(orders, safeDays),
+                funnel = funnel,
+                topProducts = buildAnalyticsTopProducts(orders),
+                topVendors = buildAnalyticsTopVendors(orders)
+            ).also { cachedAnalyticsSnapshot = System.currentTimeMillis() to it }
+        }
+    }
+
+    private suspend fun fetchAnalyticsStatusCounts(): List<AnalyticsStatusCount> = coroutineScope {
+        val statuses = listOf(
+            OrderStatuses.PENDING,
+            OrderStatuses.CONFIRMED,
+            OrderStatuses.PREPARING,
+            OrderStatuses.SHIPPED,
+            OrderStatuses.DELIVERED
+        )
+        statuses.map { status ->
+            async {
+                val count = db.collection(FirestoreCollections.ORDERS)
+                    .whereEqualTo("status", status)
+                    .aggregate(AggregateField.count())
+                    .get(AggregateSource.SERVER)
+                    .await()
+                    .count
+                    .toInt()
+                AnalyticsStatusCount(status, count)
+            }
+        }.map { it.await() }
+    }
+
+    private suspend fun fetchAnalyticsOrders(limit: Long): List<AppOrder> {
+        val safeLimit = limit.coerceIn(1L, MAX_ANALYTICS_ORDER_LIMIT)
+        val snapshot = db.collection(FirestoreCollections.ORDERS)
+            .orderBy("createdAt", com.google.firebase.firestore.Query.Direction.DESCENDING)
+            .limit(safeLimit)
+            .get()
+            .await()
+        FirebaseCostTracker.read("AdminService.fetchAnalyticsOrders", "orders", snapshot.size(), "default")
+
+        return snapshot.documents.mapNotNull { doc ->
+            doc.data?.let { AppOrder.fromMap(it).copy(id = doc.id) }
+        }.sortedByDescending { it.createdAtMillis }
+    }
+
+    private fun buildAnalyticsDayPoints(orders: List<AppOrder>, days: Int): List<AnalyticsDayPoint> {
+        val start = startOfDay(System.currentTimeMillis() - TimeUnit.DAYS.toMillis((days - 1).toLong()))
+        val windowOrders = orders.filter { it.createdAtMillis >= start }
+        val labels = arrayOf("Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam")
+        val cal = Calendar.getInstance().apply {
+            timeInMillis = start
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }
+        return (0 until days).map {
+            val dayStart = cal.timeInMillis
+            cal.add(Calendar.DAY_OF_YEAR, 1)
+            val dayEnd = cal.timeInMillis
+            val dayOrders = windowOrders.filter { order -> order.createdAtMillis in dayStart until dayEnd }
+            val label = labels[Calendar.getInstance().apply { timeInMillis = dayStart }.get(Calendar.DAY_OF_WEEK) - 1]
+            AnalyticsDayPoint(
+                dayLabel = label,
+                orderCount = dayOrders.size,
+                revenue = dayOrders.sumOf { it.total }
+            )
+        }
+    }
+
+    private fun buildAnalyticsTopProducts(orders: List<AppOrder>): List<AnalyticsRankRow> {
+        data class Acc(
+            var count: Int,
+            var revenue: Double,
+            val name: String,
+            val imageUrl: String
+        )
+        val acc = linkedMapOf<String, Acc>()
+        orders.forEach { order ->
+            order.items.forEach { item ->
+                val key = item.productId.ifBlank { item.name }
+                if (key.isBlank()) return@forEach
+                val row = acc.getOrPut(key) {
+                    Acc(0, 0.0, item.name.ifBlank { key }, item.thumbnailUrl)
+                }
+                row.count += item.quantity
+                row.revenue += item.priceAtPurchase * item.quantity
+            }
+        }
+        return acc.entries
+            .sortedWith(compareByDescending<Map.Entry<String, Acc>> { it.value.count }.thenByDescending { it.value.revenue })
+            .take(5)
+            .map { (id, row) ->
+                AnalyticsRankRow(id, row.name, row.count, row.revenue, row.imageUrl)
+            }
+    }
+
+    private fun buildAnalyticsTopVendors(orders: List<AppOrder>): List<AnalyticsRankRow> {
+        data class Acc(
+            val orderIds: MutableSet<String>,
+            var revenue: Double,
+            val name: String,
+            val imageUrl: String
+        )
+        val acc = linkedMapOf<String, Acc>()
+        orders.forEach { order ->
+            order.items.forEach { item ->
+                val key = item.sellerId
+                if (key.isBlank()) return@forEach
+                val row = acc.getOrPut(key) {
+                    Acc(mutableSetOf(), 0.0, item.sellerName.ifBlank { key.takeLast(8) }, item.sellerAvatarUrl)
+                }
+                row.orderIds += order.id.ifBlank { order.displayId }
+                row.revenue += item.priceAtPurchase * item.quantity
+            }
+        }
+        return acc.entries
+            .sortedByDescending { it.value.revenue }
+            .take(5)
+            .map { (id, row) ->
+                AnalyticsRankRow(id, row.name, row.orderIds.size, row.revenue, row.imageUrl)
+            }
+    }
+
+    private fun startOfDay(millis: Long): Long {
+        return Calendar.getInstance().apply {
+            timeInMillis = millis
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }.timeInMillis
+    }
+
     suspend fun fetchClientsPage(
         pageSize: Int,
         lastDoc: com.google.firebase.firestore.DocumentSnapshot? = null
@@ -516,7 +718,7 @@ object AdminService {
             query.startAfter(lastDoc).get().await()!!
         } else {
             query.get().await()!!
-        }
+        }.also { FirebaseCostTracker.read("AdminService.fetchClientsPage", "users", it.size(), "default") }
     }
 
     suspend fun fetchClientProfileDetails(userId: String): ClientProfileDetails? {

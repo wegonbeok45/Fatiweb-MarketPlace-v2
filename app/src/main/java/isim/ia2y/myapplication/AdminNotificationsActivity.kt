@@ -201,7 +201,7 @@ class AdminNotificationsActivity : AppCompatActivity() {
 
     private fun setupTopBar() {
         findViewById<View?>(R.id.adminNotifIvBack)?.setOnClickListener {
-            navigateBackToMain()
+            navigateAdminBack(AdminNavTab.NOTIFICATIONS)
         }
         findViewById<View?>(R.id.adminNotifIvSettings)?.setOnClickListener {
             navigateNoShift(AdminParametresActivity::class.java)

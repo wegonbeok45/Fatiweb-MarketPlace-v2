@@ -17,7 +17,7 @@
         app:cardBackgroundColor="@color/profile_card_bg"
         app:cardCornerRadius="@dimen/surface_button_corner_radius"
         app:cardElevation="0dp"
-        app:strokeColor="@color/colorBorderLight"
+        app:strokeColor="@color/ms_border_default"
         app:strokeWidth="1dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -29,7 +29,7 @@
             android:contentDescription="@string/cd_back"
             android:padding="@dimen/surface_button_inner_padding"
             app:srcCompat="@drawable/back"
-            app:tint="@color/profile_text_primary" />
+            app:tint="@color/ms_text_primary" />
     </com.google.android.material.card.MaterialCardView>
 
     <LinearLayout
@@ -52,7 +52,7 @@
             app:cardBackgroundColor="@color/profile_card_bg"
             app:cardCornerRadius="@dimen/surface_button_corner_radius"
             app:cardElevation="0dp"
-            app:strokeColor="@color/colorBorderLight"
+            app:strokeColor="@color/ms_border_default"
             app:strokeWidth="1dp">
 
             <ImageView
@@ -61,7 +61,7 @@
                 android:contentDescription="@string/cd_settings"
                 android:padding="@dimen/surface_button_inner_padding"
                 app:srcCompat="@drawable/settings"
-                app:tint="@color/profile_text_primary" />
+                app:tint="@color/ms_text_primary" />
         </com.google.android.material.card.MaterialCardView>
 
         <com.google.android.material.card.MaterialCardView
@@ -72,7 +72,7 @@
             app:cardBackgroundColor="@color/profile_card_bg"
             app:cardCornerRadius="@dimen/surface_button_corner_radius"
             app:cardElevation="@dimen/space_0"
-            app:strokeColor="@color/colorBorderLight"
+            app:strokeColor="@color/ms_border_default"
             app:strokeWidth="1dp">
 
             <ImageView
@@ -81,7 +81,7 @@
                 android:layout_gravity="center"
                 android:contentDescription="@string/cd_admin_dashboard"
                 app:srcCompat="@drawable/ic_admin_shield"
-                app:tint="?attr/colorPrimary" />
+                app:tint="@color/ms_text_primary" />
         </com.google.android.material.card.MaterialCardView>
     </LinearLayout>
 
@@ -94,7 +94,7 @@
         android:ellipsize="end"
         android:fontFamily="@font/manrope_semibold"
         android:maxLines="1"
-        android:textColor="@color/profile_text_primary"
+        android:textColor="@color/ms_text_primary"
         android:textSize="@dimen/text_size_subtitle"
         app:layout_constraintBottom_toBottomOf="@id/adminIvBack"
         app:layout_constraintEnd_toStartOf="@id/adminTopActions"

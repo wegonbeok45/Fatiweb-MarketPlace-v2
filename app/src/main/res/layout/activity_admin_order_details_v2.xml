@@ -1,0 +1,550 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/ms_surface_canvas"
+    tools:context=".AdminOrderDetailsActivity">
+
+    <!-- ====== Top bar ====== -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/adminOrderDetailsAppBar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/ms_top_bar_height"
+        android:background="@color/ms_surface_canvas"
+        android:paddingStart="@dimen/space_12"
+        android:paddingEnd="@dimen/space_20">
+
+        <ImageView
+            android:id="@+id/adminOrderDetailsIvBack"
+            android:layout_width="@dimen/ms_min_touch"
+            android:layout_height="@dimen/ms_min_touch"
+            android:background="?selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:contentDescription="@string/ms_action_back"
+            android:focusable="true"
+            android:padding="12dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/back"
+            app:tint="@color/ms_text_primary" />
+
+        <TextView
+            android:id="@+id/adminOrderDetailsTitle"
+            style="@style/Ms.Text.Title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/space_4"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="@string/admin_order_details_title"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/adminOrderDetailsIvBack"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- ====== Content area ====== -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="@dimen/ms_top_bar_height">
+
+        <!-- Skeleton (shown while loading) -->
+        <LinearLayout
+            android:id="@+id/adminOrderDetailsLoading"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_12"
+            android:orientation="vertical"
+            android:paddingStart="@dimen/space_20"
+            android:paddingEnd="@dimen/space_20"
+            android:visibility="visible">
+
+            <include
+                layout="@layout/ms_component_skeleton_card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+            <include
+                layout="@layout/ms_component_skeleton_card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_12" />
+            <include
+                layout="@layout/ms_component_skeleton_card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_12" />
+        </LinearLayout>
+
+        <!-- Scroll content (shown after load) -->
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/adminOrderDetailsContent"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:overScrollMode="never"
+            android:paddingStart="@dimen/space_20"
+            android:paddingEnd="@dimen/space_20"
+            android:paddingTop="@dimen/space_12"
+            android:paddingBottom="@dimen/space_32"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <!-- ── Order header card ── -->
+                <com.google.android.material.card.MaterialCardView
+                    style="@style/Ms.Card"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="@dimen/space_20">
+
+                        <!-- Order ID + date -->
+                        <TextView
+                            android:id="@+id/adminOrderDetailsId"
+                            style="@style/Ms.Text.Title"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textSize="22sp"
+                            tools:text="#FW-123ABC" />
+
+                        <TextView
+                            android:id="@+id/adminOrderDetailsDate"
+                            style="@style/Ms.Text.Caption"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_4"
+                            tools:text="Créé le 13 mai 2026 – 18:05" />
+
+                        <!-- Status pill + change button -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_16"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:id="@+id/adminOrderDetailsStatusPill"
+                                style="@style/Ms.Chip.Status"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                tools:text="En attente" />
+
+                            <Space
+                                android:layout_width="0dp"
+                                android:layout_height="1dp"
+                                android:layout_weight="1" />
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/adminOrderDetailsStatusButton"
+                                style="@style/Ms.Button.Primary"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/admin_order_change_status_cta" />
+
+                        </LinearLayout>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- ── Client card ── -->
+                <com.google.android.material.card.MaterialCardView
+                    style="@style/Ms.Card"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_12">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="@dimen/space_20">
+
+                        <TextView
+                            style="@style/Ms.Text.Overline"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/admin_order_details_client" />
+
+                        <!-- Avatar + identity row -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_14"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:id="@+id/adminOrderDetailsClientAvatar"
+                                android:layout_width="52dp"
+                                android:layout_height="52dp"
+                                android:background="@drawable/ms_bg_icon_chip_dark"
+                                android:scaleType="centerCrop"
+                                android:src="@drawable/profile_avatar_art" />
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="@dimen/space_14"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/adminOrderDetailsClientName"
+                                    style="@style/Ms.Text.Label"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:ellipsize="end"
+                                    android:maxLines="1"
+                                    tools:text="Mohmed Gnounou" />
+
+                                <TextView
+                                    android:id="@+id/adminOrderDetailsClientMeta"
+                                    style="@style/Ms.Text.Caption"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="@dimen/space_4"
+                                    android:ellipsize="end"
+                                    android:maxLines="2"
+                                    tools:text="client@email.com · +216 XX XXX XXX" />
+                            </LinearLayout>
+                        </LinearLayout>
+
+                        <!-- Action chips row -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_14"
+                            android:orientation="horizontal">
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/adminOrderDetailsBtnCall"
+                                style="@style/Ms.Button.Ghost"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/admin_order_action_call"
+                                android:visibility="gone" />
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/adminOrderDetailsBtnEmail"
+                                style="@style/Ms.Button.Ghost"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="@dimen/space_8"
+                                android:text="@string/admin_order_action_email"
+                                android:visibility="gone" />
+
+                        </LinearLayout>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- ── Vendor card (admin-only) ── -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/adminOrderDetailsVendorCard"
+                    style="@style/Ms.Card"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_12">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="@dimen/space_20">
+
+                        <TextView
+                            style="@style/Ms.Text.Overline"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/admin_order_details_vendor" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_14"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:id="@+id/adminOrderDetailsVendorAvatar"
+                                android:layout_width="44dp"
+                                android:layout_height="44dp"
+                                android:background="@drawable/ms_bg_icon_chip_dark"
+                                android:scaleType="centerCrop"
+                                android:src="@drawable/profile_avatar_art" />
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="@dimen/space_14"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/adminOrderDetailsVendorName"
+                                    style="@style/Ms.Text.Label"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:ellipsize="end"
+                                    android:maxLines="1"
+                                    tools:text="FatiWeb Seller" />
+
+                                <TextView
+                                    android:id="@+id/adminOrderDetailsVendorMeta"
+                                    style="@style/Ms.Text.Caption"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="@dimen/space_4"
+                                    android:ellipsize="end"
+                                    android:maxLines="1"
+                                    tools:text="seller-uid-last8" />
+                            </LinearLayout>
+                        </LinearLayout>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- ── Delivery card ── -->
+                <com.google.android.material.card.MaterialCardView
+                    style="@style/Ms.Card"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_12">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="@dimen/space_20">
+
+                        <!-- Section header -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                app:srcCompat="@drawable/ic_checkout_pin"
+                                app:tint="@color/ms_accent_gold" />
+
+                            <TextView
+                                style="@style/Ms.Text.Overline"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="@dimen/space_8"
+                                android:text="@string/admin_order_details_address" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/adminOrderDetailsAddress"
+                            style="@style/Ms.Text.Body"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_12"
+                            android:lineSpacingExtra="3dp"
+                            tools:text="Mohmed Gnounou&#10;Ariana, Tunis&#10;+216 XX XXX XXX" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/adminOrderDetailsBtnMap"
+                            style="@style/Ms.Button.Ghost"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_12"
+                            android:text="@string/admin_order_action_map"
+                            android:visibility="gone" />
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:layout_marginTop="@dimen/space_16"
+                            android:layout_marginBottom="@dimen/space_4"
+                            android:background="@color/ms_border_subtle" />
+
+                        <TextView
+                            style="@style/Ms.Text.Label"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_12"
+                            android:text="@string/admin_order_details_notes" />
+
+                        <TextView
+                            android:id="@+id/adminOrderDetailsNotes"
+                            style="@style/Ms.Text.Caption"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_6"
+                            tools:text="Call before delivery" />
+
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- ── Items card ── -->
+                <com.google.android.material.card.MaterialCardView
+                    style="@style/Ms.Card"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_12">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="@dimen/space_20">
+
+                        <TextView
+                            style="@style/Ms.Text.Label"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/admin_order_details_items" />
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/adminOrderDetailsItemsList"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_12"
+                            android:nestedScrollingEnabled="false"
+                            tools:itemCount="2"
+                            tools:listitem="@layout/item_order_detail_product" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- ── Payment summary card ── -->
+                <com.google.android.material.card.MaterialCardView
+                    style="@style/Ms.Card"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_12">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="@dimen/space_20">
+
+                        <TextView
+                            style="@style/Ms.Text.Overline"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/admin_order_details_payment" />
+
+                        <TextView
+                            android:id="@+id/adminOrderDetailsPayment"
+                            style="@style/Ms.Text.Label"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_6"
+                            tools:text="Paiement à la livraison" />
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:layout_marginTop="@dimen/space_16"
+                            android:layout_marginBottom="@dimen/space_14"
+                            android:background="@color/ms_border_subtle" />
+
+                        <!-- Subtotal -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                style="@style/Ms.Text.Caption"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="@string/admin_order_details_subtotal" />
+
+                            <TextView
+                                android:id="@+id/adminOrderDetailsSubtotal"
+                                style="@style/Ms.Text.Body"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                tools:text="52.000 DT" />
+                        </LinearLayout>
+
+                        <!-- Shipping -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_8"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                style="@style/Ms.Text.Caption"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="@string/admin_order_details_shipping" />
+
+                            <TextView
+                                android:id="@+id/adminOrderDetailsShipping"
+                                style="@style/Ms.Text.Body"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                tools:text="7.000 DT" />
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:layout_marginTop="@dimen/space_12"
+                            android:layout_marginBottom="@dimen/space_12"
+                            android:background="@color/ms_border_subtle" />
+
+                        <!-- Total -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                style="@style/Ms.Text.Label"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="@string/admin_order_details_total" />
+
+                            <TextView
+                                android:id="@+id/adminOrderDetailsTotal"
+                                style="@style/Ms.Text.Title"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@color/ms_accent_gold"
+                                tools:text="59.000 DT" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
+
+        <!-- Error state -->
+        <include
+            android:id="@+id/adminOrderDetailsError"
+            layout="@layout/ms_component_error_state"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:visibility="gone" />
+
+    </FrameLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

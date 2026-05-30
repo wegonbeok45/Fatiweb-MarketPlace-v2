@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewGroup.LayoutParams
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
@@ -13,7 +14,9 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
+import isim.ia2y.myapplication.ui.base.MsStatusPill
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -36,7 +39,7 @@ class AdminClientDetailsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_admin_client_details)
+        setContentView(R.layout.activity_admin_client_details_v2)
         clientId = intent.getStringExtra(EXTRA_CLIENT_ID).orEmpty()
         setupInsets()
         setupTopBar()
@@ -45,16 +48,29 @@ class AdminClientDetailsActivity : AppCompatActivity() {
     }
 
     private fun setupInsets() {
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.adminClientDetailsAppBar)) { view, insets ->
-            val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            view.updatePadding(top = bars.top)
+        val baseTopBarHeight = resources.getDimensionPixelSize(R.dimen.ms_top_bar_height)
+        ViewCompat.setOnApplyWindowInsetsListener(
+            findViewById(R.id.adminClientDetailsTopBar)
+        ) { v, insets ->
+            val top = insets.getInsets(WindowInsetsCompat.Type.statusBars()).top
+            v.updatePadding(top = top)
+            v.updateLayoutParams<ViewGroup.LayoutParams> { height = baseTopBarHeight + top }
+            insets
+        }
+        val scroll = findViewById<View>(R.id.adminClientDetailsScroll)
+        val baseBottom = scroll?.paddingBottom ?: 0
+        ViewCompat.setOnApplyWindowInsetsListener(scroll) { v, insets ->
+            val bottom = insets.getInsets(WindowInsetsCompat.Type.systemBars()).bottom
+            v.updatePadding(bottom = baseBottom + bottom)
             insets
         }
     }
 
     private fun setupTopBar() {
-        findViewById<View>(R.id.adminClientDetailsIvBack)?.setOnClickListener { finish() }
-        applyPressFeedback(R.id.adminClientDetailsIvBack)
+        bindAdminBack(AdminNavTab.CLIENTS)
+        findViewById<View>(R.id.adminClientDetailsIvBack)?.setOnClickListener {
+            navigateAdminBack(AdminNavTab.CLIENTS)
+        }
     }
 
     private fun setupOrdersList() {
@@ -121,8 +137,23 @@ class AdminClientDetailsActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.adminClientDetailsName)?.text = displayName
         findViewById<TextView>(R.id.adminClientDetailsEmail)?.text =
             profile.email.ifBlank { getString(R.string.admin_client_fallback_email) }
-        findViewById<TextView>(R.id.adminClientDetailsRole)?.text = profile.role.roleLabel()
-        findViewById<TextView>(R.id.adminClientDetailsStatus)?.text = profile.status.statusLabel()
+        // Role pill
+        val roleTv = findViewById<TextView>(R.id.adminClientDetailsRole)
+        val (roleKind, roleRes) = when (profile.role) {
+            UserRoles.ADMIN  -> MsStatusPill.Kind.Info    to R.string.profile_role_admin
+            UserRoles.VENDEUR -> MsStatusPill.Kind.Approved to R.string.profile_role_vendeur
+            else             -> MsStatusPill.Kind.Pending  to R.string.profile_role_client
+        }
+        MsStatusPill.bind(roleTv, roleKind, roleRes)
+
+        // Status pill
+        val statusTv = findViewById<TextView>(R.id.adminClientDetailsStatus)
+        val (statusKind, statusRes) = when (profile.status.lowercase(Locale.getDefault())) {
+            "active"                        -> MsStatusPill.Kind.Approved to R.string.admin_client_status_active
+            "disabled", "blocked", "suspended" -> MsStatusPill.Kind.Rejected to R.string.admin_client_status_blocked
+            else                            -> MsStatusPill.Kind.Pending  to R.string.admin_client_status_active
+        }
+        MsStatusPill.bind(statusTv, statusKind, statusRes)
         findViewById<TextView>(R.id.adminClientDetailsJoined)?.text = joined
         findViewById<TextView>(R.id.adminClientDetailsTotalOrders)?.text = totalOrders.toString()
         findViewById<TextView>(R.id.adminClientDetailsPhone)?.text =

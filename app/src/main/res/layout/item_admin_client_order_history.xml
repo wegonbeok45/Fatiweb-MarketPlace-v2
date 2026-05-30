@@ -1,76 +1,86 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    style="@style/Ms.Card.Surface"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="10dp"
-    app:cardBackgroundColor="@color/profile_header_bg"
-    app:cardCornerRadius="20dp"
-    app:cardElevation="0dp"
-    app:strokeColor="@color/profile_section_stroke"
-    app:strokeWidth="1dp">
+    android:layout_marginBottom="@dimen/space_8"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="12dp">
+        android:padding="@dimen/space_12">
 
+        <!-- Thumbnail -->
         <ImageView
             android:id="@+id/adminClientOrderImage"
-            android:layout_width="74dp"
-            android:layout_height="74dp"
-            android:background="@color/colorSurfaceVariant"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:background="@color/ms_surface_sunken"
+            android:contentDescription="@string/vendor_products_cd_image"
             android:scaleType="centerCrop"
-            android:src="@drawable/placeholder" />
+            android:src="@drawable/placeholder"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-        <LinearLayout
+        <!-- Order ID + status -->
+        <TextView
+            android:id="@+id/adminClientOrderTitle"
+            style="@style/Ms.Text.BodyStrong"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:layout_weight="1"
-            android:orientation="vertical">
+            android:layout_marginStart="@dimen/space_12"
+            android:ellipsize="end"
+            android:maxLines="1"
+            app:layout_constraintEnd_toStartOf="@id/adminClientOrderTotal"
+            app:layout_constraintStart_toEndOf="@id/adminClientOrderImage"
+            app:layout_constraintTop_toTopOf="@id/adminClientOrderImage"
+            tools:text="#FW-123ABC · En attente" />
 
-            <TextView
-                android:id="@+id/adminClientOrderTitle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:ellipsize="end"
-                android:fontFamily="@font/poppins_semibold"
-                android:maxLines="1"
-                android:textColor="@color/profile_text_primary"
-                android:textSize="14sp"
-                tools:text="#FW-123ABC - Pending" />
+        <!-- Date + item count -->
+        <TextView
+            android:id="@+id/adminClientOrderMeta"
+            style="@style/Ms.Text.Label"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/space_12"
+            android:layout_marginTop="@dimen/space_2"
+            android:textColor="@color/ms_text_secondary"
+            app:layout_constraintEnd_toStartOf="@id/adminClientOrderTotal"
+            app:layout_constraintStart_toEndOf="@id/adminClientOrderImage"
+            app:layout_constraintTop_toBottomOf="@id/adminClientOrderTitle"
+            tools:text="13 mai 2026 · 2 articles" />
 
-            <TextView
-                android:id="@+id/adminClientOrderMeta"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:textColor="@color/profile_text_secondary"
-                android:textSize="12sp"
-                tools:text="13 mai 2026 - 2 articles" />
+        <!-- Product list -->
+        <TextView
+            android:id="@+id/adminClientOrderProducts"
+            style="@style/Ms.Text.Label"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/space_12"
+            android:layout_marginTop="@dimen/space_6"
+            android:lineSpacingExtra="2dp"
+            android:textColor="@color/ms_text_secondary"
+            app:layout_constraintEnd_toStartOf="@id/adminClientOrderTotal"
+            app:layout_constraintStart_toEndOf="@id/adminClientOrderImage"
+            app:layout_constraintTop_toBottomOf="@id/adminClientOrderMeta"
+            tools:text="1x Hoodie - 27 DT&#10;2x Sac - 80 DT" />
 
-            <TextView
-                android:id="@+id/adminClientOrderProducts"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="7dp"
-                android:lineSpacingExtra="2dp"
-                android:textColor="@color/profile_text_secondary"
-                android:textSize="12sp"
-                tools:text="1x Hoodie - 27 DT\n2x Sac - 80 DT" />
-        </LinearLayout>
-
+        <!-- Total -->
         <TextView
             android:id="@+id/adminClientOrderTotal"
+            style="@style/Ms.Text.Subtitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:fontFamily="@font/poppins_semibold"
-            android:textColor="@color/profile_text_primary"
-            android:textSize="15sp"
-            tools:text="52 DT" />
-    </LinearLayout>
+            android:textColor="@color/ms_accent_gold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/adminClientOrderImage"
+            tools:text="107 DT" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>

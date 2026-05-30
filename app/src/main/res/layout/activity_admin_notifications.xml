@@ -6,7 +6,7 @@
     android:id="@+id/adminNotifRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/profile_body_bg"
+    android:background="@color/ms_surface_canvas"
     tools:context=".AdminNotificationsActivity">
 
     <!-- Top App Bar -->
@@ -35,7 +35,7 @@
                 app:cardBackgroundColor="@color/profile_card_bg"
                 app:cardCornerRadius="22dp"
                 app:cardElevation="0dp"
-                app:strokeColor="@color/colorBorderLight"
+                app:strokeColor="@color/ms_border_default"
                 app:strokeWidth="1dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -47,7 +47,7 @@
                     android:contentDescription="@string/cd_stat_icon"
                     android:padding="12dp"
                     app:srcCompat="@drawable/back"
-                    app:tint="@color/profile_text_primary" />
+                    app:tint="@color/ms_text_primary" />
             </com.google.android.material.card.MaterialCardView>
 
             <TextView
@@ -56,7 +56,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/admin_top_title_margin_start"
                 android:text="@string/admin_announcements_title"
-                android:textColor="@color/profile_text_primary"
+                android:textColor="@color/ms_text_primary"
                 android:fontFamily="@font/manrope_semibold"
                 android:textSize="@dimen/app_top_bar_title_size"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -74,7 +74,7 @@
                 app:cardBackgroundColor="@color/profile_card_bg"
                 app:cardCornerRadius="22dp"
                 app:cardElevation="0dp"
-                app:strokeColor="@color/colorBorderLight"
+                app:strokeColor="@color/ms_border_default"
                 app:strokeWidth="1dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -86,14 +86,14 @@
                     android:contentDescription="@string/cd_stat_icon"
                     android:padding="12dp"
                     app:srcCompat="@drawable/settings"
-                    app:tint="@color/profile_text_primary" />
+                    app:tint="@color/ms_text_primary" />
             </com.google.android.material.card.MaterialCardView>
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="@color/profile_divider" />
+            android:background="@color/ms_border_subtle" />
     </com.google.android.material.appbar.AppBarLayout>
 
     <!-- Scrollable Content -->
@@ -242,7 +242,7 @@
                         android:fontFamily="@font/manrope_semibold"
                         android:text="@string/admin_announcements_publish"
                         android:textSize="@dimen/text_size_body"
-                        app:backgroundTint="@color/home_surface_raised"
+                        app:backgroundTint="@color/ms_surface_card"
                         android:textColor="@color/home_text_primary"
                         app:cornerRadius="16dp"
                         app:strokeWidth="0dp" />
@@ -263,7 +263,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/admin_announcements_history_title"
-                android:textColor="@color/profile_text_primary"
+                android:textColor="@color/ms_text_primary"
                 android:fontFamily="@font/manrope_semibold"
                 android:textSize="@dimen/text_size_subtitle"
                 android:layout_marginBottom="12dp" />
@@ -275,7 +275,7 @@
                 app:cardBackgroundColor="@color/profile_card_bg"
                 app:cardCornerRadius="24dp"
                 app:cardElevation="0dp"
-                app:strokeColor="@color/colorBorderLight"
+                app:strokeColor="@color/ms_border_default"
                 app:strokeWidth="1dp">
 
                 <LinearLayout
@@ -290,7 +290,7 @@
                         android:gravity="center"
                         android:padding="24dp"
                         android:text="@string/admin_announcements_empty"
-                        android:textColor="@color/profile_text_secondary"
+                        android:textColor="@color/ms_text_secondary"
                         android:textSize="@dimen/text_size_caption"
                         android:visibility="gone" />
 

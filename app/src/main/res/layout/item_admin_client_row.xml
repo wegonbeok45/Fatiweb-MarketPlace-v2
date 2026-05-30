@@ -1,25 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!--
+    Admin client list row.
+    View IDs must remain stable — AdminClientsAdapter binds to them directly.
+-->
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="76dp"
-    android:paddingStart="14dp"
-    android:paddingEnd="14dp"
+    android:layout_height="72dp"
     android:background="?selectableItemBackground"
     android:clickable="true"
-    android:focusable="true">
+    android:focusable="true"
+    android:paddingStart="@dimen/space_20"
+    android:paddingEnd="@dimen/space_20">
 
+    <!-- Avatar circle -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/adminClientAvatar"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        app:cardBackgroundColor="@color/profile_card_icon_bg"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        app:cardBackgroundColor="@color/ms_border_subtle"
         app:cardCornerRadius="999dp"
         app:cardElevation="0dp"
         app:strokeWidth="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
+
         <ImageView
             android:id="@+id/adminClientAvatarImage"
             android:layout_width="match_parent"
@@ -34,56 +42,57 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center"
-
-            android:text="@string/auto_a_7fc5"
-            android:textColor="?attr/colorPrimary"
-            android:textSize="@dimen/text_size_subtitle" />
+            android:textColor="@color/ms_accent_gold"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            tools:text="A" />
     </com.google.android.material.card.MaterialCardView>
 
+    <!-- Meta line (orders · role · joined) -->
     <TextView
         android:id="@+id/adminClientId"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-
-        android:text="@string/auto_001_0ae0"
-        android:textColor="@color/profile_text_secondary"
-        android:textSize="@dimen/text_size_overline"
-        app:layout_constraintBottom_toTopOf="@id/adminClientName"
-        app:layout_constraintStart_toEndOf="@id/adminClientAvatar"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_chainStyle="packed" />
-
-    <TextView
-        android:id="@+id/adminClientName"
+        style="@style/Ms.Text.Caption"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
+        android:layout_marginStart="@dimen/space_14"
         android:ellipsize="end"
         android:maxLines="1"
+        android:textColor="@color/ms_text_tertiary"
+        app:layout_constraintBottom_toTopOf="@id/adminClientName"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/adminClientAvatar"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
+        tools:text="3 commandes · Client · Mai 2024" />
 
-        android:text="@string/auto_ahmed_ben_ali_10ae"
-        android:textColor="@color/profile_text_primary"
-        android:textSize="@dimen/text_size_caption"
+    <!-- Display name -->
+    <TextView
+        android:id="@+id/adminClientName"
+        style="@style/Ms.Text.Label"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/space_14"
+        android:ellipsize="end"
+        android:maxLines="1"
         app:layout_constraintBottom_toTopOf="@id/adminClientEmail"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/adminClientAvatar"
-        app:layout_constraintTop_toBottomOf="@id/adminClientId" />
+        app:layout_constraintTop_toBottomOf="@id/adminClientId"
+        tools:text="Mohmed Gnounou" />
 
+    <!-- Email / phone -->
     <TextView
         android:id="@+id/adminClientEmail"
+        style="@style/Ms.Text.Caption"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
+        android:layout_marginStart="@dimen/space_14"
         android:ellipsize="end"
         android:maxLines="1"
-
-        android:text="@string/auto_ahmedbenaliemailcom_512b"
-        android:textColor="@color/profile_text_secondary"
-        android:textSize="@dimen/text_size_caption"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/adminClientAvatar"
-        app:layout_constraintTop_toBottomOf="@id/adminClientName" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+        app:layout_constraintTop_toBottomOf="@id/adminClientName"
+        tools:text="mohmed@email.com · +216 XX XXX XXX" />
 
+</androidx.constraintlayout.widget.ConstraintLayout>

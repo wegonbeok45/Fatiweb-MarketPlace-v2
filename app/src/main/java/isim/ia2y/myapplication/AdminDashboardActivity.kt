@@ -8,6 +8,7 @@ import android.view.View
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.activity.addCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -56,6 +57,7 @@ class AdminDashboardActivity : AppCompatActivity() {
             setupAdminWindowInsets(R.id.adminAppBar)
             setupTopBar()
             setupBottomNav()
+            setupBackHandling()
             setupQuickActions()
             setupObservers()
             renderAdminStatsPlaceholder()
@@ -191,6 +193,16 @@ class AdminDashboardActivity : AppCompatActivity() {
         }
     }
 
+    private fun setupBackHandling() {
+        onBackPressedDispatcher.addCallback(this) {
+            if (activeTab == DashboardInlineTab.OVERVIEW) {
+                navigateAdminBack(AdminNavTab.DASHBOARD)
+            } else {
+                switchTab(DashboardInlineTab.OVERVIEW, animate = true)
+            }
+        }
+    }
+
     override fun onResume() {
         super.onResume()
         refreshAdminBottomNav(activeTab.navTab)
@@ -242,6 +254,13 @@ class AdminDashboardActivity : AppCompatActivity() {
 
     private fun renderSelectedTab(tab: DashboardInlineTab, animate: Boolean) {
         setupAdminTopBar(getString(tab.titleRes))
+        findViewById<View?>(R.id.adminIvBack)?.setOnClickListener {
+            if (tab == DashboardInlineTab.OVERVIEW) {
+                navigateAdminBack(AdminNavTab.DASHBOARD)
+            } else {
+                switchTab(DashboardInlineTab.OVERVIEW, animate = true)
+            }
+        }
         selectAdminBottomNav(tab.navTab, animate = animate)
 
         when (tab) {

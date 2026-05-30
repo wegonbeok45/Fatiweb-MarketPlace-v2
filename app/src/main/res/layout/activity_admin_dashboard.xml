@@ -6,7 +6,7 @@
     android:id="@+id/adminRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/profile_body_bg"
+    android:background="@color/ms_surface_canvas"
     tools:context=".AdminDashboardActivity">
 
     <!-- ============ Top App Bar ============ -->
@@ -14,7 +14,7 @@
         android:id="@+id/adminAppBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/profile_body_bg"
+        android:background="@color/ms_surface_canvas"
         app:elevation="0dp"
         app:liftOnScroll="false">
 
@@ -38,7 +38,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/back"
-                app:tint="@color/profile_text_primary" />
+                app:tint="@color/ms_text_primary" />
 
             <TextView
                 android:id="@+id/adminTvTitle"
@@ -47,7 +47,7 @@
                 android:layout_marginStart="@dimen/admin_top_title_margin_start"
                 android:fontFamily="@font/manrope_semibold"
                 android:text="@string/admin_title_dashboard"
-                android:textColor="@color/profile_text_primary"
+                android:textColor="@color/ms_text_primary"
                 android:textSize="@dimen/app_top_bar_title_size"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/adminIvSettings"
@@ -60,13 +60,13 @@
                 android:layout_width="@dimen/admin_top_badge_size"
                 android:layout_height="@dimen/admin_top_badge_size"
                 android:layout_marginEnd="10dp"
-                app:cardBackgroundColor="@color/colorPrimary"
+                app:cardBackgroundColor="@color/ms_surface_inverse"
                 app:cardCornerRadius="999dp"
                 app:cardElevation="0dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:strokeColor="@color/home_ref_gold"
+                app:strokeColor="@color/ms_accent_gold"
                 app:strokeWidth="1dp">
 
                 <ImageView
@@ -75,7 +75,7 @@
                     android:layout_gravity="center"
                     android:contentDescription="@string/cd_admin_dashboard"
                     app:srcCompat="@drawable/ic_admin_shield"
-                    app:tint="@color/home_ref_gold" />
+                    app:tint="@color/ms_accent_gold" />
             </com.google.android.material.card.MaterialCardView>
 
             <ImageView
@@ -92,7 +92,7 @@
                 app:layout_constraintEnd_toStartOf="@id/adminShieldBadge"
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/settings"
-                app:tint="@color/profile_text_primary" />
+                app:tint="@color/ms_text_primary" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.appbar.AppBarLayout>
@@ -169,7 +169,7 @@
                                 android:letterSpacing="0.15"
                                 android:text="@string/admin_dashboard_welcome"
                                 android:textAllCaps="true"
-                                android:textColor="@color/home_ref_gold_soft"
+                                android:textColor="@color/ms_accent_gold_soft"
                                 android:textSize="10sp" />
                         </LinearLayout>
 
@@ -237,7 +237,7 @@
                                 android:paddingEnd="12dp"
                                 android:paddingTop="6dp"
                                 android:paddingBottom="6dp"
-                                android:textColor="@color/home_ref_gold_soft"
+                                android:textColor="@color/ms_accent_gold_soft"
                                 android:textSize="11sp"
                                 tools:text="18 produits actifs" />
                         </LinearLayout>
@@ -261,7 +261,7 @@
                                 android:layout_gravity="center"
                                 android:contentDescription="@string/cd_stat_icon"
                                 app:srcCompat="@drawable/ic_admin_shield"
-                                app:tint="@color/home_ref_gold" />
+                                app:tint="@color/ms_accent_gold" />
                         </FrameLayout>
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -288,7 +288,7 @@
                     android:layout_marginStart="10dp"
                     android:fontFamily="@font/manrope_semibold"
                     android:text="@string/admin_dashboard_overview_title"
-                    android:textColor="@color/profile_text_primary"
+                    android:textColor="@color/ms_text_primary"
                     android:textSize="15sp" />
             </LinearLayout>
 
@@ -336,7 +336,7 @@
                                 android:layout_gravity="center"
                                 android:contentDescription="@string/cd_stat_icon"
                                 app:srcCompat="@drawable/shoppingbag"
-                                app:tint="@color/home_ref_gold" />
+                                app:tint="@color/ms_accent_gold" />
                         </FrameLayout>
 
                         <TextView
@@ -346,7 +346,7 @@
                             android:layout_marginTop="14dp"
                             android:fontFamily="@font/manrope_semibold"
                             android:text="@string/str_2f43b4"
-                            android:textColor="@color/profile_text_primary"
+                            android:textColor="@color/ms_text_primary"
                             android:textSize="26sp" />
 
                         <TextView
@@ -357,7 +357,7 @@
                             android:letterSpacing="0.06"
                             android:text="@string/admin_dashboard_orders_label"
                             android:textAllCaps="true"
-                            android:textColor="@color/profile_text_secondary"
+                            android:textColor="@color/ms_text_secondary"
                             android:textSize="10sp" />
 
                         <TextView
@@ -372,7 +372,7 @@
                             android:paddingTop="3dp"
                             android:paddingBottom="3dp"
                             android:text=""
-                            android:textColor="@color/home_ref_gold"
+                            android:textColor="@color/ms_accent_gold"
                             android:textSize="10sp"
                             android:visibility="gone" />
 
@@ -382,7 +382,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="6dp"
                             android:fontFamily="@font/manrope_regular"
-                            android:textColor="@color/profile_text_secondary"
+                            android:textColor="@color/ms_text_secondary"
                             android:textSize="11sp"
                             tools:text="3 commandes en attente" />
                     </LinearLayout>
@@ -433,7 +433,7 @@
                             android:layout_marginTop="14dp"
                             android:fontFamily="@font/manrope_semibold"
                             android:text="@string/str_2f43b4"
-                            android:textColor="@color/home_ref_gold_soft"
+                            android:textColor="@color/ms_accent_gold_soft"
                             android:textSize="26sp" />
 
                         <TextView
@@ -459,7 +459,7 @@
                             android:paddingTop="3dp"
                             android:paddingBottom="3dp"
                             android:text=""
-                            android:textColor="@color/home_ref_gold_soft"
+                            android:textColor="@color/ms_accent_gold_soft"
                             android:textSize="10sp"
                             android:visibility="gone" />
 
@@ -520,7 +520,7 @@
                                 android:layout_gravity="center"
                                 android:contentDescription="@string/cd_stat_icon"
                                 app:srcCompat="@drawable/user"
-                                app:tint="@color/home_ref_gold_soft" />
+                                app:tint="@color/ms_accent_gold_soft" />
                         </FrameLayout>
 
                         <TextView
@@ -530,7 +530,7 @@
                             android:layout_marginTop="14dp"
                             android:fontFamily="@font/manrope_semibold"
                             android:text="@string/str_2f43b4"
-                            android:textColor="@color/profile_text_primary"
+                            android:textColor="@color/ms_text_primary"
                             android:textSize="26sp" />
 
                         <TextView
@@ -541,7 +541,7 @@
                             android:letterSpacing="0.06"
                             android:text="@string/admin_dashboard_customers_label"
                             android:textAllCaps="true"
-                            android:textColor="@color/profile_text_secondary"
+                            android:textColor="@color/ms_text_secondary"
                             android:textSize="10sp" />
 
                         <TextView
@@ -566,7 +566,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="6dp"
                             android:fontFamily="@font/manrope_regular"
-                            android:textColor="@color/profile_text_secondary"
+                            android:textColor="@color/ms_text_secondary"
                             android:textSize="11sp"
                             tools:text="24 comptes clients" />
                     </LinearLayout>
@@ -607,7 +607,7 @@
                                 android:layout_gravity="center"
                                 android:contentDescription="@string/cd_stat_icon"
                                 app:srcCompat="@drawable/ic_home_filter"
-                                app:tint="@color/home_ref_gold" />
+                                app:tint="@color/ms_accent_gold" />
                         </FrameLayout>
 
                         <TextView
@@ -617,7 +617,7 @@
                             android:layout_marginTop="14dp"
                             android:fontFamily="@font/manrope_semibold"
                             android:text="@string/str_2f43b4"
-                            android:textColor="@color/profile_text_primary"
+                            android:textColor="@color/ms_text_primary"
                             android:textSize="26sp" />
 
                         <TextView
@@ -628,7 +628,7 @@
                             android:letterSpacing="0.06"
                             android:text="@string/admin_dashboard_low_stock_label"
                             android:textAllCaps="true"
-                            android:textColor="@color/profile_text_secondary"
+                            android:textColor="@color/ms_text_secondary"
                             android:textSize="10sp" />
 
                         <TextView
@@ -653,7 +653,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="6dp"
                             android:fontFamily="@font/manrope_regular"
-                            android:textColor="@color/profile_text_secondary"
+                            android:textColor="@color/ms_text_secondary"
                             android:textSize="11sp"
                             tools:text="4 references inactives" />
                     </LinearLayout>
@@ -680,7 +680,7 @@
                     android:layout_marginStart="10dp"
                     android:fontFamily="@font/manrope_semibold"
                     android:text="@string/admin_dashboard_quick_actions_title"
-                    android:textColor="@color/profile_text_primary"
+                    android:textColor="@color/ms_text_primary"
                     android:textSize="15sp" />
             </LinearLayout>
 
@@ -791,7 +791,7 @@
                                 android:layout_gravity="center"
                                 android:contentDescription="@string/cd_stat_icon"
                                 app:srcCompat="@drawable/shoppingbag"
-                                app:tint="@color/home_ref_gold" />
+                                app:tint="@color/ms_accent_gold" />
                         </FrameLayout>
 
                         <TextView
@@ -801,7 +801,7 @@
                             android:fontFamily="@font/manrope_semibold"
                             android:gravity="center"
                             android:text="@string/admin_dashboard_view_orders_action"
-                            android:textColor="@color/profile_text_primary"
+                            android:textColor="@color/ms_text_primary"
                             android:textSize="12sp" />
 
                         <TextView
@@ -811,7 +811,7 @@
                             android:fontFamily="@font/manrope_regular"
                             android:gravity="center"
                             android:text="@string/admin_dashboard_quick_orders_subtitle"
-                            android:textColor="@color/profile_text_secondary"
+                            android:textColor="@color/ms_text_secondary"
                             android:textSize="10sp" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
@@ -852,7 +852,7 @@
                                 android:layout_gravity="center"
                                 android:contentDescription="@string/cd_stat_icon"
                                 app:srcCompat="@drawable/settings"
-                                app:tint="@color/home_ref_gold_soft" />
+                                app:tint="@color/ms_accent_gold_soft" />
                         </FrameLayout>
 
                         <TextView
@@ -862,7 +862,7 @@
                             android:fontFamily="@font/manrope_semibold"
                             android:gravity="center"
                             android:text="@string/admin_dashboard_settings_action"
-                            android:textColor="@color/profile_text_primary"
+                            android:textColor="@color/ms_text_primary"
                             android:textSize="12sp" />
 
                         <TextView
@@ -872,7 +872,7 @@
                             android:fontFamily="@font/manrope_regular"
                             android:gravity="center"
                             android:text="@string/admin_dashboard_quick_settings_subtitle"
-                            android:textColor="@color/profile_text_secondary"
+                            android:textColor="@color/ms_text_secondary"
                             android:textSize="10sp" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
@@ -899,7 +899,7 @@
                     android:layout_weight="1"
                     android:fontFamily="@font/manrope_semibold"
                     android:text="@string/admin_dashboard_recent_orders_title"
-                    android:textColor="@color/profile_text_primary"
+                    android:textColor="@color/ms_text_primary"
                     android:textSize="15sp" />
             </LinearLayout>
 
@@ -951,7 +951,7 @@
                                 android:layout_gravity="center"
                                 android:contentDescription="@string/cd_stat_icon"
                                 app:srcCompat="@drawable/shoppingbag"
-                                app:tint="@color/home_ref_gold" />
+                                app:tint="@color/ms_accent_gold" />
                         </FrameLayout>
 
                         <TextView
@@ -961,7 +961,7 @@
                             android:layout_marginStart="14dp"
                             android:fontFamily="@font/manrope_semibold"
                             android:text="@string/auto_fw1234_cdae"
-                            android:textColor="@color/profile_text_primary"
+                            android:textColor="@color/ms_text_primary"
                             android:textSize="13sp"
                             app:layout_constraintBottom_toTopOf="@id/adminOrderName1"
                             app:layout_constraintEnd_toStartOf="@id/adminOrderPrice1"
@@ -977,7 +977,7 @@
                             android:layout_marginTop="2dp"
                             android:fontFamily="@font/manrope_regular"
                             android:text="@string/auto_ahmed_ben_salem_1afe"
-                            android:textColor="@color/profile_text_secondary"
+                            android:textColor="@color/ms_text_secondary"
                             android:textSize="11sp"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toStartOf="@id/adminOrderPrice1"
@@ -995,7 +995,7 @@
                             android:paddingTop="5dp"
                             android:paddingBottom="5dp"
                             android:text="@string/auto_85500_dt_62c3"
-                            android:textColor="@color/home_ref_gold"
+                            android:textColor="@color/ms_accent_gold"
                             android:textSize="12sp"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
@@ -1007,7 +1007,7 @@
                         android:layout_height="1dp"
                         android:layout_marginStart="18dp"
                         android:layout_marginEnd="18dp"
-                        android:background="@color/home_ref_border" />
+                        android:background="@color/ms_border_subtle" />
 
                     <!-- Order 2 -->
                     <androidx.constraintlayout.widget.ConstraintLayout
@@ -1038,7 +1038,7 @@
                                 android:layout_gravity="center"
                                 android:contentDescription="@string/cd_stat_icon"
                                 app:srcCompat="@drawable/shoppingbag"
-                                app:tint="@color/home_ref_gold" />
+                                app:tint="@color/ms_accent_gold" />
                         </FrameLayout>
 
                         <TextView
@@ -1048,7 +1048,7 @@
                             android:layout_marginStart="14dp"
                             android:fontFamily="@font/manrope_semibold"
                             android:text="@string/auto_fw1235_d604"
-                            android:textColor="@color/profile_text_primary"
+                            android:textColor="@color/ms_text_primary"
                             android:textSize="13sp"
                             app:layout_constraintBottom_toTopOf="@id/adminOrderName2"
                             app:layout_constraintEnd_toStartOf="@id/adminOrderPrice2"
@@ -1064,7 +1064,7 @@
                             android:layout_marginTop="2dp"
                             android:fontFamily="@font/manrope_regular"
                             android:text="@string/auto_meryem_mansour_f58a"
-                            android:textColor="@color/profile_text_secondary"
+                            android:textColor="@color/ms_text_secondary"
                             android:textSize="11sp"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toStartOf="@id/adminOrderPrice2"
@@ -1082,7 +1082,7 @@
                             android:paddingTop="5dp"
                             android:paddingBottom="5dp"
                             android:text="@string/auto_120000_dt_add2"
-                            android:textColor="@color/home_ref_gold"
+                            android:textColor="@color/ms_accent_gold"
                             android:textSize="12sp"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
@@ -1094,7 +1094,7 @@
                         android:layout_height="1dp"
                         android:layout_marginStart="18dp"
                         android:layout_marginEnd="18dp"
-                        android:background="@color/home_ref_border" />
+                        android:background="@color/ms_border_subtle" />
 
                     <!-- Order 3 -->
                     <androidx.constraintlayout.widget.ConstraintLayout
@@ -1125,7 +1125,7 @@
                                 android:layout_gravity="center"
                                 android:contentDescription="@string/cd_stat_icon"
                                 app:srcCompat="@drawable/shoppingbag"
-                                app:tint="@color/home_ref_gold" />
+                                app:tint="@color/ms_accent_gold" />
                         </FrameLayout>
 
                         <TextView
@@ -1135,7 +1135,7 @@
                             android:layout_marginStart="14dp"
                             android:fontFamily="@font/manrope_semibold"
                             android:text="@string/auto_fw1236_d28a"
-                            android:textColor="@color/profile_text_primary"
+                            android:textColor="@color/ms_text_primary"
                             android:textSize="13sp"
                             app:layout_constraintBottom_toTopOf="@id/adminOrderName3"
                             app:layout_constraintEnd_toStartOf="@id/adminOrderPrice3"
@@ -1151,7 +1151,7 @@
                             android:layout_marginTop="2dp"
                             android:fontFamily="@font/manrope_regular"
                             android:text="@string/auto_sami_gharbi_b744"
-                            android:textColor="@color/profile_text_secondary"
+                            android:textColor="@color/ms_text_secondary"
                             android:textSize="11sp"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toStartOf="@id/adminOrderPrice3"
@@ -1169,7 +1169,7 @@
                             android:paddingTop="5dp"
                             android:paddingBottom="5dp"
                             android:text="@string/auto_42000_dt_aad2"
-                            android:textColor="@color/home_ref_gold"
+                            android:textColor="@color/ms_accent_gold"
                             android:textSize="12sp"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"

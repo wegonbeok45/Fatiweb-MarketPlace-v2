@@ -2,7 +2,7 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item>
         <shape android:shape="oval">
-            <solid android:color="#1AB7904F" />
+            <solid android:color="@color/market_gold_overlay_10" />
         </shape>
     </item>
     <item>
@@ -10,7 +10,7 @@
             <solid android:color="@android:color/transparent" />
             <stroke
                 android:width="1dp"
-                android:color="#33B7904F" />
+                android:color="@color/market_gold_overlay_20" />
         </shape>
     </item>
 </layer-list>

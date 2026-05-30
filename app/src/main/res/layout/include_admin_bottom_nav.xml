@@ -13,7 +13,7 @@
         android:id="@+id/adminBottomNavDivider"
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/colorBorderLight" />
+        android:background="@color/ms_border_default" />
 
     <!-- Nav bar -->
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -74,7 +74,7 @@
                 android:id="@+id/adminNavDashboardLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/auto_dashboard_2938"
+                android:text="@string/admin_title_dashboard"
                 android:textSize="@dimen/text_size_overline"
                 android:textColor="@color/home_nav_inactive"
                 android:layout_marginTop="@dimen/admin_bottom_nav_label_margin_top"
@@ -112,7 +112,7 @@
                 android:id="@+id/adminNavCommandesLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/auto_commandes_66c3"
+                android:text="@string/admin_title_orders"
                 android:textSize="@dimen/text_size_overline"
                 android:textColor="@color/home_nav_inactive"
                 android:layout_marginTop="@dimen/admin_bottom_nav_label_margin_top"
@@ -150,7 +150,7 @@
                 android:id="@+id/adminNavProduitsLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/auto_produits_88c6"
+                android:text="@string/admin_nav_products"
                 android:textSize="@dimen/text_size_overline"
                 android:textColor="@color/home_nav_inactive"
                 android:layout_marginTop="@dimen/admin_bottom_nav_label_margin_top"
@@ -188,7 +188,7 @@
                 android:id="@+id/adminNavClientsLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/auto_clients_0f55"
+                android:text="@string/admin_title_clients"
                 android:textSize="@dimen/text_size_overline"
                 android:textColor="@color/home_nav_inactive"
                 android:layout_marginTop="@dimen/admin_bottom_nav_label_margin_top"
@@ -226,7 +226,7 @@
                 android:id="@+id/adminNavNotificationsLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/auto_notifs_b962"
+                android:text="@string/admin_nav_notifs"
                 android:textSize="@dimen/text_size_overline"
                 android:textColor="@color/home_nav_inactive"
                 android:layout_marginTop="@dimen/admin_bottom_nav_label_margin_top"
@@ -264,7 +264,7 @@
                 android:id="@+id/adminNavSettingsLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/auto_paramtres_e778"
+                android:text="@string/admin_title_settings"
                 android:textSize="@dimen/text_size_overline"
                 android:textColor="@color/home_nav_inactive"
                 android:layout_marginTop="5dp"
@@ -275,4 +275,3 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </LinearLayout>
-

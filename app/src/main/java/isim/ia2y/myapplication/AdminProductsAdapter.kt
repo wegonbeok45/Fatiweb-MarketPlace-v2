@@ -15,7 +15,8 @@ class AdminProductsAdapter(
     private val onEdit: (Product) -> Unit,
     private val onDelete: (Product) -> Unit,
     private val canEdit: (Product) -> Boolean = { true },
-    private val onEditBlocked: (Product) -> Unit = {}
+    private val onEditBlocked: (Product) -> Unit = {},
+    private val onOverflow: ((View, Product) -> Unit)? = null,
 ) : ListAdapter<Product, AdminProductsAdapter.ViewHolder>(ProductDiffCallback()) {
 
     init {
@@ -37,6 +38,7 @@ class AdminProductsAdapter(
         val stateText: TextView = view.findViewById(R.id.adminProductStateText)
         val edit: View = view.findViewById(R.id.adminProductBtnEdit)
         val delete: View = view.findViewById(R.id.adminProductBtnDelete)
+        val overflow: View? = view.findViewById(R.id.adminProductOverflow)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -106,6 +108,13 @@ class AdminProductsAdapter(
             if (editable) onEdit(product) else onEditBlocked(product)
         }
         holder.delete.setOnClickListener { onDelete(product) }
+        val overflowCb = onOverflow
+        if (overflowCb != null) {
+            holder.overflow?.visibility = View.VISIBLE
+            holder.overflow?.setOnClickListener { anchor -> overflowCb(anchor, product) }
+        } else {
+            holder.overflow?.visibility = View.GONE
+        }
     }
 
 }

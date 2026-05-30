@@ -15,6 +15,15 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
 import kotlinx.coroutines.launch
 
+/**
+ * Admin settings screen — ms_ design system rebuild.
+ *
+ * Sections:
+ *  - Hero banner (store identity / subtitle)
+ *  - Delivery methods (standard + express fees, tappable → price dialog)
+ *  - Payment methods (read-only display, no actions wired)
+ *  - Debug: DB seeder button (DEBUG builds only)
+ */
 class AdminParametresActivity : AppCompatActivity() {
 
     private var currentConfig = FirestoreService.CommerceConfig()
@@ -22,8 +31,9 @@ class AdminParametresActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_admin_parametres)
-        setupAdminWindowInsets(R.id.adminParametresAppBar)
+        setContentView(R.layout.activity_admin_parametres_v2)
+
+        applyInsets()
         setupTopBar()
         setupAdminBottomNav(AdminNavTab.SETTINGS)
 
@@ -32,7 +42,6 @@ class AdminParametresActivity : AppCompatActivity() {
 
             if (savedInstanceState == null) {
                 revealViewsInOrder(
-                    R.id.adminParametresTopBar,
                     R.id.adminParamCardBoutique,
                     R.id.adminParamCardLivraison,
                     R.id.adminParamCardPaiement,
@@ -68,13 +77,38 @@ class AdminParametresActivity : AppCompatActivity() {
         refreshAdminBottomNav(AdminNavTab.SETTINGS)
     }
 
+    // ===== Insets =====
+
+    private fun applyInsets() {
+        ViewCompat.setOnApplyWindowInsetsListener(
+            findViewById(R.id.adminParametresAppBar)
+        ) { v, insets ->
+            v.updatePadding(top = insets.getInsets(WindowInsetsCompat.Type.statusBars()).top)
+            insets
+        }
+    }
+
+    // ===== Top bar =====
+
+    private fun setupTopBar() {
+        findViewById<View>(R.id.adminParamsBell)?.setOnClickListener {
+            openNotificationsScreenWithPermissionCheck()
+        }
+        applyPressFeedback(R.id.adminParamsBell)
+    }
+
+    // ===== Payment section =====
+
     private fun configurePaymentSection() {
+        // Payment rows are display-only for now
         findViewById<View>(R.id.adminParamCardPaiement)?.apply {
             alpha = 1f
             isClickable = false
             isFocusable = false
         }
     }
+
+    // ===== Delivery config =====
 
     private fun loadDeliveryConfig() {
         lifecycleScope.launch {
@@ -92,22 +126,19 @@ class AdminParametresActivity : AppCompatActivity() {
 
     private fun bindDeliveryConfig(config: FirestoreService.CommerceConfig) {
         findViewById<TextView>(R.id.adminParamLivrStandardPrice)?.text = formatDt(config.standardShippingFee)
-        findViewById<TextView>(R.id.adminParamLivrExpressPrice)?.text = formatDt(config.expressShippingFee)
+        findViewById<TextView>(R.id.adminParamLivrExpressPrice)?.text  = formatDt(config.expressShippingFee)
     }
 
     private fun setupDeliveryEdits() {
-        val standardGroup = findViewById<View>(R.id.adminParamLivrStandardEditGroup)
-        val expressGroup = findViewById<View>(R.id.adminParamLivrExpressEditGroup)
-
         applyPressFeedback(R.id.adminParamLivrStandardEditGroup, R.id.adminParamLivrExpressEditGroup)
 
-        standardGroup?.setOnClickListener {
+        findViewById<View>(R.id.adminParamLivrStandardEditGroup)?.setOnClickListener {
             showEditPriceDialog(currentConfig.standardShippingFee, "Standard") { newPrice ->
                 saveDeliveryConfig(currentConfig.copy(standardShippingFee = newPrice))
             }
         }
 
-        expressGroup?.setOnClickListener {
+        findViewById<View>(R.id.adminParamLivrExpressEditGroup)?.setOnClickListener {
             showEditPriceDialog(currentConfig.expressShippingFee, "Express") { newPrice ->
                 saveDeliveryConfig(currentConfig.copy(expressShippingFee = newPrice))
             }
@@ -128,28 +159,28 @@ class AdminParametresActivity : AppCompatActivity() {
         }
     }
 
+    // ===== Edit price dialog =====
+
     private fun showEditPriceDialog(
         currentPrice: Double,
         method: String,
-        onSave: (Double) -> Unit
+        onSave: (Double) -> Unit,
     ) {
         val dialog = Dialog(this, R.style.ThemeOverlay_MyApp_Dialog)
         dialog.setContentView(R.layout.dialog_admin_edit_price)
         dialog.window?.setBackgroundDrawable(ColorDrawable(android.graphics.Color.TRANSPARENT))
 
-        val tvTitle = dialog.findViewById<TextView>(R.id.tvEditPriceTitle)
-        val etPrice = dialog.findViewById<TextInputEditText>(R.id.etEditPrice)
+        val tvTitle  = dialog.findViewById<TextView>(R.id.tvEditPriceTitle)
+        val etPrice  = dialog.findViewById<TextInputEditText>(R.id.etEditPrice)
         val btnCancel = dialog.findViewById<MaterialButton>(R.id.btnEditPriceCancel)
-        val btnSave = dialog.findViewById<MaterialButton>(R.id.btnEditPriceSave)
+        val btnSave  = dialog.findViewById<MaterialButton>(R.id.btnEditPriceSave)
 
         val initialValue = String.format(java.util.Locale.US, "%.3f", currentPrice)
         tvTitle?.text = getString(R.string.admin_delivery_price_title, method)
         etPrice?.setText(initialValue)
         etPrice?.setSelection(initialValue.length)
 
-        btnCancel?.setOnClickListener {
-            dialog.dismiss()
-        }
+        btnCancel?.setOnClickListener { dialog.dismiss() }
 
         btnSave?.setOnClickListener {
             val newPrice = etPrice?.text.toString().trim().replace(',', '.').toDoubleOrNull()
@@ -164,12 +195,14 @@ class AdminParametresActivity : AppCompatActivity() {
         dialog.show()
     }
 
+    // ===== Debug seeder =====
+
     private fun setupSeederButton() {
-        val btnSeed = findViewById<MaterialButton>(R.id.btnAdminSeedDB)
-        btnSeed?.setOnClickListener {
+        val btnSeed = findViewById<MaterialButton>(R.id.btnAdminSeedDB) ?: return
+        btnSeed.setOnClickListener {
             btnSeed.isEnabled = false
             btnSeed.text = getString(R.string.admin_settings_debug_seed_running)
-            
+
             lifecycleScope.launch {
                 runCatching {
                     AdminSeederUtils.seedDatabase(this@AdminParametresActivity) { curr, total ->
@@ -183,13 +216,11 @@ class AdminParametresActivity : AppCompatActivity() {
                 }.onFailure {
                     btnSeed.isEnabled = true
                     btnSeed.text = getString(R.string.admin_settings_debug_seed)
-                    showMotionSnackbar(getString(R.string.admin_settings_debug_seed_failed, it.message ?: "unknown error"))
+                    showMotionSnackbar(
+                        getString(R.string.admin_settings_debug_seed_failed, it.message ?: "unknown error")
+                    )
                 }
             }
         }
-    }
-
-    private fun setupTopBar() {
-        setupAdminTopBar(getString(R.string.admin_title_settings))
     }
 }

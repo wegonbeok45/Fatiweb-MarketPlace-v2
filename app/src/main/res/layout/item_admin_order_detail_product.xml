@@ -8,10 +8,10 @@
     android:clickable="true"
     android:focusable="true"
     android:foreground="?attr/selectableItemBackground"
-    app:cardBackgroundColor="@color/profile_header_bg"
+    app:cardBackgroundColor="@color/ms_surface_canvas"
     app:cardCornerRadius="20dp"
     app:cardElevation="0dp"
-    app:strokeColor="@color/profile_section_stroke"
+    app:strokeColor="@color/ms_border_subtle"
     app:strokeWidth="1dp">
 
     <LinearLayout
@@ -24,10 +24,10 @@
         <com.google.android.material.card.MaterialCardView
             android:layout_width="96dp"
             android:layout_height="96dp"
-            app:cardBackgroundColor="@color/colorSurfaceVariant"
+            app:cardBackgroundColor="@color/ms_surface_sunken"
             app:cardCornerRadius="14dp"
             app:cardElevation="0dp"
-            app:strokeColor="@color/profile_section_stroke"
+            app:strokeColor="@color/ms_border_subtle"
             app:strokeWidth="1dp">
 
             <ImageView
@@ -50,9 +50,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
-                android:fontFamily="@font/poppins_semibold"
+                android:fontFamily="@font/manrope_semibold"
                 android:maxLines="2"
-                android:textColor="@color/profile_text_primary"
+                android:textColor="@color/ms_text_primary"
                 android:textSize="14sp"
                 tools:text="Spider Hunter Green Hoodie" />
 
@@ -61,7 +61,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:textColor="@color/profile_text_secondary"
+                android:textColor="@color/ms_text_secondary"
                 android:textSize="12sp"
                 tools:text="2 × 27 DT" />
 
@@ -76,7 +76,7 @@
                 android:paddingTop="4dp"
                 android:paddingEnd="10dp"
                 android:paddingBottom="4dp"
-                android:textColor="@color/home_ref_gold"
+                android:textColor="@color/ms_accent_gold"
                 android:textSize="13sp"
                 tools:text="54 DT" />
 
@@ -88,7 +88,7 @@
                 android:drawablePadding="4dp"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:textColor="@color/profile_text_muted"
+                android:textColor="@color/ms_text_tertiary"
                 android:textSize="11sp"
                 tools:text="Mohmed Gnounou" />
         </LinearLayout>

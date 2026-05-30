@@ -27,7 +27,7 @@
         android:id="@+id/adminInlineOrderIcon"
         android:layout_width="34dp"
         android:layout_height="34dp"
-        app:cardBackgroundColor="@color/profile_card_icon_bg"
+        app:cardBackgroundColor="@color/ms_surface_sunken"
         app:cardCornerRadius="999dp"
         app:cardElevation="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -41,7 +41,7 @@
             android:layout_gravity="center"
             android:contentDescription="@string/cd_order_status"
             app:srcCompat="@drawable/shoppingbag"
-            app:tint="?attr/colorPrimary" />
+            app:tint="@color/ms_text_primary" />
     </com.google.android.material.card.MaterialCardView>
 
     <TextView
@@ -50,7 +50,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
         android:text="@string/auto_fw0000_817a"
-        android:textColor="@color/profile_text_primary"
+        android:textColor="@color/ms_text_primary"
         android:textSize="@dimen/text_size_caption"
         app:layout_constraintBottom_toTopOf="@id/adminInlineOrderName"
         app:layout_constraintEnd_toStartOf="@id/adminInlineOrderBadge"
@@ -65,8 +65,8 @@
         android:layout_marginStart="12dp"
         android:ellipsize="end"
         android:maxLines="1"
-        android:text="@string/auto_commande_87ef"
-        android:textColor="@color/profile_text_secondary"
+        android:text="@string/admin_order_fallback_label"
+        android:textColor="@color/ms_text_secondary"
         android:textSize="@dimen/text_size_overline"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/adminInlineOrderBadge"

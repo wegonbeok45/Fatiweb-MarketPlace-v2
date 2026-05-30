@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Vendor list row for the admin vendors screen.
+  Shows: avatar chip | shop name + email | status pill | 3-dot overflow
+-->
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/Ms.Card.Surface"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="@dimen/space_10">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/space_14">
+
+        <!-- Avatar / Icon chip -->
+        <ImageView
+            android:id="@+id/adminVendorAvatar"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:background="@drawable/ms_bg_icon_chip_dark"
+            android:padding="10dp"
+            android:scaleType="centerCrop"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_admin_shield"
+            app:tint="@color/ms_accent_gold"
+            tools:ignore="ContentDescription" />
+
+        <!-- Shop name -->
+        <TextView
+            android:id="@+id/adminVendorShopName"
+            style="@style/Ms.Text.Label"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/space_12"
+            android:ellipsize="end"
+            android:maxLines="1"
+            app:layout_constraintEnd_toStartOf="@id/adminVendorOverflow"
+            app:layout_constraintStart_toEndOf="@id/adminVendorAvatar"
+            app:layout_constraintTop_toTopOf="@id/adminVendorAvatar"
+            tools:text="Boutique Fati" />
+
+        <!-- Email + joined date -->
+        <TextView
+            android:id="@+id/adminVendorEmail"
+            style="@style/Ms.Text.Caption"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/space_12"
+            android:layout_marginTop="@dimen/space_2"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:textColor="@color/ms_text_secondary"
+            app:layout_constraintEnd_toStartOf="@id/adminVendorOverflow"
+            app:layout_constraintStart_toEndOf="@id/adminVendorAvatar"
+            app:layout_constraintTop_toBottomOf="@id/adminVendorShopName"
+            tools:text="boutique@fati.tn" />
+
+        <!-- Status pill -->
+        <TextView
+            android:id="@+id/adminVendorStatus"
+            style="@style/Ms.Chip.Status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/space_12"
+            android:layout_marginTop="@dimen/space_6"
+            app:layout_constraintStart_toEndOf="@id/adminVendorAvatar"
+            app:layout_constraintTop_toBottomOf="@id/adminVendorEmail"
+            tools:text="En attente"
+            tools:background="@drawable/ms_bg_status_pending"
+            tools:textColor="@color/ms_status_pending_fg" />
+
+        <!-- 3-dot overflow -->
+        <ImageView
+            android:id="@+id/adminVendorOverflow"
+            android:layout_width="@dimen/ms_min_touch"
+            android:layout_height="@dimen/ms_min_touch"
+            android:background="?selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:contentDescription="@string/ms_action_more"
+            android:focusable="true"
+            android:padding="12dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_ms_more_vert"
+            app:tint="@color/ms_text_secondary" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>

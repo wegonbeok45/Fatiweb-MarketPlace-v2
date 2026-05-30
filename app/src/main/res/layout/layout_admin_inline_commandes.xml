@@ -30,7 +30,7 @@
                 app:cardBackgroundColor="@color/profile_card_bg"
                 app:cardCornerRadius="14dp"
                 app:cardElevation="0dp"
-                app:strokeColor="@color/colorBorderLight"
+                app:strokeColor="@color/ms_border_default"
                 app:strokeWidth="1dp">
 
                 <LinearLayout
@@ -46,14 +46,14 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/auto_0_cfcd"
-                        android:textColor="?attr/colorPrimary"
+                        android:textColor="@color/ms_text_primary"
                         android:textSize="@dimen/text_size_title" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/admin_orders_total_label"
-                        android:textColor="@color/profile_text_secondary"
+                        android:textColor="@color/ms_text_secondary"
                         android:textSize="@dimen/text_size_overline" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -67,7 +67,7 @@
                 app:cardBackgroundColor="@color/profile_card_bg"
                 app:cardCornerRadius="14dp"
                 app:cardElevation="0dp"
-                app:strokeColor="@color/colorBorderLight"
+                app:strokeColor="@color/ms_border_default"
                 app:strokeWidth="1dp">
 
                 <LinearLayout
@@ -90,7 +90,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/admin_orders_pending_label"
-                        android:textColor="@color/profile_text_secondary"
+                        android:textColor="@color/ms_text_secondary"
                         android:textSize="@dimen/text_size_overline" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -103,7 +103,7 @@
                 app:cardBackgroundColor="@color/profile_card_bg"
                 app:cardCornerRadius="14dp"
                 app:cardElevation="0dp"
-                app:strokeColor="@color/colorBorderLight"
+                app:strokeColor="@color/ms_border_default"
                 app:strokeWidth="1dp">
 
                 <LinearLayout
@@ -126,7 +126,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/admin_orders_delivered_label"
-                        android:textColor="@color/profile_text_secondary"
+                        android:textColor="@color/ms_text_secondary"
                         android:textSize="@dimen/text_size_overline" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -137,7 +137,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/space_12"
             android:text="@string/admin_orders_recent_title"
-            android:textColor="@color/profile_text_primary"
+            android:textColor="@color/ms_text_primary"
             android:textSize="@dimen/text_size_body" />
 
         <com.google.android.material.card.MaterialCardView
@@ -147,7 +147,7 @@
             app:cardBackgroundColor="@color/profile_card_bg"
             app:cardCornerRadius="16dp"
             app:cardElevation="0dp"
-            app:strokeColor="@color/colorBorderLight"
+            app:strokeColor="@color/ms_border_default"
             app:strokeWidth="1dp">
 
             <androidx.recyclerview.widget.RecyclerView

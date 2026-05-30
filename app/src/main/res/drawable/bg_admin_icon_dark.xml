@@ -3,7 +3,7 @@
     android:shape="oval">
     <gradient
         android:angle="135"
-        android:startColor="#2B261E"
-        android:endColor="#171717"
+        android:startColor="@color/market_admin_dark_start"
+        android:endColor="@color/ms_surface_inverse"
         android:type="linear" />
 </shape>

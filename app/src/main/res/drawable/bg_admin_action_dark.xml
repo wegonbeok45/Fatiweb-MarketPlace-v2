@@ -4,8 +4,8 @@
         <shape android:shape="rectangle">
             <gradient
                 android:angle="135"
-                android:startColor="#2B261E"
-                android:endColor="#171717"
+                android:startColor="@color/market_admin_dark_start"
+                android:endColor="@color/ms_surface_inverse"
                 android:type="linear" />
             <corners android:radius="20dp" />
         </shape>
@@ -15,7 +15,7 @@
             <solid android:color="@android:color/transparent" />
             <stroke
                 android:width="1dp"
-                android:color="#3DB7904F" />
+                android:color="@color/market_gold_overlay_24" />
             <corners android:radius="20dp" />
         </shape>
     </item>

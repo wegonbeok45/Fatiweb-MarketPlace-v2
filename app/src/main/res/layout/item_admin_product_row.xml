@@ -13,7 +13,7 @@
         android:id="@+id/adminProductThumb"
         android:layout_width="56dp"
         android:layout_height="56dp"
-        app:cardBackgroundColor="@color/profile_card_icon_bg"
+        app:cardBackgroundColor="@color/ms_surface_sunken"
         app:cardCornerRadius="@dimen/corner_radius_medium"
         app:cardElevation="0dp"
         app:layout_constraintStart_toStartOf="parent"
@@ -46,7 +46,7 @@
             android:contentDescription="@string/cd_edit"
             android:focusable="true"
             android:foreground="?attr/selectableItemBackgroundBorderless"
-            app:cardBackgroundColor="@color/profile_card_icon_bg"
+            app:cardBackgroundColor="@color/ms_surface_sunken"
             app:cardCornerRadius="@dimen/surface_button_corner_radius"
             app:cardElevation="0dp">
 
@@ -56,8 +56,22 @@
                 android:contentDescription="@string/cd_edit"
                 android:padding="10dp"
                 app:srcCompat="@drawable/ic_admin_edit"
-                app:tint="@color/profile_text_primary" />
+                app:tint="@color/ms_text_primary" />
         </com.google.android.material.card.MaterialCardView>
+
+        <ImageView
+            android:id="@+id/adminProductOverflow"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginStart="10dp"
+            android:layout_gravity="center_vertical"
+            android:background="?selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
+            android:contentDescription="@string/ms_action_filter"
+            android:padding="4dp"
+            app:srcCompat="@drawable/ic_ms_more_vert"
+            app:tint="@color/ms_text_secondary" />
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/adminProductBtnDelete"
@@ -68,7 +82,7 @@
             android:contentDescription="@string/cd_delete"
             android:focusable="true"
             android:foreground="?attr/selectableItemBackgroundBorderless"
-            app:cardBackgroundColor="@color/profile_logout_bg"
+            app:cardBackgroundColor="@color/ms_surface_card"
             app:cardCornerRadius="@dimen/surface_button_corner_radius"
             app:cardElevation="0dp">
 
@@ -100,7 +114,7 @@
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:maxLines="2"
-            android:textColor="@color/profile_text_primary"
+            android:textColor="@color/ms_text_primary"
             android:fontFamily="@font/manrope_semibold"
             android:textSize="@dimen/text_size_caption"
             android:textStyle="bold" />
@@ -139,7 +153,7 @@
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:textColor="?attr/colorPrimary"
+                android:textColor="@color/ms_text_primary"
                 android:fontFamily="@font/manrope_semibold"
                 android:textSize="@dimen/text_size_caption" />
 
@@ -178,7 +192,7 @@
             android:layout_marginTop="6dp"
             android:ellipsize="end"
             android:maxLines="1"
-            android:textColor="@color/profile_text_secondary"
+            android:textColor="@color/ms_text_secondary"
             android:fontFamily="@font/manrope_regular"
             android:textSize="@dimen/text_size_overline" />
     </LinearLayout>

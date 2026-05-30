@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle">
-    <solid android:color="#1AB7904F" />
+    <solid android:color="@color/market_gold_overlay_10" />
     <stroke
         android:width="1dp"
-        android:color="#33B7904F" />
+        android:color="@color/market_gold_overlay_20" />
     <corners android:radius="999dp" />
 </shape>
