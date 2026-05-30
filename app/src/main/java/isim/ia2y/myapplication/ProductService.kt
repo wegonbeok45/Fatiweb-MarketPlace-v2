@@ -11,7 +11,6 @@ import kotlinx.coroutines.tasks.await
 import java.util.Date
 import java.text.Normalizer
 import java.util.Locale
-import java.util.concurrent.Executors
 
 enum class ProductSearchSort {
     POPULAR,
@@ -50,9 +49,6 @@ object ProductService {
     private const val TAG = "ProductService"
     const val DEFAULT_PRODUCT_PAGE_SIZE = 30L
     private const val SEARCH_MAX_SCANNED_DOCS = 360
-    private val productListenerExecutor = Executors.newSingleThreadExecutor { runnable ->
-        Thread(runnable, "ProductCatalogListener").apply { isDaemon = true }
-    }
     private val db: FirebaseFirestore get() = FirebaseFirestore.getInstance()
     private val productsRef get() = db.collection(FirestoreCollections.PRODUCTS)
 
@@ -62,7 +58,13 @@ object ProductService {
             .whereEqualTo(PUBLIC_PRODUCT_QUERY_SHAPE.statusField, PUBLIC_PRODUCT_QUERY_SHAPE.statusValue)
 
     suspend fun fetchProduct(id: String): Product? {
-        val doc = productsRef.document(id).get().await()
+        val cachedDoc = runCatching { productsRef.document(id).get(Source.CACHE).await() }.getOrNull()
+        if (cachedDoc?.exists() == true) {
+            FirebaseCostTracker.read("ProductService.fetchProduct", "products/$id", 1, Source.CACHE.name)
+            return productFromMap(cachedDoc.id, cachedDoc.data ?: return null)
+        }
+        val doc = productsRef.document(id).get(Source.SERVER).await()
+        FirebaseCostTracker.read("ProductService.fetchProduct", "products/$id", if (doc.exists()) 1 else 0, Source.SERVER.name)
         val data = doc.data ?: return null
         return productFromMap(doc.id, data)
     }
@@ -76,6 +78,7 @@ object ProductService {
             .limit(limit.coerceIn(1L, 50L))
             .get(source)
             .await()
+        FirebaseCostTracker.read("ProductService.fetchProducts", "products", snapshot.size(), source.name)
         return snapshot.documents.mapNotNull { doc ->
             val data = doc.data ?: return@mapNotNull null
             productFromMap(doc.id, data)
@@ -94,6 +97,7 @@ object ProductService {
             .limit(limit.coerceIn(1L, 50L))
             .get(source)
             .await()
+        FirebaseCostTracker.read("ProductService.fetchProductsUpdatedAfter", "products", snapshot.size(), source.name)
         return snapshot.documents.mapNotNull { doc ->
             val data = doc.data ?: return@mapNotNull null
             productFromMap(doc.id, data)
@@ -156,6 +160,7 @@ object ProductService {
 
             val snapshot = pageQuery.get().await()
             val documents = snapshot.documents
+            FirebaseCostTracker.read("ProductService.searchProductsPage", "products", documents.size, "default")
             scannedDocuments += documents.size
             nextCursor = documents.lastOrNull() ?: cursor
             reachedEnd = documents.size.toLong() < fetchLimit
@@ -188,27 +193,6 @@ object ProductService {
         )
     }
 
-    fun listenToProducts(
-        onUpdate: (List<Product>) -> Unit,
-        onError: (Throwable) -> Unit = {},
-        limit: Long = DEFAULT_PRODUCT_PAGE_SIZE
-    ): com.google.firebase.firestore.ListenerRegistration {
-        return publicProductsQuery()
-            .orderBy(PUBLIC_PRODUCT_QUERY_SHAPE.updatedAtField, Query.Direction.DESCENDING)
-            .limit(limit.coerceIn(1L, 50L))
-            .addSnapshotListener(productListenerExecutor) { snapshot, error ->
-                if (error != null) {
-                    onError(error)
-                    return@addSnapshotListener
-                }
-                if (snapshot == null) return@addSnapshotListener
-                val products = snapshot.documents.mapNotNull { doc ->
-                    productFromMap(doc.id, doc.data ?: return@mapNotNull null)
-                }
-                onUpdate(products)
-            }
-    }
-
     suspend fun fetchProductsPaginated(
         pageSize: Long,
         lastDoc: DocumentSnapshot? = null,
@@ -235,6 +219,7 @@ object ProductService {
         }
 
         val snapshot = query.get(source).await()
+        FirebaseCostTracker.read("ProductService.fetchProductsPaginated", "products", snapshot.size(), source.name)
         val products = snapshot.documents
             .mapNotNull { doc -> productFromMap(doc.id, doc.data ?: return@mapNotNull null) }
         val nextDoc = if (snapshot.size() > 0) snapshot.documents[snapshot.size() - 1] else null
@@ -391,6 +376,7 @@ object ProductService {
             "isBio" to product.isBio,
             "isActive" to product.isActive,
             "status" to product.status,
+            "approvalStatus" to product.approvalStatus,
             "discountPercent" to product.discountPercentClamped,
             "searchKeywords" to product.searchKeywords.ifEmpty { generateKeywords(product) },
             "sellerId" to product.sellerId,
@@ -401,6 +387,11 @@ object ProductService {
             "sellerTotalSold" to product.sellerTotalSold,
             "sellerRating" to product.sellerRating,
             "sellerRatingCount" to product.sellerRatingCount,
+            "productType" to product.productType,
+            "attributes" to product.attributes,
+            "colorOptions" to product.colorOptions.map { it.toMap() },
+            "sizeOptions" to product.sizeOptions,
+            "variants" to product.variants.map { it.toMap() },
             "createdAt" to product.createdAt,
             "updatedAt" to (product.updatedAt ?: com.google.firebase.Timestamp.now())
         )
@@ -478,7 +469,7 @@ object ProductService {
         }
     }
 
-    private fun productFromMap(id: String, map: Map<String, Any>): Product {
+    internal fun productFromMap(id: String, map: Map<String, Any>): Product {
         val imageUrls = (map["imageUrls"] as? List<*>)
             ?.mapNotNull { verifiedRemoteImageUrl(it as? String) }
             ?.distinct()
@@ -519,6 +510,7 @@ object ProductService {
             isBio = map["isBio"] as? Boolean ?: false,
             isActive = map["isActive"] as? Boolean ?: true,
             status = map["status"] as? String ?: "published",
+            approvalStatus = map["approvalStatus"] as? String ?: "approved",
             discountPercent = (map["discountPercent"] as? Number)?.toInt() ?: 0,
             searchKeywords = (map["searchKeywords"] as? List<*>)?.mapNotNull { it as? String } ?: emptyList(),
             sellerId = map["sellerId"] as? String ?: "",
@@ -533,6 +525,19 @@ object ProductService {
                 ?: (map["sellerRatingAvg"] as? Number)?.toDouble()
                 ?: 0.0,
             sellerRatingCount = (map["sellerRatingCount"] as? Number)?.toInt() ?: 0,
+            productType = map["productType"] as? String ?: "",
+            attributes = (map["attributes"] as? Map<*, *>)
+                ?.entries
+                ?.mapNotNull { (k, v) -> (k as? String)?.let { it to v } }
+                ?.toMap()
+                ?: emptyMap(),
+            colorOptions = (map["colorOptions"] as? List<*>)
+                ?.mapNotNull { (it as? Map<*, *>)?.let(ProductColor::fromMap) }
+                ?: emptyList(),
+            sizeOptions = (map["sizeOptions"] as? List<*>)?.mapNotNull { it as? String } ?: emptyList(),
+            variants = (map["variants"] as? List<*>)
+                ?.mapNotNull { (it as? Map<*, *>)?.let(ProductVariant::fromMap) }
+                ?: emptyList(),
             createdAt = map["createdAt"],
             updatedAt = map["updatedAt"]
         )

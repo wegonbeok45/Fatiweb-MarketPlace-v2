@@ -86,8 +86,8 @@
                     app:iconGravity="textStart"
                     app:iconPadding="@dimen/space_0"
                     app:iconSize="@dimen/product_card_chip_icon_size"
-                    app:iconTint="@color/home_ref_text_primary"
-                    app:rippleColor="@color/home_ref_border" />
+                    app:iconTint="@color/ms_text_primary"
+                    app:rippleColor="@color/ms_border_subtle" />
             </FrameLayout>
         </com.google.android.material.card.MaterialCardView>
 
@@ -104,7 +104,7 @@
             android:lineSpacingExtra="@dimen/space_2"
             android:maxLines="2"
             android:minLines="2"
-            android:textColor="@color/home_ref_text_primary"
+            android:textColor="@color/ms_text_primary"
             android:textSize="@dimen/product_card_text_title"
             app:layout_constraintEnd_toStartOf="@id/tvFavoritePrice"
             app:layout_constraintStart_toStartOf="parent"
@@ -121,7 +121,7 @@
             android:fontFamily="@font/manrope_bold"
             android:includeFontPadding="false"
             android:maxLines="1"
-            android:textColor="@color/home_ref_text_primary"
+            android:textColor="@color/ms_text_primary"
             android:textSize="@dimen/product_card_text_price"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/cardFavoriteImage"
@@ -163,7 +163,7 @@
                 android:layout_height="@dimen/product_card_star_size"
                 android:contentDescription="@null"
                 app:srcCompat="@drawable/ic_home_star"
-                app:tint="@color/home_ref_gold" />
+                app:tint="@color/ms_accent_gold" />
 
             <TextView
                 android:id="@+id/tvFavoriteRating"

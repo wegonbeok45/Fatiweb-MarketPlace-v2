@@ -36,7 +36,7 @@
             style="@style/AppTopBar.Title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/auto_text_024"
+            android:text="@string/favorites_title"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -65,7 +65,7 @@
         android:id="@+id/viewBottomDivider"
         android:layout_width="0dp"
         android:layout_height="@dimen/divider_height"
-        android:background="@color/profile_divider"
+        android:background="@color/ms_border_subtle"
         app:layout_constraintBottom_toTopOf="@id/layoutBottomNav"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -112,7 +112,7 @@
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="88dp"
                     android:layout_height="88dp"
-                    app:cardBackgroundColor="@color/home_surface_raised"
+                    app:cardBackgroundColor="@color/ms_surface_card"
                     app:cardCornerRadius="@dimen/corner_radius_large"
                     app:cardElevation="0dp"
                     app:strokeColor="@color/colorOutline"
@@ -125,7 +125,7 @@
                         android:alpha="0.8"
                         android:contentDescription="@string/cd_back"
                         app:srcCompat="@drawable/ic_bottom_nav_favorites"
-                        app:tint="?attr/colorPrimary" />
+                        app:tint="@color/ms_text_primary" />
                 </com.google.android.material.card.MaterialCardView>
 
                 <TextView
@@ -135,7 +135,7 @@
                     android:layout_marginTop="@dimen/space_16"
                     android:fontFamily="@font/manrope_semibold"
                     android:gravity="center"
-                    android:text="@string/auto_text_025"
+                    android:text="@string/favorites_empty_title"
                     android:textColor="@color/home_text_primary"
                     android:textSize="@dimen/text_size_subtitle"
                     android:textStyle="bold" />
@@ -163,7 +163,7 @@
                     android:textAllCaps="false"
                     android:textColor="@android:color/white"
                     android:paddingHorizontal="@dimen/space_24"
-                    app:backgroundTint="?attr/colorPrimary"
+                    app:backgroundTint="@color/ms_surface_inverse"
                     app:cornerRadius="@dimen/corner_radius_large"
                     app:elevation="0dp" />
             </LinearLayout>

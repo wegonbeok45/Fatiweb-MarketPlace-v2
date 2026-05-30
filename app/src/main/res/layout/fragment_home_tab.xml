@@ -45,19 +45,19 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:fontFamily="serif"
+                    android:fontFamily="@font/manrope_bold"
                     android:includeFontPadding="false"
                     android:text="Fati"
-                    android:textColor="@color/home_ref_text_primary"
+                    android:textColor="@color/ms_text_primary"
                     android:textSize="35sp" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:fontFamily="serif"
+                    android:fontFamily="@font/manrope_bold"
                     android:includeFontPadding="false"
                     android:text="Web"
-                    android:textColor="@color/home_ref_gold"
+                    android:textColor="@color/ms_accent_gold"
                     android:textSize="35sp" />
             </LinearLayout>
 
@@ -82,7 +82,7 @@
                         android:layout_gravity="center"
                         android:contentDescription="@string/messaging_title"
                         app:srcCompat="@drawable/ic_chat_bubble"
-                        app:tint="@color/home_ref_nav_icon" />
+                        app:tint="@color/ms_text_secondary" />
 
                     <com.google.android.material.card.MaterialCardView
                         android:id="@+id/cardTopCartBadge"
@@ -92,7 +92,7 @@
                         android:layout_marginTop="1dp"
                         android:layout_marginEnd="1dp"
                         android:visibility="gone"
-                        app:cardBackgroundColor="@color/home_ref_gold"
+                        app:cardBackgroundColor="@color/ms_accent_gold"
                         app:cardCornerRadius="@dimen/corner_radius_round"
                         app:cardElevation="0dp"
                         app:strokeWidth="0dp">
@@ -123,7 +123,7 @@
                         android:layout_gravity="center"
                         android:importantForAccessibility="no"
                         app:srcCompat="@drawable/ic_bottom_nav_favorites"
-                        app:tint="@color/home_ref_nav_icon" />
+                        app:tint="@color/ms_text_secondary" />
                 </FrameLayout>
 
                 <FrameLayout
@@ -139,7 +139,7 @@
                         android:layout_gravity="center"
                         android:contentDescription="@string/notifications_title"
                         app:srcCompat="@drawable/notification"
-                        app:tint="@color/home_ref_nav_icon" />
+                        app:tint="@color/ms_text_secondary" />
 
                     <View
                         android:id="@+id/notificationBadge"
@@ -149,7 +149,7 @@
                         android:layout_marginTop="9dp"
                         android:layout_marginEnd="9dp"
                         android:background="@drawable/bg_notification_badge"
-                        android:backgroundTint="@color/home_ref_gold"
+                        android:backgroundTint="@color/ms_accent_gold"
                         android:visibility="gone" />
                 </FrameLayout>
             </LinearLayout>
@@ -285,8 +285,8 @@
                         android:layout_weight="1"
                         android:fontFamily="@font/manrope_semibold"
                         android:text="@string/home_ref_categories_title"
-                        android:textColor="@color/home_ref_text_primary"
-                        android:textSize="22sp" />
+                        android:textColor="@color/ms_text_primary"
+                        android:textSize="@dimen/text_size_title" />
 
                     <LinearLayout
                         android:id="@+id/tvCategoriesSeeAll"
@@ -302,7 +302,7 @@
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/manrope_medium"
                             android:text="@string/home_ref_see_all"
-                            android:textColor="@color/home_ref_text_primary"
+                            android:textColor="@color/ms_text_primary"
                             android:textSize="15sp" />
 
                         <ImageView
@@ -311,7 +311,7 @@
                             android:layout_marginStart="4dp"
                             android:contentDescription="@null"
                             app:srcCompat="@drawable/ic_profile_chevron_right"
-                            app:tint="@color/home_ref_text_primary" />
+                            app:tint="@color/ms_text_primary" />
                     </LinearLayout>
                 </LinearLayout>
 
@@ -390,8 +390,8 @@
                         android:layout_weight="1"
                         android:fontFamily="@font/manrope_semibold"
                         android:text="@string/home_ref_featured_title"
-                        android:textColor="@color/home_ref_text_primary"
-                        android:textSize="22sp" />
+                        android:textColor="@color/ms_text_primary"
+                        android:textSize="@dimen/text_size_title" />
 
                     <LinearLayout
                         android:id="@+id/tvFeaturedProductsSeeAll"
@@ -407,7 +407,7 @@
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/manrope_medium"
                             android:text="@string/home_ref_see_all"
-                            android:textColor="@color/home_ref_text_primary"
+                            android:textColor="@color/ms_text_primary"
                             android:textSize="15sp" />
 
                         <ImageView
@@ -416,7 +416,7 @@
                             android:layout_marginStart="4dp"
                             android:contentDescription="@null"
                             app:srcCompat="@drawable/ic_profile_chevron_right"
-                            app:tint="@color/home_ref_text_primary" />
+                            app:tint="@color/ms_text_primary" />
                     </LinearLayout>
                 </LinearLayout>
 
@@ -484,7 +484,7 @@
                     app:cardBackgroundColor="@color/home_ref_surface"
                     app:cardCornerRadius="18dp"
                     app:cardElevation="0dp"
-                    app:strokeColor="@color/home_ref_border"
+                    app:strokeColor="@color/ms_border_subtle"
                     app:strokeWidth="1dp">
 
                     <LinearLayout
@@ -510,7 +510,7 @@
                             android:layout_marginTop="12dp"
                             android:fontFamily="@font/manrope_semibold"
                             android:text="@string/home_offline_title"
-                            android:textColor="@color/home_ref_text_primary"
+                            android:textColor="@color/ms_text_primary"
                             android:textSize="16sp" />
 
                         <TextView
@@ -566,7 +566,7 @@
                             android:letterSpacing="0.08"
                             android:text="@string/home_promo_eyebrow"
                             android:textAllCaps="true"
-                            android:textColor="#FFF5E0"
+                            android:textColor="@color/ms_text_inverse_muted"
                             android:textSize="10sp" />
 
                         <TextView
@@ -578,7 +578,7 @@
                             android:lineSpacingExtra="2dp"
                             android:maxLines="2"
                             android:text="@string/home_promo_title"
-                            android:textColor="#FFFFFF"
+                            android:textColor="@color/ms_text_inverse"
                             android:textSize="20sp" />
 
                         <TextView
@@ -589,7 +589,7 @@
                             android:includeFontPadding="false"
                             android:maxLines="2"
                             android:text="@string/home_promo_subtitle"
-                            android:textColor="#F2EEDD"
+                            android:textColor="@color/ms_text_inverse_muted"
                             android:textSize="12sp" />
 
                         <LinearLayout
@@ -623,20 +623,31 @@
                         </LinearLayout>
                     </LinearLayout>
 
-                    <TextView
+                    <com.google.android.material.card.MaterialCardView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="12dp"
-                        android:fontFamily="@font/manrope_bold"
-                        android:includeFontPadding="false"
-                        android:rotation="-8"
-                        android:shadowColor="#33000000"
-                        android:shadowDx="0"
-                        android:shadowDy="2"
-                        android:shadowRadius="6"
-                        android:text="-30%"
-                        android:textColor="#FFFFFF"
-                        android:textSize="42sp" />
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginStart="16dp"
+                        app:cardBackgroundColor="@color/overlay_white_20"
+                        app:cardCornerRadius="@dimen/corner_radius_round"
+                        app:cardElevation="0dp"
+                        app:strokeWidth="0dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/manrope_bold"
+                            android:includeFontPadding="false"
+                            android:paddingStart="14dp"
+                            android:paddingTop="10dp"
+                            android:paddingEnd="14dp"
+                            android:paddingBottom="10dp"
+                            android:text="@string/home_promo_eyebrow"
+                            android:textAllCaps="true"
+                            android:textColor="@color/ms_text_inverse"
+                            android:textSize="12sp" />
+
+                    </com.google.android.material.card.MaterialCardView>
                 </LinearLayout>
 
                 <LinearLayout
@@ -655,8 +666,8 @@
                         android:layout_weight="1"
                         android:fontFamily="@font/manrope_semibold"
                         android:text="@string/home_ref_latest_title"
-                        android:textColor="@color/home_ref_text_primary"
-                        android:textSize="22sp" />
+                        android:textColor="@color/ms_text_primary"
+                        android:textSize="@dimen/text_size_title" />
 
                     <LinearLayout
                         android:id="@+id/tvLatestProductsSeeAll"
@@ -672,7 +683,7 @@
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/manrope_medium"
                             android:text="@string/home_ref_see_all"
-                            android:textColor="@color/home_ref_text_primary"
+                            android:textColor="@color/ms_text_primary"
                             android:textSize="15sp" />
 
                         <ImageView
@@ -681,7 +692,7 @@
                             android:layout_marginStart="4dp"
                             android:contentDescription="@null"
                             app:srcCompat="@drawable/ic_profile_chevron_right"
-                            app:tint="@color/home_ref_text_primary" />
+                            app:tint="@color/ms_text_primary" />
                     </LinearLayout>
                 </LinearLayout>
 
@@ -749,7 +760,7 @@
                     app:cardBackgroundColor="@color/home_ref_surface"
                     app:cardCornerRadius="18dp"
                     app:cardElevation="0dp"
-                    app:strokeColor="@color/home_ref_border"
+                    app:strokeColor="@color/ms_border_subtle"
                     app:strokeWidth="1dp">
 
                     <LinearLayout
@@ -775,7 +786,7 @@
                             android:layout_marginTop="12dp"
                             android:fontFamily="@font/manrope_semibold"
                             android:text="@string/home_offline_title"
-                            android:textColor="@color/home_ref_text_primary"
+                            android:textColor="@color/ms_text_primary"
                             android:textSize="16sp" />
 
                         <TextView
@@ -853,7 +864,7 @@
                                 android:paddingBottom="5dp"
                                 android:text="@string/home_editorial_eyebrow"
                                 android:textAllCaps="true"
-                                android:textColor="#EDD09A"
+                                android:textColor="@color/ms_accent_gold_soft"
                                 android:textSize="10sp" />
 
                             <TextView
@@ -862,12 +873,12 @@
                                 android:layout_marginTop="10dp"
                                 android:fontFamily="@font/manrope_semibold"
                                 android:includeFontPadding="false"
-                                android:shadowColor="#80000000"
+                                android:shadowColor="@color/colorScrim"
                                 android:shadowDx="0"
                                 android:shadowDy="2"
                                 android:shadowRadius="6"
                                 android:text="@string/home_editorial_title"
-                                android:textColor="#FFFFFF"
+                                android:textColor="@color/ms_text_inverse"
                                 android:textSize="26sp" />
 
                             <TextView
@@ -880,7 +891,7 @@
                                 android:lineSpacingExtra="2dp"
                                 android:maxLines="2"
                                 android:text="@string/home_editorial_subtitle"
-                                android:textColor="#E6FFFFFF"
+                                android:textColor="@color/overlay_white_90"
                                 android:textSize="12sp" />
                         </LinearLayout>
 
@@ -934,8 +945,8 @@
                         android:layout_weight="1"
                         android:fontFamily="@font/manrope_semibold"
                         android:text="@string/home_ref_discover_title"
-                        android:textColor="@color/home_ref_text_primary"
-                        android:textSize="22sp" />
+                        android:textColor="@color/ms_text_primary"
+                        android:textSize="@dimen/text_size_title" />
 
                     <LinearLayout
                         android:id="@+id/tvDiscoverProductsSeeAll"
@@ -951,7 +962,7 @@
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/manrope_medium"
                             android:text="@string/home_ref_see_all"
-                            android:textColor="@color/home_ref_text_primary"
+                            android:textColor="@color/ms_text_primary"
                             android:textSize="15sp" />
 
                         <ImageView
@@ -960,7 +971,7 @@
                             android:layout_marginStart="4dp"
                             android:contentDescription="@null"
                             app:srcCompat="@drawable/ic_profile_chevron_right"
-                            app:tint="@color/home_ref_text_primary" />
+                            app:tint="@color/ms_text_primary" />
                     </LinearLayout>
                 </LinearLayout>
 
@@ -1028,7 +1039,7 @@
                     app:cardBackgroundColor="@color/home_ref_surface"
                     app:cardCornerRadius="18dp"
                     app:cardElevation="0dp"
-                    app:strokeColor="@color/home_ref_border"
+                    app:strokeColor="@color/ms_border_subtle"
                     app:strokeWidth="1dp">
 
                     <LinearLayout
@@ -1054,7 +1065,7 @@
                             android:layout_marginTop="12dp"
                             android:fontFamily="@font/manrope_semibold"
                             android:text="@string/home_offline_title"
-                            android:textColor="@color/home_ref_text_primary"
+                            android:textColor="@color/ms_text_primary"
                             android:textSize="16sp" />
 
                         <TextView
@@ -1103,7 +1114,7 @@
                         android:letterSpacing="0.08"
                         android:text="@string/home_community_eyebrow"
                         android:textAllCaps="true"
-                        android:textColor="#EDD09A"
+                        android:textColor="@color/ms_accent_gold_soft"
                         android:textSize="10sp" />
 
                     <TextView
@@ -1113,8 +1124,8 @@
                         android:fontFamily="@font/manrope_semibold"
                         android:includeFontPadding="false"
                         android:text="@string/home_community_title"
-                        android:textColor="#FFFFFF"
-                        android:textSize="22sp" />
+                        android:textColor="@color/ms_text_inverse"
+                        android:textSize="@dimen/text_size_title" />
 
                     <TextView
                         android:layout_width="match_parent"
@@ -1124,7 +1135,7 @@
                         android:includeFontPadding="false"
                         android:lineSpacingExtra="3dp"
                         android:text="@string/home_community_subtitle"
-                        android:textColor="#CFC9BE"
+                        android:textColor="@color/ms_text_inverse_muted"
                         android:textSize="13sp" />
 
                     <LinearLayout
@@ -1161,109 +1172,5 @@
         </androidx.core.widget.NestedScrollView>
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-    <View
-        android:id="@+id/layoutBottomNav"
-        android:layout_width="0dp"
-        android:layout_height="1dp"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <View
-        android:id="@+id/viewBottomDivider"
-        android:layout_width="1dp"
-        android:layout_height="1dp"
-        android:visibility="gone"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <FrameLayout
-        android:id="@+id/chatContainer"
-        android:layout_width="1dp"
-        android:layout_height="1dp"
-        android:visibility="gone"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <ImageView
-        android:id="@+id/ivFeaturedEditMain"
-        android:layout_width="1dp"
-        android:layout_height="1dp"
-        android:visibility="gone"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <ImageView
-        android:id="@+id/ivFeaturedEditLeft"
-        android:layout_width="1dp"
-        android:layout_height="1dp"
-        android:visibility="gone"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <ImageView
-        android:id="@+id/ivFeaturedEditRight"
-        android:layout_width="1dp"
-        android:layout_height="1dp"
-        android:visibility="gone"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <View
-        android:id="@+id/cardShopCategoryCraft"
-        android:layout_width="1dp"
-        android:layout_height="1dp"
-        android:visibility="gone"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <View
-        android:id="@+id/cardShopCategoryDecor"
-        android:layout_width="1dp"
-        android:layout_height="1dp"
-        android:visibility="gone"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <View
-        android:id="@+id/cardShopCategoryFood"
-        android:layout_width="1dp"
-        android:layout_height="1dp"
-        android:visibility="gone"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <View
-        android:id="@+id/cardShopCategoryFashion"
-        android:layout_width="1dp"
-        android:layout_height="1dp"
-        android:visibility="gone"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <View
-        android:id="@+id/cardShopCategoryBeauty"
-        android:layout_width="1dp"
-        android:layout_height="1dp"
-        android:visibility="gone"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <View
-        android:id="@+id/cardBannerSecondary"
-        android:layout_width="1dp"
-        android:layout_height="1dp"
-        android:visibility="gone"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <View
-        android:id="@+id/messageBadge"
-        android:layout_width="1dp"
-        android:layout_height="1dp"
-        android:visibility="gone"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

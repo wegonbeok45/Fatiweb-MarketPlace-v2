@@ -1,9 +1,12 @@
 package isim.ia2y.myapplication
 
+import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.ListAdapter
@@ -56,6 +59,9 @@ class HomeCatalogAdapter(
         private val rating = itemView.findViewById<TextView>(R.id.homeDynamicProductRating)
         private val category = itemView.findViewById<TextView>(R.id.homeDynamicProductCategory)
         private val favorite = itemView.findViewById<ImageView>(R.id.homeDynamicFavoriteButton)
+        private val variantHints = itemView.findViewById<View?>(R.id.homeDynamicVariantHints)
+        private val colorDotsRow = itemView.findViewById<LinearLayout?>(R.id.homeDynamicColorDotsRow)
+        private val sizeHint = itemView.findViewById<TextView?>(R.id.homeDynamicSizeHint)
 
         fun bind(product: Product) {
             val ctx = itemView.context
@@ -95,6 +101,8 @@ class HomeCatalogAdapter(
                 if (pos != RecyclerView.NO_POSITION) notifyItemChanged(pos)
             }
 
+            bindVariantHints(product)
+
             itemView.setOnClickListener { onOpenProduct(product) }
             itemView.setOnTouchListener { v, event ->
                 when (event.action) {
@@ -106,6 +114,74 @@ class HomeCatalogAdapter(
                     }
                 }
                 false
+            }
+        }
+
+        private fun bindVariantHints(product: Product) {
+            val ctx = itemView.context
+            val colors = product.colorOptions.take(5)
+            val sizes = product.sizeOptions
+            val hasColors = colors.isNotEmpty()
+            val hasSizes = sizes.isNotEmpty()
+            val showHints = hasColors || hasSizes
+
+            variantHints?.visibility = if (showHints) View.VISIBLE else View.GONE
+            if (!showHints) return
+
+            // Color dots
+            colorDotsRow?.removeAllViews()
+            if (hasColors) {
+                val dotSizePx = (10 * ctx.resources.displayMetrics.density).toInt()
+                val dotMarginPx = (3 * ctx.resources.displayMetrics.density).toInt()
+                val visibleColors = colors.take(4)
+                visibleColors.forEach { color ->
+                    val dot = View(ctx)
+                    val bg = GradientDrawable().apply {
+                        shape = GradientDrawable.OVAL
+                        val parsedColor = runCatching { Color.parseColor(
+                            if (color.hex.startsWith("#")) color.hex else "#${color.hex}"
+                        ) }.getOrNull()
+                        if (parsedColor != null) {
+                            setColor(parsedColor)
+                            setStroke((1 * ctx.resources.displayMetrics.density).toInt(),
+                                ContextCompat.getColor(ctx, R.color.ms_border_default))
+                        } else {
+                            setColor(ContextCompat.getColor(ctx, R.color.ms_surface_sunken))
+                            setStroke((1 * ctx.resources.displayMetrics.density).toInt(),
+                                ContextCompat.getColor(ctx, R.color.ms_border_default))
+                        }
+                    }
+                    dot.background = bg
+                    val lp = LinearLayout.LayoutParams(dotSizePx, dotSizePx).apply {
+                        marginEnd = dotMarginPx
+                    }
+                    colorDotsRow?.addView(dot, lp)
+                }
+                if (colors.size > 4) {
+                    val overflow = TextView(ctx).apply {
+                        text = "+${colors.size - 4}"
+                        textSize = 9f
+                        setTypeface(null, android.graphics.Typeface.BOLD)
+                        setTextColor(ContextCompat.getColor(ctx, R.color.ms_text_tertiary))
+                    }
+                    colorDotsRow?.addView(overflow)
+                }
+                colorDotsRow?.visibility = View.VISIBLE
+            } else {
+                colorDotsRow?.visibility = View.GONE
+            }
+
+            // Size hint
+            if (hasSizes && sizeHint != null) {
+                val sizeText = sizes.take(4).joinToString(" · ")
+                val suffix = if (sizes.size > 4) " ..." else ""
+                sizeHint.text = "$sizeText$suffix"
+                sizeHint.visibility = View.VISIBLE
+                // Only show size if no colors, OR show next to dots
+                if (!hasColors) sizeHint.layoutParams =
+                    (sizeHint.layoutParams as? LinearLayout.LayoutParams)?.also { it.marginStart = 0 }
+            } else {
+                sizeHint?.visibility = View.GONE
             }
         }
 

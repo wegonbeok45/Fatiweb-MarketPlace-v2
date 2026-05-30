@@ -86,11 +86,11 @@
                 android:fontFamily="@font/manrope_semibold"
                 android:includeFontPadding="false"
                 android:maxLines="2"
-                android:shadowColor="#66000000"
+                android:shadowColor="@color/overlay_black_40"
                 android:shadowDx="0"
                 android:shadowDy="1"
                 android:shadowRadius="4"
-                android:textColor="#FFFFFF"
+                android:textColor="@color/ms_text_inverse"
                 android:textSize="16sp"
                 tools:text="Artisanat &amp; déco" />
         </LinearLayout>

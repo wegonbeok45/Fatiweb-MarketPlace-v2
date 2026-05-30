@@ -2,6 +2,7 @@ package isim.ia2y.myapplication
 
 import androidx.annotation.DrawableRes
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Source
 import kotlinx.coroutines.tasks.await
 import java.text.Normalizer
 import java.util.Locale
@@ -27,10 +28,12 @@ data class MarketplaceCategory(
 
 object MarketplaceCategories {
     private const val COLLECTION = "marketplaceCategories"
+    private const val REFRESH_TTL_MS = 24L * 60 * 60 * 1000
     private val locale: Locale get() = Locale.getDefault()
     private val fallbackItems: List<MarketplaceCategory> by lazy { buildFallbackItems() }
     @Volatile private var remoteItems: List<MarketplaceCategory>? = null
     @Volatile private var cachedSnapshot: CategorySnapshot? = null
+    @Volatile private var lastServerRefreshAt: Long = 0L
 
     val items: List<MarketplaceCategory>
         get() = snapshot().topLevel
@@ -39,16 +42,42 @@ object MarketplaceCategories {
         get() = snapshot().featured
 
     suspend fun refreshFromFirestore() {
-        val snapshot = FirebaseFirestore.getInstance()
+        if (remoteItems != null && System.currentTimeMillis() - lastServerRefreshAt < REFRESH_TTL_MS) return
+
+        val db = FirebaseFirestore.getInstance()
+        val cachedSnapshot = runCatching {
+            db
+                .collection(COLLECTION)
+                .whereEqualTo("isActive", true)
+                .get(Source.CACHE)
+                .await()
+        }.getOrNull()
+        if (cachedSnapshot != null && !cachedSnapshot.isEmpty) {
+            FirebaseCostTracker.read("MarketplaceCategories.refreshFromFirestore", COLLECTION, cachedSnapshot.size(), Source.CACHE.name)
+            applyRemoteSnapshot(cachedSnapshot.documents.mapNotNull { doc ->
+                val data = doc.data ?: return@mapNotNull null
+                categoryFromMap(doc.id, data)
+            })
+            if (FirebaseCostSafeMode.enabled) return
+        }
+
+        if (FirebaseCostSafeMode.enabled) return
+
+        val snapshot = db
             .collection(COLLECTION)
             .whereEqualTo("isActive", true)
-            .get()
+            .get(Source.SERVER)
             .await()
+        FirebaseCostTracker.read("MarketplaceCategories.refreshFromFirestore", COLLECTION, snapshot.size(), Source.SERVER.name)
 
-        val loaded = snapshot.documents.mapNotNull { doc ->
+        applyRemoteSnapshot(snapshot.documents.mapNotNull { doc ->
             val data = doc.data ?: return@mapNotNull null
             categoryFromMap(doc.id, data)
-        }
+        })
+        lastServerRefreshAt = System.currentTimeMillis()
+    }
+
+    private fun applyRemoteSnapshot(loaded: List<MarketplaceCategory>) {
         if (loaded.any { it.level == 0 }) {
             remoteItems = loaded.sortedWith(compareBy<MarketplaceCategory> { it.level }.thenBy { it.sortOrder })
             cachedSnapshot = null

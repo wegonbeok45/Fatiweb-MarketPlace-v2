@@ -57,6 +57,7 @@ object FavoritesStore {
         favorites: Set<String>,
         attempt: Int = 0
     ) {
+        if (FirebaseCostSafeMode.enabled) return
         val uid = currentUidOrNull() ?: return
         val appContext = context.applicationContext
         val syncToken = System.nanoTime()
@@ -113,6 +114,7 @@ object FavoritesStore {
     }
 
     suspend fun refreshFromCloud(context: Context): Set<String> {
+        if (FirebaseCostSafeMode.enabled) return getFavorites(context)
         val uid = currentUidOrNull() ?: return getFavorites(context)
         val localFavorites = getFavorites(context)
         val remoteFavorites = runCatching { FirestoreService.fetchFavorites(uid) }
@@ -129,6 +131,7 @@ object FavoritesStore {
     }
 
     suspend fun mergeGuestFavoritesIntoCurrent(context: Context) {
+        if (FirebaseCostSafeMode.enabled) return
         val uid = currentUidOrNull() ?: return
         val guestPrefs = prefsForAccount(context, GUEST_KEY)
         val guestFavorites = guestPrefs.getStringSet(KEY_IDS, emptySet()).orEmpty()

@@ -28,6 +28,7 @@ data class Product(
     val isBio: Boolean = false,
     val isActive: Boolean = true,
     val status: String = "published",
+    val approvalStatus: String = "approved",
     val discountPercent: Int = 0,
     val searchKeywords: List<String> = emptyList(),
     val sellerId: String = "",
@@ -38,6 +39,11 @@ data class Product(
     val sellerTotalSold: Int = 0,
     val sellerRating: Double = 0.0,
     val sellerRatingCount: Int = 0,
+    val productType: String = "",
+    val attributes: Map<String, Any?> = emptyMap(),
+    val colorOptions: List<ProductColor> = emptyList(),
+    val sizeOptions: List<String> = emptyList(),
+    val variants: List<ProductVariant> = emptyList(),
     val createdAt: Any? = null,
     val updatedAt: Any? = null
 ) {
@@ -81,6 +87,40 @@ data class Product(
 
     val sellerDisplayName: String
         get() = sellerName.trim().ifBlank { "Fati" }
+
+    val activeVariants: List<ProductVariant> get() = variants.filter { it.active }
+
+    val hasVariants: Boolean get() = activeVariants.isNotEmpty()
+
+    val requiresColorSelection: Boolean
+        get() = hasVariants && activeVariants.any { it.colorName.isNotBlank() }
+
+    val requiresSizeSelection: Boolean
+        get() = hasVariants && activeVariants.any { it.size.isNotBlank() }
+
+    /** Total purchasable stock: sum of active variant stock when variants exist, else the flat [stock]. */
+    val effectiveStock: Int
+        get() = if (hasVariants) activeVariants.sumOf { it.stock } else stock
+
+    fun variantById(variantId: String?): ProductVariant? {
+        if (variantId.isNullOrBlank()) return null
+        return variants.firstOrNull { it.variantId == variantId }
+    }
+
+    fun variantFor(colorName: String?, size: String?): ProductVariant? {
+        val color = colorName?.trim().orEmpty()
+        val sz = size?.trim().orEmpty()
+        return activeVariants.firstOrNull {
+            it.colorName.equals(color, ignoreCase = true) && it.size.equals(sz, ignoreCase = true)
+        }
+    }
+
+    /** Unit price in major units for a specific variant, honoring its price override. */
+    fun unitPriceForVariant(variant: ProductVariant?): Double {
+        val overrideMinor = variant?.priceOverrideMinor ?: return unitPrice
+        val base = fromMinorUnits(overrideMinor)
+        return if (hasDiscount) base * (1.0 - discountPercentClamped / 100.0) else base
+    }
 }
 
 @DrawableRes

@@ -4,5 +4,5 @@
     <solid android:color="@color/home_heart_bg" />
     <stroke
         android:width="@dimen/stroke_width_default"
-        android:color="@color/colorBorderLight" />
+        android:color="@color/ms_border_default" />
 </shape>

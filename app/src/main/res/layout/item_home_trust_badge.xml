@@ -24,7 +24,7 @@
             android:layout_gravity="center"
             android:contentDescription="@null"
             app:srcCompat="@drawable/ic_checkout_truck"
-            app:tint="@color/home_ref_gold" />
+            app:tint="@color/ms_accent_gold" />
     </FrameLayout>
 
     <LinearLayout
@@ -42,7 +42,7 @@
             android:fontFamily="@font/manrope_semibold"
             android:includeFontPadding="false"
             android:maxLines="1"
-            android:textColor="@color/home_ref_text_primary"
+            android:textColor="@color/ms_text_primary"
             android:textSize="13sp"
             tools:text="Free delivery" />
 

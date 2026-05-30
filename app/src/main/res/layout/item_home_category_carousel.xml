@@ -50,11 +50,11 @@
             android:paddingStart="12dp"
             android:paddingEnd="12dp"
             android:paddingBottom="12dp"
-            android:shadowColor="#66000000"
+            android:shadowColor="@color/overlay_black_40"
             android:shadowDx="0"
             android:shadowDy="1"
             android:shadowRadius="4"
-            android:textColor="#FFFFFF"
+            android:textColor="@color/ms_text_inverse"
             android:textSize="14sp"
             tools:text="Home &amp; Furniture" />
     </FrameLayout>

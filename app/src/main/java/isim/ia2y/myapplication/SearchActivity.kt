@@ -1152,8 +1152,8 @@ class SearchActivity : AppCompatActivity() {
         (0 until childCount).mapNotNull { index -> getChildAt(index) as? Chip }
 
     private fun styleFilterChip(chip: Chip) {
-        val checked = ContextCompat.getColor(this, R.color.colorPrimary)
-        val unchecked = ContextCompat.getColor(this, R.color.surface_neutral)
+        val checked = ContextCompat.getColor(this, R.color.ms_surface_inverse)
+        val unchecked = ContextCompat.getColor(this, R.color.ms_surface_sunken)
         val bg = ColorStateList(
             arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()),
             intArrayOf(
@@ -1164,14 +1164,15 @@ class SearchActivity : AppCompatActivity() {
         val text = ColorStateList(
             arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()),
             intArrayOf(
-                ContextCompat.getColor(this, R.color.colorOnPrimary),
-                ContextCompat.getColor(this, R.color.colorOnSurface)
+                ContextCompat.getColor(this, R.color.ms_text_inverse),
+                ContextCompat.getColor(this, R.color.ms_text_primary)
             )
         )
 
         chip.chipBackgroundColor = bg
         chip.setTextColor(text)
-        chip.chipStrokeWidth = 0f
+        chip.chipStrokeColor = ContextCompat.getColorStateList(this, R.color.ms_border_default)
+        chip.chipStrokeWidth = 1.dp.toFloat()
         chip.chipCornerRadius = 999f
         chip.isCheckedIconVisible = false
         chip.chipMinHeight = 44.dp.toFloat()
@@ -1289,11 +1290,11 @@ class SearchActivity : AppCompatActivity() {
                 chipCornerRadius = 999f
                 setEnsureMinTouchTargetSize(true)
                 chipMinHeight = 40f
-                chipBackgroundColor = ContextCompat.getColorStateList(context, R.color.home_surface_raised)
-                chipStrokeColor = ContextCompat.getColorStateList(context, R.color.colorPrimary)
+                chipBackgroundColor = ContextCompat.getColorStateList(context, R.color.ms_surface_card)
+                chipStrokeColor = ContextCompat.getColorStateList(context, R.color.ms_border_default)
                 chipStrokeWidth = 1.dp.toFloat()
-                setTextColor(ContextCompat.getColor(context, R.color.home_text_primary))
-                closeIconTint = ContextCompat.getColorStateList(context, R.color.home_text_secondary)
+                setTextColor(ContextCompat.getColor(context, R.color.ms_text_primary))
+                closeIconTint = ContextCompat.getColorStateList(context, R.color.ms_text_secondary)
                 setOnCloseIconClickListener {
                     spec.clear()
                     performSearch(currentQuery)

@@ -46,6 +46,8 @@ class ProductDetailsScreen : AppCompatActivity() {
     private var isOpeningSellerConversation: Boolean = false
     private var loadedReviews: List<ProductReview> = emptyList()
     private var selectedRating: Int = 0
+    private var selectedColorName: String? = null
+    private var selectedSize: String? = null
     private val reviewStarIds = intArrayOf(
         R.id.ivReviewStar1,
         R.id.ivReviewStar2,
@@ -256,6 +258,9 @@ class ProductDetailsScreen : AppCompatActivity() {
         val hasHighlights = bullets.any { it.isNotBlank() }
         binding.cardHighlights.visibility = if (hasHighlights) View.VISIBLE else View.GONE
 
+        bindSpecs(product)
+        bindVariantSelectors(product)
+
         if (product.stock <= 0) {
             quantity = 0
         } else if (quantity < 1) {
@@ -350,13 +355,26 @@ class ProductDetailsScreen : AppCompatActivity() {
 
         binding.btnPlus.setOnClickListener {
             it.performLightHapticFeedback()
-            quantity = (quantity + 1).coerceAtMost(product.stock.coerceAtLeast(1))
+            quantity = (quantity + 1).coerceAtMost(availableStock().coerceAtLeast(1))
             updateQuantityUi()
         }
 
         binding.btnAddToCart.setOnClickListener {
             it.performLightHapticFeedback()
-            val addedQuantity = CartStore.add(this, product.id, quantity)
+            val selectionError = variantSelectionError(product)
+            if (selectionError != null) {
+                showMotionSnackbar(selectionError, R.id.layoutBottomBar)
+                return@setOnClickListener
+            }
+            val variant = selectedVariant()
+            val addedQuantity = CartStore.add(
+                this,
+                product.id,
+                quantity,
+                variantId = variant?.variantId,
+                selectedColor = if (product.requiresColorSelection) selectedColorName else null,
+                selectedSize = if (product.requiresSizeSelection) selectedSize else null
+            )
             if (addedQuantity > 0) {
                 AnalyticsTracker.addToCart(product, addedQuantity)
             }
@@ -874,16 +892,220 @@ class ProductDetailsScreen : AppCompatActivity() {
 
     private fun updateQuantityUi() {
         val product = product ?: return
-        val inStock = product.stock > 0
+        val maxStock = availableStock()
+        val inStock = maxStock > 0
         binding.tvQuantity.text = if (inStock) quantity.toString() else "0"
-        binding.tvTotalValue.text = formatDt(product.unitPrice * quantity.coerceAtLeast(0))
+        binding.tvTotalValue.text = formatDt(currentUnitPrice() * quantity.coerceAtLeast(0))
         binding.btnMinus.apply {
             isEnabled = inStock && quantity > 1
             alpha = if (isEnabled) 1f else 0.45f
         }
         binding.btnPlus.apply {
-            isEnabled = inStock && quantity < product.stock
+            isEnabled = inStock && quantity < maxStock
             alpha = if (isEnabled) 1f else 0.45f
+        }
+    }
+
+    private fun selectedVariant(): ProductVariant? {
+        val p = product ?: return null
+        if (!p.hasVariants) return null
+        val color = if (p.requiresColorSelection) selectedColorName ?: return null else ""
+        val size = if (p.requiresSizeSelection) selectedSize ?: return null else ""
+        return p.variantFor(color, size)
+    }
+
+    private fun currentUnitPrice(): Double {
+        val p = product ?: return 0.0
+        return p.unitPriceForVariant(selectedVariant())
+    }
+
+    /** Quantity ceiling for the current selection. Variant products require a resolved variant. */
+    private fun availableStock(): Int {
+        val p = product ?: return 0
+        if (!p.hasVariants) return p.stock
+        return selectedVariant()?.stock ?: 0
+    }
+
+    private fun bindSpecs(product: Product) {
+        val container = binding.llDetailSpecs
+        container.removeAllViews()
+        val config = ProductTypeCatalog.byKey(product.productType)
+        val labelByKey = config?.attributeFields?.associate { it.key to getString(it.labelRes) } ?: emptyMap()
+        var added = 0
+        product.attributes.forEach { (key, value) ->
+            val display = formatAttributeValue(value) ?: return@forEach
+            if (display.isBlank()) return@forEach
+            val label = when (key) {
+                "dimensions" -> getString(R.string.pa_section_dimensions)
+                else -> labelByKey[key] ?: prettifyKey(key)
+            }
+            addSpecRow(container, label, display)
+            added++
+        }
+        binding.cardDetailSpecs.visibility = if (added > 0) View.VISIBLE else View.GONE
+    }
+
+    private fun addSpecRow(container: android.view.ViewGroup, label: String, value: String) {
+        val row = TextView(this).apply {
+            text = getString(R.string.pa_spec_row, label, value)
+            setTextColor(ContextCompat.getColor(context, R.color.home_text_primary))
+            textSize = resources.getDimension(R.dimen.text_size_caption) / resources.displayMetrics.scaledDensity
+            setLineSpacing(0f, 1.2f)
+            if (container.childCount > 0) {
+                setPadding(0, resources.getDimensionPixelSize(R.dimen.space_8), 0, 0)
+            }
+        }
+        container.addView(row)
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    private fun formatAttributeValue(value: Any?): String? = when (value) {
+        null -> null
+        is Boolean -> if (value) getString(R.string.common_yes) else getString(R.string.common_no)
+        is Map<*, *> -> {
+            val w = value["width"]; val h = value["height"]; val d = value["depth"]
+            listOf(w, h, d).mapNotNull { (it as? Number)?.let { n -> numberToText(n) } }
+                .takeIf { it.isNotEmpty() }
+                ?.joinToString(" x ")
+                ?.let { "$it cm" }
+        }
+        is Number -> numberToText(value)
+        else -> value.toString().trim().takeIf { it.isNotEmpty() }
+    }
+
+    private fun numberToText(n: Number): String {
+        val d = n.toDouble()
+        return if (d == d.toLong().toDouble()) d.toLong().toString() else d.toString()
+    }
+
+    private fun prettifyKey(key: String): String =
+        key.replace(Regex("([a-z])([A-Z])"), "$1 $2").replaceFirstChar { it.uppercase() }
+
+    private fun bindVariantSelectors(product: Product) {
+        val colors = product.colorOptions
+        val showColors = colors.isNotEmpty()
+        binding.tvDetailColorsTitle.visibility = if (showColors) View.VISIBLE else View.GONE
+        binding.cgDetailColors.visibility = if (showColors) View.VISIBLE else View.GONE
+        binding.cgDetailColors.removeAllViews()
+        selectedColorName = null
+        if (showColors) {
+            colors.forEach { color ->
+                val chip = com.google.android.material.chip.Chip(this).apply {
+                    text = color.name
+                    isCheckable = true
+                    isCheckedIconVisible = true
+                    chipIcon = colorSwatch(color.hex)
+                    isChipIconVisible = color.hex.isNotBlank()
+                    setOnClickListener {
+                        selectedColorName = if (isChecked) color.name else null
+                        refreshVariantAvailability()
+                    }
+                }
+                binding.cgDetailColors.addView(chip)
+            }
+            if (colors.size == 1) {
+                (binding.cgDetailColors.getChildAt(0) as? com.google.android.material.chip.Chip)?.apply {
+                    isChecked = true
+                    selectedColorName = colors.first().name
+                }
+            }
+        }
+
+        val sizes = product.sizeOptions
+        val showSizes = sizes.isNotEmpty()
+        binding.tvDetailSizesTitle.visibility = if (showSizes) View.VISIBLE else View.GONE
+        binding.cgDetailSizes.visibility = if (showSizes) View.VISIBLE else View.GONE
+        binding.cgDetailSizes.removeAllViews()
+        selectedSize = null
+        if (showSizes) {
+            sizes.forEach { size ->
+                val chip = com.google.android.material.chip.Chip(this).apply {
+                    text = size
+                    isCheckable = true
+                    isCheckedIconVisible = true
+                    setOnClickListener {
+                        selectedSize = if (isChecked) size else null
+                        refreshVariantAvailability()
+                    }
+                }
+                binding.cgDetailSizes.addView(chip)
+            }
+            if (sizes.size == 1) {
+                (binding.cgDetailSizes.getChildAt(0) as? com.google.android.material.chip.Chip)?.apply {
+                    isChecked = true
+                    selectedSize = sizes.first()
+                }
+            }
+        }
+        refreshVariantAvailability()
+    }
+
+    /** Disables size chips that have no stock for the chosen color, then refreshes price/qty. */
+    private fun refreshVariantAvailability() {
+        val product = product ?: return
+        if (product.requiresSizeSelection) {
+            for (i in 0 until binding.cgDetailSizes.childCount) {
+                val chip = binding.cgDetailSizes.getChildAt(i) as? com.google.android.material.chip.Chip ?: continue
+                val size = chip.text.toString()
+                val color = if (product.requiresColorSelection) selectedColorName else ""
+                val available = if (color == null) {
+                    product.activeVariants.any { it.size.equals(size, true) && it.stock > 0 }
+                } else {
+                    val v = product.variantFor(color, size)
+                    v != null && v.stock > 0
+                }
+                chip.isEnabled = available
+                if (!available && chip.isChecked) {
+                    chip.isChecked = false
+                    selectedSize = null
+                }
+            }
+        }
+        val variant = selectedVariant()
+        binding.tvPrice.text = formatDt(currentUnitPrice())
+        if (variant != null) {
+            binding.tvStockHelper.apply {
+                text = when {
+                    variant.stock <= 0 -> getString(R.string.pa_variant_out_of_stock)
+                    variant.stock <= 5 -> getString(R.string.product_state_low_stock, variant.stock)
+                    else -> getString(R.string.details_stock_helper)
+                }
+                setTextColor(
+                    ContextCompat.getColor(
+                        context,
+                        if (variant.stock <= 0) R.color.colorError else R.color.home_text_primary
+                    )
+                )
+            }
+        }
+        if (quantity < 1 && availableStock() > 0) quantity = 1
+        quantity = quantity.coerceAtMost(availableStock().coerceAtLeast(if (availableStock() > 0) 1 else 0))
+        updateQuantityUi()
+    }
+
+    private fun colorSwatch(hex: String): android.graphics.drawable.GradientDrawable? {
+        val parsed = runCatching { android.graphics.Color.parseColor(hex) }.getOrNull() ?: return null
+        return android.graphics.drawable.GradientDrawable().apply {
+            shape = android.graphics.drawable.GradientDrawable.OVAL
+            setColor(parsed)
+            setStroke(
+                resources.getDimensionPixelSize(R.dimen.ms_stroke_hairline),
+                android.graphics.Color.parseColor("#33000000")
+            )
+        }
+    }
+
+    /** Validates required variant selection. Returns an error message, or null when OK to add. */
+    private fun variantSelectionError(product: Product): String? {
+        if (!product.hasVariants) return null
+        val needColor = product.requiresColorSelection && selectedColorName == null
+        val needSize = product.requiresSizeSelection && selectedSize == null
+        return when {
+            needColor && needSize -> getString(R.string.pa_select_required_both)
+            needColor -> getString(R.string.pa_select_required_color)
+            needSize -> getString(R.string.pa_select_required_size)
+            selectedVariant() == null -> getString(R.string.pa_variant_out_of_stock)
+            else -> null
         }
     }
 

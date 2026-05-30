@@ -47,7 +47,7 @@
 
         <com.google.android.material.chip.Chip
             android:id="@+id/chipCategoryAll"
-            style="@style/Widget.MaterialComponents.Chip.Choice"
+            style="@style/Ms.Chip.Filter"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/search_filter_all"
@@ -55,35 +55,35 @@
 
         <com.google.android.material.chip.Chip
             android:id="@+id/chipCategoryCraft"
-            style="@style/Widget.MaterialComponents.Chip.Choice"
+            style="@style/Ms.Chip.Filter"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/search_category_craft" />
 
         <com.google.android.material.chip.Chip
             android:id="@+id/chipCategoryDecor"
-            style="@style/Widget.MaterialComponents.Chip.Choice"
+            style="@style/Ms.Chip.Filter"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/search_category_decor" />
 
         <com.google.android.material.chip.Chip
             android:id="@+id/chipCategoryFood"
-            style="@style/Widget.MaterialComponents.Chip.Choice"
+            style="@style/Ms.Chip.Filter"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/search_category_food" />
 
         <com.google.android.material.chip.Chip
             android:id="@+id/chipCategoryFashion"
-            style="@style/Widget.MaterialComponents.Chip.Choice"
+            style="@style/Ms.Chip.Filter"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/search_category_fashion" />
 
         <com.google.android.material.chip.Chip
             android:id="@+id/chipCategoryBeauty"
-            style="@style/Widget.MaterialComponents.Chip.Choice"
+            style="@style/Ms.Chip.Filter"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/search_category_beauty" />
@@ -135,7 +135,7 @@
 
         <com.google.android.material.chip.Chip
             android:id="@+id/chipLocationAny"
-            style="@style/Widget.MaterialComponents.Chip.Choice"
+            style="@style/Ms.Chip.Filter"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/search_filter_all"
@@ -143,24 +143,24 @@
 
         <com.google.android.material.chip.Chip
             android:id="@+id/chipLocationMedina"
-            style="@style/Widget.MaterialComponents.Chip.Choice"
+            style="@style/Ms.Chip.Filter"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/auto_medina_a257" />
+            android:text="@string/search_location_medina" />
 
         <com.google.android.material.chip.Chip
             android:id="@+id/chipLocationDjerba"
-            style="@style/Widget.MaterialComponents.Chip.Choice"
+            style="@style/Ms.Chip.Filter"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/auto_djerba_9c8f" />
+            android:text="@string/search_location_djerba" />
 
         <com.google.android.material.chip.Chip
             android:id="@+id/chipLocationKairouan"
-            style="@style/Widget.MaterialComponents.Chip.Choice"
+            style="@style/Ms.Chip.Filter"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/auto_kairouan_8c5c" />
+            android:text="@string/search_location_kairouan" />
     </com.google.android.material.chip.ChipGroup>
 
     <com.google.android.material.switchmaterial.SwitchMaterial
@@ -196,4 +196,3 @@
             android:text="@string/search_filter_apply" />
     </LinearLayout>
 </LinearLayout>
-

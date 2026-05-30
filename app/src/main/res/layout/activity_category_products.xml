@@ -65,7 +65,7 @@
                 android:letterSpacing="0.08"
                 android:maxLines="1"
                 android:textAllCaps="true"
-                android:textColor="#EDD09A"
+                android:textColor="@color/ms_accent_gold_soft"
                 android:textSize="11sp"
                 tools:text="Marketplace / Artisanat" />
 
@@ -77,11 +77,11 @@
                 android:fontFamily="@font/manrope_semibold"
                 android:includeFontPadding="false"
                 android:maxLines="2"
-                android:shadowColor="#80000000"
+                android:shadowColor="@color/colorScrim"
                 android:shadowDx="0"
                 android:shadowDy="2"
                 android:shadowRadius="6"
-                android:textColor="#FFFFFF"
+                android:textColor="@color/ms_text_inverse"
                 android:textSize="28sp"
                 tools:text="Artisanat &amp; décoration" />
 
@@ -92,7 +92,7 @@
                 android:layout_marginTop="6dp"
                 android:fontFamily="@font/manrope_regular"
                 android:includeFontPadding="false"
-                android:textColor="#E6FFFFFF"
+                android:textColor="@color/overlay_white_90"
                 android:textSize="13sp"
                 tools:text="12 produits disponibles" />
         </LinearLayout>
@@ -216,7 +216,7 @@
             android:fontFamily="@font/manrope_semibold"
             android:gravity="center"
             android:text="@string/category_empty_title"
-            android:textColor="@color/home_ref_text_primary"
+            android:textColor="@color/ms_text_primary"
             android:textSize="15sp" />
 
         <TextView

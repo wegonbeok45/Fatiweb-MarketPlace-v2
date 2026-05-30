@@ -3,8 +3,8 @@
     android:shape="rectangle">
     <gradient
         android:angle="135"
-        android:startColor="#D9B47D"
-        android:centerColor="#B7904F"
-        android:endColor="#7A5B2A" />
+        android:startColor="@color/market_gold_gradient_start"
+        android:centerColor="@color/market_gold_gradient_mid"
+        android:endColor="@color/market_gold_gradient_end" />
     <corners android:radius="22dp" />
 </shape>

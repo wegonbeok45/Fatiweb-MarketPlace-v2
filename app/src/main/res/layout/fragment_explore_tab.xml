@@ -37,8 +37,8 @@
                 android:fontFamily="@font/manrope_semibold"
                 android:includeFontPadding="false"
                 android:text="@string/categories_screen_title"
-                android:textColor="@color/home_ref_text_primary"
-                android:textSize="22sp"
+                android:textColor="@color/ms_text_primary"
+                android:textSize="@dimen/text_size_title"
                 app:layout_constraintBottom_toBottomOf="@id/notificationContainer"
                 app:layout_constraintEnd_toStartOf="@id/notificationContainer"
                 app:layout_constraintStart_toStartOf="parent"
@@ -58,7 +58,7 @@
                     android:layout_gravity="center"
                     android:contentDescription="@string/notifications_title"
                     app:srcCompat="@drawable/notification"
-                    app:tint="@color/home_ref_nav_icon" />
+                    app:tint="@color/ms_text_secondary" />
 
                 <View
                     android:id="@+id/notificationBadge"
@@ -68,7 +68,7 @@
                     android:layout_marginTop="9dp"
                     android:layout_marginEnd="9dp"
                     android:background="@drawable/bg_notification_badge"
-                    android:backgroundTint="@color/home_ref_gold"
+                    android:backgroundTint="@color/ms_accent_gold"
                     android:visibility="gone" />
             </FrameLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
@@ -89,10 +89,10 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/home_search_height"
             android:layout_marginTop="@dimen/home_search_margin_top"
-            app:cardBackgroundColor="@color/home_surface_raised"
+            app:cardBackgroundColor="@color/ms_surface_card"
             app:cardCornerRadius="@dimen/home_search_radius"
             app:cardElevation="0dp"
-            app:strokeColor="@color/colorBorderLight"
+            app:strokeColor="@color/ms_border_default"
             app:strokeWidth="1dp">
 
             <LinearLayout
@@ -122,7 +122,7 @@
                     android:imeOptions="actionSearch"
                     android:inputType="textCapWords"
                     android:maxLines="1"
-                    android:textColor="@color/home_ref_text_primary"
+                    android:textColor="@color/ms_text_primary"
                     android:textColorHint="@color/home_ref_text_secondary"
                     android:textSize="@dimen/home_text_search" />
             </LinearLayout>
@@ -180,7 +180,7 @@
                     android:letterSpacing="0.04"
                     android:text="@string/categories_featured_hint"
                     android:textAllCaps="true"
-                    android:textColor="@color/home_ref_gold"
+                    android:textColor="@color/ms_accent_gold"
                     android:textSize="11sp" />
             </LinearLayout>
 
@@ -249,8 +249,8 @@
                     android:fontFamily="@font/manrope_semibold"
                     android:gravity="center"
                     android:text="@string/categories_empty_title"
-                    android:textColor="@color/home_ref_text_primary"
-                    android:textSize="15sp" />
+                    android:textColor="@color/ms_text_primary"
+                    android:textSize="@dimen/text_size_subtitle" />
 
                 <TextView
                     android:layout_width="match_parent"
