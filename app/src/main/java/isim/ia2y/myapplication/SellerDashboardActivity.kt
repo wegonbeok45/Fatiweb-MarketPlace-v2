@@ -97,18 +97,14 @@ class SellerDashboardActivity : AppCompatActivity() {
     }
 
     private fun openProducts() {
-        startActivity(
-            Intent(this, AdminProduitsActivity::class.java)
-                .putExtra(AdminProduitsActivity.EXTRA_SELLER_MODE, true)
-        )
+        startActivity(Intent(this, VendorProductsActivity::class.java))
     }
 
     private fun openAddProduct() {
         startActivity(
-            AdminProductEditorActivity.createIntent(
+            VendorProductEditorActivity.createIntent(
                 context = this,
                 productId = null,
-                sellerMode = true
             )
         )
     }

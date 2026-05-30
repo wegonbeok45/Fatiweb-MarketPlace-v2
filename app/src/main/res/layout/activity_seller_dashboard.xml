@@ -6,7 +6,7 @@
     android:id="@+id/sellerDashboardRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/profile_body_bg"
+    android:background="@color/ms_surface_canvas"
     tools:context=".SellerDashboardActivity">
 
     <!-- ============ Top App Bar ============ -->
@@ -14,7 +14,7 @@
         android:id="@+id/sellerDashboardAppBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/profile_body_bg"
+        android:background="@color/ms_surface_canvas"
         app:elevation="0dp"
         app:liftOnScroll="false">
 
@@ -38,7 +38,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/back"
-                app:tint="@color/profile_text_primary" />
+                app:tint="@color/ms_text_primary" />
 
             <TextView
                 android:id="@+id/sellerDashboardTvTitle"
@@ -47,7 +47,7 @@
                 android:layout_marginStart="@dimen/admin_top_title_margin_start"
                 android:fontFamily="@font/manrope_semibold"
                 android:text="@string/seller_dashboard_title"
-                android:textColor="@color/profile_text_primary"
+                android:textColor="@color/ms_text_primary"
                 android:textSize="@dimen/app_top_bar_title_size"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -129,7 +129,7 @@
                                     android:letterSpacing="0.15"
                                     android:text="@string/seller_dashboard_title"
                                     android:textAllCaps="true"
-                                    android:textColor="@color/home_ref_gold_soft"
+                                    android:textColor="@color/ms_accent_gold_soft"
                                     android:textSize="10sp" />
                             </LinearLayout>
 
@@ -171,7 +171,7 @@
                                 android:layout_gravity="center"
                                 android:contentDescription="@string/cd_stat_icon"
                                 app:srcCompat="@drawable/shoppingbag"
-                                app:tint="@color/home_ref_gold" />
+                                app:tint="@color/ms_accent_gold" />
                         </FrameLayout>
 
                     </LinearLayout>
@@ -184,7 +184,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="14dp"
-                android:indeterminateTint="@color/home_ref_gold"
+                android:indeterminateTint="@color/ms_accent_gold"
                 android:visibility="gone" />
 
             <!-- ====== Performance section ====== -->
@@ -206,7 +206,7 @@
                     android:layout_marginStart="10dp"
                     android:fontFamily="@font/manrope_semibold"
                     android:text="@string/admin_dashboard_overview_title"
-                    android:textColor="@color/profile_text_primary"
+                    android:textColor="@color/ms_text_primary"
                     android:textSize="15sp" />
             </LinearLayout>
 
@@ -267,7 +267,7 @@
                 android:layout_marginTop="12dp"
                 android:fontFamily="@font/manrope_regular"
                 android:text="@string/seller_dashboard_stock_meta_placeholder"
-                android:textColor="@color/profile_text_secondary"
+                android:textColor="@color/ms_text_secondary"
                 android:textSize="11sp" />
 
             <!-- ====== Quick Actions section ====== -->
@@ -289,7 +289,7 @@
                     android:layout_marginStart="10dp"
                     android:fontFamily="@font/manrope_semibold"
                     android:text="@string/admin_dashboard_quick_actions_title"
-                    android:textColor="@color/profile_text_primary"
+                    android:textColor="@color/ms_text_primary"
                     android:textSize="15sp" />
             </LinearLayout>
 
@@ -357,7 +357,7 @@
                             android:contentDescription="@string/cd_stat_icon"
                             android:rotation="180"
                             app:srcCompat="@drawable/back"
-                            app:tint="@color/home_ref_gold_soft" />
+                            app:tint="@color/ms_accent_gold_soft" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
@@ -399,7 +399,7 @@
                                 android:layout_gravity="center"
                                 android:contentDescription="@string/cd_stat_icon"
                                 app:srcCompat="@drawable/ic_home_filter"
-                                app:tint="@color/home_ref_gold" />
+                                app:tint="@color/ms_accent_gold" />
                         </FrameLayout>
 
                         <TextView
@@ -409,7 +409,7 @@
                             android:layout_weight="1"
                             android:fontFamily="@font/manrope_semibold"
                             android:text="@string/seller_dashboard_products_action"
-                            android:textColor="@color/profile_text_primary"
+                            android:textColor="@color/ms_text_primary"
                             android:textSize="14sp" />
 
                         <ImageView
@@ -418,7 +418,7 @@
                             android:contentDescription="@string/cd_stat_icon"
                             android:rotation="180"
                             app:srcCompat="@drawable/back"
-                            app:tint="@color/profile_text_secondary" />
+                            app:tint="@color/ms_text_secondary" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
@@ -459,7 +459,7 @@
                                 android:layout_gravity="center"
                                 android:contentDescription="@string/cd_stat_icon"
                                 app:srcCompat="@drawable/shoppingbag"
-                                app:tint="@color/home_ref_gold_soft" />
+                                app:tint="@color/ms_accent_gold_soft" />
                         </FrameLayout>
 
                         <TextView
@@ -469,7 +469,7 @@
                             android:layout_weight="1"
                             android:fontFamily="@font/manrope_semibold"
                             android:text="@string/seller_dashboard_orders_action"
-                            android:textColor="@color/profile_text_primary"
+                            android:textColor="@color/ms_text_primary"
                             android:textSize="14sp" />
 
                         <ImageView
@@ -478,7 +478,7 @@
                             android:contentDescription="@string/cd_stat_icon"
                             android:rotation="180"
                             app:srcCompat="@drawable/back"
-                            app:tint="@color/profile_text_secondary" />
+                            app:tint="@color/ms_text_secondary" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
             </LinearLayout>
@@ -504,7 +504,7 @@
                     android:layout_weight="1"
                     android:fontFamily="@font/manrope_semibold"
                     android:text="@string/seller_dashboard_recent_orders"
-                    android:textColor="@color/profile_text_primary"
+                    android:textColor="@color/ms_text_primary"
                     android:textSize="15sp" />
             </LinearLayout>
 
@@ -532,7 +532,7 @@
                         android:gravity="center"
                         android:padding="28dp"
                         android:text="@string/seller_orders_empty"
-                        android:textColor="@color/profile_text_secondary"
+                        android:textColor="@color/ms_text_secondary"
                         android:textSize="12sp"
                         android:visibility="gone" />
 

@@ -6,14 +6,14 @@
     android:id="@+id/sellerOrdersRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/profile_body_bg"
+    android:background="@color/ms_surface_canvas"
     tools:context=".SellerOrdersActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/sellerOrdersAppBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/profile_header_bg"
+        android:background="@color/ms_surface_canvas"
         app:elevation="0dp"
         app:liftOnScroll="false">
 
@@ -37,7 +37,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/back"
-                app:tint="@color/profile_text_primary" />
+                app:tint="@color/ms_text_primary" />
 
             <TextView
                 android:id="@+id/sellerOrdersTvTitle"
@@ -45,7 +45,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/admin_top_title_margin_start"
                 android:text="@string/seller_orders_title"
-                android:textColor="@color/profile_text_primary"
+                android:textColor="@color/ms_text_primary"
                 android:textSize="@dimen/app_top_bar_title_size"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -56,7 +56,7 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="@color/profile_divider" />
+            android:background="@color/ms_border_subtle" />
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.core.widget.NestedScrollView
@@ -116,7 +116,7 @@
                 android:layout_marginTop="18dp"
                 android:layout_marginBottom="10dp"
                 android:text="@string/seller_orders_header"
-                android:textColor="@color/profile_text_primary"
+                android:textColor="@color/ms_text_primary"
                 android:textSize="@dimen/text_size_body" />
 
             <com.google.android.material.card.MaterialCardView
@@ -126,7 +126,7 @@
                 app:cardBackgroundColor="@color/profile_card_bg"
                 app:cardCornerRadius="@dimen/corner_radius_large"
                 app:cardElevation="0dp"
-                app:strokeColor="@color/colorBorderLight"
+                app:strokeColor="@color/ms_border_default"
                 app:strokeWidth="1dp">
 
                 <LinearLayout
@@ -150,7 +150,7 @@
                         android:gravity="center"
                         android:padding="24dp"
                         android:text="@string/seller_orders_empty"
-                        android:textColor="@color/profile_text_secondary"
+                        android:textColor="@color/ms_text_secondary"
                         android:textSize="@dimen/text_size_caption"
                         android:visibility="gone" />
 

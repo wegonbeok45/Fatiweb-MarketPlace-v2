@@ -36,7 +36,7 @@
             android:fontFamily="@font/manrope_semibold"
             android:maxLines="1"
             android:text="@string/str_2f43b4"
-            android:textColor="@color/profile_text_primary"
+            android:textColor="@color/ms_text_primary"
             android:textSize="22sp"
             tools:text="128 DT" />
 
@@ -50,7 +50,7 @@
             android:letterSpacing="0.04"
             android:maxLines="2"
             android:textAllCaps="true"
-            android:textColor="@color/profile_text_secondary"
+            android:textColor="@color/ms_text_secondary"
             android:textSize="10sp"
             tools:text="Revenue" />
     </LinearLayout>

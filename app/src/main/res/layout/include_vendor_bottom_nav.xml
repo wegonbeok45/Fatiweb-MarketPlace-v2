@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Vendor bottom nav: Home / Commandes / Produits / Messages / Profil. -->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="bottom"
+    android:orientation="vertical">
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/ms_stroke_hairline"
+        android:background="@color/ms_border_subtle" />
+
+    <LinearLayout
+        android:id="@+id/vendorBottomNav"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/ms_bottom_nav_height"
+        android:background="@color/ms_surface_card"
+        android:orientation="horizontal"
+        android:weightSum="5">
+
+        <LinearLayout
+            android:id="@+id/vendorNavHome"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingTop="@dimen/space_8"
+            android:paddingBottom="@dimen/space_8">
+
+            <ImageView
+                android:id="@+id/vendorNavHomeIcon"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:importantForAccessibility="no"
+                app:srcCompat="@drawable/ic_bottom_nav_home"
+                app:tint="@color/ms_text_primary" />
+
+            <TextView
+                android:id="@+id/vendorNavHomeLabel"
+                style="@style/Ms.Text.Overline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_4"
+                android:text="@string/vendor_nav_home"
+                android:textColor="@color/ms_text_primary"
+                android:textAllCaps="false"
+                android:letterSpacing="0" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/vendorNavOrders"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingTop="@dimen/space_8"
+            android:paddingBottom="@dimen/space_8">
+
+            <ImageView
+                android:id="@+id/vendorNavOrdersIcon"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:importantForAccessibility="no"
+                app:srcCompat="@drawable/ic_admin_nav_commandes"
+                app:tint="@color/ms_text_tertiary" />
+
+            <TextView
+                android:id="@+id/vendorNavOrdersLabel"
+                style="@style/Ms.Text.Overline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_4"
+                android:text="@string/vendor_nav_orders"
+                android:textColor="@color/ms_text_tertiary"
+                android:textAllCaps="false"
+                android:letterSpacing="0" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/vendorNavProducts"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingTop="@dimen/space_8"
+            android:paddingBottom="@dimen/space_8">
+
+            <ImageView
+                android:id="@+id/vendorNavProductsIcon"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:importantForAccessibility="no"
+                app:srcCompat="@drawable/ic_admin_nav_produits"
+                app:tint="@color/ms_text_tertiary" />
+
+            <TextView
+                android:id="@+id/vendorNavProductsLabel"
+                style="@style/Ms.Text.Overline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_4"
+                android:text="@string/vendor_nav_products"
+                android:textColor="@color/ms_text_tertiary"
+                android:textAllCaps="false"
+                android:letterSpacing="0" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/vendorNavMessages"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingTop="@dimen/space_8"
+            android:paddingBottom="@dimen/space_8">
+
+            <ImageView
+                android:id="@+id/vendorNavMessagesIcon"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:importantForAccessibility="no"
+                app:srcCompat="@drawable/ic_chat_bubble"
+                app:tint="@color/ms_text_tertiary" />
+
+            <TextView
+                android:id="@+id/vendorNavMessagesLabel"
+                style="@style/Ms.Text.Overline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_4"
+                android:text="@string/vendor_nav_messages"
+                android:textColor="@color/ms_text_tertiary"
+                android:textAllCaps="false"
+                android:letterSpacing="0" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/vendorNavProfile"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingTop="@dimen/space_8"
+            android:paddingBottom="@dimen/space_8">
+
+            <ImageView
+                android:id="@+id/vendorNavProfileIcon"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:importantForAccessibility="no"
+                app:srcCompat="@drawable/ic_bottom_nav_profile"
+                app:tint="@color/ms_text_tertiary" />
+
+            <TextView
+                android:id="@+id/vendorNavProfileLabel"
+                style="@style/Ms.Text.Overline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_4"
+                android:text="@string/vendor_nav_profile"
+                android:textColor="@color/ms_text_tertiary"
+                android:textAllCaps="false"
+                android:letterSpacing="0" />
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

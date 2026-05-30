@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/Ms.Card.Surface"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="@dimen/space_20"
+    android:layout_marginEnd="@dimen/space_20"
+    android:layout_marginTop="@dimen/space_8"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/space_12">
+
+        <ImageView
+            android:id="@+id/vendorProductImage"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:background="@drawable/ms_bg_icon_chip_dark"
+            android:contentDescription="@string/vendor_products_cd_image"
+            android:scaleType="centerCrop"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:src="@color/ms_surface_sunken" />
+
+        <TextView
+            android:id="@+id/vendorProductTitle"
+            style="@style/Ms.Text.BodyStrong"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/space_12"
+            android:ellipsize="end"
+            android:maxLines="2"
+            app:layout_constraintEnd_toStartOf="@id/vendorProductOverflow"
+            app:layout_constraintStart_toEndOf="@id/vendorProductImage"
+            app:layout_constraintTop_toTopOf="@id/vendorProductImage"
+            tools:text="Casque audio sans fil premium avec annulation de bruit" />
+
+        <ImageView
+            android:id="@+id/vendorProductOverflow"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="?selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
+            android:contentDescription="@string/ms_action_filter"
+            android:padding="4dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/vendorProductImage"
+            app:srcCompat="@drawable/ic_ms_more_vert"
+            app:tint="@color/ms_text_secondary" />
+
+        <TextView
+            android:id="@+id/vendorProductPrice"
+            style="@style/Ms.Text.Subtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/space_12"
+            android:layout_marginTop="@dimen/space_4"
+            android:textColor="@color/ms_accent_gold"
+            app:layout_constraintStart_toEndOf="@id/vendorProductImage"
+            app:layout_constraintTop_toBottomOf="@id/vendorProductTitle"
+            tools:text="85,500 DT" />
+
+        <com.google.android.material.divider.MaterialDivider
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="@dimen/space_12"
+            app:dividerColor="@color/ms_border_subtle"
+            app:layout_constraintTop_toBottomOf="@id/vendorProductImage" />
+
+        <TextView
+            android:id="@+id/vendorProductStock"
+            style="@style/Ms.Text.Label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_12"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/vendorProductImage"
+            tools:text="Stock : 24" />
+
+        <TextView
+            android:id="@+id/vendorProductApproval"
+            style="@style/Ms.Chip.Status.Approved"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/space_8"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@id/vendorProductStatus"
+            app:layout_constraintEnd_toStartOf="@id/vendorProductStatus"
+            app:layout_constraintTop_toTopOf="@id/vendorProductStatus"
+            tools:text="Approuvé"
+            tools:visibility="visible" />
+
+        <TextView
+            android:id="@+id/vendorProductStatus"
+            style="@style/Ms.Chip.Status.Draft"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="@id/vendorProductStock"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/vendorProductStock"
+            tools:text="Publié" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>

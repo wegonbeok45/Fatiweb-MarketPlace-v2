@@ -160,11 +160,10 @@ class SellerOrdersActivity : AppCompatActivity() {
             return
         }
         orderDetailsLauncher.launch(
-            AdminOrderDetailsActivity.createIntent(
+            VendorOrderDetailActivity.createIntent(
                 context = this,
                 uid = row.uid,
                 orderId = orderId,
-                sellerMode = true
             )
         )
     }
@@ -267,6 +266,19 @@ class SellerOrdersActivity : AppCompatActivity() {
             textSize = 12f
             setPadding(0, dp(3), 0, 0)
         })
+        // Variant badge — only when a variant was selected
+        val variantText = item.variantLabel.ifBlank {
+            listOf(item.selectedColor, item.selectedSize).filter { it.isNotBlank() }.joinToString(" · ")
+        }
+        if (variantText.isNotBlank()) {
+            textColumn.addView(TextView(this).apply {
+                text = variantText
+                setTextColor(getColor(R.color.ms_text_tertiary))
+                textSize = 11f
+                setTypeface(null, android.graphics.Typeface.BOLD)
+                setPadding(0, dp(2), 0, 0)
+            })
+        }
         row.addView(image)
         row.addView(textColumn)
         card.addView(row)

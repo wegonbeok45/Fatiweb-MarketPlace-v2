@@ -15,7 +15,7 @@
         android:id="@+id/sellerOrderIcon"
         android:layout_width="38dp"
         android:layout_height="38dp"
-        app:cardBackgroundColor="@color/profile_card_icon_bg"
+        app:cardBackgroundColor="@color/ms_surface_sunken"
         app:cardCornerRadius="999dp"
         app:cardElevation="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -29,7 +29,7 @@
             android:layout_gravity="center"
             android:contentDescription="@string/cd_order_status"
             app:srcCompat="@drawable/shoppingbag"
-            app:tint="?attr/colorPrimary" />
+            app:tint="@color/ms_text_primary" />
     </com.google.android.material.card.MaterialCardView>
 
     <TextView
@@ -37,7 +37,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
-        android:textColor="@color/profile_text_primary"
+        android:textColor="@color/ms_text_primary"
         android:textSize="@dimen/text_size_caption"
         android:fontFamily="@font/manrope_semibold"
         app:layout_constraintBottom_toTopOf="@id/sellerOrderClient"
@@ -53,7 +53,7 @@
         android:layout_marginStart="12dp"
         android:ellipsize="end"
         android:maxLines="1"
-        android:textColor="@color/profile_text_secondary"
+        android:textColor="@color/ms_text_secondary"
         android:textSize="@dimen/text_size_overline"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/sellerOrderBadge"
@@ -64,7 +64,7 @@
         android:id="@+id/sellerOrderTotal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="?attr/colorPrimary"
+        android:textColor="@color/ms_text_primary"
         android:textSize="@dimen/text_size_caption"
         android:fontFamily="@font/manrope_semibold"
         app:layout_constraintBottom_toTopOf="@id/sellerOrderBadge"
