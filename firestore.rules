@@ -54,7 +54,7 @@ service cloud.firestore {
         'id', 'title', 'subtitle', 'description', 'bullets', 'tags',
         'category', 'categoryIds', 'categoryLeafId', 'origin', 'price', 'priceMinor', 'currency',
         'stock', 'isBio', 'discountPercent', 'imageUrl', 'imageUrls',
-        'isActive', 'status', 'searchKeywords',
+        'isActive', 'status', 'approvalStatus', 'searchKeywords',
         'rating', 'ratingAvg', 'reviewsCount', 'ratingCount',
         'sellerId', 'sellerName', 'sellerAvatarUrl', 'sellerProfileUpdatedAt',
         'sellerVerifiedAt', 'sellerMemberSince', 'sellerTotalSold', 'sellerRating', 'sellerRatingCount',
@@ -68,7 +68,7 @@ service cloud.firestore {
       return [
         'title', 'subtitle', 'description', 'bullets', 'tags',
         'category', 'categoryIds', 'categoryLeafId', 'origin', 'price', 'priceMinor', 'stock', 'isBio',
-        'discountPercent', 'imageUrl', 'imageUrls', 'updatedAt',
+        'discountPercent', 'imageUrl', 'imageUrls', 'isActive', 'status', 'approvalStatus', 'updatedAt',
         // Category-based attributes & variants (additive; optional for legacy docs).
         'productType', 'attributes', 'colorOptions', 'sizeOptions', 'variants'
       ];
@@ -198,6 +198,27 @@ service cloud.firestore {
       return keepsOwnProductOwner() &&
         vendeurProductFieldsSafe() &&
         sellerProductDocumentIsSafe(productId);
+    }
+
+    function vendeurProductLifecycleUpdateIsSafe() {
+      return isProductOwner() &&
+        (
+          request.resource.data.keys().hasOnly(['status', 'isActive', 'updatedAt']) ||
+          request.resource.data.diff(resource.data).changedKeys().hasOnly(['status', 'isActive', 'updatedAt'])
+        ) &&
+        validProductStatus(request.resource.data.status) &&
+        request.resource.data.isActive is bool;
+    }
+
+    function vendeurProductDiscountUpdateIsSafe() {
+      return isProductOwner() &&
+        (
+          request.resource.data.keys().hasOnly(['discountPercent', 'updatedAt']) ||
+          request.resource.data.diff(resource.data).changedKeys().hasOnly(['discountPercent', 'updatedAt'])
+        ) &&
+        request.resource.data.discountPercent is int &&
+        request.resource.data.discountPercent >= 0 &&
+        request.resource.data.discountPercent <= 90;
     }
 
     function allowedUserProfileKeys() {
@@ -563,7 +584,10 @@ service cloud.firestore {
         resource.data.status == 'published'
       );
       allow create: if isAdmin() || (isVendeur() && vendeurProductCreateIsSafe(productId));
-      allow update: if isAdmin() || (isVendeur() && vendeurProductUpdateIsSafe(productId));
+      allow update: if isAdmin();
+      allow update: if isVendeur() && vendeurProductLifecycleUpdateIsSafe();
+      allow update: if isVendeur() && vendeurProductDiscountUpdateIsSafe();
+      allow update: if isVendeur() && vendeurProductUpdateIsSafe(productId);
       allow delete: if isAdmin() || (isVendeur() && isProductOwner());
 
       match /reviews/{reviewId} {
