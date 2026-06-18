@@ -158,7 +158,7 @@
                 android:focusable="true"
                 android:gravity="center"
                 android:orientation="vertical"
-                app:layout_constraintEnd_toStartOf="@id/hostNavCart"
+                app:layout_constraintEnd_toStartOf="@id/hostNavVoiceSpace"
                 app:layout_constraintStart_toEndOf="@id/hostNavHome"
                 app:layout_constraintTop_toTopOf="parent">
 
@@ -181,6 +181,14 @@
                     android:textSize="@dimen/home_ref_nav_label_size" />
             </LinearLayout>
 
+            <View
+                android:id="@+id/hostNavVoiceSpace"
+                android:layout_width="76dp"
+                android:layout_height="match_parent"
+                app:layout_constraintEnd_toStartOf="@id/hostNavCart"
+                app:layout_constraintStart_toEndOf="@id/hostNavExplore"
+                app:layout_constraintTop_toTopOf="parent" />
+
             <LinearLayout
                 android:id="@+id/hostNavCart"
                 android:layout_width="0dp"
@@ -192,7 +200,7 @@
                 android:gravity="center"
                 android:orientation="vertical"
                 app:layout_constraintEnd_toStartOf="@id/hostNavProfile"
-                app:layout_constraintStart_toEndOf="@id/hostNavExplore"
+                app:layout_constraintStart_toEndOf="@id/hostNavVoiceSpace"
                 app:layout_constraintTop_toTopOf="parent">
 
                 <FrameLayout
@@ -280,6 +288,31 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.card.MaterialCardView>
 
+    <FrameLayout
+        android:id="@+id/fatiVoiceFab"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_marginBottom="34dp"
+        android:background="@drawable/bg_fativoice_nav_fab"
+        android:clickable="true"
+        android:contentDescription="@string/fativoice_mic_content_description"
+        android:elevation="14dp"
+        android:focusable="true"
+        android:foreground="?attr/selectableItemBackgroundBorderless"
+        android:outlineProvider="background"
+        android:padding="14dp"
+        app:layout_constraintBottom_toBottomOf="@id/hostLayoutBottomNav"
+        app:layout_constraintEnd_toEndOf="@id/hostLayoutBottomNav"
+        app:layout_constraintStart_toStartOf="@id/hostLayoutBottomNav">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:importantForAccessibility="no"
+            android:scaleType="centerInside"
+            app:srcCompat="@drawable/ic_voice_mic_clean" />
+    </FrameLayout>
+
     <androidx.cardview.widget.CardView
         android:id="@+id/chatFab"
         android:layout_width="@dimen/screen_fab_size"
@@ -307,6 +340,98 @@
 
     </androidx.cardview.widget.CardView>
 
+    <FrameLayout
+        android:id="@+id/fatiVoiceOverlay"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:alpha="0"
+        android:background="#CC000000"
+        android:clickable="true"
+        android:focusable="true"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#80000000" />
+
+        <LinearLayout
+            android:id="@+id/fatiVoiceSheet"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:background="@drawable/bg_fativoice_sheet"
+            android:elevation="16dp"
+            android:orientation="vertical"
+            android:padding="24dp"
+            android:translationY="400dp">
+
+            <TextView
+                android:id="@+id/tvFatiVoiceUserText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="Je vous écoute..."
+                android:textColor="@android:color/white"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvFatiVoiceResponseText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:gravity="center"
+                android:text=""
+                android:textColor="#FFD8A4"
+                android:textSize="14sp" />
+
+            <com.google.android.material.progressindicator.CircularProgressIndicator
+                android:id="@+id/fatiVoiceIndicator"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:layout_gravity="center"
+                android:layout_marginTop="20dp"
+                android:visibility="gone"
+                app:indicatorColor="@color/home_ref_gold"
+                app:indicatorSize="42dp"
+                app:trackThickness="4dp" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/fatiVoiceMicButton"
+                android:layout_width="62dp"
+                android:layout_height="62dp"
+                android:layout_gravity="center"
+                android:layout_marginTop="24dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackgroundBorderless"
+                app:cardBackgroundColor="@color/home_ref_gold"
+                app:cardCornerRadius="31dp"
+                app:cardElevation="8dp">
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="16dp"
+                    android:scaleType="centerInside"
+                    app:srcCompat="@drawable/ic_mic"
+                    app:tint="@android:color/white" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <isim.ia2y.myapplication.voice.FatiVoiceWaveView
+                android:id="@+id/fatiVoiceWaveView"
+                android:layout_width="match_parent"
+                android:layout_height="120dp"
+                android:layout_marginTop="20dp" />
+
+        </LinearLayout>
+    </FrameLayout>
+
     <View
         android:id="@+id/chatFabDot"
         android:layout_width="@dimen/screen_fab_dot_size"
@@ -318,5 +443,7 @@
         android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@id/hostLayoutBottomNav"
         app:layout_constraintEnd_toEndOf="parent" />
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
