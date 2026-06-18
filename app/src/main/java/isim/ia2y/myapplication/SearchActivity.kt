@@ -1,4 +1,7 @@
+@file:Suppress("DEPRECATION")
+
 package isim.ia2y.myapplication
+
 import android.animation.ValueAnimator
 import android.content.Context
 import android.content.Intent
@@ -52,7 +55,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.text.Normalizer
 import java.util.Locale
 import isim.ia2y.myapplication.databinding.ActivitySearchBinding
 import kotlin.math.roundToInt
@@ -136,6 +138,7 @@ class SearchActivity : AppCompatActivity() {
         enableEdgeToEdge()
         binding = ActivitySearchBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
         ViewCompat.setOnApplyWindowInsetsListener(binding.main) { v, insets ->
             val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(bars.left, bars.top, bars.right, bars.bottom)
@@ -846,12 +849,16 @@ class SearchActivity : AppCompatActivity() {
         }
         if (items.isEmpty()) {
             val hasBackendError = searchError != null
-            emptyTitle.text = if (hasBackendError) {
-                getString(R.string.search_backend_error_title)
-            } else {
-                getString(R.string.search_empty_title)
+            val isOffline = hasBackendError &&
+                (searchError?.isNetworkError() == true || !isOnline())
+            emptyTitle.text = when {
+                isOffline -> getString(R.string.offline_title)
+                hasBackendError -> getString(R.string.search_backend_error_title)
+                else -> getString(R.string.search_empty_title)
             }
-            emptySubtitle.text = if (hasBackendError) {
+            emptySubtitle.text = if (isOffline) {
+                getString(R.string.offline_subtitle)
+            } else if (hasBackendError) {
                 getString(R.string.search_backend_error_subtitle)
             } else {
                 val fallback = dynamicSuggestionPool().take(3).joinToString(", ")
@@ -923,12 +930,12 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun Product.matchesSearchQuery(query: String): Boolean {
-        val normalizedQuery = normalizeSearchText(query)
+        val normalizedQuery = SmartSearch.normalize(query)
         if (normalizedQuery.isBlank()) return true
-        val queryTokens = normalizedSearchTokens(normalizedQuery)
+        val queryTokens = SmartSearch.expandedQueryTokens(normalizedQuery)
         if (queryTokens.isEmpty()) return true
 
-        val searchable = normalizeSearchText(
+        val searchable = SmartSearch.normalize(
             listOf(
                 title,
                 subtitle,
@@ -943,55 +950,10 @@ class SearchActivity : AppCompatActivity() {
         )
         if (searchable.contains(normalizedQuery)) return true
 
-        val productTokens = normalizedSearchTokens(searchable)
+        val productTokens = SmartSearch.tokens(searchable)
         return queryTokens.all { queryToken ->
-            productTokens.any { productToken -> productToken.matchesQueryToken(queryToken) }
+            productTokens.any { productToken -> SmartSearch.matchesToken(productToken, queryToken) }
         }
-    }
-
-    private fun String.matchesQueryToken(queryToken: String): Boolean {
-        return startsWith(queryToken) ||
-            contains(queryToken) ||
-            (queryToken.length >= 4 && this.length >= 4 && editDistanceAtMostOne(this, queryToken))
-    }
-
-    private fun normalizedSearchTokens(value: String): List<String> {
-        return normalizeSearchText(value)
-            .split(Regex("[^a-z0-9\\p{IsArabic}]+"))
-            .map { it.trim() }
-            .filter { it.length >= 2 }
-            .distinct()
-    }
-
-    private fun normalizeSearchText(value: String): String {
-        return Normalizer.normalize(value.lowercase(Locale.getDefault()).trim(), Normalizer.Form.NFD)
-            .replace("\\p{InCombiningDiacriticalMarks}+".toRegex(), "")
-            .replace("\\s+".toRegex(), " ")
-    }
-
-    private fun editDistanceAtMostOne(a: String, b: String): Boolean {
-        if (kotlin.math.abs(a.length - b.length) > 1) return false
-        var i = 0
-        var j = 0
-        var edits = 0
-        while (i < a.length && j < b.length) {
-            if (a[i] == b[j]) {
-                i++
-                j++
-            } else {
-                edits++
-                if (edits > 1) return false
-                when {
-                    a.length > b.length -> i++
-                    a.length < b.length -> j++
-                    else -> {
-                        i++
-                        j++
-                    }
-                }
-            }
-        }
-        return edits + (a.length - i) + (b.length - j) <= 1
     }
 
     private fun applySort(items: List<Product>, sort: SortOption): List<Product> = when (sort) {
@@ -1567,6 +1529,7 @@ class SearchActivity : AppCompatActivity() {
             outState.putParcelable(KEY_RESULTS_LAYOUT_STATE, state)
         }
     }
+
 
     companion object {
         private const val PREFS_SEARCH = "search_screen_prefs"

@@ -20,7 +20,7 @@ class ProductImagePagerAdapter(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT
             )
-            scaleType = ImageView.ScaleType.CENTER_CROP
+            scaleType = ImageView.ScaleType.FIT_CENTER
             contentDescription = parent.context.getString(R.string.details_image_cd)
         }
         return ImageViewHolder(image)

@@ -10,6 +10,8 @@
     app:cardBackgroundColor="@color/home_ref_surface_alt"
     app:cardCornerRadius="@dimen/marketplace_category_card_radius"
     app:cardElevation="@dimen/marketplace_category_card_elevation"
+    app:cardPreventCornerOverlap="false"
+    app:cardUseCompatPadding="false"
     app:strokeWidth="0dp">
 
     <FrameLayout
@@ -21,6 +23,7 @@
             android:id="@+id/ivMarketplaceCategoryImage"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:adjustViewBounds="false"
             android:contentDescription="@string/cd_category"
             android:scaleType="centerCrop"
             tools:src="@drawable/categorie1" />

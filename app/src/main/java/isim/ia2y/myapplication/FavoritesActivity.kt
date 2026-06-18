@@ -107,10 +107,6 @@ class FavoritesActivity : AppCompatActivity() {
 
             card.findViewById<View>(R.id.btnFavoriteToggle)?.setOnClickListener {
                 FavoritesStore.setFavorite(this, product.id, false)
-                showMotionSnackbar(
-                    getString(R.string.product_removed_from_favorites, product.title),
-                    R.id.layoutBottomNav
-                )
                 shouldAnimateListOnNextRender = false
                 renderFavorites()
             }

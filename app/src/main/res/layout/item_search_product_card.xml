@@ -44,7 +44,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:contentDescription="@string/cd_product_image"
-                    android:scaleType="centerCrop" />
+                    android:scaleType="fitCenter" />
 
                 <ImageView
                     android:id="@+id/btnSearchFavorite"

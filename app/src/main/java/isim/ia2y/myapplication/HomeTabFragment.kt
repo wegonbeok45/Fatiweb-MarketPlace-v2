@@ -1,9 +1,12 @@
+@file:Suppress("DEPRECATION")
+
 package isim.ia2y.myapplication
 
 import android.content.Intent
 import android.graphics.drawable.GradientDrawable
 import android.graphics.Rect
 import android.os.Bundle
+import android.view.MotionEvent
 import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -39,6 +42,9 @@ class HomeTabFragment : Fragment(R.layout.fragment_home_tab), TabReselectionHand
     private var messageUnreadListener: ListenerRegistration? = null
     private var renderJob: Job? = null
     private var heroAutoScrollJob: Job? = null
+    private var categoryAutoScrollJob: Job? = null
+    private var categoryAutoScrollPausedByUser = false
+    private var categoryCarousel: RecyclerView? = null
     private var heroPageCallback: ViewPager2.OnPageChangeCallback? = null
     private val sectionDisplayJobs = mutableMapOf<Int, Job>()
 
@@ -72,7 +78,13 @@ class HomeTabFragment : Fragment(R.layout.fragment_home_tab), TabReselectionHand
     }
 
     private val categoriesAdapter by lazy {
-        HomeCategoryCarouselAdapter(homeCategoryItems(), ::openCuratedSearch)
+        HomeCategoryCarouselAdapter(
+            homeCategoryItems(),
+            ::openCuratedSearch,
+            onInteractionChanged = { isInteracting ->
+                categoryAutoScrollPausedByUser = isInteracting
+            }
+        )
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -136,6 +148,7 @@ class HomeTabFragment : Fragment(R.layout.fragment_home_tab), TabReselectionHand
         updateNotificationBadge()
         listenForMessageUnread()
         view?.let { renderCatalogSections(it) }
+        categoryCarousel?.let { startCategoryAutoScroll(it) }
         if (!hasPlayedEntrance) {
             hasPlayedEntrance = true
             (activity as? AppCompatActivity)?.forceViewsFullyVisible(
@@ -143,6 +156,12 @@ class HomeTabFragment : Fragment(R.layout.fragment_home_tab), TabReselectionHand
                 R.id.scrollHomeContent
             )
         }
+    }
+
+    override fun onPause() {
+        categoryAutoScrollJob?.cancel()
+        categoryAutoScrollJob = null
+        super.onPause()
     }
 
     override fun onStop() {
@@ -159,6 +178,9 @@ class HomeTabFragment : Fragment(R.layout.fragment_home_tab), TabReselectionHand
         sectionDisplayJobs.clear()
         heroAutoScrollJob?.cancel()
         heroAutoScrollJob = null
+        categoryAutoScrollJob?.cancel()
+        categoryAutoScrollJob = null
+        categoryCarousel = null
         heroPageCallback?.let { callback ->
             view?.findViewById<ViewPager2?>(R.id.viewPagerHomeHero)?.unregisterOnPageChangeCallback(callback)
         }
@@ -203,6 +225,7 @@ class HomeTabFragment : Fragment(R.layout.fragment_home_tab), TabReselectionHand
 
     private fun setupCategoryCarousel(root: View) {
         val recycler = root.findViewById<RecyclerView>(R.id.rvCategories) ?: return
+        categoryCarousel = recycler
         recycler.layoutManager = LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
         recycler.adapter = categoriesAdapter
         recycler.isNestedScrollingEnabled = false
@@ -213,6 +236,51 @@ class HomeTabFragment : Fragment(R.layout.fragment_home_tab), TabReselectionHand
         }
         root.findViewById<View?>(R.id.tvCategoriesSeeAll)?.setOnClickListener {
             (activity as? MainActivity)?.selectTab(MainActivity.Tab.EXPLORE)
+        }
+        recycler.setOnTouchListener { _, event ->
+            when (event.actionMasked) {
+                MotionEvent.ACTION_DOWN,
+                MotionEvent.ACTION_POINTER_DOWN,
+                MotionEvent.ACTION_MOVE -> categoryAutoScrollPausedByUser = true
+
+                MotionEvent.ACTION_UP,
+                MotionEvent.ACTION_CANCEL -> categoryAutoScrollPausedByUser = false
+            }
+            false
+        }
+        recycler.setOnHoverListener { _, event ->
+            when (event.actionMasked) {
+                MotionEvent.ACTION_HOVER_ENTER -> categoryAutoScrollPausedByUser = true
+                MotionEvent.ACTION_HOVER_EXIT -> categoryAutoScrollPausedByUser = false
+            }
+            false
+        }
+        recycler.post {
+            if (recycler.adapter === categoriesAdapter && recycler.scrollState == RecyclerView.SCROLL_STATE_IDLE) {
+                recycler.scrollToPosition(categoriesAdapter.centeredStartPosition())
+            }
+        }
+        startCategoryAutoScroll(recycler)
+    }
+
+    private fun startCategoryAutoScroll(recycler: RecyclerView) {
+        if (categoryAutoScrollJob?.isActive == true) return
+        categoryAutoScrollJob = viewLifecycleOwner.lifecycleScope.launch {
+            while (true) {
+                delay(CATEGORY_AUTO_SCROLL_FRAME_MS)
+                if (!isAdded || recycler.adapter !== categoriesAdapter) continue
+                if (categoryAutoScrollPausedByUser || recycler.scrollState != RecyclerView.SCROLL_STATE_IDLE) continue
+                if (categoriesAdapter.itemCount <= MarketplaceCategories.featuredItems.size) continue
+
+                val range = recycler.computeHorizontalScrollRange()
+                val extent = recycler.computeHorizontalScrollExtent()
+                val offset = recycler.computeHorizontalScrollOffset()
+                if (range > extent && offset >= range - extent - CATEGORY_AUTO_SCROLL_RESET_EDGE_PX) {
+                    recycler.scrollToPosition(categoriesAdapter.centeredStartPosition())
+                } else {
+                    recycler.scrollBy(CATEGORY_AUTO_SCROLL_STEP_PX, 0)
+                }
+            }
         }
     }
 
@@ -229,9 +297,17 @@ class HomeTabFragment : Fragment(R.layout.fragment_home_tab), TabReselectionHand
 
     private fun refreshMarketplaceCategories() {
         categoriesAdapter.submitList(homeCategoryItems())
+        categoryCarousel?.post {
+            categoryCarousel?.scrollToPosition(categoriesAdapter.centeredStartPosition())
+        }
         viewLifecycleOwner.lifecycleScope.launch {
             runCatching { MarketplaceCategories.refreshFromFirestore() }
-                .onSuccess { categoriesAdapter.submitList(homeCategoryItems()) }
+                .onSuccess {
+                    categoriesAdapter.submitList(homeCategoryItems())
+                    categoryCarousel?.post {
+                        categoryCarousel?.scrollToPosition(categoriesAdapter.centeredStartPosition())
+                    }
+                }
         }
     }
 
@@ -692,12 +768,7 @@ class HomeTabFragment : Fragment(R.layout.fragment_home_tab), TabReselectionHand
     }
 
     private fun toggleFavorite(product: Product) {
-        val host = activity as? AppCompatActivity ?: return
-        val nextState = FavoritesStore.toggleFavorite(requireContext(), product.id)
-        host.showMotionSnackbar(
-            if (nextState) getString(R.string.product_added_to_favorites, product.title)
-            else getString(R.string.product_removed_from_favorites, product.title)
-        )
+        FavoritesStore.toggleFavorite(requireContext(), product.id)
     }
 
     private fun addToCart(product: Product) {
@@ -728,9 +799,6 @@ class HomeTabFragment : Fragment(R.layout.fragment_home_tab), TabReselectionHand
     }
 
     private fun setupHeaderAndContentActions(root: View) {
-        root.findViewById<View>(R.id.tvBrand)?.setOnClickListener {
-            (activity as? MainActivity)?.selectTab(MainActivity.Tab.HOME)
-        }
         root.findViewById<View>(R.id.ivTopCart)?.setOnClickListener { source ->
             openMessagingInbox(source)
         }
@@ -901,7 +969,6 @@ class HomeTabFragment : Fragment(R.layout.fragment_home_tab), TabReselectionHand
 
     private fun setupMotionPolish() {
         (activity as? AppCompatActivity)?.applyPressFeedback(
-            R.id.tvBrand,
             R.id.ivTopCart,
             R.id.ivTopFavorites,
             R.id.chatContainer,
@@ -950,6 +1017,9 @@ class HomeTabFragment : Fragment(R.layout.fragment_home_tab), TabReselectionHand
     private companion object {
         const val HOME_HERO_AUTO_SCROLL_MS = 6_000L
         const val HOME_SECTION_PROGRESSIVE_DELAY_MS = 80L
+        const val CATEGORY_AUTO_SCROLL_FRAME_MS = 32L
+        const val CATEGORY_AUTO_SCROLL_STEP_PX = 2
+        const val CATEGORY_AUTO_SCROLL_RESET_EDGE_PX = 600
         const val HOME_HERO_STORAGE_PREFIX =
             "https://firebasestorage.googleapis.com/v0/b/fatiweb-marketplace.firebasestorage.app/o/category-images%2F"
     }

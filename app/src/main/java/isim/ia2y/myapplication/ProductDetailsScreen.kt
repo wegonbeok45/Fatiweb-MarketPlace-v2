@@ -1,4 +1,7 @@
+@file:Suppress("DEPRECATION")
+
 package isim.ia2y.myapplication
+
 
 import android.content.Context
 import android.content.Intent
@@ -61,6 +64,7 @@ class ProductDetailsScreen : AppCompatActivity() {
         enableEdgeToEdge()
         binding = ActivityProductDetailsBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
 
         val bottomBar = binding.layoutBottomBar
         val bottomBarBasePaddingLeft = bottomBar.paddingLeft
@@ -156,8 +160,8 @@ class ProductDetailsScreen : AppCompatActivity() {
         bindUi()
         bindActions()
         loadReviews()
-        animateEntry()
     }
+
 
     private fun showDetailsLoading() {
         binding.layoutContent.visibility = View.GONE
@@ -181,7 +185,6 @@ class ProductDetailsScreen : AppCompatActivity() {
 
     private fun bindUi() {
         val product = product ?: return
-        binding.tvTopTitle.text = getString(R.string.details_top_title)
         bindGallery()
         binding.tvTag1.text =
             product.tags.getOrNull(0)?.takeIf { it.isNotBlank() } ?: getString(R.string.product_default_tag)
@@ -277,13 +280,7 @@ class ProductDetailsScreen : AppCompatActivity() {
             )
         }
         
-        // Favorite state setup (Lottie Heart)
-        val isFav = FavoritesStore.isFavorite(this, product.id)
-        if (isFav) {
-            binding.ivFavoriteLottie.progress = 1f // Full heart
-        } else {
-            binding.ivFavoriteLottie.progress = 0f // Empty heart
-        }
+        updateFavoriteIcon(FavoritesStore.isFavorite(this, product.id))
     }
 
     private fun bindActions() {
@@ -397,17 +394,7 @@ class ProductDetailsScreen : AppCompatActivity() {
         binding.btnFavoriteDetails.setOnClickListener {
             it.performLightHapticFeedback()
             val isNowFav = FavoritesStore.toggleFavorite(this, product.id)
-            if (isNowFav) {
-                binding.ivFavoriteLottie.apply {
-                    speed = 1f // Play forward
-                    playAnimation()
-                }
-            } else {
-                binding.ivFavoriteLottie.apply {
-                    speed = -2f // Play backward quickly
-                    playAnimation()
-                }
-            }
+            updateFavoriteIcon(isNowFav)
         }
         applyPressFeedback(
             R.id.ivBack,
@@ -419,6 +406,18 @@ class ProductDetailsScreen : AppCompatActivity() {
             R.id.btnMinus,
             R.id.btnPlus,
             R.id.btnAddToCart
+        )
+    }
+
+    private fun updateFavoriteIcon(isFavorite: Boolean) {
+        binding.ivFavoriteIcon.setImageResource(
+            if (isFavorite) R.drawable.ic_home_heart_filled else R.drawable.ic_home_heart
+        )
+        binding.ivFavoriteIcon.setColorFilter(
+            ContextCompat.getColor(
+                this,
+                if (isFavorite) R.color.home_heart_active else R.color.ms_text_primary
+            )
         )
     }
 
@@ -933,6 +932,7 @@ class ProductDetailsScreen : AppCompatActivity() {
         val labelByKey = config?.attributeFields?.associate { it.key to getString(it.labelRes) } ?: emptyMap()
         var added = 0
         product.attributes.forEach { (key, value) ->
+            if (!isCustomerVisibleAttributeKey(key)) return@forEach
             val display = formatAttributeValue(value) ?: return@forEach
             if (display.isBlank()) return@forEach
             val label = when (key) {
@@ -943,6 +943,22 @@ class ProductDetailsScreen : AppCompatActivity() {
             added++
         }
         binding.cardDetailSpecs.visibility = if (added > 0) View.VISIBLE else View.GONE
+    }
+
+    private fun isCustomerVisibleAttributeKey(key: String): Boolean {
+        val normalized = key.trim()
+            .lowercase(Locale.ROOT)
+            .replace(Regex("[^a-z0-9]"), "")
+        if (normalized.isBlank()) return false
+        return normalized !in setOf(
+            "importedfrom",
+            "sourcesite",
+            "sourceproductid",
+            "sourcepermalink",
+            "wootype",
+            "woocategories",
+            "wooattributes"
+        ) && !normalized.startsWith("source")
     }
 
     private fun addSpecRow(container: android.view.ViewGroup, label: String, value: String) {

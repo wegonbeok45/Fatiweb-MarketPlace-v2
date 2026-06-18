@@ -9,8 +9,6 @@ import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.Source
 import kotlinx.coroutines.tasks.await
 import java.util.Date
-import java.text.Normalizer
-import java.util.Locale
 
 enum class ProductSearchSort {
     POPULAR,
@@ -118,8 +116,8 @@ object ProductService {
         val safePageSize = pageSize.coerceIn(1L, 50L)
         val targetPageSize = safePageSize.toInt()
         val fetchLimit = (safePageSize * 3L).coerceAtMost(90L)
-        val queryTokens = normalizedSearchTokens(queryText)
-        val indexedTokens = queryTokens.filter { it.length >= 3 }.take(10)
+        val queryTokens = SmartSearch.expandedQueryTokens(queryText)
+        val indexedTokens = SmartSearch.indexedQueryTokens(queryText)
 
         var baseQuery: Query = productsRef
             .whereEqualTo(PUBLIC_PRODUCT_QUERY_SHAPE.activeField, PUBLIC_PRODUCT_QUERY_SHAPE.activeValue)
@@ -398,12 +396,13 @@ object ProductService {
     }
 
     private fun generateKeywords(product: Product): List<String> {
-        return expandedSearchTokens(
+        return SmartSearch.productIndexTokens(
             listOf(
                 product.title,
                 product.subtitle,
                 product.description,
                 product.category,
+                MarketplaceCategories.displayNameFor(product.category),
                 product.origin,
                 product.tags.joinToString(" ")
             ).joinToString(" ")
@@ -551,9 +550,9 @@ object ProductService {
         maxPrice: Double,
         bioOnly: Boolean
     ): Boolean {
-        val normalizedQuery = normalizeSearchText(queryText)
-        val queryTokens = tokens.ifEmpty { normalizedSearchTokens(queryText) }
-        val productTokens = normalizedSearchTokens(
+        val normalizedQuery = SmartSearch.normalize(queryText)
+        val queryTokens = tokens.ifEmpty { SmartSearch.expandedQueryTokens(queryText) }
+        val productTokens = SmartSearch.tokens(
             listOf(
                 title,
                 subtitle,
@@ -567,9 +566,9 @@ object ProductService {
             ).joinToString(" ")
         )
         val queryMatch = normalizedQuery.isBlank() ||
-            normalizeSearchText(searchableText).contains(normalizedQuery) ||
+            SmartSearch.normalize(searchableText).contains(normalizedQuery) ||
             queryTokens.all { queryToken ->
-                productTokens.any { productToken -> productToken.matchesQueryToken(queryToken) }
+                productTokens.any { productToken -> SmartSearch.matchesToken(productToken, queryToken) }
             }
         val locationKeyword = when (locationFilter) {
             "medina" -> "medina"
@@ -581,65 +580,6 @@ object ProductService {
         val priceMatch = price in minPrice..maxPrice
         val bioMatch = !bioOnly || isBio
         return isActive && status == "published" && queryMatch && locationMatch && priceMatch && bioMatch
-    }
-
-    private fun normalizedSearchTokens(value: String): List<String> {
-        return normalizeSearchText(value)
-            .split(Regex("[^a-z0-9\\p{IsArabic}]+"))
-            .map { it.trim() }
-            .filter { it.length >= 2 }
-            .distinct()
-    }
-
-    private fun expandedSearchTokens(value: String): List<String> {
-        return normalizedSearchTokens(value)
-            .flatMap { token ->
-                buildList {
-                    add(token)
-                    for (length in 3 until token.length) {
-                        add(token.take(length))
-                    }
-                }
-            }
-            .distinct()
-    }
-
-    private fun normalizeSearchText(value: String): String {
-        return Normalizer.normalize(value.lowercase(Locale.getDefault()), Normalizer.Form.NFD)
-            .replace("\\p{InCombiningDiacriticalMarks}+".toRegex(), "")
-            .trim()
-            .replace("\\s+".toRegex(), " ")
-    }
-
-    private fun String.matchesQueryToken(queryToken: String): Boolean {
-        return startsWith(queryToken) ||
-            contains(queryToken) ||
-            (queryToken.length >= 4 && length >= 4 && editDistanceAtMostOne(this, queryToken))
-    }
-
-    private fun editDistanceAtMostOne(a: String, b: String): Boolean {
-        if (kotlin.math.abs(a.length - b.length) > 1) return false
-        var i = 0
-        var j = 0
-        var edits = 0
-        while (i < a.length && j < b.length) {
-            if (a[i] == b[j]) {
-                i++
-                j++
-            } else {
-                edits++
-                if (edits > 1) return false
-                when {
-                    a.length > b.length -> i++
-                    a.length < b.length -> j++
-                    else -> {
-                        i++
-                        j++
-                    }
-                }
-            }
-        }
-        return edits + (a.length - i) + (b.length - j) <= 1
     }
 
     private fun verifiedRemoteImageUrl(value: String?): String? {

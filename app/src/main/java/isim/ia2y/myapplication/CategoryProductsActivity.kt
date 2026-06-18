@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package isim.ia2y.myapplication
 
 import android.content.Context
@@ -123,11 +125,7 @@ class CategoryProductsActivity : AppCompatActivity() {
     private fun setupProductsGrid() {
         adapter = HomeCatalogAdapter(
             onToggleFavorite = { product ->
-                val isFavorite = FavoritesStore.toggleFavorite(this, product.id)
-                showMotionSnackbar(
-                    if (isFavorite) getString(R.string.product_added_to_favorites, product.title)
-                    else getString(R.string.product_removed_from_favorites, product.title)
-                )
+                FavoritesStore.toggleFavorite(this, product.id)
             },
             onOpenProduct = { product ->
                 navigateToProductDetails(product.id)
