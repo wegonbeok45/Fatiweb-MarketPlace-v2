@@ -34,7 +34,7 @@
                 android:id="@+id/adminOrderProductImage"
                 android:layout_width="96dp"
                 android:layout_height="96dp"
-                android:scaleType="centerCrop"
+                android:scaleType="fitCenter"
                 android:src="@drawable/placeholder" />
         </com.google.android.material.card.MaterialCardView>
 

@@ -18,6 +18,6 @@
         android:layout_gravity="center"
         android:contentDescription="@string/cd_product_image"
         android:padding="6dp"
-        android:scaleType="centerCrop" />
+        android:scaleType="fitCenter" />
 
 </com.google.android.material.card.MaterialCardView>

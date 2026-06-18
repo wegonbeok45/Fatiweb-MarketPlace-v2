@@ -321,6 +321,7 @@ class CartTabFragment : Fragment(R.layout.fragment_cart_tab) {
         subtotalValue.text = formatDt(subtotal)
         livraisonValue.text = formatDt(livraison)
         totalValue.text = formatDt(subtotal + livraison)
+
         if (shouldAnimateListOnNextRender) {
             (activity as? AppCompatActivity)?.revealSingleView(R.id.cardSummary)
         }

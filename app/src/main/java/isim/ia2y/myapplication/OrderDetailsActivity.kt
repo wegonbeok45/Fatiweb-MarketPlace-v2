@@ -95,15 +95,23 @@ class OrderDetailsActivity : AppCompatActivity() {
                         bindOrder(resolvedOrder)
                     }
                 }
-                .onFailure {
+                .onFailure { error ->
                     val localOrder = LocalOrderStore.findById(this@OrderDetailsActivity, orderId)
                     if (localOrder != null) {
                         bindOrder(localOrder)
                     } else {
+                        val offline = error.isNetworkError() ||
+                            !this@OrderDetailsActivity.isOnline()
                         renderOrderState(
                             loading = false,
-                            title = getString(R.string.order_details_state_error_title),
-                            message = getString(R.string.order_details_load_failed),
+                            title = getString(
+                                if (offline) R.string.offline_title
+                                else R.string.order_details_state_error_title
+                            ),
+                            message = getString(
+                                if (offline) R.string.offline_subtitle
+                                else R.string.order_details_load_failed
+                            ),
                             actionLabel = getString(R.string.order_details_state_error_action)
                         ) {
                             loadOrder()
@@ -231,7 +239,10 @@ class OrderDetailsActivity : AppCompatActivity() {
         actionLabel: String = "",
         action: (() -> Unit)? = null
     ) {
-        findViewById<View>(R.id.orderDetailsLoading)?.visibility = if (loading) View.VISIBLE else View.GONE
+        findViewById<View>(R.id.orderDetailsLoading)?.apply {
+            visibility = if (loading) View.VISIBLE else View.GONE
+            if (loading) startShimmerPulse() else stopShimmerPulse()
+        }
         findViewById<View>(R.id.scrollOrderDetails)?.visibility = if (showContent) View.VISIBLE else View.GONE
         findViewById<View>(R.id.layoutOrderState)?.visibility = if (!loading && !showContent) View.VISIBLE else View.GONE
         findViewById<TextView>(R.id.tvOrderStateTitle)?.text = title

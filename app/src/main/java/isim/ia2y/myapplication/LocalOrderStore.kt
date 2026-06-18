@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package isim.ia2y.myapplication
 
 import android.content.Context
@@ -84,7 +86,7 @@ object LocalOrderStore {
             buildList {
                 for (index in 0 until array.length()) {
                     val item = array.optJSONObject(index) ?: continue
-                    add(AppOrder.fromMap(item.toMap().filterValues { it != null } as Map<String, Any>))
+                    add(AppOrder.fromMap(item.toNonNullMap()))
                 }
             }.sortedByDescending { it.createdAtMillis }
         }.getOrDefault(emptyList())
@@ -173,6 +175,12 @@ object LocalOrderStore {
             }
         }
         return result
+    }
+
+    private fun JSONObject.toNonNullMap(): Map<String, Any> {
+        return toMap().mapNotNull { (key, value) ->
+            value?.let { key to it }
+        }.toMap()
     }
 
     private fun JSONArray.toList(): List<Any?> {

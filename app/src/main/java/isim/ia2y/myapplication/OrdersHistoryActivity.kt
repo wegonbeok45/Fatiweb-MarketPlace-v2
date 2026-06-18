@@ -16,6 +16,7 @@ class OrdersHistoryActivity : AppCompatActivity() {
     private var allOrders: List<AppOrder> = emptyList()
     private var selectedFilter: OrderFilter = OrderFilter.ALL
     private var ordersErrorVisible: Boolean = false
+    private var lastErrorWasOffline: Boolean = false
 
     private val ordersAdapter = OrdersHistoryAdapter { order ->
         startActivity(OrderDetailsActivity.createIntent(this, order.id))
@@ -25,6 +26,7 @@ class OrdersHistoryActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_orders_history)
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
@@ -73,9 +75,15 @@ class OrdersHistoryActivity : AppCompatActivity() {
                     }
                     if (merged.isEmpty()) ScreenState.Empty() else ScreenState.Content(merged)
                 },
-                onFailure = {
+                onFailure = { error ->
+                    lastErrorWasOffline = error.isNetworkError() || !isOnline()
                     if (localOrders.isEmpty()) {
-                        ScreenState.Error(getString(R.string.orders_history_load_error))
+                        ScreenState.Error(
+                            getString(
+                                if (lastErrorWasOffline) R.string.offline_title
+                                else R.string.orders_history_load_error
+                            )
+                        )
                     } else {
                         ScreenState.Content(localOrders)
                     }
@@ -140,7 +148,10 @@ class OrdersHistoryActivity : AppCompatActivity() {
                 emptyState.visibility = View.VISIBLE
                 configureEmptyState(
                     title = state.message,
-                    subtitle = getString(R.string.orders_history_error_subtitle),
+                    subtitle = getString(
+                        if (lastErrorWasOffline) R.string.offline_subtitle
+                        else R.string.orders_history_error_subtitle
+                    ),
                     action = getString(R.string.cart_sync_retry_action)
                 )
                 playEmptyAnimation(emptyAnimation)

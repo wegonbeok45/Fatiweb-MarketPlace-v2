@@ -1,7 +1,11 @@
 package isim.ia2y.myapplication
 
 import android.Manifest
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
+import android.os.Build
 import android.os.Bundle
 import android.text.InputFilter
 import android.text.InputType
@@ -27,6 +31,11 @@ import com.google.android.material.card.MaterialCardView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.launch
 import isim.ia2y.myapplication.databinding.ActivityCheckoutDetailsBinding
+import isim.ia2y.myapplication.voice.FatiVoiceController
+import isim.ia2y.myapplication.voice.FatiVoiceGeminiService
+import isim.ia2y.myapplication.voice.FatiVoicePreferences
+import isim.ia2y.myapplication.voice.FatiVoiceService
+import isim.ia2y.myapplication.voice.VoiceFormFiller
 
 class CheckoutDetailsActivity : AppCompatActivity() {
     private companion object {
@@ -45,10 +54,20 @@ class CheckoutDetailsActivity : AppCompatActivity() {
         const val MAX_CITY_LENGTH = 80
         const val MAX_ADDRESS_LENGTH = 180
         const val MAX_NOTE_LENGTH = 240
+        const val ACTION_TEST_FATIVOICE_CHECKOUT = "com.fatiweb.store.FATIVOICE_CHECKOUT_TEST"
+        const val EXTRA_TEST_FATIVOICE_COMMAND = "fativoice_test_command"
     }
 
     private val viewModel: CheckoutViewModel by viewModels()
     private lateinit var binding: ActivityCheckoutDetailsBinding
+    private lateinit var fatiVoiceService: FatiVoiceService
+    private lateinit var fatiVoiceController: FatiVoiceController
+    private lateinit var voiceFormFiller: VoiceFormFiller
+    private var isVoiceFormActive = false
+    private var awaitingVoiceConfirmation = false
+    private var awaitingDeliveryChoice = false
+    private var awaitingFinalConfirmation = false
+    private var checkoutVoiceFormStarted = false
     private var selectedPaymentMethod = PaymentMethod.CASH
     private var confirmationOrderNumber = ""
     private var confirmationDeliveryEstimate = ""
@@ -57,6 +76,7 @@ class CheckoutDetailsActivity : AppCompatActivity() {
     private var lastSavedOrder: AppOrder? = null
     private var lastDraftOrder: AppOrder? = null
     private var guestCheckoutChoiceShown = false
+    private var fatiVoiceDebugReceiver: BroadcastReceiver? = null
     private val btnContinue: MaterialButton
         get() = binding.btnCheckoutContinue
 
@@ -81,6 +101,7 @@ class CheckoutDetailsActivity : AppCompatActivity() {
         enableEdgeToEdge()
         binding = ActivityCheckoutDetailsBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
         restoreCheckoutState(savedInstanceState)
         val scrollBaseBottomPadding = binding.scrollCheckoutContent.paddingBottom
         val bottomBarBaseBottomPadding = binding.layoutCheckoutBottomBar.paddingBottom
@@ -99,6 +120,7 @@ class CheckoutDetailsActivity : AppCompatActivity() {
         }
 
         setupActions()
+        setupVoiceCheckout()
         observeShippingSelection()
         observeOrderResult()
         observeUserProfile()
@@ -108,7 +130,7 @@ class CheckoutDetailsActivity : AppCompatActivity() {
         renderStepState()
         loadCommerceConfig()
 
-        if (FirebaseAuthManager.currentUser == null) {
+        if (FirebaseAuthManager.currentUser == null && !FatiVoicePreferences.isVoiceEnabled(this)) {
             binding.root.post { showCheckoutContinuationChoice() }
         }
 
@@ -133,6 +155,7 @@ class CheckoutDetailsActivity : AppCompatActivity() {
             R.id.cardPayCash,
             R.id.btnCheckoutContinue
         )
+        registerFatiVoiceDebugReceiver()
     }
 
     override fun onResume() {
@@ -140,6 +163,33 @@ class CheckoutDetailsActivity : AppCompatActivity() {
         bindDynamicData()
         applyPaymentSelection()
         updateCheckoutActionCard()
+
+        if (FatiVoicePreferences.isVoiceEnabled(this) && !checkoutVoiceFormStarted) {
+            if (!isVoiceFormActive && !awaitingVoiceConfirmation && (viewModel.currentStep.value ?: 1) == 1) {
+                checkoutVoiceFormStarted = true
+                startCheckoutVoiceFill()
+            } else if (::fatiVoiceController.isInitialized) {
+                fatiVoiceController.start()
+            }
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        if (::fatiVoiceController.isInitialized) {
+            fatiVoiceController.reset()
+        }
+    }
+
+    override fun onDestroy() {
+        if (::fatiVoiceController.isInitialized) {
+            fatiVoiceController.destroy()
+        }
+        fatiVoiceDebugReceiver?.let { receiver ->
+            runCatching { unregisterReceiver(receiver) }
+        }
+        fatiVoiceDebugReceiver = null
+        super.onDestroy()
     }
 
     private fun setupActions() {
@@ -148,7 +198,12 @@ class CheckoutDetailsActivity : AppCompatActivity() {
         }
 
         binding.tvCheckoutModifyAddress.setOnClickListener {
-            navigateNoShift(AddressesActivity::class.java)
+            it.performLightHapticFeedback()
+            if (::fatiVoiceController.isInitialized && FatiVoicePreferences.isVoiceEnabled(this)) {
+                fatiVoiceController.handleVoiceInput("modifier adresse")
+            } else {
+                navigateNoShift(AddressesActivity::class.java)
+            }
         }
 
         binding.cardDeliveryStandard.setOnClickListener {
@@ -174,6 +229,10 @@ class CheckoutDetailsActivity : AppCompatActivity() {
             it.performLightHapticFeedback()
             Log.d(TAG, "Continue tapped on step=${viewModel.currentStep.value ?: 1}")
             if (FirebaseAuthManager.currentUser == null) {
+                if (FatiVoicePreferences.isVoiceEnabled(this) && AddressBookStore.getCurrent(this) != null) {
+                    transitionToStep2()
+                    return@setOnClickListener
+                }
                 showCheckoutContinuationChoice(force = true)
                 return@setOnClickListener
             }
@@ -312,6 +371,12 @@ class CheckoutDetailsActivity : AppCompatActivity() {
     private fun confirmOrder() {
         if (viewModel.isProcessing.value == true) return
         if (FirebaseAuthManager.currentUser == null) {
+            val voiceAddress = AddressBookStore.getCurrent(this)
+            if (FatiVoicePreferences.isVoiceEnabled(this) && voiceAddress != null) {
+                if (!requireCompleteCheckoutAddress { confirmOrder() }) return
+                saveGuestOrderAndProceed(voiceAddress)
+                return
+            }
             showPhoneCheckoutDialog()
             return
         }
@@ -463,7 +528,9 @@ class CheckoutDetailsActivity : AppCompatActivity() {
 
     private fun transitionToStep2() {
         if (viewModel.currentStep.value == 2) return
-        if (FirebaseAuthManager.currentUser == null) {
+        val voiceGuestReady = FatiVoicePreferences.isVoiceEnabled(this) &&
+                AddressBookStore.getCurrent(this) != null
+        if (FirebaseAuthManager.currentUser == null && !voiceGuestReady) {
             showCheckoutContinuationChoice(force = true)
             return
         }
@@ -472,6 +539,9 @@ class CheckoutDetailsActivity : AppCompatActivity() {
             return
         }
         if (!requireCompleteCheckoutAddress { transitionToStep2() }) return
+        checkoutVoiceFormStarted = false
+        isVoiceFormActive = false
+        awaitingVoiceConfirmation = false
         viewModel.setStep(2)
         AnalyticsTracker.checkoutStepCompleted(1, "delivery")
         AnalyticsTracker.beginCheckout(
@@ -493,6 +563,9 @@ class CheckoutDetailsActivity : AppCompatActivity() {
         }.start()
 
         applyPaymentSelection()
+        if (FatiVoicePreferences.isVoiceEnabled(this)) {
+            startDeliveryVoiceFlow()
+        }
     }
 
     private fun transitionToStep3() {
@@ -641,6 +714,244 @@ class CheckoutDetailsActivity : AppCompatActivity() {
         binding.tvCheckoutTotal.text = formatDt(total)
     }
 
+    private fun setupVoiceCheckout() {
+        fatiVoiceService = FatiVoiceService(this)
+        fatiVoiceController = FatiVoiceController(this, fatiVoiceService, FatiVoiceGeminiService)
+        fatiVoiceController.onRecognitionResult = { result ->
+            runOnUiThread {
+                Log.d(TAG, "Voice recognition result received -> $result")
+                handleVoiceRecognitionResult(result)
+            }
+        }
+        fatiVoiceController.onRecognitionError = { errorMessage ->
+            runOnUiThread {
+                showMotionSnackbar("FatiVoice erreur: $errorMessage")
+                binding.tvCheckoutVoiceProgress.text = voiceFormFiller.getProgressText()
+                promptVoiceStep()
+            }
+        }
+        voiceFormFiller = VoiceFormFiller()
+    }
+
+    private fun registerFatiVoiceDebugReceiver() {
+        if (!BuildConfig.DEBUG || fatiVoiceDebugReceiver != null) return
+        fatiVoiceDebugReceiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context, intent: Intent) {
+                if (intent.action != ACTION_TEST_FATIVOICE_CHECKOUT) return
+                val command = intent.getStringExtra(EXTRA_TEST_FATIVOICE_COMMAND).orEmpty()
+                if (command.isBlank()) return
+                binding.root.postDelayed({
+                    Log.d(TAG, "Checkout FatiVoice debug command: $command")
+                    if (::fatiVoiceController.isInitialized) {
+                        fatiVoiceController.reset()
+                    }
+                    handleVoiceRecognitionResult(command)
+                }, 500L)
+            }
+        }
+        val filter = IntentFilter(ACTION_TEST_FATIVOICE_CHECKOUT)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(fatiVoiceDebugReceiver, filter, Context.RECEIVER_EXPORTED)
+        } else {
+            @Suppress("DEPRECATION")
+            registerReceiver(fatiVoiceDebugReceiver, filter)
+        }
+    }
+
+    private fun startCheckoutVoiceFill() {
+        if (isVoiceFormActive || awaitingVoiceConfirmation) {
+            Log.d(TAG, "Voice form already active or awaiting confirmation")
+            return
+        }
+        if ((viewModel.currentStep.value ?: 1) != 1) {
+            Log.d(TAG, "Voice form only available on step 1")
+            return
+        }
+        isVoiceFormActive = true
+        voiceFormFiller.reset()
+        binding.tvCheckoutVoiceProgress.visibility = View.VISIBLE
+        binding.tvCheckoutVoiceProgress.text = voiceFormFiller.getProgressText()
+        Log.d(TAG, "Checkout voice form started")
+        promptVoiceStep()
+    }
+
+    private fun promptVoiceStep() {
+        if (!::fatiVoiceController.isInitialized || !::voiceFormFiller.isInitialized) return
+        val step = voiceFormFiller.getCurrentStep()
+        highlightVoiceStep(step)
+        binding.tvCheckoutVoiceProgress.text = voiceFormFiller.getProgressText()
+        Log.d(TAG, "Prompting voice step -> $step : ${voiceFormFiller.getCurrentPrompt()}")
+        fatiVoiceController.startListening(voiceFormFiller.getCurrentPrompt())
+    }
+
+    private fun startDeliveryVoiceFlow() {
+        if (!::fatiVoiceController.isInitialized || !FatiVoicePreferences.isVoiceEnabled(this)) return
+        awaitingDeliveryChoice = true
+        val prompt = "Voulez-vous livraison standard, ou express demain ?"
+        Log.d(TAG, "startDeliveryVoiceFlow -> prompt: $prompt")
+        fatiVoiceController.startListening(prompt)
+    }
+
+    private fun startFinalConfirmationFlow() {
+        if (!::fatiVoiceController.isInitialized || !FatiVoicePreferences.isVoiceEnabled(this)) return
+        awaitingFinalConfirmation = true
+        val cart = CartStore.getCart(this)
+        val itemsSummary = if (cart.isEmpty()) {
+            "aucun article"
+        } else {
+            cart.entries.joinToString(separator = ", ") { (key, qty) ->
+                val productId = CartKey.productId(key)
+                val product = ProductCatalog.byId(productId)
+                val name = product?.title ?: productId
+                "$name x$qty"
+            }
+        }
+
+        val subtotal = CartStore.subtotal(this)
+        val shippingFee = selectedShippingFee()
+        val total = CartStore.total(this, shippingFee)
+        val deliveryType = if (viewModel.isStandardSelected.value == true) "standard" else "express"
+        val address = AddressBookStore.getCurrent(this)?.summaryLine ?: "adresse non fournie"
+        val prompt = buildString {
+            append("Resume de votre commande. ")
+            append("Articles: $itemsSummary. ")
+            append("Sous-total: ${String.format(java.util.Locale.FRANCE, "%.2f", subtotal)} dinars. ")
+            append("Livraison $deliveryType: ${String.format(java.util.Locale.FRANCE, "%.2f", shippingFee)} dinars. ")
+            append("Total: ${String.format(java.util.Locale.FRANCE, "%.2f", total)} dinars. ")
+            append("Adresse: $address. ")
+            append("Voulez-vous confirmer la commande ? Dites oui pour confirmer.")
+        }
+        Log.d(TAG, "startFinalConfirmationFlow -> promptSummary: ${prompt.take(200)}")
+        fatiVoiceController.startListening(prompt)
+    }
+
+    private fun handleVoiceRecognitionResult(result: String) {
+        val normalized = result.trim().lowercase()
+        Log.d(
+            TAG,
+            "handleVoiceRecognitionResult result=$result awaitingVoiceConfirmation=$awaitingVoiceConfirmation awaitingDeliveryChoice=$awaitingDeliveryChoice awaitingFinalConfirmation=$awaitingFinalConfirmation isVoiceFormActive=$isVoiceFormActive"
+        )
+
+        if (awaitingVoiceConfirmation) {
+            if (normalized.contains("oui")) {
+                awaitingVoiceConfirmation = false
+                clearVoiceHighlights()
+                isVoiceFormActive = false
+                transitionToStep2()
+            } else {
+                fatiVoiceController.startListening("Je n'ai pas compris. Dites oui pour confirmer les informations.")
+            }
+            return
+        }
+
+        if (awaitingDeliveryChoice) {
+            when {
+                normalized.contains("express") || normalized.contains("rapide") || normalized.contains("demain") -> {
+                    awaitingDeliveryChoice = false
+                    viewModel.setShippingType(false)
+                    startFinalConfirmationFlow()
+                }
+                normalized.contains("standard") || normalized.contains("normale") || normalized.contains("classique") -> {
+                    awaitingDeliveryChoice = false
+                    viewModel.setShippingType(true)
+                    startFinalConfirmationFlow()
+                }
+                else -> {
+                    fatiVoiceController.startListening("Dites standard ou express.")
+                }
+            }
+            return
+        }
+
+        if (awaitingFinalConfirmation) {
+            if (normalized.contains("oui")) {
+                awaitingFinalConfirmation = false
+                confirmOrder()
+            } else {
+                fatiVoiceController.startListening("Dites oui pour confirmer la commande.")
+            }
+            return
+        }
+
+        if (!isVoiceFormActive) {
+            fatiVoiceController.startListening("Dites oui, standard, express, ou reprenez votre commande.")
+            return
+        }
+
+        val voiceResult = voiceFormFiller.advance(result)
+        binding.tvCheckoutVoiceProgress.text = voiceFormFiller.getProgressText()
+
+        if (voiceFormFiller.hasMoreSteps()) {
+            fatiVoiceService.speak("Merci.") {
+                promptVoiceStep()
+            }
+            return
+        }
+
+        val addressText = voiceFormFiller.getAddressLine()
+        val city = inferVoiceCity(addressText)
+        val deliveryAddress = buildCheckoutAddress(
+            fullName = voiceFormFiller.getRecipientName(),
+            phone = voiceFormFiller.getPhone(),
+            address = addressText,
+            city = city,
+            note = "Saisi par FatiVoice"
+        ) ?: run {
+            fatiVoiceController.startListening("Certaines informations sont incompletes. Recommencons. ${voiceFormFiller.getCurrentPrompt()}")
+            voiceFormFiller.reset()
+            return
+        }
+
+        AddressBookStore.upsert(this, deliveryAddress)
+        lifecycleScope.launch { LocationProfileSync.saveManualAddress(this@CheckoutDetailsActivity, deliveryAddress) }
+        bindDynamicData()
+        updateCheckoutActionCard()
+        clearVoiceHighlights()
+        isVoiceFormActive = false
+        awaitingVoiceConfirmation = true
+        val summary = voiceFormFiller.getCompletionSummary()
+        fatiVoiceController.startListening("Voici les informations: $summary Dites oui pour confirmer.")
+        Log.d(TAG, "Voice form completed at step ${voiceResult.step}")
+    }
+
+    private fun highlightVoiceStep(step: VoiceFormFiller.Step) {
+        clearVoiceHighlights()
+        val color = ContextCompat.getColor(this, R.color.home_ref_gold)
+        val width = resources.getDimensionPixelSize(R.dimen.checkout_selected_stroke)
+        when (step) {
+            VoiceFormFiller.Step.NAME,
+            VoiceFormFiller.Step.PHONE,
+            VoiceFormFiller.Step.ADDRESS -> {
+                binding.cardCheckoutAddress.strokeColor = color
+                binding.cardCheckoutAddress.strokeWidth = width
+            }
+            VoiceFormFiller.Step.PAYMENT -> {
+                binding.cardPayCash.strokeColor = color
+                binding.cardPayCash.strokeWidth = width
+            }
+        }
+    }
+
+    private fun clearVoiceHighlights() {
+        binding.cardCheckoutAddress.strokeColor = ContextCompat.getColor(this, R.color.ms_border_default)
+        binding.cardCheckoutAddress.strokeWidth = 1
+        applyPaymentSelection()
+    }
+
+    private fun inferVoiceCity(addressText: String): String {
+        val commaPart = addressText.split(',')
+            .map { it.trim() }
+            .lastOrNull { it.length >= 2 }
+        if (!commaPart.isNullOrBlank()) return commaPart.take(MAX_CITY_LENGTH)
+
+        val words = addressText.split(Regex("\\s+"))
+            .map { it.trim(',', '.', ';') }
+            .filter { it.length >= 2 }
+        return words.takeLast(2).joinToString(" ")
+            .ifBlank { "Tunis" }
+            .take(MAX_CITY_LENGTH)
+    }
+
     private fun applyDeliverySelection() {
         val cardStandard = binding.cardDeliveryStandard
         val cardExpress = binding.cardDeliveryExpress
@@ -675,7 +986,9 @@ class CheckoutDetailsActivity : AppCompatActivity() {
     }
 
     private fun updateCheckoutActionCard(requestFocus: Boolean = false) {
-        val needsLogin = FirebaseAuthManager.currentUser == null
+        val voiceGuestReady = FatiVoicePreferences.isVoiceEnabled(this) &&
+                AddressBookStore.getCurrent(this) != null
+        val needsLogin = FirebaseAuthManager.currentUser == null && !voiceGuestReady
         val needsAddress = AddressBookStore.getCurrent(this) == null
         val shouldShow = if (needsLogin) viewModel.currentStep.value != 3 else needsAddress
 
@@ -845,6 +1158,7 @@ class CheckoutDetailsActivity : AppCompatActivity() {
     private fun showCheckoutContinuationChoice(force: Boolean = false) {
         if (!force && guestCheckoutChoiceShown) return
         if (FirebaseAuthManager.currentUser != null) return
+        if (!force && FatiVoicePreferences.isVoiceEnabled(this)) return
         guestCheckoutChoiceShown = true
 
         MaterialAlertDialogBuilder(this)
@@ -1050,31 +1364,52 @@ class CheckoutDetailsActivity : AppCompatActivity() {
 
         binding.layoutLottieLoading.visibility = View.VISIBLE
         btnContinue.isEnabled = false
-        lifecycleScope.launch {
-            val existingUser = FirebaseAuthManager.currentUser
-            val userResult = if (existingUser != null) {
-                Result.success(existingUser)
-            } else {
-                FirebaseAuthManager.signInAnonymously()
-            }
-            userResult.fold(
-                onSuccess = { user ->
-                    runCatching {
-                        UserService.updateUserProfileName(user.uid, deliveryAddress.recipientName)
-                        UserService.markPhoneAccount(user.uid, deliveryAddress.phone)
-                    }
-                    AddressBookStore.upsert(this@CheckoutDetailsActivity, deliveryAddress)
-                    LocationProfileSync.saveManualAddress(this@CheckoutDetailsActivity, deliveryAddress)
-                    bindDynamicData()
-                    saveOrderAndProceed()
-                },
-                onFailure = { error ->
-                    binding.layoutLottieLoading.visibility = View.GONE
-                    btnContinue.isEnabled = true
-                    showMotionSnackbar(FirebaseAuthManager.friendlyError(this@CheckoutDetailsActivity, error))
+        val existingUser = FirebaseAuthManager.currentUser
+        if (existingUser != null) {
+            lifecycleScope.launch {
+                runCatching {
+                    UserService.updateUserProfileName(existingUser.uid, deliveryAddress.recipientName)
+                    UserService.markPhoneAccount(existingUser.uid, deliveryAddress.phone)
                 }
-            )
+                AddressBookStore.upsert(this@CheckoutDetailsActivity, deliveryAddress)
+                LocationProfileSync.saveManualAddress(this@CheckoutDetailsActivity, deliveryAddress)
+                bindDynamicData()
+                saveOrderAndProceed()
+            }
+            return
         }
+
+        val guestOrder = buildOrderFromCart(
+            uid = buildGuestOrderUid(deliveryAddress),
+            deliveryAddress = deliveryAddress,
+            id = buildGuestOrderId()
+        ) ?: run {
+            binding.layoutLottieLoading.visibility = View.GONE
+            btnContinue.isEnabled = true
+            return
+        }
+
+        AddressBookStore.upsert(this, deliveryAddress)
+        lifecycleScope.launch { LocationProfileSync.saveManualAddress(this@CheckoutDetailsActivity, deliveryAddress) }
+        lastSavedOrder = guestOrder
+        lastDraftOrder = null
+        LocalOrderStore.upsert(this, guestOrder)
+        AnalyticsTracker.purchase(guestOrder)
+        AnalyticsTracker.checkoutStepCompleted(3, "confirmation")
+        CartStore.clear(this)
+        updateSummary()
+        binding.layoutLottieLoading.visibility = View.GONE
+        btnContinue.isEnabled = true
+        transitionToStep3()
+    }
+
+    private fun buildGuestOrderId(): String {
+        return "guest_${System.currentTimeMillis()}"
+    }
+
+    private fun buildGuestOrderUid(deliveryAddress: DeliveryAddress): String {
+        val digits = deliveryAddress.phone.filter { it.isDigit() }.takeLast(8)
+        return if (digits.isBlank()) "guest" else "guest_$digits"
     }
 
     private fun buildOrderFromCart(uid: String, deliveryAddress: DeliveryAddress, id: String): AppOrder? {
@@ -1247,7 +1582,9 @@ class CheckoutDetailsActivity : AppCompatActivity() {
         binding.lineStep2to3.setBackgroundColor(
             ContextCompat.getColor(this, if (step >= 3) R.color.ms_surface_inverse else R.color.ms_border_default)
         )
+
     }
+
 
     private fun updateStepIndicator(stepNumber: Int, isActive: Boolean, isComplete: Boolean) {
         val bgView = when (stepNumber) {

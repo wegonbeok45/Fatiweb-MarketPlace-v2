@@ -48,15 +48,24 @@
             app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <ProgressBar
+    <LinearLayout
         android:id="@+id/orderDetailsLoading"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/space_14"
         android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/layoutTopBar" />
+        app:layout_constraintTop_toBottomOf="@id/layoutTopBar">
+
+        <include layout="@layout/item_order_history_shimmer" />
+
+        <include
+            layout="@layout/item_order_history_shimmer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/layoutOrderState"

@@ -267,6 +267,16 @@
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
+                <TextView
+                    android:id="@+id/tvCheckoutVoiceProgress"
+                    style="@style/AppText.Caption"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_12"
+                    android:text="Étape 1/4"
+                    android:textColor="@color/home_ref_gold"
+                    android:visibility="gone" />
+
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/cardCheckoutActionNeeded"
                     style="@style/AppCard"

@@ -38,11 +38,13 @@ object CartStore {
     private const val SYNC_DEBOUNCE_MS = 500L
     private const val SYNC_RETRY_DELAY_MS = 1_000L
     private const val SYNC_MAX_ATTEMPTS = 3
+    private const val RECENT_CLEAR_GRACE_MS = 60_000L
 
     private var pendingSyncJob: Job? = null
     private var pendingSyncCart: Map<String, Int>? = null
     private var pendingSyncContext: Context? = null
     private var pendingSyncToken = 0L
+    private val recentlyClearedAccounts = mutableMapOf<String, Long>()
 
     private var _syncState = MutableStateFlow(CartSyncState())
     val syncState: StateFlow<CartSyncState> = _syncState.asStateFlow()
@@ -345,14 +347,22 @@ object CartStore {
     }
 
     fun clear(context: Context) {
+        val accountKey = currentAccountKey()
         synchronized(this) {
-            val key = currentAccountKey()
-            saveLocalCart(context, key, emptyMap())
+            saveLocalCart(context, accountKey, emptyMap())
+            recentlyClearedAccounts[accountKey] = System.currentTimeMillis()
         }
         cancelPendingSync()
         val uid = currentUidOrNull()
         if (uid != null && !FirebaseCostSafeMode.enabled) {
-            scope.launch { runCatching { CartFirestoreService.replaceCart(uid, emptyMap()) } }
+            scope.launch {
+                runCatching { CartFirestoreService.replaceCart(uid, emptyMap()) }
+                    .onSuccess {
+                        synchronized(this@CartStore) {
+                            recentlyClearedAccounts.remove(uid)
+                        }
+                    }
+            }
         }
     }
 
@@ -374,12 +384,27 @@ object CartStore {
     suspend fun refreshFromCloud(context: Context): Map<String, Int> {
         if (FirebaseCostSafeMode.enabled) return getCart(context)
         val uid = currentUidOrNull() ?: return getCart(context)
+        if (wasRecentlyCleared(uid)) return getCart(context)
         if (hasPendingCloudSync()) return getCart(context)
         val remoteCart = runCatching { CartFirestoreService.fetchCart(uid) }.getOrDefault(getCart(context))
+        if (remoteCart.isEmpty()) {
+            synchronized(this) { recentlyClearedAccounts.remove(uid) }
+        }
         synchronized(this) {
             saveLocalCart(context, uid, remoteCart)
         }
         return remoteCart
+    }
+
+    private fun wasRecentlyCleared(accountKey: String): Boolean {
+        return synchronized(this) {
+            val clearedAt = recentlyClearedAccounts[accountKey] ?: return@synchronized false
+            val isRecent = System.currentTimeMillis() - clearedAt < RECENT_CLEAR_GRACE_MS
+            if (!isRecent) {
+                recentlyClearedAccounts.remove(accountKey)
+            }
+            isRecent
+        }
     }
 
     suspend fun mergeGuestCartIntoCurrent(context: Context) {
