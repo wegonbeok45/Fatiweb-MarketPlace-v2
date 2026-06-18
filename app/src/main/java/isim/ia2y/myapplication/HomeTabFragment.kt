@@ -43,6 +43,7 @@ class HomeTabFragment : Fragment(R.layout.fragment_home_tab), TabReselectionHand
     private var renderJob: Job? = null
     private var heroAutoScrollJob: Job? = null
     private var categoryAutoScrollJob: Job? = null
+    private var catalogSkeletonRetryJob: Job? = null
     private var categoryAutoScrollPausedByUser = false
     private var categoryCarousel: RecyclerView? = null
     private var heroPageCallback: ViewPager2.OnPageChangeCallback? = null
@@ -180,6 +181,8 @@ class HomeTabFragment : Fragment(R.layout.fragment_home_tab), TabReselectionHand
         heroAutoScrollJob = null
         categoryAutoScrollJob?.cancel()
         categoryAutoScrollJob = null
+        catalogSkeletonRetryJob?.cancel()
+        catalogSkeletonRetryJob = null
         categoryCarousel = null
         heroPageCallback?.let { callback ->
             view?.findViewById<ViewPager2?>(R.id.viewPagerHomeHero)?.unregisterOnPageChangeCallback(callback)
@@ -287,7 +290,7 @@ class HomeTabFragment : Fragment(R.layout.fragment_home_tab), TabReselectionHand
     private fun homeCategoryItems(): List<HomeCategoryItem> =
         MarketplaceCategories.featuredItems.map { category ->
             HomeCategoryItem(
-                label = category.name,
+                label = MarketplaceCategories.displayNameFor(category),
                 imageUrl = category.imageUrl,
                 imageResId = MarketplaceCategories.imageResFor(category.id),
                 categoryKey = category.id,
@@ -542,12 +545,12 @@ class HomeTabFragment : Fragment(R.layout.fragment_home_tab), TabReselectionHand
         val latest = renderData.latest
         val discovery = renderData.discovery
         val syncState = renderData.syncState
-        val isInitialLoading = renderData.catalogIsEmpty && syncState.isRefreshing
-        val isOfflineWithoutCache = renderData.catalogIsEmpty && syncState.status == CatalogSyncStatus.ERROR
+        val shouldShowCatalogSkeleton = renderData.catalogIsEmpty && syncState.status != CatalogSyncStatus.SUCCESS
         val isShowingSavedProducts = syncState.status == CatalogSyncStatus.ERROR && syncState.fromCache
 
-        setShimmering(isInitialLoading)
+        setShimmering(shouldShowCatalogSkeleton)
         updateHomeRefreshState(syncState)
+        updateCatalogSkeletonRetry(shouldShowCatalogSkeleton, syncState)
 
         renderHomeProductSection(
             root = root,
@@ -559,8 +562,7 @@ class HomeTabFragment : Fragment(R.layout.fragment_home_tab), TabReselectionHand
             cacheMessageId = R.id.tvFeaturedProductsCacheMessage,
             adapter = featuredProductsAdapter,
             items = featured,
-            isInitialLoading = isInitialLoading,
-            isOfflineWithoutCache = isOfflineWithoutCache,
+            showLoadingSkeleton = shouldShowCatalogSkeleton,
             isShowingSavedProducts = isShowingSavedProducts,
             emptyMessage = featuredEmptyMessage ?: root.context.getString(R.string.home_section_empty),
             progressive = !syncState.fromCache && syncState.status == CatalogSyncStatus.SUCCESS
@@ -575,8 +577,7 @@ class HomeTabFragment : Fragment(R.layout.fragment_home_tab), TabReselectionHand
             cacheMessageId = R.id.tvLatestProductsCacheMessage,
             adapter = latestProductsAdapter,
             items = latest,
-            isInitialLoading = isInitialLoading,
-            isOfflineWithoutCache = isOfflineWithoutCache,
+            showLoadingSkeleton = shouldShowCatalogSkeleton,
             isShowingSavedProducts = isShowingSavedProducts,
             emptyMessage = latestEmptyMessage ?: root.context.getString(R.string.home_section_empty),
             progressive = !syncState.fromCache && syncState.status == CatalogSyncStatus.SUCCESS
@@ -591,8 +592,7 @@ class HomeTabFragment : Fragment(R.layout.fragment_home_tab), TabReselectionHand
             cacheMessageId = R.id.tvDiscoverProductsCacheMessage,
             adapter = discoverProductsAdapter,
             items = discovery,
-            isInitialLoading = isInitialLoading,
-            isOfflineWithoutCache = isOfflineWithoutCache,
+            showLoadingSkeleton = shouldShowCatalogSkeleton,
             isShowingSavedProducts = isShowingSavedProducts,
             emptyMessage = discoverEmptyMessage ?: root.context.getString(R.string.home_section_empty),
             progressive = !syncState.fromCache && syncState.status == CatalogSyncStatus.SUCCESS
@@ -609,8 +609,7 @@ class HomeTabFragment : Fragment(R.layout.fragment_home_tab), TabReselectionHand
         cacheMessageId: Int,
         adapter: HomeCatalogAdapter,
         items: List<Product>,
-        isInitialLoading: Boolean,
-        isOfflineWithoutCache: Boolean,
+        showLoadingSkeleton: Boolean,
         isShowingSavedProducts: Boolean,
         emptyMessage: String,
         progressive: Boolean
@@ -621,20 +620,34 @@ class HomeTabFragment : Fragment(R.layout.fragment_home_tab), TabReselectionHand
         root.findViewById<View>(cacheMessageId)?.visibility =
             if (items.isNotEmpty() && isShowingSavedProducts) View.VISIBLE else View.GONE
         root.findViewById<View>(emptyCardId)?.visibility =
-            if (items.isEmpty() && !isInitialLoading) View.VISIBLE else View.GONE
+            if (items.isEmpty() && !showLoadingSkeleton) View.VISIBLE else View.GONE
 
         val title = root.findViewById<TextView>(emptyTitleId)
         val body = root.findViewById<TextView>(emptyBodyId)
         val retry = root.findViewById<View>(retryButtonId)
-        if (isOfflineWithoutCache) {
-            title?.text = root.context.getString(R.string.home_offline_title)
-            body?.text = root.context.getString(R.string.home_offline_subtitle)
-            body?.visibility = View.VISIBLE
-            retry?.visibility = View.VISIBLE
-        } else {
-            title?.text = emptyMessage
-            body?.visibility = View.GONE
-            retry?.visibility = View.GONE
+        title?.text = emptyMessage
+        body?.visibility = View.GONE
+        retry?.visibility = View.GONE
+    }
+
+    private fun updateCatalogSkeletonRetry(showLoadingSkeleton: Boolean, syncState: CatalogSyncState) {
+        if (!showLoadingSkeleton) {
+            catalogSkeletonRetryJob?.cancel()
+            catalogSkeletonRetryJob = null
+            return
+        }
+        if (syncState.isRefreshing || catalogSkeletonRetryJob?.isActive == true) return
+
+        catalogSkeletonRetryJob = viewLifecycleOwner.lifecycleScope.launch {
+            try {
+                delay(CATALOG_SKELETON_RETRY_DELAY_MS)
+                val stillWaitingForProducts = ProductCatalog.all(includeInactive = false).none { it.isDisplayReady }
+                if (isAdded && stillWaitingForProducts) {
+                    CatalogSyncManager.refreshAsync(force = true)
+                }
+            } finally {
+                catalogSkeletonRetryJob = null
+            }
         }
     }
 
@@ -1016,6 +1029,7 @@ class HomeTabFragment : Fragment(R.layout.fragment_home_tab), TabReselectionHand
 
     private companion object {
         const val HOME_HERO_AUTO_SCROLL_MS = 6_000L
+        const val CATALOG_SKELETON_RETRY_DELAY_MS = 6_000L
         const val HOME_SECTION_PROGRESSIVE_DELAY_MS = 80L
         const val CATEGORY_AUTO_SCROLL_FRAME_MS = 32L
         const val CATEGORY_AUTO_SCROLL_STEP_PX = 2

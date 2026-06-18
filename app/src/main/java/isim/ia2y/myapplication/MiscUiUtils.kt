@@ -118,7 +118,11 @@ fun productCardRatingText(product: Product): String {
 }
 
 fun productCardCategoryLabel(product: Product): String {
-    val key = MarketplaceCategories.categoryFor(product.category)?.topLevelId ?: product.category
+    val key = MarketplaceCategories.categoryFor(product.category)?.topLevelId
+        ?: product.categoryIds.asSequence()
+            .mapNotNull { MarketplaceCategories.categoryFor(it)?.topLevelId }
+            .firstOrNull()
+        ?: product.category
     return MarketplaceCategories.displayNameFor(key)
 }
 

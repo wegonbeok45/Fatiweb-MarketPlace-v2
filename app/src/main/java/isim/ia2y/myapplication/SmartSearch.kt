@@ -10,6 +10,12 @@ object SmartSearch {
 
     private val conceptGroups = listOf(
         setOf(
+            "game", "games", "gaming", "gamer", "play", "console", "consoles", "xbox",
+            "playstation", "nintendo", "switch", "video", "videogame", "videogames",
+            "jeu", "jeux", "jouer", "console", "consoles", "gaming-consoles",
+            "video-games", "games-puzzles", "board-games", "game-assets"
+        ),
+        setOf(
             "baby", "babies", "bebe", "kids", "kid", "child", "children", "infant", "toddler",
             "enfant", "enfants", "garcon", "fille", "boy", "girl", "toy", "toys", "jouet", "jouets",
             "stroller", "strollers", "diaper", "diapers", "nursery", "maternity", "feeding", "school",
@@ -123,6 +129,94 @@ object SmartSearch {
             (normalizedQueryToken.length >= 4 &&
                 normalizedProductToken.length >= 4 &&
                 editDistanceAtMostOne(normalizedProductToken, normalizedQueryToken))
+    }
+
+    fun productSearchScore(product: Product, query: String): Int {
+        val directQueryTokens = tokens(query)
+        if (directQueryTokens.isEmpty()) return 1
+
+        val expandedTokens = expandedQueryTokens(query)
+        val titleTokens = tokens(product.title)
+        val categoryTokens = tokens(
+            listOf(
+                product.category,
+                MarketplaceCategories.displayNameFor(product.category),
+                product.categoryIds.joinToString(" ") { MarketplaceCategories.displayNameFor(it) }
+            ).joinToString(" ")
+        )
+        val keywordTokens = product.searchKeywords.flatMap(::tokens)
+        val allTokens = tokens(
+            listOf(
+                product.title,
+                product.subtitle,
+                product.description,
+                product.category,
+                MarketplaceCategories.displayNameFor(product.category),
+                product.categoryIds.joinToString(" "),
+                product.origin,
+                product.sellerName,
+                product.tags.joinToString(" "),
+                product.searchKeywords.joinToString(" ")
+            ).joinToString(" ")
+        )
+        val normalizedSearchable = normalize(allTokens.joinToString(" "))
+        val normalizedQuery = normalize(query)
+
+        var score = 0
+        if (normalizedSearchable.contains(normalizedQuery)) score += 32
+
+        directQueryTokens.forEach { queryToken ->
+            score += bestTokenScore(queryToken, titleTokens, exact = 36, prefix = 26, fuzzy = 10)
+            score += bestTokenScore(queryToken, categoryTokens, exact = 34, prefix = 24, fuzzy = 8)
+            score += bestTokenScore(queryToken, keywordTokens, exact = 30, prefix = 20, fuzzy = 6)
+            score += bestTokenScore(queryToken, allTokens, exact = 18, prefix = 12, fuzzy = 4)
+        }
+
+        val directMatches = directQueryTokens.count { queryToken ->
+            allTokens.any { productToken -> matchesToken(productToken, queryToken) }
+        }
+        if (directMatches == directQueryTokens.size) score += 24
+
+        val expansionMatches = expandedTokens.count { queryToken ->
+            allTokens.any { productToken -> matchesToken(productToken, queryToken) }
+        }
+        score += expansionMatches.coerceAtMost(6) * 5
+
+        if (directQueryTokens.any { it in gameIntentTokens } &&
+            (categoryTokens + keywordTokens + titleTokens).any { it in gameIntentTokens }
+        ) {
+            score += 70
+        }
+
+        return score
+    }
+
+    private val gameIntentTokens = setOf(
+        "game", "games", "gaming", "console", "consoles", "videogame", "videogames",
+        "jeu", "jeux", "jouer", "xbox", "playstation", "nintendo", "switch"
+    )
+
+    private fun bestTokenScore(
+        queryToken: String,
+        productTokens: List<String>,
+        exact: Int,
+        prefix: Int,
+        fuzzy: Int
+    ): Int {
+        if (queryToken.isBlank()) return 0
+        var best = 0
+        productTokens.forEach { token ->
+            best = maxOf(
+                best,
+                when {
+                    token == queryToken -> exact
+                    token.startsWith(queryToken) || queryToken.startsWith(token) -> prefix
+                    matchesToken(token, queryToken) -> fuzzy
+                    else -> 0
+                }
+            )
+        }
+        return best
     }
 
     private fun stem(token: String): String {

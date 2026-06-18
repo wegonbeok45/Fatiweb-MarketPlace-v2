@@ -206,7 +206,7 @@
     <string name="admin_announcements_audience_admins">Admins</string>
 
     <string name="nav_tab_home">Home</string>
-    <string name="nav_tab_explore">Explore</string>
+    <string name="nav_tab_explore">Categories</string>
     <string name="nav_tab_cart">Cart</string>
     <string name="nav_tab_profile">Profile</string>
     <string name="main_tab_load_failed">Could not open this tab. Please try again.</string>

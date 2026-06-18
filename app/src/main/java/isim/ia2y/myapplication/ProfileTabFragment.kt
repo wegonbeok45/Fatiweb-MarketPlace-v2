@@ -584,7 +584,7 @@ class ProfileTabFragment : Fragment() {
         button.backgroundTintList = ColorStateList.valueOf(
             ContextCompat.getColor(
                 requireContext(),
-                if (isLoggedIn) R.color.profile_logout_bg else R.color.profile_edit_bg
+                if (isLoggedIn) R.color.ms_surface_canvas else R.color.profile_edit_bg
             )
         )
         button.setTextColor(tint)

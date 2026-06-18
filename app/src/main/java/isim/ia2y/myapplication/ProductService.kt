@@ -127,12 +127,6 @@ object ProductService {
             ?.takeIf { it.isNotBlank() && it != "all" }
             ?.let { MarketplaceCategories.normalizeKey(it) }
 
-        if (!normalizedCategoryFilter.isNullOrBlank() &&
-            MarketplaceCategories.categoryFor(normalizedCategoryFilter)?.level == 0
-        ) {
-            baseQuery = baseQuery.whereEqualTo("category", normalizedCategoryFilter)
-        }
-
         if (indexedTokens.isNotEmpty()) {
             baseQuery = baseQuery.whereArrayContainsAny("searchKeywords", indexedTokens)
         }
@@ -403,6 +397,8 @@ object ProductService {
                 product.description,
                 product.category,
                 MarketplaceCategories.displayNameFor(product.category),
+                product.categoryIds.joinToString(" "),
+                product.categoryIds.joinToString(" ") { MarketplaceCategories.displayNameFor(it) },
                 product.origin,
                 product.tags.joinToString(" ")
             ).joinToString(" ")
@@ -550,26 +546,7 @@ object ProductService {
         maxPrice: Double,
         bioOnly: Boolean
     ): Boolean {
-        val normalizedQuery = SmartSearch.normalize(queryText)
-        val queryTokens = tokens.ifEmpty { SmartSearch.expandedQueryTokens(queryText) }
-        val productTokens = SmartSearch.tokens(
-            listOf(
-                title,
-                subtitle,
-                description,
-                category,
-                MarketplaceCategories.displayNameFor(category),
-                origin,
-                sellerName,
-                searchKeywords.joinToString(" "),
-                tags.joinToString(" ")
-            ).joinToString(" ")
-        )
-        val queryMatch = normalizedQuery.isBlank() ||
-            SmartSearch.normalize(searchableText).contains(normalizedQuery) ||
-            queryTokens.all { queryToken ->
-                productTokens.any { productToken -> SmartSearch.matchesToken(productToken, queryToken) }
-            }
+        val queryMatch = queryText.isBlank() || SmartSearch.productSearchScore(this, queryText) > 0
         val locationKeyword = when (locationFilter) {
             "medina" -> "medina"
             "djerba" -> "djerba"

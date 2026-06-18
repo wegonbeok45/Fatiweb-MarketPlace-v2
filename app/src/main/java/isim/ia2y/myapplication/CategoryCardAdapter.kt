@@ -75,7 +75,7 @@ class CategoryCardAdapter(
                 requestedSizePx = 480,
                 crossfadeMillis = 180
             )
-            title.text = item.name
+            title.text = MarketplaceCategories.displayNameFor(item)
             meta.text = itemView.context.getString(R.string.category_card_browse)
             itemView.layoutParams = itemView.layoutParams.apply {
                 height = if (mode == Mode.COMPACT) {

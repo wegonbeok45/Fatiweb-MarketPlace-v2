@@ -846,15 +846,14 @@
                 android:textAllCaps="false"
                 android:textSize="@dimen/profile_text_size_logout"
                 app:backgroundTint="@color/ms_surface_card"
-                app:cornerRadius="18dp"
+                app:cornerRadius="14dp"
                 app:icon="@drawable/ic_profile_logout"
                 app:iconGravity="textStart"
                 app:iconPadding="12dp"
                 app:iconSize="18dp"
                 app:iconTint="@color/ms_text_primary"
                 app:rippleColor="@color/ms_accent_gold_soft"
-                app:strokeColor="@color/ms_border_default"
-                app:strokeWidth="@dimen/stroke_width_default" />
+                app:strokeWidth="0dp" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 

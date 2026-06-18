@@ -756,7 +756,8 @@ class SearchActivity : AppCompatActivity() {
                     bioNaturel = bioAtRequestTime
                 )
             }
-            val page = if (!isLoadMore && sourceResult.isSuccess && sourcePage.products.isEmpty()) {
+            val cleanedSourcePage = sourcePage.cleanForQuery(query, sortAtRequestTime)
+            val page = if (!isLoadMore && sourceResult.isSuccess && cleanedSourcePage.products.isEmpty()) {
                 buildLocalFallbackSearchPage(
                     query = query,
                     startIndex = 0,
@@ -766,9 +767,9 @@ class SearchActivity : AppCompatActivity() {
                     minPrice = minPriceAtRequestTime,
                     maxPrice = maxPriceAtRequestTime,
                     bioNaturel = bioAtRequestTime
-                ).takeIf { it.products.isNotEmpty() } ?: sourcePage
+                ).takeIf { it.products.isNotEmpty() } ?: cleanedSourcePage
             } else {
-                sourcePage
+                cleanedSourcePage
             }
 
             if (isFinishing || isDestroyed || requestToken != searchRequestToken) {
@@ -930,37 +931,42 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun Product.matchesSearchQuery(query: String): Boolean {
-        val normalizedQuery = SmartSearch.normalize(query)
-        if (normalizedQuery.isBlank()) return true
-        val queryTokens = SmartSearch.expandedQueryTokens(normalizedQuery)
-        if (queryTokens.isEmpty()) return true
-
-        val searchable = SmartSearch.normalize(
-            listOf(
-                title,
-                subtitle,
-                description,
-                category,
-                MarketplaceCategories.displayNameFor(category),
-                origin,
-                sellerName,
-                tags.joinToString(" "),
-                searchKeywords.joinToString(" ")
-            ).joinToString(" ")
-        )
-        if (searchable.contains(normalizedQuery)) return true
-
-        val productTokens = SmartSearch.tokens(searchable)
-        return queryTokens.all { queryToken ->
-            productTokens.any { productToken -> SmartSearch.matchesToken(productToken, queryToken) }
-        }
+        return SmartSearch.productSearchScore(this, query) > 0
     }
 
-    private fun applySort(items: List<Product>, sort: SortOption): List<Product> = when (sort) {
+    private fun applySort(items: List<Product>, sort: SortOption, query: String = currentQuery): List<Product> = when (sort) {
         SortOption.PRICE_LOW -> items.sortedBy { it.price }
         SortOption.PRICE_HIGH -> items.sortedByDescending { it.price }
-        SortOption.POPULAR -> items.sortedByDescending { it.reviewsCount }
+        SortOption.POPULAR -> {
+            if (query.isBlank()) {
+                items.sortedByDescending { it.reviewsCount }
+            } else {
+                items.sortedWith(
+                    compareByDescending<Product> { SmartSearch.productSearchScore(it, query) }
+                        .thenByDescending { it.reviewsCount }
+                        .thenByDescending { it.rating }
+                        .thenBy { it.title.lowercase(Locale.getDefault()) }
+                )
+            }
+        }
         SortOption.NEWEST -> items.sortedByDescending { it.updatedAtMillis }
+    }
+
+    private fun ProductSearchPage.cleanForQuery(query: String, sort: SortOption): ProductSearchPage {
+        if (query.isBlank()) return copy(products = applySort(products, sort, query))
+        val cleaned = products
+            .asSequence()
+            .map { product -> product to SmartSearch.productSearchScore(product, query) }
+            .filter { (_, score) -> score > 0 }
+            .sortedWith(
+                compareByDescending<Pair<Product, Int>> { it.second }
+                    .thenByDescending { it.first.reviewsCount }
+                    .thenByDescending { it.first.rating }
+                    .thenBy { it.first.title.lowercase(Locale.getDefault()) }
+            )
+            .map { it.first }
+            .toList()
+        return copy(products = cleaned)
     }
 
     private fun SortOption.toProductSearchSort(): ProductSearchSort = when (this) {
@@ -989,7 +995,7 @@ class SearchActivity : AppCompatActivity() {
             maxPrice = maxPrice,
             bioNaturel = bioNaturel
         )
-        val sorted = applySort(filtered, sort)
+        val sorted = applySort(filtered, sort, query)
         ProductSearchPage(
             products = sorted.drop(startIndex).take(SEARCH_PAGE_SIZE),
             nextCursor = null,
@@ -1097,7 +1103,7 @@ class SearchActivity : AppCompatActivity() {
         group.removeAllViews()
         group.addView(buildFilterCategoryChip("all", getString(R.string.search_filter_all)))
         MarketplaceCategories.items.forEach { category ->
-            group.addView(buildFilterCategoryChip(category.id, category.name))
+            group.addView(buildFilterCategoryChip(category.id, MarketplaceCategories.displayNameFor(category)))
         }
     }
 

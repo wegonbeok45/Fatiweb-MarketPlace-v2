@@ -210,7 +210,7 @@ class CategoryProductsActivity : AppCompatActivity() {
             val products = withContext(Dispatchers.Default) {
                 allProducts
                     .asSequence()
-                    .filter { it.isDisplayReady }
+                    .filter { it.isCategoryBrowsable }
                     .filter { MarketplaceCategories.matches(it, categoryKey) }
                     .filter { !stockFilter || it.stock > 0 }
                     .filter { !bioFilter || it.isBio }
@@ -270,6 +270,9 @@ class CategoryProductsActivity : AppCompatActivity() {
         val freshnessSignal = if ((updatedAtMillis.takeIf { it > 0L } ?: createdAtMillis) > 0L) 8.0 else 0.0
         return rating * 14.0 + reviewSignal + stockSignal + completenessSignal + freshnessSignal + if (isBio) 5.0 else 0.0
     }
+
+    private val Product.isCategoryBrowsable: Boolean
+        get() = title.trim().length >= 2
 
     private fun buildChip(key: String, label: String): Chip {
         return Chip(this).apply {
