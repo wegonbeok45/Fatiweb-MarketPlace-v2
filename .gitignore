@@ -43,6 +43,7 @@ firebase_functions_setup/node_modules/
 firebase_functions_setup/lib/
 firebase_functions_setup/lib-scripts/
 categories/
+junk/
 local.secrets.properties
 .agent/
 .claude/
