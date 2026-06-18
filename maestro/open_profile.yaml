@@ -1,7 +1,0 @@
-appId: isim.ia2y.myapplication
----
-- launchApp:
-    stopApp: false
-- tapOn:
-    id: "isim.ia2y.myapplication:id/hostNavProfile"
-- takeScreenshot: profile-tab-current
