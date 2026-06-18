@@ -410,9 +410,9 @@ object AdminService {
             .limit(safePageSize.toLong())
         
         return if (lastDoc != null) {
-            query.startAfter(lastDoc).get().await()!!
+            query.startAfter(lastDoc).get().await()
         } else {
-            query.get().await()!!
+            query.get().await()
         }.also { FirebaseCostTracker.read("AdminService.fetchOrdersPage", "orders", it.size(), "default") }
     }
 
@@ -715,9 +715,9 @@ object AdminService {
             .limit(safePageSize.toLong())
             
         return if (lastDoc != null) {
-            query.startAfter(lastDoc).get().await()!!
+            query.startAfter(lastDoc).get().await()
         } else {
-            query.get().await()!!
+            query.get().await()
         }.also { FirebaseCostTracker.read("AdminService.fetchClientsPage", "users", it.size(), "default") }
     }
 

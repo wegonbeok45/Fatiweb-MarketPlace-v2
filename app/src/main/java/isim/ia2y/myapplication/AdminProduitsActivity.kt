@@ -12,6 +12,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
+import androidx.core.view.doOnLayout
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
 import androidx.lifecycle.Lifecycle
@@ -43,6 +44,7 @@ open class AdminProduitsActivity : AppCompatActivity() {
 
     private val viewModel: AdminProductsViewModel by viewModels()
     private var roleVerified = false
+    private var productsList: RecyclerView? = null
 
     private val adapter = BaseListAdapter<Product>(
         layoutRes = R.layout.item_admin_product,
@@ -102,8 +104,13 @@ open class AdminProduitsActivity : AppCompatActivity() {
             insets
         }
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.adminProduitsList)) { v, insets ->
-            v.updatePadding(bottom = insets.getInsets(WindowInsetsCompat.Type.systemBars()).bottom + 96)
+            val navHeight = findViewById<View>(R.id.adminBottomNav)?.height ?: 0
+            val extraGap = resources.getDimensionPixelSize(R.dimen.space_24)
+            v.updatePadding(bottom = insets.getInsets(WindowInsetsCompat.Type.systemBars()).bottom + navHeight + extraGap)
             insets
+        }
+        findViewById<View>(R.id.adminBottomNav)?.doOnLayout {
+            ViewCompat.requestApplyInsets(findViewById(R.id.adminProduitsList))
         }
     }
 
@@ -130,19 +137,24 @@ open class AdminProduitsActivity : AppCompatActivity() {
 
     private fun setupList() {
         val rv = findViewById<RecyclerView>(R.id.adminProduitsList) ?: return
+        productsList = rv
         rv.layoutManager = LinearLayoutManager(this)
         rv.adapter = adapter
         rv.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                if (dy <= 0) return
-                val lm = recyclerView.layoutManager as? LinearLayoutManager ?: return
-                val lastVisible = lm.findLastVisibleItemPosition()
-                val total = lm.itemCount
-                if (total > 0 && lastVisible >= total - 4 && viewModel.hasMore) {
-                    viewModel.loadNextPage()
-                }
+                if (dy > 0) maybeLoadNextPage(recyclerView)
             }
         })
+    }
+
+    private fun maybeLoadNextPage(recyclerView: RecyclerView? = productsList) {
+        recyclerView ?: return
+        val lm = recyclerView.layoutManager as? LinearLayoutManager ?: return
+        val total = lm.itemCount
+        val lastVisible = lm.findLastVisibleItemPosition()
+        if (total > 0 && lastVisible >= total - 4 && viewModel.hasMore) {
+            viewModel.loadNextPage()
+        }
     }
 
     // ===== Bottom nav =====
@@ -163,7 +175,11 @@ open class AdminProduitsActivity : AppCompatActivity() {
                 viewModel.state.collect { state ->
                     listState.render(state)
                     when (state) {
-                        is UiState.Data -> adapter.submitList(state.value)
+                        is UiState.Data -> {
+                            adapter.submitList(state.value) {
+                                productsList?.post { maybeLoadNextPage() }
+                            }
+                        }
                         is UiState.Empty, is UiState.Error -> adapter.submitList(emptyList())
                         else -> Unit
                     }

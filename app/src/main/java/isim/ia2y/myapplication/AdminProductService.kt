@@ -37,11 +37,11 @@ object AdminProductService {
         lastDoc: DocumentSnapshot? = null,
         source: Source = Source.DEFAULT,
     ): Pair<List<Product>, DocumentSnapshot?> {
-        var query: Query = productsRef()
-
         if (approvalFilter != null) {
-            query = query.whereEqualTo(ProductFields.APPROVAL_STATUS, approvalFilter.wireValue)
+            return fetchFilteredProductsPage(approvalFilter, lastDoc, source)
         }
+
+        var query: Query = productsRef()
 
         query = query
             .orderBy("updatedAt", Query.Direction.DESCENDING)
@@ -61,6 +61,53 @@ object AdminProductService {
             ?.takeIf { snapshot.documents.size.toLong() == PAGE_SIZE }
 
         return Pair(products, nextCursor)
+    }
+
+    private suspend fun fetchFilteredProductsPage(
+        approvalFilter: ProductApprovalStatus,
+        lastDoc: DocumentSnapshot? = null,
+        source: Source = Source.DEFAULT,
+    ): Pair<List<Product>, DocumentSnapshot?> {
+        val filtered = mutableListOf<Product>()
+        var cursor = lastDoc
+        var nextCursor: DocumentSnapshot? = null
+
+        do {
+            var query = productsRef()
+                .orderBy("updatedAt", Query.Direction.DESCENDING)
+                .limit(PAGE_SIZE)
+
+            if (cursor != null) {
+                query = query.startAfter(cursor)
+            }
+
+            val snapshot = query.get(source).await()
+            FirebaseCostTracker.read(
+                "AdminProductService.fetchFilteredProductsPage",
+                "products",
+                snapshot.size(),
+                source.name
+            )
+            val docs = snapshot.documents
+            if (docs.isEmpty()) {
+                nextCursor = null
+                break
+            }
+
+            docs.mapNotNull { doc ->
+                val data = doc.data ?: return@mapNotNull null
+                productFromMap(doc.id, data)
+            }.filter {
+                ProductApprovalStatus.fromWire(it.approvalStatus) == approvalFilter
+            }.forEach { product ->
+                if (filtered.size < PAGE_SIZE) filtered.add(product)
+            }
+
+            cursor = docs.last()
+            nextCursor = cursor.takeIf { docs.size.toLong() == PAGE_SIZE }
+        } while (filtered.size < PAGE_SIZE && nextCursor != null)
+
+        return Pair(filtered, nextCursor)
     }
 
     /**
