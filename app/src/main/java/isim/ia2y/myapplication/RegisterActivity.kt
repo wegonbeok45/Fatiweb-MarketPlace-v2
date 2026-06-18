@@ -1,5 +1,10 @@
+@file:Suppress("DEPRECATION")
+
 package isim.ia2y.myapplication
 
+import android.content.Intent
+import android.app.Dialog
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.text.InputType
 import android.util.Log
@@ -10,17 +15,29 @@ import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.credentials.exceptions.GetCredentialCancellationException
+import androidx.credentials.exceptions.NoCredentialException
 import androidx.lifecycle.lifecycleScope
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
+import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.launch
 
 class RegisterActivity : AppCompatActivity() {
     private var passwordVisible = false
     private var isRegisterSubmitting = false
+    private val legacyGoogleSignInLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        handleLegacyGoogleSignInResult(result.data)
+    }
 
     companion object {
         private const val KEY_NAME = "name"
@@ -147,7 +164,14 @@ class RegisterActivity : AppCompatActivity() {
                             markInputState(R.id.cardFullNameField, InputFieldState.SUCCESS)
                             markInputState(R.id.cardEmailField, InputFieldState.SUCCESS)
                             markInputState(R.id.cardPasswordField, InputFieldState.SUCCESS)
-                            showPhoneVerificationPrompt()
+                            val verification = FirebaseAuthManager.sendEmailVerification()
+                            showEmailVerificationDialog(
+                                email = email,
+                                emailSent = verification.isSuccess
+                            )
+                            verification.exceptionOrNull()?.let { error ->
+                                showMotionSnackbar(FirebaseAuthManager.friendlyError(this@RegisterActivity, error))
+                            }
                         },
                         onFailure = { e ->
                             findViewById<TextView>(R.id.tvPasswordError)?.apply {
@@ -187,6 +211,28 @@ class RegisterActivity : AppCompatActivity() {
         )
     }
 
+    private fun showEmailVerificationDialog(email: String, emailSent: Boolean) {
+        val dialog = Dialog(this, R.style.ThemeOverlay_MyApp_Dialog)
+        dialog.setContentView(R.layout.dialog_auth_verify_email)
+        dialog.setCancelable(false)
+        dialog.setCanceledOnTouchOutside(false)
+        dialog.window?.setBackgroundDrawable(
+            ColorDrawable(ContextCompat.getColor(this, android.R.color.transparent))
+        )
+
+        dialog.findViewById<TextView?>(R.id.tvVerifyDialogMessage)?.text =
+            if (emailSent) {
+                getString(R.string.auth_verify_created_message, email)
+            } else {
+                getString(R.string.auth_verify_created_message_fallback, email)
+            }
+        dialog.findViewById<MaterialButton?>(R.id.btnVerifyDialogOk)?.setOnClickListener {
+            dialog.dismiss()
+            completeAuthFlow()
+        }
+        dialog.show()
+    }
+
     private fun setupGoogleLogin() {
         findViewById<View>(R.id.btnGoogle)?.setOnClickListener { launchGoogleSignIn() }
     }
@@ -196,20 +242,47 @@ class RegisterActivity : AppCompatActivity() {
             try {
                 val idToken = GoogleCredentialHelper.fetchIdToken(
                     this@RegisterActivity,
-                    getString(R.string.google_web_client_id)
+                    getString(R.string.default_web_client_id)
                 )
                 if (idToken != null) {
                     handleGoogleIdToken(idToken)
                 } else {
-                    showMotionSnackbar(getString(R.string.auth_google_sign_in_failed))
+                    launchLegacyGoogleSignIn()
                 }
             } catch (e: GetCredentialCancellationException) {
                 // User dismissed — no-op.
+            } catch (e: NoCredentialException) {
+                Log.i("RegisterActivity", "No saved Google credential, opening account chooser", e)
+                launchLegacyGoogleSignIn()
             } catch (e: Exception) {
                 Log.w("RegisterActivity", "Google sign-in failed", e)
-                showMotionSnackbar(getString(R.string.auth_google_sign_in_failed))
+                launchLegacyGoogleSignIn()
             }
         }
+    }
+
+    private fun launchLegacyGoogleSignIn() {
+        val options = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken(getString(R.string.default_web_client_id))
+            .requestEmail()
+            .build()
+        legacyGoogleSignInLauncher.launch(GoogleSignIn.getClient(this, options).signInIntent)
+    }
+
+    private fun handleLegacyGoogleSignInResult(data: Intent?) {
+        val account = runCatching {
+            GoogleSignIn.getSignedInAccountFromIntent(data).getResult(ApiException::class.java)
+        }.getOrElse { error ->
+            Log.w("RegisterActivity", "Legacy Google sign-in failed", error)
+            showMotionSnackbar(getString(R.string.auth_google_sign_in_failed))
+            return
+        }
+        val idToken = account.idToken
+        if (idToken.isNullOrBlank()) {
+            showMotionSnackbar(getString(R.string.auth_google_sign_in_failed))
+            return
+        }
+        handleGoogleIdToken(idToken)
     }
 
     private fun handleGoogleIdToken(idToken: String) {

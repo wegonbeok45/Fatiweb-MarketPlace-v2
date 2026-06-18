@@ -52,5 +52,8 @@ open class BaseListAdapter<T : Any>(
 inline fun <T : Any> idDiff(crossinline id: (T) -> Any): DiffUtil.ItemCallback<T> =
     object : DiffUtil.ItemCallback<T>() {
         override fun areItemsTheSame(oldItem: T, newItem: T): Boolean = id(oldItem) == id(newItem)
+
+        // Callers must pass items with structural equality (data classes).
+        @android.annotation.SuppressLint("DiffUtilEquals")
         override fun areContentsTheSame(oldItem: T, newItem: T): Boolean = oldItem == newItem
     }

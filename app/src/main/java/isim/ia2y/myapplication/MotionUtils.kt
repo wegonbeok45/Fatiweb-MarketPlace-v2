@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package isim.ia2y.myapplication
 
 import android.animation.ArgbEvaluator

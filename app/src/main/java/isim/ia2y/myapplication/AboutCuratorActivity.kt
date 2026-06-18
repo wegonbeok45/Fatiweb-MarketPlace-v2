@@ -36,16 +36,10 @@ class AboutCuratorActivity : AppCompatActivity() {
     private fun bindActions() {
         findViewById<View>(R.id.ivBack)?.setOnClickListener { finishWithMotion() }
         findViewById<View>(R.id.cardTerms)?.setOnClickListener {
-            showStaticSheet(
-                getString(R.string.about_curator_terms_title),
-                getString(R.string.about_curator_terms_body)
-            )
+            openExternalUrl(getString(R.string.terms_url))
         }
         findViewById<View>(R.id.cardPrivacy)?.setOnClickListener {
-            showStaticSheet(
-                getString(R.string.about_curator_privacy_title),
-                getString(R.string.about_curator_privacy_body)
-            )
+            openExternalUrl(getString(R.string.privacy_policy_url))
         }
         findViewById<View>(R.id.cardLicenses)?.setOnClickListener {
             showStaticSheet(

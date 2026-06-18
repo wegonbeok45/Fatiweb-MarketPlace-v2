@@ -1,5 +1,10 @@
+@file:Suppress("DEPRECATION")
+
 package isim.ia2y.myapplication
 
+import android.app.Dialog
+import android.content.Intent
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.Log
 import android.text.method.PasswordTransformationMethod
@@ -8,12 +13,18 @@ import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.credentials.exceptions.GetCredentialCancellationException
+import androidx.credentials.exceptions.NoCredentialException
 import androidx.lifecycle.lifecycleScope
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
+import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.launch
 import isim.ia2y.myapplication.databinding.ActivityLoginBinding
 
@@ -21,6 +32,11 @@ class LoginActivity : AppCompatActivity() {
     private var passwordVisible = false
     private var isEmailLoginSubmitting = false
     private lateinit var binding: ActivityLoginBinding
+    private val legacyGoogleSignInLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        handleLegacyGoogleSignInResult(result.data)
+    }
 
     companion object {
         private const val KEY_EMAIL = "email"
@@ -208,20 +224,47 @@ class LoginActivity : AppCompatActivity() {
             try {
                 val idToken = GoogleCredentialHelper.fetchIdToken(
                     this@LoginActivity,
-                    getString(R.string.google_web_client_id)
+                    getString(R.string.default_web_client_id)
                 )
                 if (idToken != null) {
                     handleGoogleIdToken(idToken)
                 } else {
-                    showMotionSnackbar(getString(R.string.auth_google_sign_in_failed))
+                    launchLegacyGoogleSignIn()
                 }
             } catch (e: GetCredentialCancellationException) {
                 // User dismissed the sheet — no-op.
+            } catch (e: NoCredentialException) {
+                Log.i("LoginActivity", "No saved Google credential, opening account chooser", e)
+                launchLegacyGoogleSignIn()
             } catch (e: Exception) {
                 Log.w("LoginActivity", "Google sign-in failed", e)
-                showMotionSnackbar(getString(R.string.auth_google_sign_in_failed))
+                launchLegacyGoogleSignIn()
             }
         }
+    }
+
+    private fun launchLegacyGoogleSignIn() {
+        val options = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken(getString(R.string.default_web_client_id))
+            .requestEmail()
+            .build()
+        legacyGoogleSignInLauncher.launch(GoogleSignIn.getClient(this, options).signInIntent)
+    }
+
+    private fun handleLegacyGoogleSignInResult(data: Intent?) {
+        val account = runCatching {
+            GoogleSignIn.getSignedInAccountFromIntent(data).getResult(ApiException::class.java)
+        }.getOrElse { error ->
+            Log.w("LoginActivity", "Legacy Google sign-in failed", error)
+            showMotionSnackbar(getString(R.string.auth_google_sign_in_failed))
+            return
+        }
+        val idToken = account.idToken
+        if (idToken.isNullOrBlank()) {
+            showMotionSnackbar(getString(R.string.auth_google_sign_in_failed))
+            return
+        }
+        handleGoogleIdToken(idToken)
     }
 
     private fun handleGoogleIdToken(idToken: String) {
@@ -240,43 +283,47 @@ class LoginActivity : AppCompatActivity() {
 
     private fun showResetPasswordDialog() {
         val prefill = binding.etEmail.text?.toString().orEmpty()
-        val view = layoutInflater.inflate(R.layout.dialog_single_input, null)
-        val input = view.findViewById<EditText>(R.id.etDialogInput).apply {
-            inputType = android.text.InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS
+        val dialog = Dialog(this, R.style.ThemeOverlay_MyApp_Dialog)
+        dialog.setContentView(R.layout.dialog_auth_reset_password)
+        dialog.setCancelable(true)
+        dialog.setCanceledOnTouchOutside(true)
+        dialog.window?.setBackgroundDrawable(
+            ColorDrawable(ContextCompat.getColor(this, android.R.color.transparent))
+        )
+
+        val input = dialog.findViewById<EditText>(R.id.etResetEmail).apply {
             hint = getString(R.string.login_email_hint)
             if (prefill.isNotBlank()) {
                 setText(prefill)
                 setSelection(prefill.length)
             }
         }
+        val sendButton = dialog.findViewById<MaterialButton>(R.id.btnResetSend)
 
-        val dialog = MaterialAlertDialogBuilder(this)
-            .setTitle(getString(R.string.auth_reset_title))
-            .setMessage(getString(R.string.auth_reset_message))
-            .setView(view)
-            .setNegativeButton(getString(R.string.profile_edit_cancel), null)
-            .setPositiveButton(getString(R.string.auth_reset_send), null)
-            .create()
-
-        dialog.setOnShowListener {
-            dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE)?.setOnClickListener {
-                val email = input.text?.toString().orEmpty().trim()
-                if (!email.contains("@") || !email.contains(".")) {
-                    showMotionSnackbar(getString(R.string.auth_invalid_email))
-                    return@setOnClickListener
-                }
-                lifecycleScope.launch {
-                    val result = FirebaseAuthManager.sendPasswordReset(email)
-                    result.fold(
-                        onSuccess = {
-                            dialog.dismiss()
-                            showMotionSnackbar(getString(R.string.auth_reset_email_sent))
-                        },
-                        onFailure = { error ->
-                            showMotionSnackbar(FirebaseAuthManager.friendlyError(this@LoginActivity, error))
-                        }
-                    )
-                }
+        dialog.findViewById<MaterialButton>(R.id.btnResetCancel)?.setOnClickListener {
+            dialog.dismiss()
+        }
+        sendButton?.setOnClickListener {
+            val email = input.text?.toString().orEmpty().trim()
+            if (!email.contains("@") || !email.contains(".")) {
+                input.error = getString(R.string.auth_invalid_email)
+                return@setOnClickListener
+            }
+            lifecycleScope.launch {
+                sendButton.isEnabled = false
+                sendButton.text = getString(R.string.auth_reset_sending)
+                val result = FirebaseAuthManager.sendPasswordReset(email)
+                result.fold(
+                    onSuccess = {
+                        dialog.dismiss()
+                        showMotionSnackbar(getString(R.string.auth_reset_email_sent))
+                    },
+                    onFailure = { error ->
+                        sendButton.isEnabled = true
+                        sendButton.text = getString(R.string.auth_reset_send)
+                        showMotionSnackbar(FirebaseAuthManager.friendlyError(this@LoginActivity, error))
+                    }
+                )
             }
         }
         dialog.show()

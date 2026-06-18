@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package isim.ia2y.myapplication
 
 import android.app.Activity
@@ -197,6 +199,16 @@ fun Activity.openPhoneDialer(phone: String) {
         data = android.net.Uri.parse("tel:$trimmed")
     }
     startExternalIntent(intent, getString(R.string.external_phone_unavailable))
+}
+
+fun Activity.openExternalUrl(url: String) {
+    val intent = Intent(Intent.ACTION_VIEW, android.net.Uri.parse(url))
+    try {
+        startActivity(intent)
+    } catch (e: Exception) {
+        Log.e(TAG_NAV, "Failed to open url", e)
+        (this as? AppCompatActivity)?.showError(getString(R.string.external_browser_unavailable))
+    }
 }
 
 fun Activity.openInMaps(query: String) {

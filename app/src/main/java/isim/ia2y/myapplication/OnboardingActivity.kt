@@ -18,6 +18,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.launch
 
@@ -69,6 +70,7 @@ class OnboardingActivity : AppCompatActivity() {
     private lateinit var indicatorContainer: LinearLayout
     private lateinit var primaryButton: MaterialButton
     private val indicatorDots = mutableListOf<View>()
+    private var voicePromptHandled = false
 
     private val requestLocationLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -161,6 +163,11 @@ class OnboardingActivity : AppCompatActivity() {
 
     private fun finishOnboarding() {
         setOnboardingCompleted()
+        navigateAfterOnboarding()
+    }
+
+
+    private fun navigateAfterOnboarding() {
         // navigateToMainTab already plays the forward window transition; just close
         // onboarding without stacking a second animation.
         navigateToMainTab(MainActivity.Tab.HOME)
