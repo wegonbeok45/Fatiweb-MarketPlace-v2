@@ -11,6 +11,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.view.ViewCompat
+import androidx.core.view.doOnLayout
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
 import androidx.lifecycle.Lifecycle
@@ -37,6 +38,7 @@ class VendorProductsActivity : AppCompatActivity() {
 
     private val viewModel: VendorProductsViewModel by viewModels()
     private var roleVerified = false
+    private var productsList: RecyclerView? = null
 
     private val adapter = BaseListAdapter<Product>(
         layoutRes = R.layout.item_vendor_product,
@@ -89,22 +91,39 @@ class VendorProductsActivity : AppCompatActivity() {
             v.updatePadding(top = insets.getInsets(WindowInsetsCompat.Type.statusBars()).top)
             insets
         }
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.vendorProductsList)) { v, insets ->
+            val fab = findViewById<View>(R.id.vendorProductsFab)
+            val fabClearance = (fab?.height ?: 0) +
+                resources.getDimensionPixelSize(R.dimen.space_24) +
+                resources.getDimensionPixelSize(R.dimen.space_16)
+            v.updatePadding(bottom = insets.getInsets(WindowInsetsCompat.Type.systemBars()).bottom + fabClearance)
+            insets
+        }
+        findViewById<View>(R.id.vendorProductsFab)?.doOnLayout {
+            ViewCompat.requestApplyInsets(findViewById(R.id.vendorProductsList))
+        }
     }
 
     private fun setupList() {
         findViewById<RecyclerView>(R.id.vendorProductsList)?.apply {
+            productsList = this
             layoutManager = LinearLayoutManager(this@VendorProductsActivity)
             adapter = this@VendorProductsActivity.adapter
             setHasFixedSize(false)
             addOnScrollListener(object : RecyclerView.OnScrollListener() {
                 override fun onScrolled(rv: RecyclerView, dx: Int, dy: Int) {
-                    val lm = rv.layoutManager as? LinearLayoutManager ?: return
-                    val total = lm.itemCount
-                    val last = lm.findLastVisibleItemPosition()
-                    if (total > 0 && last >= total - 4) viewModel.loadNextPage()
+                    if (dy > 0) maybeLoadNextPage(rv)
                 }
             })
         }
+    }
+
+    private fun maybeLoadNextPage(recyclerView: RecyclerView? = productsList) {
+        recyclerView ?: return
+        val lm = recyclerView.layoutManager as? LinearLayoutManager ?: return
+        val total = lm.itemCount
+        val last = lm.findLastVisibleItemPosition()
+        if (total > 0 && last >= total - 4) viewModel.loadNextPage()
     }
 
     private fun setupFilters() {
@@ -169,7 +188,9 @@ class VendorProductsActivity : AppCompatActivity() {
             is UiState.Error -> listState.render(state)
             is UiState.Data -> {
                 listState.render(state)
-                adapter.submitList(state.value)
+                adapter.submitList(state.value) {
+                    productsList?.post { maybeLoadNextPage() }
+                }
             }
         }
     }
@@ -205,9 +226,9 @@ class VendorProductsActivity : AppCompatActivity() {
         // Status pill (lifecycle: published / draft / archived)
         val statusPill = view.findViewById<TextView>(R.id.vendorProductStatus)
         val (statusKind, statusLabel) = when {
-            !product.isActive || product.status == "archived" ->
+            product.status == "archived" ->
                 MsStatusPill.Kind.Archived to R.string.ms_status_archived
-            product.status == "draft" ->
+            product.status == "draft" || !product.isActive ->
                 MsStatusPill.Kind.Draft to R.string.ms_status_draft
             else ->
                 MsStatusPill.Kind.Info to R.string.ms_status_published

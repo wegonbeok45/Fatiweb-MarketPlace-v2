@@ -101,9 +101,7 @@ class VendorShopProfileActivity : AppCompatActivity() {
         shopLogoUrl = text(R.id.vendorProfileLogoUrl),
         shopBannerUrl = text(R.id.vendorProfileBannerUrl),
         operatingHours = text(R.id.vendorProfileHours),
-        shippingFeeDt = text(R.id.vendorProfileShippingFee)
-            .replace(",", ".")
-            .toDoubleOrNull() ?: 0.0,
+        shippingFeeDt = parseDtInput(text(R.id.vendorProfileShippingFee)),
         deliveryZones = text(R.id.vendorProfileZones)
             .split(",").map { it.trim() }.filter { it.isNotBlank() },
         email = initial.email,
@@ -144,4 +142,11 @@ class VendorShopProfileActivity : AppCompatActivity() {
 
     private fun edit(id: Int): TextInputEditText = findViewById(id)
     private fun text(id: Int): String = edit(id).text?.toString()?.trim().orEmpty()
+
+    private fun parseDtInput(raw: String): Double {
+        val normalized = raw
+            .replace(",", ".")
+            .replace(Regex("[^0-9.]"), "")
+        return normalized.toDoubleOrNull() ?: 0.0
+    }
 }

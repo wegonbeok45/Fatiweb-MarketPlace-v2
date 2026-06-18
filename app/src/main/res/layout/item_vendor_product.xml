@@ -24,7 +24,7 @@
             android:layout_height="72dp"
             android:background="@drawable/ms_bg_icon_chip_dark"
             android:contentDescription="@string/vendor_products_cd_image"
-            android:scaleType="centerCrop"
+            android:scaleType="fitCenter"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:src="@color/ms_surface_sunken" />

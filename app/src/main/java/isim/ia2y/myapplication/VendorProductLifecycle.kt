@@ -1,5 +1,9 @@
 package isim.ia2y.myapplication
 
+import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
+import kotlinx.coroutines.tasks.await
 import java.util.UUID
 
 /**
@@ -17,7 +21,7 @@ object VendorProductLifecycle {
     }
 
     /** Move a draft / archived product back to a live, approved listing. */
-    suspend fun publish(product: Product): Result = save(
+    suspend fun publish(product: Product): Result = updateLifecycle(
         product.copy(
             status = "published",
             isActive = true,
@@ -28,7 +32,7 @@ object VendorProductLifecycle {
     )
 
     /** Take a live product off the catalog without deleting it. */
-    suspend fun unpublish(product: Product): Result = save(
+    suspend fun unpublish(product: Product): Result = updateLifecycle(
         product.copy(
             status = "draft",
             isActive = false,
@@ -36,7 +40,7 @@ object VendorProductLifecycle {
     )
 
     /** Archive a product. Hidden from clients; vendor can restore via publish. */
-    suspend fun archive(product: Product): Result = save(
+    suspend fun archive(product: Product): Result = updateLifecycle(
         product.copy(
             status = "archived",
             isActive = false,
@@ -85,6 +89,29 @@ object VendorProductLifecycle {
                 onSuccess = { Result.Success(it) },
                 onFailure = { Result.Failure(it) },
             )
+    }
+
+    private suspend fun updateLifecycle(product: Product): Result {
+        return runCatching {
+            FirebaseFirestore.getInstance()
+                .collection(FirestoreCollections.PRODUCTS)
+                .document(product.id)
+                .set(
+                    mapOf(
+                        "status" to product.status,
+                        "isActive" to product.isActive,
+                        "updatedAt" to FieldValue.serverTimestamp(),
+                    ),
+                    SetOptions.merge(),
+                )
+                .await()
+            ProductCatalog.upsert(product.copy(updatedAt = System.currentTimeMillis()))
+            CatalogSyncManager.publishCachedSnapshot()
+            product
+        }.fold(
+            onSuccess = { Result.Success(it) },
+            onFailure = { Result.Failure(it) },
+        )
     }
 
     private fun appendCopySuffix(title: String): String {

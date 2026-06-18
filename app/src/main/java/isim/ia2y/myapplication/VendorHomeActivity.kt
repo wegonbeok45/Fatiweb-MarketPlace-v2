@@ -190,22 +190,22 @@ class VendorHomeActivity : AppCompatActivity() {
         when (state) {
             UiState.Loading -> {
                 activityState.render(UiState.Loading)
-                bindKpis(empty = true)
+                bindKpis(null)
                 bindHero(null)
             }
             UiState.Empty -> {
                 activityState.render(UiState.Empty)
-                bindKpis(empty = true)
+                bindKpis(null)
                 bindHero(null)
             }
             is UiState.Error -> {
                 activityState.render(state)
-                bindKpis(empty = true)
+                bindKpis(null)
                 bindHero(null)
             }
             is UiState.Data -> {
                 bindHero(state.value)
-                bindKpis(empty = false, data = state.value)
+                bindKpis(state.value)
                 if (state.value.recentRows.isEmpty()) {
                     activityState.render(UiState.Empty)
                     activityAdapter.submitList(emptyList())
@@ -249,49 +249,52 @@ class VendorHomeActivity : AppCompatActivity() {
         orders?.text = data.monthOrders.toString()
     }
 
-    private fun bindKpis(empty: Boolean, data: VendorHomeViewModel.Data? = null) {
+    private fun bindKpis(data: VendorHomeViewModel.Data? = null) {
         bindKpiCard(
             R.id.vendorHomeKpiRevenue,
             iconRes = R.drawable.ic_checkout_wallet,
-            valueText = formatCurrency(if (empty) 0.0 else data!!.totalRevenue),
+            valueText = formatCurrency(data?.totalRevenue ?: 0.0),
             labelRes = R.string.vendor_home_kpi_revenue_label,
-            metaText = if (empty) null else getString(
-                R.string.vendor_home_kpi_revenue_meta,
-                formatCurrency(data!!.avgBasket),
-            ),
+            metaText = data?.let {
+                getString(
+                    R.string.vendor_home_kpi_revenue_meta,
+                    formatCurrency(it.avgBasket),
+                )
+            },
         )
         bindKpiCard(
             R.id.vendorHomeKpiPending,
             iconRes = R.drawable.ic_admin_nav_commandes,
-            valueText = (if (empty) 0 else data!!.pendingOrders).toString(),
+            valueText = (data?.pendingOrders ?: 0).toString(),
             labelRes = R.string.vendor_home_kpi_pending_label,
-            metaText = if (empty) null else getString(
-                R.string.vendor_home_kpi_pending_meta,
-                data!!.totalOrders,
-            ),
-            statusKind = if (!empty && data!!.pendingOrders > 0) {
+            metaText = data?.let {
+                getString(R.string.vendor_home_kpi_pending_meta, it.totalOrders)
+            },
+            statusKind = if ((data?.pendingOrders ?: 0) > 0) {
                 MsStatusPill.Kind.Pending
             } else null,
         )
         bindKpiCard(
             R.id.vendorHomeKpiLowStock,
             iconRes = R.drawable.ic_feedback_warning,
-            valueText = (if (empty) 0 else data!!.lowStockCount).toString(),
+            valueText = (data?.lowStockCount ?: 0).toString(),
             labelRes = R.string.vendor_home_kpi_low_stock_label,
-            metaText = if (empty) null else getString(R.string.vendor_home_kpi_low_stock_meta),
-            statusKind = if (!empty && data!!.lowStockCount > 0) {
+            metaText = data?.let { getString(R.string.vendor_home_kpi_low_stock_meta) },
+            statusKind = if ((data?.lowStockCount ?: 0) > 0) {
                 MsStatusPill.Kind.Rejected
             } else null,
         )
         bindKpiCard(
             R.id.vendorHomeKpiProducts,
             iconRes = R.drawable.ic_admin_nav_produits,
-            valueText = (if (empty) 0 else data!!.activeProducts).toString(),
+            valueText = (data?.activeProducts ?: 0).toString(),
             labelRes = R.string.vendor_home_kpi_products_label,
-            metaText = if (empty) null else getString(
-                R.string.vendor_home_kpi_products_meta,
-                data!!.activeProducts, data.totalProducts,
-            ),
+            metaText = data?.let {
+                getString(
+                    R.string.vendor_home_kpi_products_meta,
+                    it.activeProducts, it.totalProducts,
+                )
+            },
         )
     }
 
