@@ -50,6 +50,6 @@ export const DEFAULTS = {
   currency: "TND",
   standardShippingFee: 7.0,
   expressShippingFee: 12.5,
-  assistantCooldownMs: 15000,
+  assistantCooldownMs: 3000,
   assistantMaxTurns: 12,
 } as const;

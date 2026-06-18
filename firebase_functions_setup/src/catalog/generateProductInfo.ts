@@ -5,13 +5,10 @@ import {assertAdminOrVendeur} from "../shared/auth";
 import {asRecord, asString} from "../shared/domain";
 import {trustedCallableOptions} from "../shared/callableOptions";
 import {admin, db} from "../shared/firestore";
-import {chatCompletion} from "../shared/groqClient";
+import {chatCompletion} from "../shared/firebaseAiClient";
 
-const groqApiKey = defineSecret("GROQ_API_KEY");
-
-// Vision-capable Groq model. Llama 4 Scout supports multimodal input via the
-// OpenAI-style image_url content part.
-const VISION_MODEL = "meta-llama/llama-4-scout-17b-16e-instruct";
+// Vision-capable Gemini model.
+const VISION_MODEL = "gemini-2.5-flash";
 const MAX_INLINE_IMAGE_CHARS = 2_000_000;
 const RATE_LIMIT_WINDOW_MS = 30_000;
 
@@ -153,7 +150,7 @@ async function enforceGenerateProductInfoRateLimit(uid: string): Promise<void> {
 }
 
 export const generateProductInfo = onCall(
-  {...trustedCallableOptions, secrets: [groqApiKey], timeoutSeconds: 30, maxInstances: 3},
+  {...trustedCallableOptions, timeoutSeconds: 30, maxInstances: 3},
   async (request) => {
     const actor = await assertAdminOrVendeur(request);
     await enforceGenerateProductInfoRateLimit(actor.uid);
@@ -170,7 +167,6 @@ export const generateProductInfo = onCall(
     }
 
     const reply = await chatCompletion({
-      apiKey: groqApiKey.value(),
       model: VISION_MODEL,
       messages: [
         {

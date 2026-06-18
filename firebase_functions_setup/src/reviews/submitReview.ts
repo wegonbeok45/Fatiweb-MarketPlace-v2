@@ -20,26 +20,6 @@ export const submitReview = onCall(trustedCallableOptions, async (request) => {
     throw new HttpsError("invalid-argument", "A productId and review comment are required.");
   }
 
-  const orderSnapshot = await db.collection(COLLECTIONS.ORDERS)
-    .where("uid", "==", authContext.uid)
-    .orderBy("createdAt", "desc")
-    .limit(50)
-    .get();
-  const hasPurchased = orderSnapshot.docs.some((doc) => {
-    const status = asString(doc.get("status")).trim().toLowerCase();
-    if (status !== "delivered") {
-      return false;
-    }
-    const items = doc.get("items");
-    return Array.isArray(items) && items.some((item) => {
-      const record = asRecord(item);
-      return asString(record?.productId).trim() === productId;
-    });
-  });
-  if (!hasPurchased) {
-    throw new HttpsError("failed-precondition", "Only verified purchasers can review this product.");
-  }
-
   const productRef = db.collection(COLLECTIONS.PRODUCTS).doc(productId);
   const existingReviewSnapshot = await productRef.collection("reviews")
     .where("userId", "==", authContext.uid)

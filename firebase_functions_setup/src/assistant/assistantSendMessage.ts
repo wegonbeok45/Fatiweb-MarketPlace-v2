@@ -10,13 +10,10 @@ import {
 import {admin, db} from "../shared/firestore";
 import {asNumber, asRecord, asString} from "../shared/domain";
 import {hotCallableOptions} from "../shared/callableOptions";
-import {chatCompletion, GroqMessage} from "../shared/groqClient";
+import {chatCompletion, AiMessage} from "../shared/firebaseAiClient";
 
-const groqApiKey = defineSecret("GROQ_API_KEY");
-
-// Primary model: Llama 3.3 70B (fast, high quality). Fallback: Llama 3.1 8B (instant).
-const PRIMARY_MODEL = "llama-3.3-70b-versatile";
-const FALLBACK_MODELS = ["llama-3.1-8b-instant"];
+// Primary model: Gemini 2.5 Flash
+const PRIMARY_MODEL = "gemini-2.5-flash";
 const ASSISTANT_CONTEXT_CACHE_TTL_MS = 5 * 60 * 1000;
 
 type ChatTurn = {
@@ -166,8 +163,8 @@ Store facts:
   `.trim();
 }
 
-function buildGroqMessages(systemPrompt: string, history: ChatTurn[]): GroqMessage[] {
-  const messages: GroqMessage[] = [
+function buildAiMessages(systemPrompt: string, history: ChatTurn[]): AiMessage[] {
+  const messages: AiMessage[] = [
     {role: "system", content: systemPrompt},
   ];
   for (const turn of history) {
@@ -177,7 +174,7 @@ function buildGroqMessages(systemPrompt: string, history: ChatTurn[]): GroqMessa
 }
 
 export const assistantSendMessage = onCall(
-  {...hotCallableOptions, secrets: [groqApiKey], timeoutSeconds: 60},
+  {...hotCallableOptions, timeoutSeconds: 60},
   async (request) => {
     const uid = request.auth?.uid || null;
     const payload = asRecord(request.data) || {};
@@ -190,10 +187,8 @@ export const assistantSendMessage = onCall(
     const context = await fetchAssistantContext(uid);
 
     const reply = await chatCompletion({
-      apiKey: groqApiKey.value(),
       model: PRIMARY_MODEL,
-      fallbackModels: FALLBACK_MODELS,
-      messages: buildGroqMessages(buildSystemPrompt(context), history),
+      messages: buildAiMessages(buildSystemPrompt(context), history),
       temperature: 0.65,
       maxTokens: 512,
       topP: 0.95,
