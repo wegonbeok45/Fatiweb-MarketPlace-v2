@@ -21,13 +21,14 @@ android {
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "isim.ia2y.myapplication"
+        applicationId = "com.fatiweb.store"
         minSdk = 26
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField("String", "GOOGLE_CLOUD_TTS_API_KEY", "\"\"")
     }
 
     signingConfigs {
@@ -82,6 +83,9 @@ android {
     }
     kotlinOptions {
         jvmTarget = "17"
+    }
+    lint {
+        baseline = file("lint-baseline.xml")
     }
 }
 

@@ -3,8 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
+
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
@@ -130,9 +132,6 @@
             android:exported="false"
             android:theme="@style/Theme.MyApplication.Admin" />
         <activity
-            android:name=".RoleSelectionActivity"
-            android:exported="false" />
-        <activity
             android:name=".LanguageSettingsActivity"
             android:exported="false" />
         <activity
@@ -143,9 +142,6 @@
             android:exported="false" />
         <activity
             android:name=".HelpCenterActivity"
-            android:exported="false" />
-        <activity
-            android:name=".PaymentMethodsActivity"
             android:exported="false" />
         <activity
             android:name=".PersonalDetailsActivity"
@@ -215,6 +211,10 @@
         <activity
             android:name=".CheckoutDetailsActivity"
             android:exported="false" />
+        <activity
+            android:name=".voice.FatiVoiceTestActivity"
+            android:exported="true"
+            android:label="FatiVoice Test" />
 
         <activity
             android:name=".ChatActivity"
