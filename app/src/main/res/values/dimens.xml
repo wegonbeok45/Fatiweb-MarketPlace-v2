@@ -187,7 +187,7 @@
     <dimen name="profile_horizontal_margin">16dp</dimen>
     <dimen name="profile_edit_button_size_exact">34dp</dimen>
     <dimen name="profile_menu_top_padding">16dp</dimen>
-    <dimen name="profile_menu_bottom_padding">20dp</dimen>
+    <dimen name="profile_menu_bottom_padding">104dp</dimen>
     <dimen name="profile_menu_card_radius">8dp</dimen>
     <dimen name="profile_menu_content_horizontal_padding">12dp</dimen>
     <dimen name="profile_menu_text_start_margin">10dp</dimen>
@@ -207,6 +207,8 @@
     <dimen name="profile_header_padding_bottom">12dp</dimen>
     <dimen name="profile_header_avatar_size">72dp</dimen>
     <dimen name="profile_header_avatar_corner_radius">36dp</dimen>
+    <dimen name="profile_header_edit_size">30dp</dimen>
+    <dimen name="profile_header_edit_padding">7dp</dimen>
     <dimen name="profile_header_edit_corner_radius">17dp</dimen>
     <dimen name="profile_name_margin_top_compact">6dp</dimen>
     <dimen name="profile_content_overlap_margin">-6dp</dimen>

@@ -674,10 +674,12 @@
     <style name="Ms.Chip.Filter" parent="Widget.MaterialComponents.Chip.Choice">
         <item name="chipMinHeight">36dp</item>
         <item name="chipCornerRadius">@dimen/ms_radius_pill</item>
-        <item name="chipBackgroundColor">@color/ms_surface_sunken</item>
-        <item name="chipStrokeColor">@color/ms_border_default</item>
+        <item name="android:checkable">true</item>
+        <item name="checkedIconVisible">false</item>
+        <item name="chipBackgroundColor">@color/ms_filter_chip_background</item>
+        <item name="chipStrokeColor">@color/ms_filter_chip_stroke</item>
         <item name="chipStrokeWidth">@dimen/ms_stroke_hairline</item>
-        <item name="android:textColor">@color/ms_text_primary</item>
+        <item name="android:textColor">@color/ms_filter_chip_text</item>
         <item name="android:textSize">@dimen/ms_text_label</item>
         <item name="android:fontFamily">@font/manrope_semibold</item>
         <item name="android:textAllCaps">false</item>

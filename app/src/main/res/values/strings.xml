@@ -639,6 +639,12 @@
     <string name="auth_reset_title">Reinitialiser le mot de passe</string>
     <string name="auth_reset_message">Entrez votre e-mail pour recevoir un lien de reinitialisation.</string>
     <string name="auth_reset_send">Envoyer</string>
+    <string name="auth_reset_sending">Envoi...</string>
+    <string name="auth_reset_badge">Securite du compte</string>
+    <string name="auth_verify_created_title">Compte cree</string>
+    <string name="auth_verify_created_message">Un lien de verification a ete envoye a %1$s. Ouvrez votre boite mail et cliquez sur le lien pour verifier votre compte.</string>
+    <string name="auth_verify_created_message_fallback">Votre compte a ete cree avec %1$s. L e-mail de verification n a pas pu etre envoye maintenant; vous pourrez le renvoyer depuis votre compte.</string>
+    <string name="auth_verify_dialog_ok">D\'accord</string>
     <string name="login_connecting">Connexion...</string>
     <string name="register_submitting">Creation du compte...</string>
 
@@ -902,6 +908,56 @@
     <string name="chat_hint">Ecrivez un message...</string>
     <string name="chat_retry">Reessayer</string>
     <string name="chat_send">Envoyer</string>
+    <string name="chat_voice_start">Dicter un message</string>
+    <string name="chat_voice_stop">Arreter l ecoute</string>
+    <string name="chat_voice_listening">FatiBot ecoute...</string>
+    <string name="chat_voice_speaking">FatiBot lit la reponse...</string>
+    <string name="chat_voice_permission_denied">Autorisez le microphone pour dicter vos messages.</string>
+    <string name="chat_voice_unavailable">La reconnaissance vocale n\'est pas disponible sur cet appareil.</string>
+    <string name="chat_voice_no_match">Je n\'ai pas compris. R&#233;essayez en parlant un peu plus clairement.</string>
+    <string name="chat_voice_error">L\'&#233;coute vocale a &#233;chou&#233;. R&#233;essayez dans un instant.</string>
+    <string name="voice_assistant_dialog_title">Assistance vocale</string>
+    <string name="voice_assistant_dialog_message">Voulez-vous activer l\'assistance vocale ?</string>
+    <string name="voice_assistant_enable">Activer</string>
+    <string name="voice_assistant_ignore">Ignorer</string>
+    <string name="voice_assistant_enabled">Assistance vocale activ&#233;e.</string>
+    <string name="voice_assistant_auto_enabled">Assistance vocale activ&#233;e automatiquement apr&#232;s une minute sans interaction.</string>
+    <string name="voice_assistant_mic_content_description">Microphone Voix-Off</string>
+    <string name="voice_assistant_command_prompt">Dites chercher suivi du nom du produit, ou dites panier, accueil, commandes, profil, aide, r&#233;p&#233;ter, arr&#234;ter.</string>
+    <string name="voice_assistant_mic_permission_needed">Autorisez le microphone puis touchez &#224; nouveau le bouton vocal.</string>
+    <string name="voice_assistant_speech_unavailable">La reconnaissance vocale n\'est pas disponible sur cet appareil.</string>
+    <string name="voice_assistant_listening_error">L\'&#233;coute vocale a &#233;chou&#233;. Veuillez r&#233;essayer.</string>
+    <string name="voice_assistant_not_understood">Je n\'ai pas compris, veuillez r&#233;essayer.</string>
+    <string name="voice_assistant_nothing_to_repeat">Aucun message &#224; r&#233;p&#233;ter pour le moment.</string>
+    <string name="voice_assistant_search_hint">Dites chercher suivi du nom du produit.</string>
+    <string name="voice_assistant_searching">Recherche de %1$s.</string>
+    <string name="voice_assistant_opening_cart">Ouverture du panier.</string>
+    <string name="voice_assistant_opening_home">Retour &#224; l\'accueil.</string>
+    <string name="voice_assistant_opening_profile">Ouverture du profil.</string>
+    <string name="voice_assistant_opening_orders">Ouverture de vos commandes.</string>
+    <string name="voice_assistant_opening_help">Ouverture de l\'aide FatiBot.</string>
+    <string name="voice_home_summary">Accueil FatiWeb. Le catalogue contient %1$d produits. Suggestions: %2$s.</string>
+    <string name="voice_home_empty">Accueil FatiWeb. Le catalogue est en cours de chargement.</string>
+    <string name="voice_screen_explore">Explorez les cat&#233;gories. Dites chercher suivi du nom du produit pour lancer une recherche vocale.</string>
+    <string name="voice_screen_profile">Profil. Vous pouvez consulter vos informations, commandes et param&#232;tres.</string>
+    <string name="voice_screen_chatbot">FatiBot ouvert. Posez une question sur les produits, les commandes ou la livraison.</string>
+    <string name="voice_product_intro">Produit: %1$s.</string>
+    <string name="voice_product_price">Prix: %1$s.</string>
+    <string name="voice_product_stock">Stock disponible: %1$d.</string>
+    <string name="voice_product_seller">Vendeur: %1$s.</string>
+    <string name="voice_product_description">Description: %1$s.</string>
+    <string name="voice_product_colors">Couleurs disponibles: %1$s.</string>
+    <string name="voice_product_sizes">Tailles disponibles: %1$s.</string>
+    <string name="voice_product_added_to_cart">Produit ajout&#233; au panier.</string>
+    <string name="voice_cart_empty">Votre panier est vide.</string>
+    <string name="voice_cart_summary">Votre panier contient %1$d articles pour un total de %2$s.</string>
+    <string name="voice_checkout_step_address">&#201;tape 1. V&#233;rifiez ou ajoutez votre adresse de livraison.</string>
+    <string name="voice_checkout_step_payment">&#201;tape 2. Paiement &#224; la livraison s&#233;lectionn&#233;. Confirmez votre commande quand vous &#234;tes pr&#234;t.</string>
+    <string name="voice_checkout_step_confirm">&#201;tape 3. Confirmation. Votre commande contient %1$d articles pour un total de %2$s.</string>
+    <string name="voice_search_ready">Recherche ouverte. Dites chercher suivi du nom du produit.</string>
+    <string name="voice_search_results">Recherche %1$s. %2$d r&#233;sultats trouv&#233;s.</string>
+    <string name="voice_orders_empty">Aucune commande &#224; lire pour le moment.</string>
+    <string name="voice_orders_summary">Vous avez %1$d commandes. La derni&#232;re commande %2$s est au statut %3$s, total %4$s.</string>
     <string name="chat_suggestion_products">Produits</string>
     <string name="chat_suggestion_orders">Commandes</string>
     <string name="chat_suggestion_delivery">Livraison</string>
@@ -977,7 +1033,6 @@
     <string name="home_catalog_error">Le catalogue ne peut pas etre charge pour le moment. Reessayez.</string>
     <string name="admin_product_editor_action_autofill">Utiliser IA</string>
     <string name="admin_product_editor_autofill_done">Champs remplis par IA.</string>
-    <string name="generated_product_art_caption">Visuel de secours genere automatiquement</string>
     <string name="notification_preferences_title">Preferences de notification</string>
     <string name="notification_preferences_heading">Choisissez les alertes qui comptent vraiment</string>
     <string name="notification_preferences_summary_muted">Les notifications sont coupees sur cet appareil.</string>
@@ -1096,7 +1151,7 @@
     <string name="details_reviews_load_more">Charger plus d avis</string>
     <string name="details_review_counter">%1$d/%2$d caracteres</string>
     <string name="details_review_counter_initial">0/280</string>
-    <string name="details_review_verified_hint">Seuls les clients ayant achete ce produit peuvent publier un avis.</string>
+    <string name="details_review_verified_hint">Les clients connectes peuvent publier un avis.</string>
     <string name="details_seller_verified">Verifie</string>
     <string name="details_contact_seller">Contact seller</string>
     <string name="details_seller_rating">%1$.1f vendeur</string>
@@ -1141,23 +1196,6 @@
     <string name="orders_history_filter_all">Toutes</string>
     <string name="orders_history_filter_active">En cours</string>
     <string name="orders_history_total_label">Total</string>
-    <string name="payment_methods_title">Moyens de paiement</string>
-    <string name="payment_methods_saved_cards">Cartes enregistrees</string>
-    <string name="payment_methods_add">Ajouter</string>
-    <string name="payment_methods_empty">Aucun moyen de paiement enregistre.</string>
-    <string name="payment_methods_brand">Marque</string>
-    <string name="payment_methods_last4">4 derniers chiffres</string>
-    <string name="payment_methods_expiry_month">Mois</string>
-    <string name="payment_methods_expiry_year">Annee</string>
-    <string name="payment_methods_billing_address">Adresse de facturation</string>
-    <string name="payment_methods_address_empty">Aucune adresse</string>
-    <string name="payment_methods_default">Par defaut</string>
-    <string name="payment_methods_set_default">Definir par defaut</string>
-    <string name="payment_methods_remove">Supprimer</string>
-    <string name="payment_methods_edit_address">Modifier l adresse</string>
-    <string name="payment_methods_dialog_add_title">Ajouter une carte</string>
-    <string name="payment_methods_dialog_edit_title">Modifier la carte</string>
-    <string name="payment_methods_validation_error">Verifiez les informations de paiement.</string>
     <string name="personal_details_title">Informations personnelles</string>
     <string name="personal_details_first_name">Prenom</string>
     <string name="personal_details_last_name">Nom</string>
@@ -1194,15 +1232,6 @@
     <string name="profile_seller_shop_invalid">Entrez un nom de boutique valide.</string>
     <string name="profile_seller_phone_invalid">Entrez un telephone valide.</string>
     <string name="profile_seller_already_active">Votre espace vendeur est deja actif.</string>
-    <string name="role_selection_title">Choisir votre role</string>
-    <string name="role_selection_buyer">Acheteur</string>
-    <string name="role_selection_seller">Vendeur</string>
-    <string name="seller_access_title">Devenir vendeur</string>
-    <string name="seller_access_body">Contactez FatiWeb pour activer votre espace vendeur.</string>
-    <string name="seller_access_email">Email</string>
-    <string name="seller_access_phone">Telephone</string>
-    <string name="seller_access_whatsapp">WhatsApp</string>
-    <string name="seller_access_back_to_buyer">Retour a l espace client</string>
     <string name="seller_dashboard_title">Espace vendeur</string>
     <string name="seller_dashboard_hero_title">Vos produits, au meme endroit.</string>
     <string name="seller_dashboard_hero_subtitle">Ajoutez et gerez les articles associes a votre compte vendeur.</string>
@@ -1251,10 +1280,10 @@
     <string name="home_ref_category_fashion">Fashion</string>
     <string name="home_ref_category_home">Home &amp; Furniture</string>
     <string name="home_ref_category_beauty">Beauty &amp; Health</string>
-    <string name="home_ref_nav_home">Home</string>
-    <string name="home_ref_nav_categories">Categories</string>
-    <string name="home_ref_nav_cart">Cart</string>
-    <string name="home_ref_nav_account">Account</string>
+    <string name="home_ref_nav_home">Accueil</string>
+    <string name="home_ref_nav_categories">Catégories</string>
+    <string name="home_ref_nav_cart">Panier</string>
+    <string name="home_ref_nav_account">Compte</string>
     <string name="home_ref_stock_low">Low stock</string>
     <string name="home_ref_stock_in">In stock</string>
     <string name="home_ref_stock_out">Out of stock</string>
@@ -1325,6 +1354,11 @@
     <string name="external_email_unavailable">Aucune application e-mail compatible n est installee.</string>
     <string name="external_phone_unavailable">Aucune application telephone disponible.</string>
     <string name="external_map_unavailable">Aucune application de carte disponible.</string>
+    <string name="external_browser_unavailable">Aucun navigateur disponible pour ouvrir ce lien.</string>
+    <string name="offline_title">Pas de connexion Internet</string>
+    <string name="offline_subtitle">Verifiez votre connexion puis reessayez.</string>
+    <string name="privacy_policy_url">https://fatiweb-marketplace.web.app/privacy.html</string>
+    <string name="terms_url">https://fatiweb-marketplace.web.app/terms.html</string>
     <string name="admin_order_action_call">Appeler</string>
     <string name="admin_order_action_map">Itineraire</string>
     <string name="admin_order_action_email">E-mail</string>
@@ -1339,9 +1373,7 @@
     <string name="about_curator_instagram_title">Instagram</string>
     <string name="about_curator_twitter_title">Twitter</string>
     <string name="about_curator_terms_title">Conditions</string>
-    <string name="about_curator_terms_body">Les conditions d utilisation seront disponibles prochainement.</string>
     <string name="about_curator_privacy_title">Confidentialite</string>
-    <string name="about_curator_privacy_body">Vos donnees sont utilisees pour securiser votre compte et vos commandes.</string>
     <string name="about_curator_licenses_title">Licences</string>
     <string name="about_curator_licenses_body">FatiWeb utilise des bibliotheques Android et Firebase.</string>
     <string name="about_curator_social_pending">Lien social bientot disponible.</string>
@@ -1749,5 +1781,20 @@
         <item>Bon &#233;tat</item>
         <item>Occasion</item>
     </string-array>
+
+    <!-- FatiVoice assistant -->
+    <string name="fativoice_intro_title">Voulez-vous activer l&#8217;assistance vocale ?</string>
+    <string name="fativoice_intro_message">FatiVoice peut lire les ecrans, ecouter vos commandes et vous aider a chercher un produit, ouvrir le panier ou suivre une commande.</string>
+    <string name="fativoice_enable">Activer</string>
+    <string name="fativoice_ignore">Ignorer</string>
+    <string name="fativoice_enabled">Assistance vocale activee</string>
+    <string name="fativoice_auto_enabled">Assistance vocale activee automatiquement</string>
+    <string name="fativoice_mic_content_description">Micro FatiVoice</string>
+    <string name="fativoice_idle">FatiVoice</string>
+    <string name="fativoice_listening">Je vous ecoute</string>
+    <string name="fativoice_thinking">Traitement en cours</string>
+    <string name="fativoice_speaking">Reponse vocale</string>
+    <string name="fativoice_hint">Dites chercher suivi du nom du produit.</string>
+    <string name="fativoice_mic_permission_denied">Micro refuse. Activez l&#8217;autorisation dans les parametres.</string>
 
 </resources>
