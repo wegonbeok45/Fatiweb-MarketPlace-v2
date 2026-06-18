@@ -2,7 +2,6 @@ package isim.ia2y.myapplication
 
 import android.os.Bundle
 import android.view.View
-import android.widget.ProgressBar
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -61,9 +60,14 @@ class NotificationsActivity : AppCompatActivity() {
                     val filtered = notifications.filter { !it.title.startsWith("{") && !it.message.startsWith("{") }
                     if (filtered.isEmpty()) ScreenState.Empty() else ScreenState.Content(filtered)
                 },
-                onFailure = {
+                onFailure = { error ->
                     if (cached.isEmpty()) {
-                        ScreenState.Error(getString(R.string.notifications_load_error))
+                        ScreenState.Error(
+                            getString(
+                                if (error.isNetworkError() || !isOnline()) R.string.offline_title
+                                else R.string.notifications_load_error
+                            )
+                        )
                     } else {
                         ScreenState.Content(cached)
                     }
@@ -77,12 +81,18 @@ class NotificationsActivity : AppCompatActivity() {
         val rv = findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.rvNotifications)
         val emptyState = findViewById<View>(R.id.layoutEmptyState)
         val emptyAnimation = findViewById<com.airbnb.lottie.LottieAnimationView>(R.id.ivNotificationsEmptyAnimation)
-        val loading = findViewById<ProgressBar>(R.id.loadingIndicator)
+        val shimmer = findViewById<View>(R.id.layoutNotificationsShimmer)
+
+        fun hideShimmer() {
+            shimmer?.stopShimmerPulse()
+            shimmer?.visibility = View.GONE
+        }
+
         val clearAll = findViewById<View>(R.id.tvClearAll)
         when (state) {
             is ScreenState.Content -> {
                 allNotifications = state.data
-                loading?.visibility = View.GONE
+                hideShimmer()
                 emptyAnimation?.pauseAnimation()
                 clearAll?.visibility = if (state.data.any { !it.isRead }) View.VISIBLE else View.GONE
                 if (rv.layoutManager == null) {
@@ -95,7 +105,7 @@ class NotificationsActivity : AppCompatActivity() {
             }
             is ScreenState.Empty -> {
                 allNotifications = emptyList()
-                loading?.visibility = View.GONE
+                hideShimmer()
                 rv.visibility = View.GONE
                 emptyState.visibility = View.VISIBLE
                 emptyAnimation?.playAnimation()
@@ -103,7 +113,7 @@ class NotificationsActivity : AppCompatActivity() {
             }
             is ScreenState.Error -> {
                 allNotifications = emptyList()
-                loading?.visibility = View.GONE
+                hideShimmer()
                 rv.visibility = View.GONE
                 emptyState.visibility = View.VISIBLE
                 emptyAnimation?.playAnimation()
@@ -112,7 +122,8 @@ class NotificationsActivity : AppCompatActivity() {
             }
             ScreenState.Loading -> {
                 allNotifications = emptyList()
-                loading?.visibility = View.VISIBLE
+                shimmer?.visibility = View.VISIBLE
+                shimmer?.startShimmerPulse()
                 rv.visibility = View.GONE
                 emptyState.visibility = View.GONE
                 clearAll?.visibility = View.GONE

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Skeleton placeholder for a notification row.
+    Matches the real row's general shape so layout doesn't jump when content arrives.
+-->
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="@dimen/space_10"
+    app:cardBackgroundColor="@color/profile_card_bg"
+    app:cardCornerRadius="@dimen/corner_radius_large"
+    app:cardElevation="0dp"
+    app:strokeColor="@color/ms_border_default"
+    app:strokeWidth="@dimen/stroke_width_default">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="@dimen/space_14">
+
+        <!-- Icon circle -->
+        <View
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/bg_home_skeleton_pill" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/space_10"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <!-- Title line -->
+            <View
+                android:layout_width="160dp"
+                android:layout_height="13dp"
+                android:background="@drawable/bg_home_skeleton_block" />
+
+            <!-- Message line -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="11dp"
+                android:layout_marginTop="@dimen/space_6"
+                android:background="@drawable/bg_home_skeleton_block" />
+
+            <!-- Timestamp line -->
+            <View
+                android:layout_width="72dp"
+                android:layout_height="10dp"
+                android:layout_marginTop="@dimen/space_6"
+                android:background="@drawable/bg_home_skeleton_block" />
+        </LinearLayout>
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

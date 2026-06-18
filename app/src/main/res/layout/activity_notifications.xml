@@ -79,15 +79,36 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/viewTopDivider" />
 
-    <ProgressBar
-        android:id="@+id/loadingIndicator"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
+    <LinearLayout
+        android:id="@+id/layoutNotificationsShimmer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingStart="@dimen/space_16"
+        android:paddingTop="@dimen/space_12"
+        android:paddingEnd="@dimen/space_16"
         android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/viewTopDivider" />
+        app:layout_constraintTop_toBottomOf="@id/viewTopDivider">
+
+        <include layout="@layout/item_notification_shimmer" />
+
+        <include
+            layout="@layout/item_notification_shimmer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <include
+            layout="@layout/item_notification_shimmer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <include
+            layout="@layout/item_notification_shimmer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/layoutEmptyState"
