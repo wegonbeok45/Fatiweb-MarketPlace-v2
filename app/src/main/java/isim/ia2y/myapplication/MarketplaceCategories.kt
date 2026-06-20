@@ -6,6 +6,7 @@ import com.google.firebase.firestore.Source
 import kotlinx.coroutines.tasks.await
 import java.text.Normalizer
 import java.util.Locale
+import java.util.concurrent.ConcurrentHashMap
 
 data class MarketplaceCategory(
     val id: String,
@@ -31,6 +32,19 @@ object MarketplaceCategories {
     private const val REFRESH_TTL_MS = 24L * 60 * 60 * 1000
     private val locale: Locale get() = Locale.getDefault()
     private val fallbackItems: List<MarketplaceCategory> by lazy { buildFallbackItems() }
+    private val slugCache = ConcurrentHashMap<String, String>()
+    private val combiningMarksRegex = "\\p{InCombiningDiacriticalMarks}+".toRegex()
+    private val nonAlphaNumericRegex = "[^a-z0-9]+".toRegex()
+    private val aliasLookup: Map<String, Set<String>> by lazy {
+        buildMap {
+            categoryAliases.forEach { (canonicalKey, aliases) ->
+                val related = (aliases + canonicalKey).map(::slugify).filter { it.isNotBlank() }.toSet()
+                related.forEach { alias ->
+                    put(alias, get(alias).orEmpty() + related)
+                }
+            }
+        }
+    }
     @Volatile private var remoteItems: List<MarketplaceCategory>? = null
     @Volatile private var cachedSnapshot: CategorySnapshot? = null
     @Volatile private var lastServerRefreshAt: Long = 0L
@@ -117,6 +131,12 @@ object MarketplaceCategories {
             ?: category.name
     }
 
+    fun displayNameForKnownKey(key: String): String {
+        val raw = key.trim()
+        return localizedCategoryName(raw)
+            ?: raw.ifBlank { fallbackOtherName() }.humanizeCategory()
+    }
+
     fun normalizeKey(key: String?): String {
         val normalized = slugify(key.orEmpty())
         if (normalized.isBlank()) return items.firstOrNull()?.id ?: "electronics"
@@ -135,9 +155,117 @@ object MarketplaceCategories {
         return productKeys.any { it in acceptedKeys }
     }
 
+    fun structuredMatches(product: Product, key: String): Boolean {
+        val categorySnapshot = snapshot()
+        val normalized = normalizeKey(key)
+        if (normalized == "all") return true
+
+        val acceptedKeys = acceptedKeysFor(categorySnapshot, normalized)
+        if (acceptedKeys.isEmpty()) return false
+
+        val productKeys = structuredProductCategoryMatchKeys(product, categorySnapshot)
+        return productKeys.any { it in acceptedKeys }
+    }
+
+    fun browsingMatches(product: Product, key: String): Boolean {
+        val normalized = normalizeKey(key)
+        if (structuredMatches(product, normalized)) return true
+
+        val categoryKeys = categorySignalKeys(categoryFallbackSearchText(normalized))
+        if (categoryKeys.isEmpty()) return false
+        val productKeys = categorySignalKeys(
+            listOf(
+                product.title,
+                product.subtitle,
+                product.description,
+                product.productType,
+                product.origin,
+                product.tags.joinToString(" "),
+                product.searchKeywords.joinToString(" "),
+                product.bullets.joinToString(" ")
+            ).joinToString(" ")
+        )
+        return productKeys.any { it in categoryKeys }
+    }
+
+    fun queryKeysForCategory(key: String): List<String> {
+        val categorySnapshot = snapshot()
+        val normalized = normalizeKey(key)
+        if (normalized.isBlank() || normalized == "all") return emptyList()
+        val selected = categorySnapshot.byLookup[slugify(normalized)] ?: categorySnapshot.byLookup[normalized]
+        val topLevelId = selected?.topLevelId ?: normalized
+        val categories = buildList {
+            selected?.let(::add)
+            categorySnapshot.byLookup[topLevelId]?.let { topLevel ->
+                if (none { it.id == topLevel.id }) add(topLevel)
+            }
+            categorySnapshot.descendantsByParent[topLevelId].orEmpty().forEach { descendant ->
+                if (none { it.id == descendant.id }) add(descendant)
+            }
+        }
+        return buildList {
+            fun addKey(value: String?) {
+                fun addUnique(key: String) {
+                    if (key.isNotBlank() && key !in this) add(key)
+                }
+
+                fun addAndCompatibility(key: String) {
+                    addUnique(key.replace("-and-", "-"))
+                    val leafSeparator = key.indexOf("__")
+                    if (leafSeparator >= 0) {
+                        val prefix = key.substring(0, leafSeparator + 2)
+                        val leaf = key.substring(leafSeparator + 2)
+                        addUnique(prefix + leaf.replace("-and-", "-"))
+                    }
+                }
+
+                val raw = value.orEmpty().trim()
+                if (raw.isBlank()) return
+                addUnique(raw)
+                addAndCompatibility(raw)
+                val slug = slugify(raw)
+                addUnique(slug)
+                addAndCompatibility(slug)
+            }
+
+            addKey(normalized)
+            addKey(topLevelId)
+            categories.forEach { category ->
+                addKey(category.id)
+                addKey(category.slug)
+            }
+            categories.forEach { category ->
+                addKey(category.name)
+                addKey(displayNameFor(category))
+                addKey(displayNameForKnownKey(category.id))
+                category.searchKeywords.forEach(::addKey)
+                category.aliasKeys().forEach(::addKey)
+            }
+        }
+    }
+
     @DrawableRes
     fun imageResFor(categoryKey: String?): Int {
-        return when (categoryFor(categoryKey)?.topLevelId ?: normalizeKey(categoryKey)) {
+        val directKey = slugify(categoryKey.orEmpty())
+        val imageKey = when (directKey) {
+            "automotive",
+            "baby-and-toys",
+            "beauty-and-health",
+            "business-and-industrial",
+            "digital-products",
+            "electronics",
+            "fashion",
+            "food-and-grocery",
+            "home-and-furniture",
+            "jobs-and-services",
+            "pets",
+            "real-estate",
+            "sports-and-outdoors",
+            "books-and-media",
+            "collectibles-and-hobbies" -> directKey
+            else -> categoryFor(categoryKey)?.topLevelId ?: normalizeKey(categoryKey)
+        }
+        return when (imageKey) {
             "automotive" -> R.drawable.category_automotive
             "baby-and-toys" -> R.drawable.category_baby_toys
             "beauty-and-health" -> R.drawable.category_beauty_health
@@ -186,14 +314,14 @@ object MarketplaceCategories {
         val lookup = mutableMapOf<String, MarketplaceCategory>()
         active.forEach { category ->
             lookup[category.id] = category
-            lookup[category.slug] = category
-            lookup[slugify(category.name)] = category
-            lookup[slugify(displayNameFor(category))] = category
+            lookup.putIfAbsent(category.slug, category)
+            lookup.putIfAbsent(slugify(category.name), category)
+            lookup.putIfAbsent(slugify(displayNameFor(category)), category)
             category.searchKeywords.forEach { keyword ->
-                lookup[slugify(keyword)] = category
+                lookup.putIfAbsent(slugify(keyword), category)
             }
             category.aliasKeys().forEach { alias ->
-                lookup[alias] = category
+                lookup.putIfAbsent(slugify(alias), category)
             }
         }
         val children = active.groupBy { it.parentCategory }
@@ -201,16 +329,18 @@ object MarketplaceCategories {
         val descendants = active
             .flatMap { category -> category.ancestorIds.map { parent -> parent to category } }
             .groupBy({ it.first }, { it.second })
-        val accepted = active.associate { category ->
-            val keys = (listOf(category) + descendants[category.id].orEmpty())
-                .flatMap { item ->
-                    listOf(item.id, item.slug, item.name, displayNameFor(item)) +
-                        item.searchKeywords +
-                        item.aliasKeys()
-                }
-                .flatMap(::categorySignalKeys)
-                .toSet()
-            category.id to keys
+        val accepted = lazy(LazyThreadSafetyMode.PUBLICATION) {
+            active.associate { category ->
+                val keys = (listOf(category) + descendants[category.id].orEmpty())
+                    .flatMap { item ->
+                        listOf(item.id, item.slug, item.name, displayNameFor(item)) +
+                            item.searchKeywords +
+                            item.aliasKeys()
+                    }
+                    .flatMap(::categorySignalKeys)
+                    .toSet()
+                category.id to keys
+            }
         }
         return CategorySnapshot(
             source = source,
@@ -333,7 +463,7 @@ object MarketplaceCategories {
         val byLookup: Map<String, MarketplaceCategory>,
         val childrenByParent: Map<String?, List<MarketplaceCategory>>,
         val descendantsByParent: Map<String, List<MarketplaceCategory>>,
-        val acceptedProductKeys: Map<String, Set<String>>
+        val acceptedProductKeys: Lazy<Map<String, Set<String>>>
     )
 
     private val subcategoryNames = mapOf(
@@ -420,7 +550,7 @@ object MarketplaceCategories {
     )
 
     private val categoryAliases = mapOf(
-        "electronics" to listOf("electronique", "electronics", "electronic", "tech", "phone", "phones", "telephone", "computer", "ordinateur", "laptop", "chargeur"),
+        "electronics" to listOf("electronique", "electro", "electronics", "electronic", "electornics", "electorincs", "tech", "phone", "phones", "telephone", "smartphone", "smartphones", "computer", "ordinateur", "laptop", "chargeur", "charger", "camera", "audio", "headphones", "casque"),
         "baby-and-toys" to listOf("bebe", "baby", "toys", "toy", "jouet", "jouets", "jeux", "games", "game", "enfant", "kids"),
         "books-and-media" to listOf("books", "book", "livres", "livre", "media", "medias", "video games", "jeux video", "manga", "music"),
         "digital-products" to listOf("digital", "numerique", "game assets", "assets de jeux", "software", "template", "ebook"),
@@ -456,18 +586,20 @@ object MarketplaceCategories {
     }
 
     private fun MarketplaceCategory.aliasKeys(): List<String> {
-        val normalizedKeys = listOf(id, slug, name).map(::slugify)
-        return normalizedKeys.flatMap { key -> categoryAliases[key].orEmpty() }
+        val normalizedKeys = listOf(id, slug, name, displayNameFor(this)).map(::slugify).toSet()
+        return normalizedKeys.flatMap(::aliasesForKey).distinct()
     }
 
     private fun acceptedKeysFor(snapshot: CategorySnapshot, normalized: String): Set<String> {
         val selected = snapshot.byLookup[slugify(normalized)] ?: snapshot.byLookup[normalized]
+        val acceptedProductKeys = snapshot.acceptedProductKeys.value
         return buildSet {
-            addAll(snapshot.acceptedProductKeys[normalized].orEmpty())
+            addAll(acceptedProductKeys[normalized].orEmpty())
             addAll(categorySignalKeys(normalized))
+            aliasesForKey(normalized).forEach { addAll(categorySignalKeys(it)) }
             selected?.let { category ->
-                addAll(snapshot.acceptedProductKeys[category.id].orEmpty())
-                addAll(snapshot.acceptedProductKeys[category.topLevelId].orEmpty())
+                addAll(acceptedProductKeys[category.id].orEmpty())
+                addAll(acceptedProductKeys[category.topLevelId].orEmpty())
                 addAll(categorySignalKeys(category.id))
                 addAll(categorySignalKeys(category.slug))
                 addAll(categorySignalKeys(category.name))
@@ -477,22 +609,61 @@ object MarketplaceCategories {
         }
     }
 
+    private fun categoryFallbackSearchText(key: String): String {
+        val categorySnapshot = snapshot()
+        val normalized = normalizeKey(key)
+        val selected = categorySnapshot.byLookup[slugify(normalized)] ?: categorySnapshot.byLookup[normalized]
+        return buildSet {
+            add(key)
+            add(normalized)
+            add(displayNameForKnownKey(normalized))
+            aliasesForKey(normalized).forEach(::add)
+            selected?.let { category ->
+                add(category.id)
+                add(category.slug)
+                add(category.name)
+                add(displayNameFor(category))
+                add(category.topLevelId)
+                category.searchKeywords.forEach(::add)
+                category.aliasKeys().forEach(::add)
+            }
+        }.joinToString(" ")
+    }
+
     private fun productCategoryMatchKeys(product: Product, snapshot: CategorySnapshot): Set<String> {
+        return structuredProductCategoryMatchKeys(product, snapshot) + descriptiveProductCategoryMatchKeys(product)
+    }
+
+    private fun structuredProductCategoryMatchKeys(product: Product, snapshot: CategorySnapshot): Set<String> {
         val structuredValues = listOf(product.category, product.categoryLeafId) + product.categoryIds
-        val descriptiveValues = product.tags + product.searchKeywords + listOf(
-            product.productType,
-            product.title,
-            product.subtitle
-        )
         return buildSet {
             structuredValues.forEach { value ->
                 addAll(categoryValueKeys(value, snapshot))
                 addAll(categorySignalKeys(value))
             }
+        }
+    }
+
+    private fun descriptiveProductCategoryMatchKeys(product: Product): Set<String> {
+        val descriptiveValues = product.tags + product.searchKeywords + listOf(
+            product.productType,
+            product.title,
+            product.subtitle,
+            product.description,
+            product.bullets.joinToString(" "),
+            product.origin
+        )
+        return buildSet {
             descriptiveValues.forEach { value ->
                 addAll(categorySignalKeys(value))
             }
         }
+    }
+
+    private fun aliasesForKey(key: String): List<String> {
+        val normalized = slugify(key)
+        if (normalized.isBlank()) return emptyList()
+        return aliasLookup[normalized].orEmpty().toList()
     }
 
     private fun categoryValueKeys(value: String, snapshot: CategorySnapshot): Set<String> {
@@ -539,13 +710,18 @@ object MarketplaceCategories {
         if (locale.language.equals("fr", ignoreCase = true)) "Autre" else "Other"
 
     private fun slugify(value: String): String {
-        val normalized = Normalizer.normalize(value.trim().lowercase(Locale.US), Normalizer.Form.NFD)
-            .replace("\\p{InCombiningDiacriticalMarks}+".toRegex(), "")
+        val cacheKey = value.trim().lowercase(Locale.US)
+        if (cacheKey.isBlank()) return ""
+        return slugCache[cacheKey] ?: run {
+            val normalized = Normalizer.normalize(cacheKey, Normalizer.Form.NFD)
+            .replace(combiningMarksRegex, "")
             .replace("&", " and ")
             .replace("+", " plus ")
-            .replace("[^a-z0-9]+".toRegex(), "-")
+            .replace(nonAlphaNumericRegex, "-")
             .trim('-')
-        return normalized
+            slugCache[cacheKey] = normalized
+            normalized
+        }
     }
 
     private fun String.humanizeCategory(): String =

@@ -11,6 +11,7 @@ import coil.request.CachePolicy
 import com.google.firebase.appcheck.AppCheckProviderFactory
 import com.google.firebase.appcheck.FirebaseAppCheck
 import com.google.firebase.appcheck.playintegrity.PlayIntegrityAppCheckProviderFactory
+import com.google.firebase.FirebaseApp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreSettings
 import com.google.firebase.firestore.PersistentCacheSettings
@@ -21,15 +22,27 @@ class MyApplication : Application(), ImageLoaderFactory {
             private set
     }
 
+    @Volatile
+    private var firebaseConfigured = false
+
     override fun onCreate() {
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         super.onCreate()
         instance = this
+        UserService.init(this)
+        LanguageManager.ensureDefaultAndApply(this)
+    }
+
+    fun configureFirebaseAfterFirstFrame() {
+        if (firebaseConfigured) return
+        synchronized(this) {
+            if (firebaseConfigured) return
+            firebaseConfigured = true
+        }
+        FirebaseApp.initializeApp(this)
         configureAppCheck()
         configureFirestoreOffline()
-        UserService.init(this)
         FirebaseAuthManager.syncCrashlyticsUser()
-        LanguageManager.ensureDefaultAndApply(this)
     }
 
     private val firebaseAppCheck: FirebaseAppCheck get() = FirebaseAppCheck.getInstance()

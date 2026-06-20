@@ -47,6 +47,8 @@ object ProductService {
     private const val TAG = "ProductService"
     const val DEFAULT_PRODUCT_PAGE_SIZE = 30L
     private const val SEARCH_MAX_SCANNED_DOCS = 360
+    private const val CATEGORY_QUERY_CHUNK_SIZE = 10
+    private const val CATEGORY_QUERY_KEY_LIMIT = 30
     private val db: FirebaseFirestore get() = FirebaseFirestore.getInstance()
     private val productsRef get() = db.collection(FirestoreCollections.PRODUCTS)
 
@@ -100,6 +102,81 @@ object ProductService {
             val data = doc.data ?: return@mapNotNull null
             productFromMap(doc.id, data)
         }
+    }
+
+    suspend fun fetchProductsForCategory(
+        categoryFilter: String,
+        limit: Long = 80L,
+        source: Source = Source.DEFAULT
+    ): List<Product> {
+        val normalizedCategory = MarketplaceCategories.normalizeKey(categoryFilter)
+        if (normalizedCategory.isBlank() || normalizedCategory == "all") {
+            return fetchProducts(limit = limit.coerceAtMost(50L), source = source)
+        }
+
+        val safeLimit = limit.coerceIn(1L, 100L)
+        val categoryKeys = MarketplaceCategories.queryKeysForCategory(normalizedCategory)
+            .take(CATEGORY_QUERY_KEY_LIMIT)
+        val productsById = linkedMapOf<String, Product>()
+
+        suspend fun collect(label: String, query: Query) {
+            val snapshot = query
+                .limit(safeLimit)
+                .get(source)
+                .await()
+            FirebaseCostTracker.read("ProductService.fetchProductsForCategory.$label", "products", snapshot.size(), source.name)
+            snapshot.documents
+                .asSequence()
+                .mapNotNull { doc -> productFromMap(doc.id, doc.data ?: return@mapNotNull null) }
+                .filter { MarketplaceCategories.browsingMatches(it, normalizedCategory) }
+                .forEach { product -> productsById[product.id] = product }
+        }
+
+        if (categoryKeys.isNotEmpty()) {
+            runCatching {
+                for ((index, keyChunk) in categoryKeys.chunked(CATEGORY_QUERY_CHUNK_SIZE).withIndex()) {
+                    if (productsById.size >= safeLimit.toInt()) break
+                    collect(
+                        label = "categoryIds.$index",
+                        query = publicProductsQuery().whereArrayContainsAny("categoryIds", keyChunk)
+                    )
+                }
+            }.onFailure { error ->
+                Log.w(TAG, "Category categoryIds query failed for $normalizedCategory", error)
+            }
+        }
+
+        listOf("category", "categoryLeafId").forEach { field ->
+            if (productsById.size >= safeLimit.toInt() || categoryKeys.isEmpty()) return@forEach
+            runCatching {
+                for ((index, keyChunk) in categoryKeys.chunked(CATEGORY_QUERY_CHUNK_SIZE).withIndex()) {
+                    if (productsById.size >= safeLimit.toInt()) break
+                    collect(
+                        label = "$field.$index",
+                        query = publicProductsQuery().whereIn(field, keyChunk)
+                    )
+                }
+            }.onFailure { error ->
+                Log.w(TAG, "Category $field query failed for $normalizedCategory", error)
+            }
+        }
+
+        if (productsById.size < safeLimit.toInt()) {
+            runCatching {
+                fetchProducts(limit = safeLimit.coerceAtMost(50L), source = source)
+                    .asSequence()
+                    .filter { MarketplaceCategories.browsingMatches(it, normalizedCategory) }
+                    .forEach { product -> productsById[product.id] = product }
+            }.onFailure { error ->
+                Log.w(TAG, "Category broad fallback failed for $normalizedCategory", error)
+            }
+        }
+
+        return productsById.values
+            .sortedWith(
+                compareByDescending<Product> { it.updatedAtMillis.takeIf { value -> value > 0L } ?: it.createdAtMillis }
+                    .thenBy { it.title.lowercase() }
+            )
     }
 
     suspend fun searchProductsPage(

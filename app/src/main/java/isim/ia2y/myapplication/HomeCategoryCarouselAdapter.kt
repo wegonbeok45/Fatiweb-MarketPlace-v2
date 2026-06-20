@@ -90,6 +90,6 @@ class HomeCategoryCarouselAdapter(
     }
 
     private companion object {
-        const val LOOP_MULTIPLIER = 400
+        const val LOOP_MULTIPLIER = 8
     }
 }

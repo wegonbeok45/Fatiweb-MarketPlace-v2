@@ -29,6 +29,10 @@
             android:name="com.google.firebase.messaging.default_notification_color"
             android:resource="@color/colorPrimary" />
 
+        <provider
+            android:name="com.google.firebase.provider.FirebaseInitProvider"
+            tools:node="remove" />
+
         <service
             android:name=".FatiFirebaseMessagingService"
             android:exported="false">

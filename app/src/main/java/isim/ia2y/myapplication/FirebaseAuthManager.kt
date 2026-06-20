@@ -2,6 +2,7 @@ package isim.ia2y.myapplication
 
 import android.util.Log
 import android.net.Uri
+import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
@@ -38,19 +39,31 @@ object FirebaseAuthManager {
     private const val CLAIMS_TIMEOUT_MS = 5_000L
     private const val PROFILE_SYNC_TIMEOUT_MS = 8_000L
 
-    private val auth: FirebaseAuth get() = FirebaseAuth.getInstance()
+    private val auth: FirebaseAuth
+        get() {
+            MyApplication.instance.configureFirebaseAfterFirstFrame()
+            return FirebaseAuth.getInstance()
+        }
+    private val authIfReady: FirebaseAuth?
+        get() = if (isFirebaseReady()) FirebaseAuth.getInstance() else null
     private val backgroundScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     /** The currently signed-in user, or null if no one is logged in. */
-    val currentUser: FirebaseUser? get() = auth.currentUser
+    val currentUser: FirebaseUser? get() = authIfReady?.currentUser
 
     /** The current non-anonymous user. Anonymous checkout accounts are treated as guests in UI/local stores. */
-    val currentRealUser: FirebaseUser? get() = auth.currentUser?.takeUnless { it.isAnonymous }
+    val currentRealUser: FirebaseUser? get() = authIfReady?.currentUser?.takeUnless { it.isAnonymous }
 
     val currentRealUid: String? get() = currentRealUser?.uid
 
     /** True if a real (non-guest) user is logged in. */
     val isLoggedIn: Boolean get() = currentRealUser != null
+
+    private fun isFirebaseReady(): Boolean {
+        return runCatching {
+            FirebaseApp.getApps(MyApplication.instance).isNotEmpty()
+        }.getOrDefault(false)
+    }
 
     /**
      * Sign in with Google ID token.

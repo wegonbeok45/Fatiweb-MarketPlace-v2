@@ -21,6 +21,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.firestore.Source
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
@@ -44,8 +45,10 @@ class CategoryProductsActivity : AppCompatActivity() {
     private var inStockOnly = false
     private var bioOnly = false
     private var renderJob: Job? = null
+    private var categoryLoadJob: Job? = null
     private var lastCatalogSignature: Int = 0
     private var scrollToTopAfterRender = false
+    private var isLoadingCategoryProducts = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -72,6 +75,7 @@ class CategoryProductsActivity : AppCompatActivity() {
             .map { it.id to it.updatedAtMillis }
             .hashCode()
         renderProducts()
+        loadCategoryProducts()
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -85,9 +89,6 @@ class CategoryProductsActivity : AppCompatActivity() {
                     }
                 }
             }
-        }
-        lifecycleScope.launch {
-            runCatching { CatalogSyncManager.ensureSynced(force = false) }
         }
 
         onBackPressedDispatcher.addCallback(this) {
@@ -105,6 +106,7 @@ class CategoryProductsActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         renderJob?.cancel()
+        categoryLoadJob?.cancel()
         super.onDestroy()
     }
 
@@ -211,13 +213,14 @@ class CategoryProductsActivity : AppCompatActivity() {
                 allProducts
                     .asSequence()
                     .filter { it.isCategoryBrowsable }
-                    .filter { MarketplaceCategories.matches(it, categoryKey) }
+                    .filter { MarketplaceCategories.browsingMatches(it, categoryKey) }
                     .filter { !stockFilter || it.stock > 0 }
                     .filter { !bioFilter || it.isBio }
                     .let { sequence ->
                         when (sort) {
                             SortOption.POPULAR -> sequence.sortedWith(
-                                compareByDescending<Product> { it.categoryRelevanceScore() }
+                                compareBy<Product> { it.categoryBrowseRank(categoryKey) }
+                                    .thenByDescending { it.categoryRelevanceScore() }
                                     .thenBy { it.title.lowercase(Locale.getDefault()) }
                             )
                             SortOption.NEWEST -> sequence.sortedByDescending { it.updatedAtMillis }
@@ -229,7 +232,11 @@ class CategoryProductsActivity : AppCompatActivity() {
             }
 
             findViewById<TextView>(R.id.tvCategoryProductsCount).text =
-                resources.getQuantityString(R.plurals.category_products_count, products.size, products.size)
+                if (isLoadingCategoryProducts && products.isEmpty()) {
+                    getString(R.string.ms_loading)
+                } else {
+                    resources.getQuantityString(R.plurals.category_products_count, products.size, products.size)
+                }
 
             val shouldScrollToTop = scrollToTopAfterRender
             scrollToTopAfterRender = false
@@ -239,8 +246,53 @@ class CategoryProductsActivity : AppCompatActivity() {
                 }
             }
             val isEmpty = products.isEmpty()
-            findViewById<View>(R.id.layoutCategoryEmptyState).visibility = if (isEmpty) View.VISIBLE else View.GONE
+            findViewById<View>(R.id.layoutCategoryEmptyState).visibility =
+                if (isEmpty && !isLoadingCategoryProducts) View.VISIBLE else View.GONE
             findViewById<RecyclerView>(R.id.rvCategoryProducts).visibility = if (isEmpty) View.GONE else View.VISIBLE
+        }
+    }
+
+    private fun loadCategoryProducts() {
+        categoryLoadJob?.cancel()
+        categoryLoadJob = lifecycleScope.launch {
+            isLoadingCategoryProducts = true
+            renderProducts()
+
+            val categoryKey = selectedCategory
+            var loadedAny = false
+            val cachedProducts = withContext(Dispatchers.IO) {
+                runCatching {
+                    ProductService.fetchProductsForCategory(categoryKey, source = Source.CACHE)
+                }.getOrDefault(emptyList())
+            }
+            if (cachedProducts.isNotEmpty()) {
+                withContext(Dispatchers.Default) {
+                    cachedProducts.forEach(ProductCatalog::upsert)
+                }
+                loadedAny = true
+                renderProducts()
+            }
+
+            val serverProducts = withContext(Dispatchers.IO) {
+                runCatching {
+                    ProductService.fetchProductsForCategory(categoryKey, source = Source.SERVER)
+                }.getOrDefault(emptyList())
+            }
+            if (serverProducts.isNotEmpty()) {
+                withContext(Dispatchers.Default) {
+                    serverProducts.forEach(ProductCatalog::upsert)
+                }
+                loadedAny = true
+            }
+
+            isLoadingCategoryProducts = false
+            if (loadedAny) {
+                lastCatalogSignature = ProductCatalog.all(includeInactive = true)
+                    .asSequence()
+                    .map { it.id to it.updatedAtMillis }
+                    .hashCode()
+            }
+            renderProducts()
         }
     }
 
@@ -270,6 +322,9 @@ class CategoryProductsActivity : AppCompatActivity() {
         val freshnessSignal = if ((updatedAtMillis.takeIf { it > 0L } ?: createdAtMillis) > 0L) 8.0 else 0.0
         return rating * 14.0 + reviewSignal + stockSignal + completenessSignal + freshnessSignal + if (isBio) 5.0 else 0.0
     }
+
+    private fun Product.categoryBrowseRank(categoryKey: String): Int =
+        if (MarketplaceCategories.structuredMatches(this, categoryKey)) 0 else 1
 
     private val Product.isCategoryBrowsable: Boolean
         get() = title.trim().length >= 2

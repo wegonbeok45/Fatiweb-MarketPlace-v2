@@ -318,7 +318,7 @@
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rvCategories"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="@dimen/home_ref_category_card_height"
                     android:layout_marginStart="@dimen/home_ref_horizontal_padding"
                     android:layout_marginTop="14dp"
                     android:layout_marginEnd="@dimen/home_ref_horizontal_padding"

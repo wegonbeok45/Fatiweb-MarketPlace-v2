@@ -8,6 +8,7 @@ import android.graphics.Rect
 import android.os.Bundle
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -48,6 +49,8 @@ class HomeTabFragment : Fragment(R.layout.fragment_home_tab), TabReselectionHand
     private var categoryCarousel: RecyclerView? = null
     private var heroPageCallback: ViewPager2.OnPageChangeCallback? = null
     private val sectionDisplayJobs = mutableMapOf<Int, Job>()
+    private var deferredBelowFoldViews: List<Pair<View, Int>> = emptyList()
+    private var belowFoldRestored = false
 
     private data class HomeRenderData(
         val catalogIsEmpty: Boolean,
@@ -79,8 +82,9 @@ class HomeTabFragment : Fragment(R.layout.fragment_home_tab), TabReselectionHand
     }
 
     private val categoriesAdapter by lazy {
+        val items = homeCategoryItemsFast()
         HomeCategoryCarouselAdapter(
-            homeCategoryItems(),
+            items,
             ::openCuratedSearch,
             onInteractionChanged = { isInteracting ->
                 categoryAutoScrollPausedByUser = isInteracting
@@ -92,9 +96,9 @@ class HomeTabFragment : Fragment(R.layout.fragment_home_tab), TabReselectionHand
         super.onViewCreated(view, savedInstanceState)
         view.findViewById<View?>(R.id.layoutBottomNav)?.isGone = true
         view.findViewById<View?>(R.id.viewBottomDivider)?.isGone = true
+        deferBelowFoldContentUntilFirstFrame(view)
         setupCatalogSections(view)
         setupCategoryCarousel(view)
-        renderCatalogSections(view)
         setupHeaderAndContentActions(view)
         setupHomeRefresh(view)
         setupMotionPolish()
@@ -107,7 +111,7 @@ class HomeTabFragment : Fragment(R.layout.fragment_home_tab), TabReselectionHand
                     latestEmptyMessage = getString(R.string.home_section_empty)
                     discoverEmptyMessage = getString(R.string.home_section_empty)
                     updateHomeRefreshState(state)
-                    if (isAdded) {
+                    if (isAdded && belowFoldRestored) {
                         renderCatalogSections(requireView())
                     }
                 }
@@ -148,7 +152,9 @@ class HomeTabFragment : Fragment(R.layout.fragment_home_tab), TabReselectionHand
         (activity as? MainActivity)?.updateHostCartBadge()
         updateNotificationBadge()
         listenForMessageUnread()
-        view?.let { renderCatalogSections(it) }
+        if (belowFoldRestored) {
+            view?.let { renderCatalogSections(it) }
+        }
         categoryCarousel?.let { startCategoryAutoScroll(it) }
         if (!hasPlayedEntrance) {
             hasPlayedEntrance = true
@@ -183,6 +189,8 @@ class HomeTabFragment : Fragment(R.layout.fragment_home_tab), TabReselectionHand
         categoryAutoScrollJob = null
         catalogSkeletonRetryJob?.cancel()
         catalogSkeletonRetryJob = null
+        deferredBelowFoldViews = emptyList()
+        belowFoldRestored = false
         categoryCarousel = null
         heroPageCallback?.let { callback ->
             view?.findViewById<ViewPager2?>(R.id.viewPagerHomeHero)?.unregisterOnPageChangeCallback(callback)
@@ -191,6 +199,37 @@ class HomeTabFragment : Fragment(R.layout.fragment_home_tab), TabReselectionHand
         messageUnreadListener?.remove()
         messageUnreadListener = null
         super.onDestroyView()
+    }
+
+    private fun deferBelowFoldContentUntilFirstFrame(root: View) {
+        if (belowFoldRestored || deferredBelowFoldViews.isNotEmpty()) return
+        val scrollView = root.findViewById<NestedScrollView>(R.id.scrollHomeContent) ?: return
+        val content = scrollView.getChildAt(0) as? ViewGroup ?: return
+        val anchor = root.findViewById<View>(R.id.rvCategories) ?: return
+        val anchorIndex = content.indexOfChild(anchor)
+        if (anchorIndex < 0 || anchorIndex >= content.childCount - 1) {
+            belowFoldRestored = true
+            return
+        }
+
+        deferredBelowFoldViews = (anchorIndex + 1 until content.childCount)
+            .map { index ->
+                val child = content.getChildAt(index)
+                child to child.visibility
+            }
+        deferredBelowFoldViews.forEach { (child, _) -> child.visibility = View.GONE }
+
+        root.postDelayed({
+            root.post {
+                if (view !== root || !isAdded) return@post
+                deferredBelowFoldViews.forEach { (child, visibility) ->
+                    child.visibility = visibility
+                }
+                deferredBelowFoldViews = emptyList()
+                belowFoldRestored = true
+                renderCatalogSections(root)
+            }
+        }, BELOW_FOLD_RESTORE_DELAY_MS)
     }
 
     private fun setupCatalogSections(root: View) {
@@ -231,6 +270,7 @@ class HomeTabFragment : Fragment(R.layout.fragment_home_tab), TabReselectionHand
         categoryCarousel = recycler
         recycler.layoutManager = LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
         recycler.adapter = categoriesAdapter
+        recycler.setHasFixedSize(true)
         recycler.isNestedScrollingEnabled = false
         recycler.clipToPadding = false
         recycler.overScrollMode = View.OVER_SCROLL_NEVER
@@ -273,7 +313,7 @@ class HomeTabFragment : Fragment(R.layout.fragment_home_tab), TabReselectionHand
                 delay(CATEGORY_AUTO_SCROLL_FRAME_MS)
                 if (!isAdded || recycler.adapter !== categoriesAdapter) continue
                 if (categoryAutoScrollPausedByUser || recycler.scrollState != RecyclerView.SCROLL_STATE_IDLE) continue
-                if (categoriesAdapter.itemCount <= MarketplaceCategories.featuredItems.size) continue
+                if (categoriesAdapter.itemCount <= HOME_FEATURED_CATEGORY_KEYS.size) continue
 
                 val range = recycler.computeHorizontalScrollRange()
                 val extent = recycler.computeHorizontalScrollExtent()
@@ -298,25 +338,45 @@ class HomeTabFragment : Fragment(R.layout.fragment_home_tab), TabReselectionHand
             )
         }
 
+    private fun homeCategoryItemsFast(): List<HomeCategoryItem> =
+        HOME_FEATURED_CATEGORY_KEYS.map { categoryKey ->
+            HomeCategoryItem(
+                label = MarketplaceCategories.displayNameForKnownKey(categoryKey),
+                imageUrl = "",
+                imageResId = MarketplaceCategories.imageResFor(categoryKey),
+                categoryKey = categoryKey,
+                badgeIconResId = badgeIconForTopLevelCategory(categoryKey)
+            )
+        }
+
     private fun refreshMarketplaceCategories() {
-        categoriesAdapter.submitList(homeCategoryItems())
+        categoriesAdapter.submitList(homeCategoryItemsFast())
         categoryCarousel?.post {
             categoryCarousel?.scrollToPosition(categoriesAdapter.centeredStartPosition())
         }
         viewLifecycleOwner.lifecycleScope.launch {
-            runCatching { MarketplaceCategories.refreshFromFirestore() }
-                .onSuccess {
-                    categoriesAdapter.submitList(homeCategoryItems())
-                    categoryCarousel?.post {
-                        categoryCarousel?.scrollToPosition(categoriesAdapter.centeredStartPosition())
-                    }
+            val cachedItems = withContext(Dispatchers.Default) { homeCategoryItems() }
+            categoriesAdapter.submitList(cachedItems)
+            categoryCarousel?.post {
+                categoryCarousel?.scrollToPosition(categoriesAdapter.centeredStartPosition())
+            }
+            if (runCatching { MarketplaceCategories.refreshFromFirestore() }.isSuccess) {
+                val refreshedItems = withContext(Dispatchers.Default) { homeCategoryItems() }
+                categoriesAdapter.submitList(refreshedItems)
+                categoryCarousel?.post {
+                    categoryCarousel?.scrollToPosition(categoriesAdapter.centeredStartPosition())
                 }
+            }
         }
     }
 
     private fun badgeIconForCategory(categoryKey: String): Int {
         val normalized = MarketplaceCategories.normalizeKey(categoryKey)
-        return when (MarketplaceCategories.categoryFor(normalized)?.topLevelId ?: normalized) {
+        return badgeIconForTopLevelCategory(MarketplaceCategories.categoryFor(normalized)?.topLevelId ?: normalized)
+    }
+
+    private fun badgeIconForTopLevelCategory(categoryKey: String): Int {
+        return when (categoryKey) {
             "fashion", "baby-and-toys" -> R.drawable.ic_home_category_shirt
             "home-and-furniture", "real-estate", "business-and-industrial" -> R.drawable.ic_home_category_lamp
             "beauty-and-health", "food-and-grocery", "sports-and-outdoors", "pets" -> R.drawable.ic_home_category_leaf
@@ -1034,8 +1094,19 @@ class HomeTabFragment : Fragment(R.layout.fragment_home_tab), TabReselectionHand
         const val CATEGORY_AUTO_SCROLL_FRAME_MS = 32L
         const val CATEGORY_AUTO_SCROLL_STEP_PX = 2
         const val CATEGORY_AUTO_SCROLL_RESET_EDGE_PX = 600
+        const val BELOW_FOLD_RESTORE_DELAY_MS = 750L
         const val HOME_HERO_STORAGE_PREFIX =
             "https://firebasestorage.googleapis.com/v0/b/fatiweb-marketplace.firebasestorage.app/o/category-images%2F"
+        val HOME_FEATURED_CATEGORY_KEYS = listOf(
+            "electronics",
+            "fashion",
+            "home-and-furniture",
+            "beauty-and-health",
+            "automotive",
+            "real-estate",
+            "jobs-and-services",
+            "food-and-grocery"
+        )
     }
 
 

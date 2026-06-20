@@ -42,6 +42,7 @@ import isim.ia2y.myapplication.voice.FatiVoiceGeminiService
 import isim.ia2y.myapplication.voice.FatiVoicePreferences
 import isim.ia2y.myapplication.voice.FatiVoiceService
 import isim.ia2y.myapplication.voice.FatiVoiceWaveView
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
@@ -164,7 +165,6 @@ class MainActivity : AppCompatActivity() {
         setupBottomNav()
         setupTabLoadingUi()
         setupMessagingEntry()
-        setupFatiVoiceController()
         applyFatiVoiceDebugPrefs(intent)
 
         currentTab = savedInstanceState?.getString(KEY_SELECTED_TAB)
@@ -187,9 +187,6 @@ class MainActivity : AppCompatActivity() {
         }
         setupFatiVoiceButton()
         registerFatiVoiceDebugReceiver()
-        maybeShowFatiVoiceIntro()
-        promptFatiVoicePermissionsOnce()
-        handleFatiVoiceDebugIntent(intent)
         startDeferredWorkAfterFirstFrame()
     }
 
@@ -739,7 +736,16 @@ class MainActivity : AppCompatActivity() {
         binding.root.post {
             binding.root.post {
                 if (!isFinishing && !isDestroyed) {
-                    AppStartupCoordinator.startDeferred(applicationContext)
+                    if (!::fatiVoiceController.isInitialized) {
+                        setupFatiVoiceController()
+                    }
+                    maybeShowFatiVoiceIntro()
+                    promptFatiVoicePermissionsOnce()
+                    handleFatiVoiceDebugIntent(intent)
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        (application as? MyApplication)?.configureFirebaseAfterFirstFrame()
+                        AppStartupCoordinator.startDeferred(applicationContext)
+                    }
                 }
             }
         }
@@ -827,6 +833,20 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun prepareInitialTabShell(tab: Tab) {
+        currentTab = tab
+        pendingTabSelection = null
+        loadingErrorTab = null
+        isTabLoading = false
+        showTabLoading(loading = false, errorMessage = null)
+        setBottomNavEnabled(true)
+        updateBottomNavSelection(tab)
+        binding.hostLayoutBottomNav.post {
+            updateTabIndicator(tab, animate = false)
+        }
+        updateHostCartBadge()
+    }
+
     private fun openInitialTabContent(tab: Tab) {
         runCatching {
             val target = supportFragmentManager.findFragmentByTag(tab.name) ?: createTabFragment(tab)
@@ -836,17 +856,7 @@ class MainActivity : AppCompatActivity() {
                     .add(R.id.hostFragmentContainer, target, tab.name)
                     .commitNow()
             }
-            currentTab = tab
-            pendingTabSelection = null
-            loadingErrorTab = null
-                isTabLoading = false
-                showTabLoading(loading = false, errorMessage = null)
-                setBottomNavEnabled(true)
-                updateBottomNavSelection(tab)
-                binding.hostLayoutBottomNav.post {
-                    updateTabIndicator(tab, animate = false)
-                }
-            updateHostCartBadge()
+            prepareInitialTabShell(tab)
         }.onFailure { error ->
             Log.e(TAG, "Failed to open initial tab: $tab", error)
             selectTab(tab, animate = false)
